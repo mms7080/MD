@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,29 +9,12 @@
   <meta property="og:description" content="수학 기반 자기주도 시스템으로 전과목 성장을 이끕니다." />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#2563eb" />
-  <link rel="stylesheet" href="home/index.css">
+  <link rel="stylesheet" href="home/home.css">
+  <link rel="stylesheet" th:href="@{header.css}">
 </head>
 <body class="body">
   <!-- Header -->
-  <header class="header">
-    <div class="container header__inner">
-      <div class="brand">
-        <div class="brand__logo">MD</div>
-        <div>
-          <div class="brand__name">엠디스카이</div>
-          <div class="brand__sub">수학으로 완성하는 자기주도 플랫폼</div>
-        </div>
-      </div>
-      <nav class="nav">
-        <a href="#programs" class="nav__a">프로그램</a>
-        <a href="#system" class="nav__a">학습시스템</a>
-        <a href="#results" class="nav__a">성과</a>
-        <a href="#about" class="nav__a">브랜드</a>
-        <a href="#contact" class="nav__a">상담/등록</a>
-      </nav>
-      <a href="#contact" class="btn btn--primary btn--sm">상담 신청</a>
-    </div>
-  </header>
+ <div th:replace="~{fragments/header :: siteHeader}"></div>
 
   <!-- Hero -->
   <section class="hero">
