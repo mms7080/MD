@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MD스카이 통합회원 로그인</title>
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="stylesheet" th:href="@{/auth/login.css}">
+</head>
+<body class="login-body">
+
+  <!-- 상단 바 -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__title">MD스카이 회원 로그인</div>
+      <a class="topbar__close" th:href="@{/}" aria-label="닫기">✕</a>
+    </div>
+  </header>
+
+  <!-- 로고 + 브랜드(가로) -->
+  <div class="brand">
+    <div class="brand__logo">MD</div>
+    <div class="brand__name">엠디스카이</div>
+  </div>
+
+  <!-- 중앙 카드 -->
+  <main class="wrap">
+    <section class="panel" role="dialog" aria-label="로그인">
+      <form class="form" th:action="@{/login}" method="post" autocomplete="on">
+        <input class="input" type="text" name="username"
+               placeholder="아이디(이메일) 또는 휴대폰 번호" required />
+
+        <div class="pw">
+          <input class="input" type="password" name="password"
+                 placeholder="비밀번호 (영문+숫자+특수문자 8~20자)" minlength="8" maxlength="20" required />
+          <button type="button" class="pw__hold" aria-label="비밀번호 보기(누르는 동안)">보기</button>
+        </div>
+
+        <button type="submit" class="btn btn--primary">로그인</button>
+
+        <div class="divider"><span>SNS 계정으로 로그인</span></div>
+
+        <!-- SNS (아이콘 포함) -->
+        <div class="sns">
+          <a href="#" class="sns__btn sns--kakao" aria-label="카카오 로그인">
+            <img class="sns__ico" th:src="@{/auth/icons/kakao.svg}" alt="카카오" />
+          </a>
+          <a href="#" class="sns__btn sns--naver" aria-label="네이버 로그인">
+            <img class="sns__ico" th:src="@{/auth/icons/naver.svg}" alt="네이버" />
+          </a>
+          <a href="#" class="sns__btn sns--google" aria-label="구글 로그인">
+            <img class="sns__ico" th:src="@{/auth/icons/google.svg}" alt="구글" />
+          </a>
+          <a href="#" class="sns__btn sns--apple" aria-label="애플 로그인">
+            <img class="sns__ico" th:src="@{/auth/icons/apple.svg}" alt="애플" />
+          </a>
+        </div>
+
+        <!-- 계정찾기 / 회원가입: 그대로 유지 -->
+        <div class="sub-links">
+          <a th:href="@{/account/find}">계정찾기</a>
+          <span class="sep">|</span>
+          <a th:href="@{/signup}">회원가입</a>
+        </div>
+      </form>
+
+      <!-- 푸터 링크: 모달 오픈으로 변경 -->
+      <footer class="legal">
+        <a href="#" id="openPrivacy" data-modal-open="privacy" role="button">개인정보처리방침</a>
+        <span class="sep">|</span>
+        <a href="#" id="openTerms" data-modal-open="terms" role="button">이용약관</a>
+        <span class="copy">© <span id="year">2025</span> MD SKY All Rights Reserved</span>
+      </footer>
+    </section>
+  </main>
+
+  <!-- ========== 모달들 (오버레이 없음 / 배경 스크롤 가능) ========== -->
+  <!-- 개인정보처리방침 -->
+  <section id="modal-privacy" class="modal" aria-hidden="true" aria-labelledby="privacyTitle" role="dialog">
+    <div class="modal__card" tabindex="-1">
+      <div class="modal__head">
+        <h3 id="privacyTitle" class="modal__title">개인정보처리방침</h3>
+        <button class="modal__close" type="button" data-modal-close aria-label="닫기">✕</button>
+      </div>
+      <div class="modal__body">
+        <p class="muted">여기에 개인정보처리방침 본문이 들어갑니다. (추후 실제 내용 대체)</p>
+        <ul class="modal__list">
+          <li>수집 항목, 이용 목적, 보유 기간</li>
+          <li>제3자 제공 및 처리위탁</li>
+          <li>개인정보 보호를 위한 기술적, 관리적 조치</li>
+        </ul>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--light" type="button" data-modal-close>확인</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 이용약관 -->
+  <section id="modal-terms" class="modal" aria-hidden="true" aria-labelledby="termsTitle" role="dialog">
+    <div class="modal__card" tabindex="-1">
+      <div class="modal__head">
+        <h3 id="termsTitle" class="modal__title">이용약관</h3>
+        <button class="modal__close" type="button" data-modal-close aria-label="닫기">✕</button>
+      </div>
+      <div class="modal__body">
+        <p class="muted">여기에 이용약관 본문이 들어갑니다. (추후 실제 내용 대체)</p>
+        <ol class="modal__list">
+          <li>서비스 이용 계약의 성립</li>
+          <li>회원의 의무 및 계정 관리</li>
+          <li>서비스 제공, 변경, 중단</li>
+        </ol>
+      </div>
+      <div class="modal__foot">
+        <button class="btn btn--light" type="button" data-modal-close>확인</button>
+      </div>
+    </div>
+  </section>
+
+  <script th:src="@{/auth/login.js}"></script>
+</body>
+</html>
