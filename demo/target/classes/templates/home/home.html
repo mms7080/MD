@@ -1,329 +1,132 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" data-theme="light">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>엠디스카이 | 수학으로 완성하는 자기주도 플랫폼</title>
-  <meta name="description" content="수학을 지렛대로 국어·영어까지 확장하는 자기주도 학습 플랫폼 – 재수·고등·초중 전 학년 맞춤 프로그램" />
-  <meta property="og:title" content="엠디스카이 – 수학으로 완성하는 자기주도 플랫폼" />
-  <meta property="og:description" content="수학 기반 자기주도 시스템으로 전과목 성장을 이끕니다." />
-  <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#2563eb" />
-  <link rel="stylesheet" href="home/home.css">
-  <link rel="stylesheet" th:href="@{header.css}">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>kafolio – Home</title>
+  <meta name="description" content="웹페이지 제작 포트폴리오 갤러리" />
+  <link rel="stylesheet" href="home/home.css" />
+  <link rel="stylesheet" href="header.css" />
+<!-- <head> 안의 파비콘 교체 -->
+<link rel="icon" type="image/x-icon" href="https://kafolio.kr/static/icon.ico" />
+
 </head>
-<body class="body">
-  <!-- Header -->
- <div th:replace="~{fragments/header :: siteHeader}"></div>
+<body data-page="home">
+  <a class="skip-link" href="#content">본문 바로가기</a>
 
-  <!-- Hero -->
+  <!-- 헤더 -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <!-- 헤더 로고: 기존 점(●) 대신 아이콘 이미지 -->
+<a class="brand" href="home.html" aria-label="홈으로">
+  <img class="brand-mark" src="https://kafolio.kr/static/icon.ico" alt="" width="20" height="20" />
+  <span class="brand-text">kafolio</span>
+</a>
+
+
+      <nav class="nav">
+        <button class="nav-toggle" aria-expanded="false" aria-controls="primary-menu" aria-label="메뉴 열기">
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+        </button>
+        <ul id="primary-menu" class="nav-list">
+          <li><a href="home.html" class="is-active">home</a></li> 
+          <li><a href="detail.html">detail</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+  <button id="btnTheme" class="btn ghost" aria-pressed="false" aria-label="다크모드 전환">🌓</button>
+  <a href="login.html" class="btn ghost">로그인</a>
+  <a href="signup.html" class="btn primary">회원가입</a>
+</div>
+
+    </div>
+  </header>
+
+  <!-- 히어로 -->
   <section class="hero">
-    <div class="hero__bg"></div>
-    <div class="container hero__inner">
-      <div class="hero__grid">
-        <div>
-          <span class="chip chip--blue">수학 기반 전과목 확장형</span>
-          <h1 class="hero__title">
-            수학을 지렛대로, <br>
-            <span class="txt-blue">자기주도</span>를 완성하고
-            <br class="hide-sm" /> 전과목 성장을 만듭니다.
-          </h1>
-          <p class="muted max-w">
-            엠디스카이는 수학을 통해 계획·실행·피드백의 루틴을 확립하고, 국어·영어까지 확장하는 학습 플랫폼입니다. 재수·고등·초중 전 학년을 위한 체계적인 코칭을 제공합니다.
-          </p>
-          <div class="btn-row">
-            <a href="#contact" class="btn btn--primary">무료 상담 신청</a>
-            <a href="#programs" class="btn btn--ghost">프로그램 살펴보기</a>
-          </div>
-          <div class="hero__stats">
-            <div class="stat">
-              <div class="stat__num">93%</div>
-              <div class="stat__label">12주 내 루틴 정착</div>
-            </div>
-            <div class="stat">
-              <div class="stat__num">+24점</div>
-              <div class="stat__label">평균 수학 향상</div>
-            </div>
-            <div class="stat">
-              <div class="stat__num">78%</div>
-              <div class="stat__label">국·영 동반 상승</div>
-            </div>
+    <div class="container hero-inner">
+      <h1>웹 제작 포트폴리오, 한 곳에.</h1>
+      <p class="hero-sub">Landing · Product · Admin · Campaign—최신 작업을 기술 스택과 키워드로 탐색하세요.</p>
+      <form id="heroSearch" class="hero-search" role="search" aria-label="포트폴리오 검색">
+        <input id="searchInputHero" type="search" placeholder="키워드, 태그, 크리에이터 검색" autocomplete="off" />
+        <button type="submit" class="btn primary">검색</button>
+      </form>
+      <ul class="hero-tags" aria-label="빠른 태그">
+        <li><button class="tag" data-tag="Landing">#Landing</button></li>
+        <li><button class="tag" data-tag="Admin">#Admin</button></li>
+        <li><button class="tag" data-tag="SEO">#SEO</button></li>
+        <li><button class="tag" data-tag="Accessibility">#Accessibility</button></li>
+        <li><button class="tag" data-tag="Animation">#Animation</button></li>
+      </ul>
+    </div>
+  </section>
+
+  <main id="content">
+    <!-- 목록 툴바 -->
+    <section id="section-projects" class="toolbar">
+      <div class="container toolbar-inner">
+        <div class="filters">
+          <div class="search-inline">
+            <input id="searchInput" type="search" placeholder="검색어를 입력하세요 (팀명/제목/태그)" aria-label="목록 검색" />
           </div>
         </div>
-
-        <div>
-          <div class="card glass">
-            <div class="card__title">12주 수학 향상 트렌드 (예시)</div>
-
-            <!-- SVG Line/Area Chart (JS 없이) -->
-            <div class="chart">
-              <svg viewBox="0 0 600 230" role="img" aria-label="수학 점수 추이">
-                <!-- grid -->
-                <g stroke="#e2e8f0" stroke-width="1">
-                  <line x1="0" y1="40" x2="600" y2="40"/>
-                  <line x1="0" y1="80" x2="600" y2="80"/>
-                  <line x1="0" y1="120" x2="600" y2="120"/>
-                  <line x1="0" y1="160" x2="600" y2="160"/>
-                  <line x1="0" y1="200" x2="600" y2="200"/>
-                </g>
-                <!-- area (62,68,74,81,86) mapped to y (높을수록 위) -->
-                <!-- normalize: 50->200px, 100->20px  -->
-                <defs>
-                  <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#2563eb" stop-opacity="0.25"/>
-                    <stop offset="100%" stop-color="#2563eb" stop-opacity="0"/>
-                  </linearGradient>
-                </defs>
-                <path d="M0 200 
-                         L60 152 
-                         L180 136 
-                         L300 120 
-                         L420 101 
-                         L540 92 
-                         L600 230 
-                         L0 230 Z"
-                      fill="url(#area)"/>
-                <!-- line -->
-                <polyline fill="none" stroke="#2563eb" stroke-width="3"
-                  points="60,152 180,136 300,120 420,101 540,92"/>
-                <!-- points -->
-                <g fill="#2563eb">
-                  <circle cx="60" cy="152" r="4"/><circle cx="180" cy="136" r="4"/>
-                  <circle cx="300" cy="120" r="4"/><circle cx="420" cy="101" r="4"/>
-                  <circle cx="540" cy="92" r="4"/>
-                </g>
-                <!-- x labels -->
-                <g fill="#64748b" font-size="12">
-                  <text x="52" y="222">1주</text>
-                  <text x="172" y="222">4주</text>
-                  <text x="292" y="222">8주</text>
-                  <text x="412" y="222">12주</text>
-                  <text x="532" y="222">16주</text>
-                </g>
-              </svg>
-            </div>
-
-            <ul class="list">
-              <li>✅ 오답 기반 맞춤 플랜으로 꾸준한 상승</li>
-              <li>✅ 주간 코칭 & 루틴 점검</li>
-              <li>✅ 전과목 확장: 국어·영어 학습 루틴 연동</li>
-            </ul>
-          </div>
+        <div class="sorts">
+          <label for="sortSelect" class="sr-only">정렬</label>
+          <select id="sortSelect" aria-label="정렬">
+            <option value="latest">최신순</option>
+            <option value="popular">인기순</option>
+            <option value="title">제목순</option>
+          </select>
+          <button id="btnClear" class="btn ghost">초기화</button>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Programs -->
-  <section id="programs" class="section">
-    <div class="container">
-      <div class="center">
-        <div class="kicker">Programs</div>
-        <h2 class="h2">학년/목표별 맞춤 프로그램</h2>
-        <p class="muted">수학을 중심으로 자기주도 루틴을 정립하고, 국어·영어까지 확장합니다.</p>
+    <!-- 그리드 -->
+    <section class="container grid-wrap">
+      <div id="grid" class="grid" aria-live="polite" aria-busy="false"></div>
+      <div class="grid-footer">
+        <button id="btnLoadMore" class="btn" aria-controls="grid">더 보기</button>
+        <button id="btnToTop" class="fab" aria-label="맨 위로">↑</button>
       </div>
+    </section>
+  </main>
 
-      <!-- CSS-only Tabs -->
-      <div class="tabs">
-        <input type="radio" name="tab" id="tab-n" class="tabs__radio" checked>
-        <input type="radio" name="tab" id="tab-hs" class="tabs__radio">
-        <input type="radio" name="tab" id="tab-ms" class="tabs__radio">
-
-        <div class="tabs__bar">
-          <label for="tab-n"  class="tabs__btn">재수/N수</label>
-          <label for="tab-hs" class="tabs__btn">고등부</label>
-          <label for="tab-ms" class="tabs__btn">초·중등</label>
-          <span class="tabs__indicator"></span>
+  <!-- 상세 모달 -->
+  <dialog id="modal" class="modal" aria-labelledby="modalTitle">
+    <form method="dialog" class="modal-card">
+      <button class="modal-close" aria-label="닫기">×</button>
+      <figure class="modal-media">
+        <img id="modalImage" alt="" loading="lazy" />
+      </figure>
+      <div class="modal-body">
+        <h3 id="modalTitle"></h3>
+        <p id="modalDesc" class="modal-desc"></p>
+        <div class="modal-meta">
+          <div id="modalTags" class="tags"></div>
         </div>
-
-        <div class="tabs__panes">
-          <!-- N수 -->
-          <div class="grid3 tabs__pane pane--n">
-            <div class="card">
-              <div class="ico">🧭</div>
-              <div class="card__title sm">루틴 리빌드</div>
-              <p class="muted sm">플래너·타임블록·오답노트 재설계로 학습 시스템을 처음부터 다시 세웁니다.</p>
-            </div>
-            <div class="card">
-              <div class="ico">📊</div>
-              <div class="card__title sm">약점 집중 수학</div>
-              <p class="muted sm">진단-유형-난이도 매핑으로 효율적인 점수 상승을 설계합니다.</p>
-            </div>
-            <div class="card">
-              <div class="ico">📖</div>
-              <div class="card__title sm">전과목 확장</div>
-              <p class="muted sm">수학 루틴을 국어·영어 독해/문법/어휘로 연결해 전체 성과를 끌어올립니다.</p>
-            </div>
-          </div>
-
-          <!-- 고등부 -->
-          <div class="grid3 tabs__pane pane--hs">
-            <div class="card">
-              <div class="ico">🎓</div>
-              <div class="card__title sm">내신·수능 동시관리</div>
-              <p class="muted sm">단원별 기출·서술형 대비와 개념-문제-오답의 3단 루틴으로 안정화.</p>
-            </div>
-            <div class="card">
-              <div class="ico">📈</div>
-              <div class="card__title sm">주간 코칭</div>
-              <p class="muted sm">학습 데이터 기반 주간 피드백과 목표 점검으로 꾸준함을 만듭니다.</p>
-            </div>
-            <div class="card">
-              <div class="ico">🧠</div>
-              <div class="card__title sm">사고력 → 표현력</div>
-              <p class="muted sm">수학적 사고를 국어 논증·영어 논리독해로 전이합니다.</p>
-            </div>
-          </div>
-
-          <!-- 초·중등 -->
-          <div class="grid3 tabs__pane pane--ms">
-            <div class="card">
-              <div class="ico">🛡️</div>
-              <div class="card__title sm">기초 탄탄</div>
-              <p class="muted sm">연산·도형의 기초 체력을 키우고 스스로 점검하는 습관을 형성합니다.</p>
-            </div>
-            <div class="card">
-              <div class="ico">🧭</div>
-              <div class="card__title sm">자기관리 습관</div>
-              <p class="muted sm">숙제 계획·자가 점검·보상 루프 설계로 자기주도 기반을 완성합니다.</p>
-            </div>
-            <div class="card">
-              <div class="ico">📚</div>
-              <div class="card__title sm">읽기·쓰기 연결</div>
-              <p class="muted sm">수학 스토리텔링 학습을 국어 독서·영어 리딩으로 자연스럽게 확장.</p>
-            </div>
-          </div>
+        <div class="modal-actions">
+          <a id="modalLink" class="btn" href="#" target="_blank" rel="noopener">원본 보기</a>
+          <button class="btn ghost" value="cancel">닫기</button>
         </div>
       </div>
-    </div>
-  </section>
+    </form>
+  </dialog>
 
-  <!-- Learning System -->
-  <section id="system" class="section section--alt">
-    <div class="container">
-      <div class="center">
-        <div class="kicker">System</div>
-        <h2 class="h2">수학 기반 자기주도 학습 시스템</h2>
-        <p class="muted">진단 → 계획 → 실행 → 오답 분석 → 피드백 → 확장의 선순환을 만듭니다.</p>
-      </div>
-
-      <div class="grid3 grid3--rows2">
-        <div class="card"><div class="ico lg">📊</div><div class="card__title sm">① 진단 & 목표설정</div><p class="muted sm">개념·유형 진단으로 현재 위치를 파악하고 주차별 목표를 수립.</p></div>
-        <div class="card"><div class="ico lg">🗓️</div><div class="card__title sm">② 계획 & 루틴화</div><p class="muted sm">타임블록·플래너·스터디 플랜으로 하루·주간 실행계획을 시각화.</p></div>
-        <div class="card"><div class="ico lg">⏱️</div><div class="card__title sm">③ 실행 & 체크인</div><p class="muted sm">집중 시간 관리(Pomodoro)와 체크리스트로 실행력을 강화.</p></div>
-        <div class="card"><div class="ico lg">🔁</div><div class="card__title sm">④ 오답 & 리마스터</div><p class="muted sm">오답 태깅과 재학습(스파이럴)로 약점을 자산으로 전환.</p></div>
-        <div class="card"><div class="ico lg">🤝</div><div class="card__title sm">⑤ 코칭 & 피드백</div><p class="muted sm">데이터 기반 1:1 코칭으로 습관과 성과를 동시에 관리.</p></div>
-        <div class="card"><div class="ico lg">🧩</div><div class="card__title sm">⑥ 전과목 확장</div><p class="muted sm">국어·영어 학습을 수학 루틴에 연결해 전과목 성장을 완성.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Results -->
-  <section id="results" class="section">
-    <div class="container">
-      <div class="center">
-        <div class="kicker">Outcomes</div>
-        <h2 class="h2">성과와 변화</h2>
-        <p class="muted">루틴이 성과를 만듭니다. 데이터로 확인하세요.</p>
-      </div>
-
-      <div class="grid3">
-        <div class="card">
-          <div class="card__title">12주 향상 사례</div>
-          <p class="muted sm">재수 N 학생: 수학 3→1등급, 국어 4→2등급. 주간 코칭과 오답 리마스터 루틴 정착.</p>
-          <p class="muted sm mt">고2 H 학생: 내신 2.8→1.5, 영어 독해 속도 20% 향상.</p>
-        </div>
-        <div class="card">
-          <div class="card__title">학부모 후기</div>
-          <p class="muted sm">“스스로 계획하고 점검하는 습관이 생겼어요. 성적은 물론 생활 리듬이 안정됐습니다.”</p>
-          <p class="muted sm mt">“수학 공부가 국어·영어까지 영향을 주는 걸 실제로 느꼈어요.”</p>
-        </div>
-        <div class="card">
-          <div class="card__title">관리 지표</div>
-          <ul class="list">
-            <li>✅ 주간 목표 달성률</li>
-            <li>✅ 오답 회복 리드타임</li>
-            <li>✅ 집중시간(Deep Work) 누적</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Brand Story -->
-  <section id="about" class="section section--alt">
-    <div class="container">
-      <div class="center">
-        <div class="kicker">Brand</div>
-        <h2 class="h2">수학은 침묵의 언어</h2>
-      </div>
-      <div class="copy">
-        <p class="lg">수학은 침묵의 언어입니다. 눈에 보이지 않지만 세상의 원리를 설명하는 가장 강력한 도구입니다. 엠디스카이는 이 침묵의 언어를 스스로 해석하는 힘을 길러, 학생이 주체적으로 성장하도록 돕습니다.</p>
-        <p class="mt">우리는 공식을 암기하는 대신, 문제 해결의 과정을 설계합니다. 진단과 계획, 실행과 오답, 피드백과 확장의 선순환을 통해 수학적 사고력을 키우고, 그 힘을 국어·영어 학습으로 확장합니다.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Banner -->
-  <section class="cta">
-    <div class="container">
-      <div class="cta__box">
-        <div>
-          <h3 class="h3">수학으로 시작해 전과목을 완성하세요</h3>
-          <p class="cta__sub">지금 무료 상담을 신청하시면 학습 진단과 맞춤 플랜을 제시해드립니다.</p>
-        </div>
-        <a href="#contact" class="btn btn--light">무료 상담 신청</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact -->
-  <section id="contact" class="section section--border">
-    <div class="container">
-      <div class="center">
-        <div class="kicker">Contact</div>
-        <h2 class="h2">상담 및 등록</h2>
-        <p class="muted">아래 폼을 작성해 주시면 담당 코치가 연락드립니다.</p>
-      </div>
-
-      <div class="grid2">
-        <div class="card">
-          <div class="card__title">상담 신청 폼</div>
-          <!-- 폼은 데모용(동작 없이 시각만 동일) -->
-          <form class="form">
-            <div class="grid2 gap">
-              <input class="input" placeholder="학생 이름" required />
-              <input class="input" placeholder="학년 (예: 고2, 중3, N수)" required />
-            </div>
-            <input type="tel" class="input" placeholder="연락처 (숫자만)" required />
-            <input type="email" class="input" placeholder="이메일 (선택)" />
-            <textarea class="input textarea" rows="4" placeholder="상담 희망 내용 / 목표 (예: 수학 2→1등급, 루틴 점검 등)"></textarea>
-            <button type="button" class="btn btn--primary">상담 신청하기</button>
-          </form>
-          <p class="help">* 제출 시 담당 코치가 영업일 기준 1일 내 연락드립니다.</p>
-          <div class="toast">제출되었습니다! 빠르게 연락드릴게요.</div>
-        </div>
-
-        <div class="card info">
-          <div class="card__title">위치 및 연락처</div>
-          <div>📞 02-000-0000</div>
-          <div>✉️ hello@mdsky.academy</div>
-          <div class="map">지도 영역 (네이버/구글 지도 연동)</div>
-          <div class="time">🗓️ 상담 가능: 평일 13:00–21:00 / 토 10:00–17:00</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container footer__inner">
-      <div class="brand brand--small">
-        <div class="brand__logo brand__logo--sm">MD</div>
-        <div class="foot-txt">© <span id="year">2025</span> 엠디스카이 | 수학으로 완성하는 자기주도 플랫폼</div>
-      </div>
-      <div class="foot-sub">개인정보처리방침 · 이용약관</div>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> kafolio. All rights reserved.</p>
+      <ul class="footer-links">
+        <li><a href="#">이용약관</a></li>
+        <li><a href="#">개인정보처리방침</a></li>
+        <li><a href="#">도움말</a></li>
+      </ul>
     </div>
   </footer>
+
+  <script src="home/home.js"></script>
 </body>
 </html>
