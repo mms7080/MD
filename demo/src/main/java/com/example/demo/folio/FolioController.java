@@ -36,7 +36,7 @@ public class FolioController {
             "portfolios", List.of("포트폴리오1", "포트폴리오2"),
             "introduction", "안녕하세요 신입 개발자 송준회입니다."
         );
-        return "folios/detail";
+        return "detail";
     }
 
     // 3. 작성 페이지(/folios/write)

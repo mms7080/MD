@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${project != null} ? ${project.title} : '포트폴리오 없음'">Portfolio</title>
+  <link rel="stylesheet" href="/detail/portfolio-detail.css">
+  
+</head>
+
+<body>
+<main class="container">
+
+  <!-- ❌ Not Found -->
+  <div th:if="${notFound}" class="error-box">
+    <h1>포트폴리오를 찾을 수 없습니다.</h1>
+    <a href="/home">← 홈으로</a>
+  </div>
+
+  <!-- ✅ Portfolio Content -->
+  <div th:if="${project != null}" class="card">
+  
+    <h1 class="title" th:text="${project.title}">제목</h1>
+  <p class="creator">작성자: <span th:text="${project.creator}"></span></p>
+      
+    </div>
+    <div class="highlight-box">
+      <!-- 여기 안에 강조하고 싶은 콘텐츠들 -->
+    
+    <!-- 🖼 이미지 슬라이더 -->
+    <div class="carousel-container">
+      <div class="carousel-track">
+        
+          <img th:each="img : ${project.screenshots}" th:src="${img}" class="carousel-item" />
+        
+        </div>
+      <button class="carousel-btn prev">‹</button>
+      <button class="carousel-btn next">›</button>
+    </div>
+
+    <!-- 이미지 확대 모달 -->
+<div id="imageModal" class="modal">
+  <span class="modal-close">&times;</span>
+  <img class="modal-content" id="modalImg">
+</div>
+
+</div>
+
+    <div>
+      <p class="desc" th:text="${project.desc}"></p>
+    </div>
+
+    <!-- 조회수  -->
+    <div class="view-count-box">
+      <span class="view-label">Views:</span>
+      <span id="viewCount">0</span>
+    </div>
+
+
+    <!-- 🏷️ 태그 -->
+    <div class="tags">
+      <strong>Tags:</strong>
+      <div class="tag-wrap">
+        <span th:each="tag : ${project.tags}" th:text="${tag}" class="tag"></span>
+      </div>
+    </div>
+
+  
+  
+
+   <!-- 👁️ 조회수 / ❤️ 좋아요 / 📅 작성일 -->
+
+
+    <!-- ❤️ 좋아요 -->
+    <div class="meta-bar">
+  <div class="meta-left">
+    <button id="likeBtn" class="like-btn" title="좋아요">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+           stroke-width="1.5" stroke="currentColor" class="heart-icon">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 
+              2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 
+              8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+      </svg>
+      <span id="likeCount" th:text="${project.likes}">0</span>
+    </button>
+  </div>
+
+  <div class="meta-right">
+    <span class="created-date">📅 <span th:text="${project.createdAt}"></span></span>
+  </div>
+</div>
+
+
+
+        <!-- 👥 팀원 소개 -->
+        <div class="team-section">
+          <h2 th:text="${#lists.isEmpty(project.team) ? 'Team' : project.team[0].teamName}">Team</h2>
+          <table class="team-table">
+            <tbody>
+              <tr th:each="member : ${project.team}">
+                <td class="member-name">
+                  <span th:text="|${member.name} (${member.role})|"></span>
+                </td>
+                <td class="member-parts">
+                  <span th:text="${#strings.listJoin(member.parts, ' / ')}"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+
+    <!-- 💬 댓글 -->
+    <div class="comment-section">
+      <h2>댓글</h2>
+      <form>
+        <textarea placeholder="댓글을 입력하세요..." rows="4"></textarea>
+        <button type="submit">등록</button>
+      </form>
+
+      <div class="comment"><p><strong>사용자1</strong>: 좋은 프로젝트네요!</p></div>
+      <div class="comment"><p><strong>사용자2</strong>: 디자인이 멋져요!</p></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- 🔗 JavaScript -->
+<script src="/detail/portfolio-detail.js"></script>
+
+
+</body>
+</html>

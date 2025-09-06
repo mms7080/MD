@@ -17,53 +17,45 @@ const sampleProjects = [
   { id:"p1", title:"핀테크 대시보드 리디자인", creator:"J. Kim",
     tags:["React","TypeScript","Tailwind","Dashboard","DesignSystem"], likes:128,
     createdAt:"2025-08-15", cover:"https://picsum.photos/seed/fin/800/500",
-    desc:"금융 데이터 시각화 중심의 관리자 대시보드 리디자인 프로젝트.", link:"https://example.com/fin" },
+    desc:"금융 데이터 시각화 중심의 관리자 대시보드 리디자인 프로젝트.", link:"/folio/1" },
   { id:"p2", title:"헬스케어 습관 트래커 웹앱", creator:"M. Lee",
     tags:["Next.js","React","Zustand","PWA","Analytics"], likes:203,
     createdAt:"2025-06-01", cover:"https://picsum.photos/seed/health/800/500",
-    desc:"개인 맞춤 습관 형성 UX를 반영한 웹앱. 오프라인 동기화 지원.", link:"https://example.com/health" },
+    desc:"개인 맞춤 습관 형성 UX를 반영한 웹앱. 오프라인 동기화 지원.", link:"/folio/2" },
   { id:"p3", title:"브랜드 사이트 – Cafe VERT", creator:"A. Park",
     tags:["Astro","Tailwind","SSR","SEO","Animation"], likes:96,
     createdAt:"2025-07-10", cover:"https://picsum.photos/seed/brand/800/500",
-    desc:"친환경 카페 브랜드의 모션 인터랙션과 SEO 최적화.", link:"https://example.com/vert" },
+    desc:"친환경 카페 브랜드의 모션 인터랙션과 SEO 최적화.", link:"/folio/3" },
   { id:"p4", title:"3D 제품 뷰어(웹)", creator:"D. Choi",
     tags:["Three.js","WebGL","React","Product","Viewer"], likes:310,
     createdAt:"2025-05-20", cover:"https://picsum.photos/seed/3d/800/500",
-    desc:"브라우저에서 회전/재질 변경 가능한 3D 제품 뷰어.", link:"https://example.com/3d" },
+    desc:"브라우저에서 회전/재질 변경 가능한 3D 제품 뷰어.", link:"/folio/4" },
   { id:"p5", title:"에듀테크 랜딩", creator:"S. Han",
     tags:["Next.js","TypeScript","A/B Test","Accessibility","Landing"], likes:77,
     createdAt:"2025-08-22", cover:"https://picsum.photos/seed/edu/800/500",
-    desc:"전환율 상승을 위한 메시지 구조와 접근성 개선.", link:"https://example.com/edu" },
+    desc:"전환율 상승을 위한 메시지 구조와 접근성 개선.", link:"/folio/5" },
   { id:"p6", title:"매거진 타이포 시스템(웹)", creator:"B. Yoo",
     tags:["Vue","Nuxt","SSR","Typography","WebFont"], likes:65,
     createdAt:"2025-02-18", cover:"https://picsum.photos/seed/type/800/500",
-    desc:"가독성 중심의 모듈형 타이포그래피 시스템.", link:"https://example.com/type" },
+    desc:"가독성 중심의 모듈형 타이포그래피 시스템.", link:"folio/6" },
   { id:"p7", title:"여행 계획 웹 서비스 UX 개편", creator:"H. Jung",
     tags:["React","Redux","REST","i18n","Admin"], likes:181,
     createdAt:"2025-04-02", cover:"https://picsum.photos/seed/travel/800/500",
-    desc:"검색→저장→공유 플로우 개선으로 예약 전환율 향상.", link:"https://example.com/travel" },
+    desc:"검색→저장→공유 플로우 개선으로 예약 전환율 향상.", link:"folio/7" },
   { id:"p8", title:"러닝 코치 대시보드", creator:"R. Kwon",
     tags:["Svelte","Node.js","Express","MongoDB","Realtime"], likes:142,
     createdAt:"2025-03-12", cover:"https://picsum.photos/seed/run/800/500",
-    desc:"센서 데이터 실시간 시각화와 사용자 피드백 모듈.", link:"https://example.com/run" },
+    desc:"센서 데이터 실시간 시각화와 사용자 피드백 모듈.", link:"/folio/8" },
   { id:"p9", title:"컴포넌트 문서화 시스템", creator:"Y. Song",
     tags:["Storybook","React","Testing","DesignSystem","CI/CD"], likes:54,
     createdAt:"2025-07-25", cover:"https://picsum.photos/seed/illu/800/500",
-    desc:"디자인 시스템 문서화와 테스트 자동화 파이프라인.", link:"https://example.com/illu" },
+    desc:"디자인 시스템 문서화와 테스트 자동화 파이프라인.", link:"/folio/9" },
 ];
 
 const formatDate = iso => new Date(iso).toLocaleDateString('ko-KR');
 
 // ===== 공통 헤더/테마 =====
-function applyTheme(theme){
-  document.documentElement.setAttribute("data-theme", theme);
-  const btn = $("#btnTheme"); if (btn) btn.setAttribute("aria-pressed", theme === "dark");
-}
-function toggleTheme(){
-  state.theme = state.theme === "dark" ? "light" : "dark";
-  localStorage.setItem("theme", state.theme);
-  applyTheme(state.theme);
-}
+
 function initHeader(){
   const themeBtn = $("#btnTheme");
   if (themeBtn) themeBtn.addEventListener("click", toggleTheme);

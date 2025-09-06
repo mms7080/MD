@@ -157,3 +157,16 @@ select{height:38px;border-radius:10px;border:1px solid var(--border);background:
 
 /* detail도 home과 동일한 3열(=12칸 그리드에서 카드 span 4) */
 body[data-page="detail"] .grid .card { grid-column: span 4; }
+
+
+.modal-body,
+.modal-body h3,
+.modal-desc,
+.modal-meta,
+.modal-actions,
+.modal-actions .btn,
+.modal-actions .btn.ghost,
+.modal-tags,
+.modal-close {
+  color: var(--text);
+}
