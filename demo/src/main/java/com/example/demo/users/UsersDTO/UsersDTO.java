@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserDTO {
+public class UsersDTO {
 
     public interface Create {}
     public interface Update {}
@@ -29,6 +29,7 @@ public class UserDTO {
     @NotBlank(message = "이름이 작성되지 않았습니다.", groups = Create.class)
     private String name;
 
+    @NotBlank(message = "이메일은 필수입니다.", groups = Create.class)
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email; 
 }
