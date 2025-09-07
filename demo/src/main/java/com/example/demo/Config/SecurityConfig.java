@@ -41,10 +41,10 @@ public class SecurityConfig {
 
             .formLogin(form -> form
                 .loginPage("/signin")              // 커스텀 로그인 페이지 (GET)
-                .loginProcessingUrl("/api/signin") // 로그인 처리 (POST) — Spring Security가 가로채 처리
+                .loginProcessingUrl("/signin") 
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/", false)     // 원래 가려던 페이지 우선
+                .defaultSuccessUrl("/", true)     // 원래 가려던 페이지 우선
                 .failureUrl("/signin?error=true")
                 .permitAll()
             )
