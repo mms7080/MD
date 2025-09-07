@@ -16,11 +16,16 @@ public class Project {
     private List<String> screenshots;
     
     private List<TeamMember> team;
+
+    private String icon; // 팀 아이콘
+    private String link; // 실제 접속 경로
+    private String download; // 코드 다운로드 폴더 
     
 
     // 생성자에 포함
     public Project(String id, String title, String creator, List<String> tags, int likes,
-                   String createdAt, String cover, String desc, List<String> screenshots,List<TeamMember> team) {
+                   String createdAt, String cover, String desc, List<String> screenshots,List<TeamMember> team
+                   ,String icon, String link, String download) {
         this.id = id;
         this.title = title;
         this.creator = creator;
@@ -31,6 +36,9 @@ public class Project {
         this.desc = desc;
         this.screenshots = screenshots;
         this.team = team;
+        this.icon = icon;
+        this.link = link;
+        this.download = download;
     }
 
     // Getter (Thymeleaf는 getter 메서드 기준으로 속성을 찾습니다)
@@ -44,4 +52,7 @@ public class Project {
     public String getDesc() { return desc; }
     public List<String> getScreenshots() { return screenshots; }
     public List<TeamMember> getTeam() { return team; }
+    public String getIcon() { return icon; }
+    public String getLink() { return link; }
+    public String getDownload() { return download; }
 }

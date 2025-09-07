@@ -14,10 +14,10 @@ const MAX_TAGS_PER_CARD = 3;
 
 // 데모 데이터
 const sampleProjects = [
-  { id:"p1", title:"핀테크 대시보드 리디자인", creator:"J. Kim",
-    tags:["React","TypeScript","Tailwind","Dashboard","DesignSystem"], likes:128,
-    createdAt:"2025-08-15", cover:"https://picsum.photos/seed/fin/800/500",
-    desc:"금융 데이터 시각화 중심의 관리자 대시보드 리디자인 프로젝트.", link:"/folio/1" },
+  { id:"p1", title:"Pawple", creator:"J. Kim",
+    tags:["React","SpringBoot","Tailwind","JPA","Lombok"], likes:98,
+    createdAt:"2025-08-15", cover:"https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png",
+    desc:"반려동물 건강관리 및 펫 스토어", link:"/folio/1" },
   { id:"p2", title:"헬스케어 습관 트래커 웹앱", creator:"M. Lee",
     tags:["Next.js","React","Zustand","PWA","Analytics"], likes:203,
     createdAt:"2025-06-01", cover:"https://picsum.photos/seed/health/800/500",
@@ -30,10 +30,10 @@ const sampleProjects = [
     tags:["Three.js","WebGL","React","Product","Viewer"], likes:310,
     createdAt:"2025-05-20", cover:"https://picsum.photos/seed/3d/800/500",
     desc:"브라우저에서 회전/재질 변경 가능한 3D 제품 뷰어.", link:"/folio/4" },
-  { id:"p5", title:"에듀테크 랜딩", creator:"S. Han",
-    tags:["Next.js","TypeScript","A/B Test","Accessibility","Landing"], likes:77,
-    createdAt:"2025-08-22", cover:"https://picsum.photos/seed/edu/800/500",
-    desc:"전환율 상승을 위한 메시지 구조와 접근성 개선.", link:"/folio/5" },
+  { id:"p5", title:"Filmora", creator:"S. Han",
+    tags:["Next.js","SpringBoot","React","VSCode","JPA"], likes:77,
+    createdAt:"2025-08-22", cover:"https://kafolio.kr/static/requests/2025/7/9/boards/ZTI0YmNkZTMxMjIzY2VkNmRlYmFkZDYyY2M4M2Q2NDJlNTE2MTdmZGUzZDE3MWVkMmE1ZTMxYTc0YjBmNWQ4Yw==.png",
+    desc:"영화 예매 및 스토어 이벤트.", link:"/folio/5" },
   { id:"p6", title:"매거진 타이포 시스템(웹)", creator:"B. Yoo",
     tags:["Vue","Nuxt","SSR","Typography","WebFont"], likes:65,
     createdAt:"2025-02-18", cover:"https://picsum.photos/seed/type/800/500",
@@ -46,10 +46,10 @@ const sampleProjects = [
     tags:["Svelte","Node.js","Express","MongoDB","Realtime"], likes:142,
     createdAt:"2025-03-12", cover:"https://picsum.photos/seed/run/800/500",
     desc:"센서 데이터 실시간 시각화와 사용자 피드백 모듈.", link:"/folio/8" },
-  { id:"p9", title:"컴포넌트 문서화 시스템", creator:"Y. Song",
-    tags:["Storybook","React","Testing","DesignSystem","CI/CD"], likes:54,
-    createdAt:"2025-07-25", cover:"https://picsum.photos/seed/illu/800/500",
-    desc:"디자인 시스템 문서화와 테스트 자동화 파이프라인.", link:"/folio/9" },
+  { id:"p9", title:"ModeMe", creator:"Y. Song",
+    tags:["JAVA","HTML","THYMELEAF","JS","SPRING"], likes:54,
+    createdAt:"2025-07-25", cover:"https://kafolio.kr/static/requests/2025/3/27/boards/OTZjOTNiYWJkMjNhMjA0ZTI2MGI1YWZmMmNiYTlhNmVmOGZlODJlYjlhODBkNmU0OTdjZmY3ZTM1MmNmMTI2Mg==.jpg",
+    desc:"20대 남성 전문 쇼핑몰" },
 ];
 
 const formatDate = iso => new Date(iso).toLocaleDateString('ko-KR');

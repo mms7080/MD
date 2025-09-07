@@ -20,34 +20,59 @@
   <div th:if="${project != null}" class="card">
   
     <h1 class="title" th:text="${project.title}">제목</h1>
-  <p class="creator">작성자: <span th:text="${project.creator}"></span></p>
-      
-    </div>
-    <div class="highlight-box">
+    
+    <!-- 기존 <p class="creator">...</p> 과 meta-right(작성일) 대신 사용 -->
+      <p class="header-meta">
+        <span class="creator-name">
+          Writer: <span th:text="${project.creator}"></span>
+        </span>
+        <span class="created-date"> WriterDate: <span th:text="${project.createdAt}"></span></span>
+      </p>
+    
       <!-- 여기 안에 강조하고 싶은 콘텐츠들 -->
     
-    <!-- 🖼 이미지 슬라이더 -->
-    <div class="carousel-container">
-      <div class="carousel-track">
-        
-          <img th:each="img : ${project.screenshots}" th:src="${img}" class="carousel-item" />
-        
+      <!-- 🖼 썸네일 카드 그리드 -->
+      <!-- 프로젝트 스크린샷 개수 사용 -->
+        <div class="gallery-box">
+          <div class="thumb-grid"
+              th:style="'--cols:' + ${#lists.size(project.screenshots)}">
+            <div class="thumb-card" th:each="img : ${project.screenshots}">
+              <img th:src="${img}" th:attr="data-original=${img}" class="thumb" alt="screenshot">
+            </div>
+          </div>
         </div>
-      <button class="carousel-btn prev">‹</button>
-      <button class="carousel-btn next">›</button>
+
+
+      <!-- 🔍 라이트박스 모달 (반드시 body 직속) -->
+    <!-- 🔍 라이트박스 모달 (반드시 body 직속) -->
+    <div id="lightbox" class="lightbox" hidden aria-hidden="true">
+      <button class="lb-btn lb-prev" aria-label="이전">‹</button>
+    
+      <div class="lb-content">
+        <button class="lb-btn lb-close" aria-label="닫기">×</button>
+        <img class="lb-img" alt="preview" />
+      </div>
+    
+      <button class="lb-btn lb-next" aria-label="다음">›</button>
     </div>
 
-    <!-- 이미지 확대 모달 -->
-<div id="imageModal" class="modal">
-  <span class="modal-close">&times;</span>
-  <img class="modal-content" id="modalImg">
-</div>
 
-</div>
+
 
     <div>
       <p class="desc" th:text="${project.desc}"></p>
     </div>
+
+    <!-- 요약 섹션 래퍼 -->
+<div class="summary-grid">
+  <!-- 왼쪽: 기존 내용 전부를 이 div 안으로 옮겨 주세요 -->
+  <div class="summary-left">
+
+    <!-- 접속 링크 -->
+    <div class="links">
+      <span class="link-label">Link : </span>
+      <a th:href="${project.link}" target="_blank" th:text="${project.link}" class="custom-link"></a>
+     </div>
 
     <!-- 조회수  -->
     <div class="view-count-box">
@@ -85,29 +110,58 @@
     </button>
   </div>
 
-  <div class="meta-right">
-    <span class="created-date">📅 <span th:text="${project.createdAt}"></span></span>
+  
+</div>
+
+    <!-- 다운로드 -->
+     <div class="downloads">
+      <span class="download-label">Download : </span>
+      <a th:href="${project.download}" download th:text="${project.download}" class="download-link"></a>
+    </div>
+
   </div>
+  <!-- 오른쪽: 아이콘(있을 때만) -->
+  <aside class="summary-logo" th:if="${project.icon}">
+    <figure class="logo-card" title="Project Logo">
+      <img th:src="${project.icon}"
+           th:alt="|${project.title} 아이콘|"
+           loading="lazy" decoding="async">
+    </figure>
+  </aside>
+</div>
+    
+
+
+
+      <!-- 👥 팀원 소개 (전체 2열 그리드) -->
+<div class="team-section">
+  <h2 th:text="${#lists.isEmpty(project.team) ? 'Team' : project.team[0].teamName}">Team</h2>
+
+
+  <!-- 팀원 -->
+   <div class="team-card">
+  <div class="team-rows">
+    <div class="team-row" th:each="member : ${project.team}">
+      <!-- 왼쪽: 이름 + 역할뱃지 -->
+      <div class="team-name-cell">
+        <span class="name" th:text="${member.name}">이름</span>
+        <span class="role-badge" th:text="${member.role}">Role</span>
+      </div>
+
+      <!-- 오른쪽: 담당(칩) / 텍스트형으로 원하면 아래 주석 참고 -->
+      <div class="team-parts-cell">
+        <span class="part-chip" th:each="p : ${member.parts}" th:text="${p}">파트</span>
+
+        <!-- ▽ 텍스트 형태 원하면 위 줄 대신 아래 한 줄만 사용
+        <span class="parts-text" th:text="${#strings.listJoin(member.parts, ' / ')}"></span>
+        -->
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 
-
-        <!-- 👥 팀원 소개 -->
-        <div class="team-section">
-          <h2 th:text="${#lists.isEmpty(project.team) ? 'Team' : project.team[0].teamName}">Team</h2>
-          <table class="team-table">
-            <tbody>
-              <tr th:each="member : ${project.team}">
-                <td class="member-name">
-                  <span th:text="|${member.name} (${member.role})|"></span>
-                </td>
-                <td class="member-parts">
-                  <span th:text="${#strings.listJoin(member.parts, ' / ')}"></span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
         
 
     <!-- 💬 댓글 -->
