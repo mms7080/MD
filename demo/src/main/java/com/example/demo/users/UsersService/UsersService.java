@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.users.UsersDTO.UsersDTO;
+import com.example.demo.users.UsersEntity.Role;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 
@@ -62,7 +63,9 @@ public class UsersService {
         users.setPassword(encodedPassword);
         users.setName(usersDTO.getName());
         users.setEmail(normalizedEmail);
-        // users.setEnabled(true); // 이메일 인증 후 활성화 등을 쓴다면
+        users.setAge(usersDTO.getAge());
+        users.setGender(usersDTO.getGender());
+        users.setRole(Role.USER);
 
         usersRepository.save(users);
     }

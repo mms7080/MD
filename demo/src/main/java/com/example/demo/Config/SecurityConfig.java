@@ -36,6 +36,16 @@ public class SecurityConfig {
                     "/send-code",
                     "/css/**", "/js/**", "/images/**", "/webjars/**"
                 ).permitAll()
+
+                // 관리자만 허용
+                // .requestMatchers().hasRole("ADMIN")
+
+                // 학생만 허용
+                // .requestMatchers().hasRole("STUDENT")
+
+                // 로그인 한 사용자만 접근 가능
+                //  .requestMatchers().authenticated()
+
                 .anyRequest().authenticated()
             )
 

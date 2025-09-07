@@ -2,6 +2,8 @@ package com.example.demo.users.UsersEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,7 +16,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "users")
 public class Users {
-     
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,7 +33,13 @@ public class Users {
     @Column(nullable = false, unique = true)
     private String email;
 
-     @Column(length = 10, nullable = false)
-    private String role = "user";
+    @Column(nullable = false)
+    private Integer age;
 
+    @Enumerated(EnumType.STRING)     // ✅ enum을 문자열로 저장
+    @Column(nullable = false, length = 10)
+    private Role role = Role.USER;   // ✅ 기본값 USER
+
+    @Column(nullable = false, length = 10)
+    private String gender;
 }

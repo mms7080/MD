@@ -26,12 +26,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Users users = usersRepository.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
-
+            
         // 디버깅: 데이터베이스의 role 확인
         System.out.println("Database Role: " + users.getRole()); // 데이터베이스에서 가져온 역할
 
         // GrantedAuthority 생성
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + users.getRole().toUpperCase()));
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + users.getRole()));
 
         // CustomUserDetails 객체 반환
         return new CustomUserDetails(users, authorities);

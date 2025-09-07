@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.example.demo.users.UsersEntity.Role;
 import com.example.demo.users.UsersEntity.Users;
 
 public interface UsersRepository extends JpaRepository<Users, Long>{
@@ -22,5 +23,5 @@ public interface UsersRepository extends JpaRepository<Users, Long>{
     Optional<Users> findByEmail(String email);
 
     // 권한별 유저 조회
-    List<Users> findByRole(String role);
+    List<Users> findByRole(Role role);
 }

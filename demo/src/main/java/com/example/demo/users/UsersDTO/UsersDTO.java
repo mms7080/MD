@@ -2,7 +2,9 @@ package com.example.demo.users.UsersDTO;
 
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -32,4 +34,11 @@ public class UsersDTO {
     @NotBlank(message = "이메일은 필수입니다.", groups = Create.class)
     @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email; 
+
+    @NotNull(message = "나이를 입력하세요.", groups = Create.class)
+    @Min(value = 0, message = "나이는 0 이상이어야 합니다.", groups = Create.class)
+    private Integer age;
+
+    @NotBlank(message = "성별을 선택하세요.", groups = Create.class)
+    private String gender; 
 }

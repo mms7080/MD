@@ -24,8 +24,6 @@ public class SignUpController {
     /** 회원가입 폼 */
     @GetMapping("/signup")
     public String signupForm(@ModelAttribute("usersDTO") UsersDTO usersDTO) {
-        // FlashAttribute 로 이미 넘어온 usersDTO가 있으면 그대로 쓰이고,
-        // 없으면 새 인스턴스가 바인딩됨.
         return "users/signup";
     }
 
@@ -36,8 +34,8 @@ public class SignUpController {
             @ModelAttribute("usersDTO") UsersDTO usersDTO,
             BindingResult bindingResult,
             @RequestParam("emailCode") String emailCode,
-            HttpSession session,
-            RedirectAttributes ra
+            HttpSession httpSession,
+            RedirectAttributes redirectAttributes
     ) {
         // 비밀번호 확인 검증
         if (usersDTO.getConfirmPassword() != null &&
@@ -46,22 +44,22 @@ public class SignUpController {
         }
 
         if (bindingResult.hasErrors()) {
-            ra.addFlashAttribute("org.springframework.validation.BindingResult.usersDTO", bindingResult);
-            ra.addFlashAttribute("usersDTO", usersDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.usersDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("usersDTO", usersDTO);
             return "redirect:/signup";
         }
 
         try {
-            usersService.registerUser(usersDTO, emailCode, session); // ⬅️ 세션 전달
-            ra.addFlashAttribute("msg", "회원가입이 완료되었습니다. 로그인해 주세요.");
+            usersService.registerUser(usersDTO, emailCode, httpSession); // ⬅️ 세션 전달
+            redirectAttributes.addFlashAttribute("msg", "회원가입이 완료되었습니다. 로그인해 주세요.");
             return "redirect:/signin";
         } catch (IllegalArgumentException | IllegalStateException e) {
-            ra.addFlashAttribute("error", e.getMessage());
-            ra.addFlashAttribute("usersDTO", usersDTO);
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("usersDTO", usersDTO);
             return "redirect:/signup";
         } catch (Exception e) {
-            ra.addFlashAttribute("error", "알 수 없는 오류가 발생했습니다.");
-            ra.addFlashAttribute("usersDTO", usersDTO);
+            redirectAttributes.addFlashAttribute("error", "알 수 없는 오류가 발생했습니다.");
+            redirectAttributes.addFlashAttribute("usersDTO", usersDTO);
             return "redirect:/signup";
         }
     }

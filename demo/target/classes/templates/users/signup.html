@@ -11,6 +11,9 @@
     button { margin-top: 16px; padding: 10px 14px; border: 0; background: #111827; color: #fff; border-radius: 6px; cursor: pointer; }
     .error { color: #b91c1c; font-size: 0.9rem; margin-top: 6px; }
     .note  { color: #065f46; }
+    .gender-group label { display:inline-flex; align-items:center; margin-right:12px; }
+    .gender-group input[type="checkbox"] { width:auto; margin:0; }
+    .gender-group span { margin-left:6px; }
   </style>
 </head>
 <body>
@@ -20,8 +23,7 @@
   <p th:if="${msg}" th:text="${msg}" class="note"></p>
   <p th:if="${error}" th:text="${error}" class="error"></p>
 
-  <!-- 이메일 인증코드 발송 -->
-  <!-- EmailController 가 @PostMapping("/send-code") 라는 가정 -->
+  <!-- 이메일 인증코드 발송 (EmailController @PostMapping("/send-code") 가정) -->
   <form th:action="@{/send-code}" method="post">
     <h3>이메일 인증</h3>
     <label for="emailSend">이메일</label>
@@ -37,7 +39,7 @@
   <form th:action="@{/signup}" method="post" th:object="${usersDTO}">
     <h3>계정 정보</h3>
 
-    <!-- (이동) 전역/필드 에러 출력: th:object 안에서 안전하게 -->
+    <!-- 전역/필드 에러 출력 -->
     <div th:if="${#fields.hasAnyErrors()}">
       <ul>
         <li class="error" th:each="e : ${#fields.errors('*')}" th:text="${e}">에러</li>
@@ -64,6 +66,37 @@
     <input id="email" type="email" th:field="*{email}" required />
     <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
 
+    <!-- 성별(M/W) - 체크박스(상호 배타) -->
+    <h3 style="margin-top:22px;">성별</h3>
+    <div role="group" aria-label="성별 선택" class="gender-group">
+      <label>
+        <input
+          type="checkbox"
+          name="gender"
+          id="genderM"
+          value="M"
+          th:checked="${usersDTO != null and usersDTO.gender == 'M'}"
+        />
+        <span>남자</span>
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          name="gender"
+          id="genderW"
+          value="W"
+          th:checked="${usersDTO != null and usersDTO.gender == 'W'}"
+        />
+        <span>여자</span>
+      </label>
+    </div>
+    <div class="error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+
+    <label for="age">나이</label>
+<input id="age" type="number" min="0" max="150" th:field="*{age}" required />
+<div class="error" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
+
     <h3 style="margin-top:22px;">이메일 인증코드</h3>
     <label for="emailCode">인증코드</label>
     <!-- DTO에는 없으니 name 속성으로만 전송 -->
@@ -77,5 +110,32 @@
   <p style="margin-top:16px;">
     이미 계정이 있으신가요? <a th:href="@{/signin}">로그인</a>
   </p>
+
+  <script>
+    // 체크박스를 상호 배타적으로(라디오처럼) 동작시키기 + 제출 시 검증
+    (function () {
+      const m = document.getElementById("genderM");
+      const w = document.getElementById("genderW");
+
+      function enforceExclusive(e) {
+        if (e.target === m && m.checked) w.checked = false;
+        if (e.target === w && w.checked) m.checked = false;
+      }
+      m.addEventListener("change", enforceExclusive);
+      w.addEventListener("change", enforceExclusive);
+
+      // 현재 문서 내 /signup 폼을 잡아서 제출 전 체크
+      const signupForm = document.querySelector('form[th\\:action="@{/signup}"]') || document.querySelector('form[action$="/signup"]');
+      if (signupForm) {
+        signupForm.addEventListener("submit", function (e) {
+          // 둘 다 체크 안됐으면 막기
+          if (!m.checked && !w.checked) {
+            e.preventDefault();
+            alert("성별을 선택하세요.");
+          }
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

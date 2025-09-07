@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.example.demo.users.UsersEntity.Role;
 import com.example.demo.users.UsersEntity.Users;
 
 public class CustomUserDetails implements UserDetails {
@@ -38,8 +39,8 @@ public class CustomUserDetails implements UserDetails {
         return users.getUsername() != null ? users.getUsername() : "";
     }
 
-    public String getRole() {
-        return users.getRole() != null ? users.getRole() : "USER";
+    public Role getRole() {
+        return users.getRole() != null ? users.getRole() : Role.USER;
     }
 
     @Override
