@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class PortfoliosController {
@@ -91,6 +94,16 @@ private static final List<TeamMemberEntity> team3 = List.of(
     ));
     }
 
+    @GetMapping("/portfolios/{id}")
+    public String getPortfolio(@PathVariable String id, Model model) {
+        PortfoliosEntity portfolios = PORTFOLIOS.get(id);
+        if (portfolios == null) {
+            model.addAttribute("notFound", true);
+        } else {
+            model.addAttribute("portfolios", portfolios);
+        }
+        return "portfolios/portfolios"; // templates/detail/portfolio-detail.html
+    }
 
 
 }

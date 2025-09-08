@@ -226,6 +226,8 @@ function createCard(project){
   el.className = "card";
   el.setAttribute("data-id", project.id);
   el.setAttribute("tabindex", "0");
+  
+
   el.innerHTML = `
     <figure class="card-media skeleton">
       <img src="${project.cover}" alt="${project.title} 대표 이미지" loading="lazy" />

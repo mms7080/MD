@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="light">
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="utf-8" />
@@ -123,7 +123,7 @@
           <div id="modalTags" class="tags"></div>
         </div>
         <div class="modal-actions">
-          <a id="modalLink" class="btn" href="#" target="_blank" rel="noopener">원본 보기</a>
+          <a id="modalLink" class="btn" th:href="@{/portfolios/portfolios}" target="_blank">원본 보기</a>
           <button class="btn ghost" value="cancel">닫기</button>
         </div>
       </div>
