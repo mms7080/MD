@@ -1,90 +1,94 @@
-/* ===========================
-   Header (kafolio) – header.css
-   =========================== */
-
-/* 헤더 바 */
-.site-header{
-  position: sticky;
+/* 헤더 */
+.site-header {
+  /* 필요하다면 sticky 주석 풀어도 됨 */
+  /* position: sticky;
   top: 0;
   z-index: 50;
   backdrop-filter: saturate(180%) blur(12px);
   background: color-mix(in oklab, var(--bg-soft) 85%, transparent);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border); */
 }
 
-/* 내부 레이아웃 */
-.header-inner{
+.header-inner {
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 14px 0;
 }
 
-/* 브랜드 */
-.brand{
+/* 로고 */
+.brand {
   display: flex;
   align-items: center;
   gap: 10px;
   font-weight: 800;
-  letter-spacing: 0.2px;
+  letter-spacing: .2px;
 }
-.brand-mark{
+.brand-mark {
   width: 20px;
   height: 20px;
-  display: inline-block;
-  object-fit: contain;
-  vertical-align: middle;
-  border-radius: 6px; /* 원형 원하면 50% 로 변경 */
+  display: inline-grid;
+  place-items: center;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
 }
-.brand-text{ font-size: 18px }
+.brand-text {
+  font-size: 18px;
+}
 
-/* 내비게이션 */
-.nav-toggle{
+/* 네비게이션 */
+.nav-toggle {
   display: none;
   background: none;
   border: 0;
   padding: 8px;
   border-radius: 10px;
 }
-.nav-toggle-bar{
+.nav-toggle-bar {
   display: block;
-  width: 20px; height: 2px;
+  width: 20px;
+  height: 2px;
   background: var(--text);
   margin: 4px 0;
   border-radius: 1px;
 }
 
-.nav-list{
+.nav-list {
   display: flex;
   gap: 8px;
   list-style: none;
-  padding: 0; margin: 0;
+  padding: 0;
+  margin: 0;
 }
-.nav-list a{
+.nav-list a {
   display: inline-block;
   padding: 8px 12px;
   border-radius: 10px;
 }
-.nav-list a:hover{ background: var(--primary-ink) }
-.nav-list a.is-active{
+.nav-list a:hover {
+  background: var(--primary-ink);
+}
+.nav-list a.is-active {
   background: var(--primary);
   color: #fff;
 }
 
-/* 헤더 우측 영역 */
-.header-actions{
+/* 헤더 오른쪽 버튼 영역 */
+.header-actions {
   margin-left: auto;
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-/* 반응형 – 모바일 메뉴 드롭다운 */
-@media (max-width: 640px){
-  .nav-toggle{ display: inline-grid }
-  .nav-list{
+/* 반응형 (모바일 네비게이션) */
+@media (max-width:640px) {
+  .nav-toggle { display: inline-grid; }
+  .nav-list {
     position: absolute;
-    right: 20px; top: 60px;
+    right: 20px;
+    top: 60px;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -93,5 +97,5 @@
     flex-direction: column;
     min-width: 160px;
   }
-  .nav-list.open{ display: flex }
+  .nav-list.open { display: flex; }
 }

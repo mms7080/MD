@@ -1,26 +1,47 @@
-<th:block th:fragment="siteHeader">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<body>
+<!-- 헤더 fragment -->
+<header th:fragment="site-header" class="site-header">
+  <div class="container header-inner">
+    <!-- 헤더 로고 -->
+    <a class="brand" th:href="@{/home}" aria-label="홈으로">
+      <img class="brand-mark" src="https://kafolio.kr/static/icon.ico" alt="" width="20" height="20" />
+      <span class="brand-text">kafolio</span>
+    </a>
 
-  <link rel="stylesheet" th:href="@{/header.css}">
+    <nav class="nav">
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-menu" aria-label="메뉴 열기">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <ul id="primary-menu" class="nav-list">
+        <li><a th:href="@{/home}" th:classappend="${page == 'home'} ? ' is-active'">home</a></li>
+        <li><a th:href="@{/detail}" th:classappend="${page == 'detail'} ? ' is-active'">detail</a></li>
+      </ul>
+    </nav>
 
-  <header class="header">
-    <div class="container header__inner">
-      <div class="brand">
-        <div class="brand__logo">MD</div>
-        <div>
-          <div class="brand__name">엠디스카이</div>
-          <div class="brand__sub">수학으로 완성하는 자기주도 플랫폼</div>
-        </div>
-      </div>
+    <div class="header-actions">
+      <button id="btnTheme" class="btn ghost" aria-pressed="false" aria-label="다크모드 전환">🌓</button>
 
-      <nav class="nav" aria-label="주요 메뉴">
-        <a th:href="@{/#programs}" class="nav__a">프로그램</a>
-        <a th:href="@{/#system}"   class="nav__a">학습시스템</a>
-        <a th:href="@{/#results}"  class="nav__a">성과</a>
-        <a th:href="@{/#about}"    class="nav__a">브랜드</a>
-        <a th:href="@{/#contact}"  class="nav__a">상담/등록</a>
-      </nav>
+      <!-- 로그인 전 -->
+      <span sec:authorize="isAnonymous()">
+        <a th:href="@{/signin}" class="btn ghost">로그인</a>
+        <a th:href="@{/signup}" class="btn primary">회원가입</a>
+      </span>
 
-      <a th:href="@{/#contact}" class="btn btn--primary btn--sm">상담 신청</a>
+      <!-- 로그인 후 -->
+      <span sec:authorize="isAuthenticated()">
+        <a th:href="@{/mypage}" class="btn ghost">마이페이지</a>
+        <form th:action="@{/logout}" method="post" style="display:inline">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <button type="submit" class="btn primary">로그아웃</button>
+        </form>
+      </span>
     </div>
-  </header>
-</th:block>
+  </div>
+</header>
+</body>
+</html>

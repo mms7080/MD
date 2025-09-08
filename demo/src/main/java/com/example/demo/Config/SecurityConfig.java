@@ -34,7 +34,9 @@ public class SecurityConfig {
                     "/signup",
                     "/error",   
                     "/send-code",
-                    "/css/**", "/js/**", "/images/**", "/webjars/**"
+                    "/css/**", "/js/**", "/images/**", "/webjars/**",
+                    "/home/**",
+                     "/**" //일단 테스트로 전체허용해놨다
                 ).permitAll()
 
                 // 관리자만 허용

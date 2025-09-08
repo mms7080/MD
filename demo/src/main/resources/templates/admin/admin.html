@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>관리자 페이지 – kafolio</title>
+  <link rel="stylesheet" href="/css/admin/admin.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+</head>
+<body data-page="admin">
+  <div th:replace="fragments/header :: site-header"></div>
+  <div class="admin-layout">
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">관리자</div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#" class="active" data-page="dashboard">대시보드</a></li>
+          <li><a href="#" data-page="filios">Filios 관리</a></li>
+          <li><a href="#" data-page="portfolios">Portfolios 관리</a></li>
+          <li><a href="#" data-page="teams">팀 관리</a></li>
+          <li><a href="#" data-page="users">유저 관리</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- 메인 -->
+    <main class="main-content">
+      <header class="admin-header">
+        <h1 id="page-title">관리자 대시보드</h1>
+        <div class="header-actions">
+          <button class="btn ghost">🔔 알림</button>
+        </div>
+      </header>
+
+      <section id="page-content" class="content-area">
+        <!-- 기본 대시보드 -->
+        <div class="dashboard">
+          <div class="card"><h3>총 유저 수</h3><p>124명</p></div>
+          <div class="card"><h3>등록된 Portfolios</h3><p>57개</p></div>
+          <div class="card"><h3>팀 수</h3><p>12개</p></div>
+          <div class="card"><h3>Filios</h3><p>34개</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // 페이지 정의
+    const pages = {
+      dashboard: `
+        <div class="dashboard">
+          <div class="card"><h3>총 유저 수</h3><p>124명</p></div>
+          <div class="card"><h3>등록된 Portfolios</h3><p>57개</p></div>
+          <div class="card"><h3>팀 수</h3><p>12개</p></div>
+          <div class="card"><h3>Filios</h3><p>34개</p></div>
+        </div>
+      `,
+      teams: `
+        <section class="list-section">
+          <h2>팀 관리</h2>
+          <div class="team-manager">
+            <!-- 좌측: 회원 목록 -->
+            <div class="team-column">
+              <h3>회원 목록</h3>
+              <input type="search" id="memberSearch" placeholder="회원 검색" />
+              <ul id="memberList" class="list-box">
+                <li data-id="1">박범수</li>
+                <li data-id="2">김철수</li>
+                <li data-id="3">이영희</li>
+                <li data-id="4">John Doe</li>
+              </ul>
+            </div>
+
+            <!-- 중앙: 이동 버튼 -->
+            <div class="team-controls">
+              <button id="btnAdd" class="btn primary">▶</button>
+              <button id="btnRemove" class="btn ghost">◀</button>
+            </div>
+
+            <!-- 우측: 선택된 팀원 -->
+            <div class="team-column">
+              <h3>선택된 팀원</h3>
+              <ul id="selectedList" class="list-box"></ul>
+              <input type="text" id="teamName" placeholder="팀 이름 입력" />
+              <button id="btnSaveTeam" class="btn primary full">팀 저장</button>
+            </div>
+          </div>
+
+          <div class="team-result">
+            <h3>저장된 팀 목록</h3>
+            <ul id="teamList"></ul>
+          </div>
+        </section>
+      `,
+      filios: `<section class="list-section"><h2>Filios 관리</h2>
+        <table class="list-table"><thead><tr><th>ID</th><th>파일명</th><th>업로더</th><th>상태</th><th>업로드일</th><th>관리</th></tr></thead>
+        <tbody><tr><td>F1</td><td>banner.png</td><td>admin</td><td>활성</td><td>2025-09-06</td>
+        <td><button class="btn ghost">수정</button><button class="btn primary">삭제</button></td></tr></tbody></table></section>`,
+      portfolios: `<section class="list-section"><h2>Portfolios 관리</h2>
+        <table class="list-table"><thead><tr><th>ID</th><th>제목</th><th>작성자</th><th>태그</th><th>등록일</th><th>관리</th></tr></thead>
+        <tbody><tr><td>P1</td><td>웹 포트폴리오</td><td>박범수</td><td>#Landing</td><td>2025-09-05</td>
+        <td><button class="btn ghost">수정</button><button class="btn primary">삭제</button></td></tr></tbody></table></section>`,
+      users: `<section class="list-section"><h2>유저 관리</h2>
+        <table class="list-table"><thead><tr><th>ID</th><th>이메일</th><th>닉네임</th><th>역할</th><th>가입일</th><th>관리</th></tr></thead>
+        <tbody><tr><td>1</td><td>user1@example.com</td><td>범수</td><td>USER</td><td>2025-09-01</td>
+        <td><button class="btn ghost">수정</button><button class="btn primary">삭제</button></td></tr>
+        <tr><td>2</td><td>admin@example.com</td><td>관리자</td><td>ADMIN</td><td>2025-09-02</td>
+        <td><button class="btn ghost">수정</button><button class="btn primary">삭제</button></td></tr></tbody></table></section>`
+    };
+
+    // 사이드바 클릭 이벤트
+    const sidebarLinks = document.querySelectorAll(".sidebar-nav a");
+    const content = document.getElementById("page-content");
+    const pageTitle = document.getElementById("page-title");
+
+    sidebarLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        sidebarLinks.forEach((l) => l.classList.remove("active"));
+        link.classList.add("active");
+        const page = link.dataset.page;
+        content.innerHTML = pages[page];
+        pageTitle.textContent = link.textContent;
+
+        // 팀 관리 초기화
+        if (page === "teams") initTeamManager();
+      });
+    });
+
+    // 팀 관리 기능
+    function initTeamManager() {
+      const memberList = document.getElementById("memberList");
+      const selectedList = document.getElementById("selectedList");
+      const btnAdd = document.getElementById("btnAdd");
+      const btnRemove = document.getElementById("btnRemove");
+      const btnSave = document.getElementById("btnSaveTeam");
+      const teamName = document.getElementById("teamName");
+      const teamList = document.getElementById("teamList");
+      const search = document.getElementById("memberSearch");
+
+      memberList.addEventListener("click", (e) => {
+        if (e.target.tagName === "LI") {
+          [...memberList.children].forEach(li => li.classList.remove("selected"));
+          e.target.classList.add("selected");
+        }
+      });
+
+      selectedList.addEventListener("click", (e) => {
+        if (e.target.tagName === "LI") {
+          [...selectedList.children].forEach(li => li.classList.remove("selected"));
+          e.target.classList.add("selected");
+        }
+      });
+
+      btnAdd.addEventListener("click", () => {
+        const selected = memberList.querySelector(".selected");
+        if (selected) {
+          selected.classList.remove("selected");
+          selectedList.appendChild(selected);
+        }
+      });
+
+      btnRemove.addEventListener("click", () => {
+        const selected = selectedList.querySelector(".selected");
+        if (selected) {
+          selected.classList.remove("selected");
+          memberList.appendChild(selected);
+        }
+      });
+
+      btnSave.addEventListener("click", () => {
+        const name = teamName.value.trim();
+        if (!name) {
+          alert("팀 이름을 입력하세요!");
+          return;
+        }
+        const members = [...selectedList.children].map(li => li.textContent);
+        if (members.length === 0) {
+          alert("팀원을 선택하세요!");
+          return;
+        }
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <div class="team-name">${name}</div>
+          <div class="team-members">${members.join(", ")}</div>
+        `;
+        teamList.appendChild(li);
+        teamName.value = "";
+        selectedList.innerHTML = "";
+      });
+
+      search.addEventListener("input", () => {
+        const keyword = search.value.toLowerCase();
+        [...memberList.children].forEach(li => {
+          li.style.display = li.textContent.toLowerCase().includes(keyword) ? "" : "none";
+        });
+      });
+    }
+  </script>
+</body>
+</html>
