@@ -127,6 +127,18 @@
     align-items: center;
 }
 
+.note-banner {
+    margin: 12px auto 0;
+    padding: 10px 14px;
+    background: var(--primary-ink);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+.note-banner.error {
+    background: color-mix(in oklab, #ff6b6b 20%, transparent);
+    border-color: color-mix(in oklab, #ff6b6b 40%, var(--border));
+}
+
 /* 반응형 */
 @media (max-width: 640px) {
     .auth-card {

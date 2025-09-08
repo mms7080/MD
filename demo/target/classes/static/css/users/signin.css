@@ -117,6 +117,18 @@
     background: var(--border);
 }
 
+.note-banner {
+    margin: 12px auto 0;
+    padding: 10px 14px;
+    background: var(--primary-ink);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+.note-banner.error {
+    background: color-mix(in oklab, #ff6b6b 20%, transparent);
+    border-color: color-mix(in oklab, #ff6b6b 40%, var(--border));
+}
+
 /* .socials{ display: grid; gap: 8px; }
 .note{ margin: 4px 0 0; font-size: 12px; color: var(--muted); text-align: center; } */
 
