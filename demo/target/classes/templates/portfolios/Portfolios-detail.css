@@ -1,0 +1,584 @@
+@import url('//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css');
+
+
+body {
+    font-family: 'SpoqaHanSans-kr', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* 종이책 느낌의 큰 프레임 */
+.container{
+  /* 폭 제한 + 중앙 정렬 */
+  max-width: 1200px;                 /* 필요시 1100~1280px로 조절 */
+  width: min(1200px, 96vw);
+  margin: 28px auto;
+
+  /* 여백 */
+  padding: clamp(24px, 3vw, 40px);
+
+  /* 종이 느낌 테두리 */
+  background: #fff;
+  border: 1px solid #e5e7eb;         /* 얇은 테두리 */
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);  /* 은은한 그림자 */
+  box-sizing: border-box;
+}
+
+/* 아주 큰 화면에서 살짝 더 넓게 쓰고 싶다면 선택 */
+@media (min-width: 1600px){
+  .container{ max-width: 1300px; }   /* 취향에 맞게 */
+}
+  
+  
+  .title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .header-meta{
+    display: flex;
+    justify-content: flex-end;  /* 오른쪽 정렬 */
+    align-items: center;
+    gap: 12px;
+    margin-top: -2rem;          /* 기존 creator와 동일 */
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .creator{
+    text-align: right;
+    margin-top: -2rem;  /* 제목과 겹치지 않도록 */
+    font-size: 0.9rem;
+    color: #666;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.4;
+  }
+
+  .creator .created-date{
+    margin-top: 2px;        /* 작성자와 간격 */
+    font-size: 0.9rem;      /* 필요하면 0.85rem로 살짝 줄여도 OK */
+    color: #666;
+  }
+
+  .desc {
+        text-align: center;
+        margin: 20px 0;
+        font-size: 1.25rem; /* 기존보다 크게 */
+        font-weight: 600;   /* 굵게: 500~700 사이로 조정 가능 */
+        line-height: 1.7;   /* 줄간격 넉넉하게 */
+  }
+  
+  .image-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+  }
+  
+  .image-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0;
+  }
+  
+  
+  .links {
+    margin: 20px 0;
+    font-size: 0.95rem;
+  }
+  .link-label{
+    font-weight: bold;
+  }
+
+  .tags {
+    margin: 20px 0;
+    font-size: 0.95rem;
+  }
+
+  .downloads{
+    margin: 20px 0;
+    font-size: 0.95rem;
+  }
+  .download-label{
+    font-weight: bold;
+  }
+  
+  .tag-wrap {
+    margin-top: 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .tag {
+    background: #e2e6ea;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+  }
+  
+  .meta-bar {
+    display: flex;
+    justify-content: flex-start; /* 좌우 정렬 */
+    align-items: center;
+    margin: 20px 0;
+  }
+  
+  .meta-left {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* 좋아요 버튼 옆에 다른 요소가 올 경우 간격 */
+  }
+  
+  /* .meta-right {
+    font-size: 0.9rem;
+    color: #555;
+  } */
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .heart-icon {
+    width: 20px;
+    height: 20px;
+    stroke: #e11d48;
+  }
+
+  /* views */
+  .view-count-box {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    gap: 6px;
+  }
+  
+  .view-label {
+    font-weight: bold;
+  }
+  
+  .comment-section {
+    margin-top: 40px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+  }
+  
+  .comment-section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  
+  .comment-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .comment-section textarea {
+    resize: none;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  .comment-section button {
+    width: 100px;
+    padding: 8px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+  
+  .comment-section button:hover {
+    background: #2563eb;
+  }
+  
+  .comment {
+    background: #f1f5f9;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 8px;
+  }
+  
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+  .like-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    transition: transform 0.2s ease;
+    outline: none;
+  }
+  
+  .like-btn:hover {
+    transform: scale(1.15);
+  }
+  
+  .heart-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 6px;
+    stroke: #f44336; /* 붉은색 */
+  }
+  
+  /* 슬라이더 */
+  .carousel-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px; /* 원하는 최대 폭 */
+    margin: 2rem auto;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  
+  .carousel-track {
+    display: flex;
+    transition: transform 0.4s ease-in-out;
+    will-change: transform;
+  }
+  
+  .carousel-item {
+    flex: 0 0 100%; /* 한 장씩만 */
+    width: 100%;
+    height: auto;
+    object-fit: cover;      /* 영역을 유지하며 잘라냄 */
+    image-rendering: auto;  /* 고화질 유지 */
+    border-radius: 8px;
+  }
+  
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;   /* 투명 배경 */
+    border: none;
+    font-size: 2rem;
+    color: rgba(0, 0, 0, 0.4);  /* 아이콘 색도 투명도 조절 가능 */
+    padding: 0 12px;
+    cursor: pointer;
+    z-index: 1;
+    border-radius: 50%;
+    transition: color 0.3s ease;
+  }
+  
+  .carousel-btn:hover {
+    color: rgba(0, 0, 0, 0.8);  /* 마우스 올리면 진하게 */
+  }
+  
+  
+  .carousel-btn.prev {
+    left: 10px;
+  }
+  
+  .carousel-btn.next {
+    right: 10px;
+  }
+
+ /* 전체 2열 그리드 */
+.team-rows{
+  display: grid;
+  grid-template-columns: 260px 1fr;   /* 좌: 이름/역할, 우: 파트 */
+  column-gap: 28px;
+  row-gap: 12px;                      /* ✅ 밑줄 대신 행 간격 */
+  align-items: start;
+}
+
+/* 각 행을 두 셀로 배치하기 위해 contents 사용 */
+.team-row{ display: contents; }
+/* 
+✅ 밑줄 제거 */
+.team-name-cell,
+.team-parts-cell{
+  padding: 8px 0;
+  border-bottom: none;                /* ← 밑줄 제거 */
+} 
+
+/* 바깥을 감싸는 카드(빨간선 느낌) */
+.team-card{
+  margin-top: 10px;
+  padding: 16px 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,.06);
+}
+
+/* 왼쪽 셀: 이름/역할 */
+.team-name-cell{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.team-name-cell .name{
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111;
+}
+.role-badge{
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 600;
+  background: #eef2ff;
+  color: #3b82f6;
+  white-space: nowrap;
+}
+
+/* 오른쪽 셀: 파트 칩 */
+.team-parts-cell{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.part-chip{
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #333;
+  font-size: .85rem;
+  border: 1px solid #e5e7eb;
+}
+
+/* 반응형 */
+@media (max-width: 640px){
+  .team-rows{ grid-template-columns: 1fr; }
+}
+
+
+  
+
+
+/* link */
+.custom-link {
+  font-size: 0.95rem;        /* view-count-box와 동일 */
+  font-weight: 500;          /* 동일 굵기 */
+  color: #333;               /* 동일 색상 */
+  text-decoration: none;     /* 밑줄 제거 */
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  gap: 6px;
+}
+
+.custom-link:visited {
+  color: #333;               /* 방문 후에도 동일 */
+  text-decoration: none;     /* 방문 후에도 밑줄 제거 */
+}
+
+
+
+/* 파일 링크 */
+.download-link {
+  font-size: 0.95rem;        /* view-count-box와 동일 */
+  font-weight: 500;          /* 동일 굵기 */
+  color: #333;               /* 동일 색상 */
+  text-decoration: none;     /* 밑줄 제거 */
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  gap: 6px;
+}
+
+.download-link:visited {
+  color: #333;               /* 방문 후에도 동일 */
+  text-decoration: none;     /* 방문 후에도 밑줄 제거 */
+}
+
+
+
+/* 카드 */
+/* 그리드 컨테이너(박스 느낌) */
+.gallery-box{
+  width: 100%;
+  margin: 16px 0 24px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 0 12px rgba(0,0,0,.06);
+  box-sizing: border-box;
+}
+
+/* 한 줄에 5장 + 행(카드) 높이 지정 */
+.thumb-grid{
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 5), 1fr);
+  gap: 16px;
+
+  /* ✅ 카드 세로 길이: 숫자 키워서 더 길게 */
+  grid-auto-rows: clamp(260px, 22vw, 480px);
+  /* 예) 더 길게: clamp(300px, 26vw, 560px) */
+}
+
+/* 카드가 그리드 행 높이를 꽉 채우도록 */
+.thumb-card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+
+  height: 100%;
+  display: flex;
+  overflow: hidden;          /* 모서리 밖으로 삐짐 방지 */
+}
+
+/* ✅ 이미지: 중앙 크롭(중간이 보이도록) + 카드 높이에 맞춤 */
+.thumb{
+  width: 100%;
+  height: 100%;              /* ← 중요: 카드 높이에 맞춤 */
+  object-fit: cover;         /* 꽉 채우되 크롭 */
+  object-position: center;   /* 중앙 기준 크롭 */
+  border-radius: 10px;
+  display: block;
+  cursor: zoom-in;
+}
+
+
+/* 반응형: 좁아지면 4→3→2열로 (원하지 않으면 아래 3개 미디어쿼리 삭제) */
+@media (max-width: 1200px){ .thumb-grid{ grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 900px){  .thumb-grid{ grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 640px){  .thumb-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+
+/* 감춤 상태 */
+#lightbox[hidden]{ display:none !important; }
+
+/* 화면 전체 오버레이 */
+#lightbox{
+  position: fixed; inset: 0;
+  z-index: 99999;                      /* 🔼 항상 맨 위 */
+  background: rgba(0,0,0,.88);
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px; box-sizing: border-box;
+  overflow: auto;                      /* 모달 내부는 스크롤 가능 */
+}
+
+/* 모달 박스(이미지 컨테이너) */
+#lightbox .lb-content{
+  position: relative;                  /* 닫기 버튼 기준 */
+  display: flex; align-items: center; justify-content: center;
+  max-width: min(1000px, 70vw);        /* 가로 크기 제한 */
+  max-height: 70svh;                   /* 세로 크기 제한 */
+  max-height: 70vh;                    /* 폴백 */
+}
+
+/* 이미지: 컨테이너에 맞춰 축소(전체 보이기) */
+#lightbox .lb-img{
+  width: auto; height: auto;
+  max-width: 100%; max-height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.5);
+}
+
+/* 버튼 공통 */
+.lb-btn{
+  border: none; cursor: pointer;
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.92);
+  color: #111; font-size: 22px; line-height: 1;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+
+/* 닫기 버튼: 모달 박스 우상단 */
+.lb-close{ position: absolute; top: 8px; right: 8px; }
+
+/* 좌우 화살표: 뷰포트 좌우 중앙에 고정 */
+.lb-prev, .lb-next{
+  position: fixed; top: 50%; transform: translateY(-50%);
+}
+.lb-prev{ left: 24px; }
+.lb-next{ right: 24px; }
+
+/* 호버(선택) */
+.lb-btn:hover{ filter: brightness(0.95); }
+
+
+
+/* 데스크톱 등 정교한 포인터에서만 호버 효과 */
+@media (hover:hover) and (pointer:fine){
+  .thumb-card{
+    position: relative;
+    overflow: hidden; /* 확대된 이미지가 넘치지 않게 */
+    transition: transform .18s ease, box-shadow .18s ease;
+    will-change: transform;
+  }
+
+  /* 카드 자체도 살짝 들리는 느낌 */
+  .thumb-card:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0,0,0,.12);
+  }
+
+  /* 이미지 부드러운 확대 */
+  .thumb-card .thumb{
+    transition: transform .22s ease;
+    will-change: transform;
+    transform-origin: center center;
+    backface-visibility: hidden;
+  }
+  .thumb-card:hover .thumb{
+    transform: scale(1.04); /* 필요 시 1.02~1.08 사이로 조절 */
+  }
+
+  /* 키보드 접근성 (Tab 포커스) */
+  .thumb-card:focus-within{
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+}
+
+/* 모션 최소화 선호 사용자의 경우 효과 완화 */
+@media (prefers-reduced-motion: reduce){
+  .thumb-card,
+  .thumb-card .thumb{
+    transition: none;
+  }
+}
+
+
+/* icon */
+/* 텍스트 + 로고 2열 그리드 */
+.summary-grid{
+  --logo-w: 200px;     /* ← 로고 칼럼 폭 */
+  --logo-gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr var(--logo-w);
+  column-gap: var(--logo-gap);
+  align-items: start;
+}
+
+.summary-logo{
+  justify-self: start;
+  padding: 0; margin: 0; background: transparent; border: 0; box-shadow: none;
+}
+.summary-logo img{ width: 100%; height: auto; border-radius: 12px; }
+
+

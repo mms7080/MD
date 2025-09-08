@@ -56,4 +56,9 @@ public class PortfoliosEntity {
     public String getIcon() { return icon; }
     public String getLink() { return link; }
     public String getDownload() { return download; }
+
+    public static void put(String string, PortfoliosEntity portfoliosEntity) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'put'");
+    }
 }
