@@ -8,7 +8,7 @@
   --primary-ink: #e5f0ff;
   --border: #e6e9ef;
   --radius: 14px;
-  --shadow: 0 4px 12px rgba(0,0,0,.06);
+  --shadow: 0 6px 20px rgba(0,0,0,.08);
 }
 
 body {
@@ -16,9 +16,10 @@ body {
   font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* 전체 레이아웃 */
+/* ================== 레이아웃 ================== */
 .admin-layout {
   display: flex;
   min-height: 100vh;
@@ -35,15 +36,16 @@ body {
 }
 .sidebar-brand {
   font-size: 1.4rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-bottom: 30px;
+  color: var(--primary);
 }
 .sidebar-nav ul {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 .sidebar-nav a {
   display: block;
@@ -51,17 +53,19 @@ body {
   border-radius: 10px;
   color: var(--text);
   text-decoration: none;
-  transition: background .2s;
+  transition: background 0.25s;
+  font-weight: 500;
 }
 .sidebar-nav a:hover {
-  background: rgba(0,122,255,0.1);
+  background: rgba(0,122,255,0.08);
 }
 .sidebar-nav a.active {
   background: var(--primary);
   color: #fff;
+  font-weight: 600;
 }
 
-/* ===== 메인 ===== */
+/* ===== 메인 영역 ===== */
 .main-content {
   flex: 1;
   display: flex;
@@ -78,43 +82,83 @@ body {
   background: var(--bg-soft);
   position: sticky;
   top: 0;
+  z-index: 10;
 }
 .admin-header h1 {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
+  color: var(--text);
 }
 .header-actions {
   display: flex;
   gap: 10px;
 }
 
-/* 버튼 */
+/* ================== 버튼 ================== */
+/* ================== 버튼 (iOS 스타일) ================== */
 .btn {
-  --h: 36px;
+  --h: 38px;
   display: inline-grid;
   place-items: center;
   height: var(--h);
-  padding: 0 14px;
-  border-radius: 8px;
+  padding: 0 16px;
+  border-radius: 10px;
   border: 1px solid var(--border);
-  background: var(--bg-soft);
+  background: #f9f9f9; /* 기본 화이트 */
   cursor: pointer;
   font-size: 0.9rem;
-  transition: all .15s ease;
-}
-.btn:hover { transform: translateY(-1px); }
-.btn.primary {
-  background: var(--primary);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: var(--shadow);
-}
-.btn.ghost {
-  background: transparent;
+  font-weight: 500;
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: all .2s ease;
 }
 
-/* ===== 대시보드 카드 ===== */
+.btn:hover {
+  background: #f2f2f2; /* hover 시 미세한 톤 변화 */
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  background: #eaeaea; /* 눌림 효과 */
+  transform: translateY(0);
+}
+
+/* 주요 버튼도 같은 톤에서만 살짝 강조 */
+.btn.primary {
+  background: #ededed; /* 진한 그레이 화이트 */
+  color: var(--text);
+  border: 1px solid #d1d1d6; /* iOS 테두리 느낌 */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6),
+              0 1px 3px rgba(0,0,0,0.08);
+}
+
+.btn.primary:hover {
+  background: #e2e2e6;
+}
+
+.btn.primary:active {
+  background: #d9d9dd;
+}
+
+/* 테두리만 있는 보조 버튼 */
+.btn.ghost {
+  background: #ffffff;
+  border: 1px solid #d1d1d6;
+  color: #555;
+  box-shadow: none;
+}
+
+.btn.ghost:hover {
+  background: #f7f7f8;
+}
+
+.btn.ghost:active {
+  background: #efeff0;
+}
+
+
+/* ================== 대시보드 카드 ================== */
 .dashboard {
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
@@ -131,16 +175,16 @@ body {
 .dashboard .card h3 {
   margin: 0 0 6px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--muted);
 }
 .dashboard .card p {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
 }
 
-/* ===== 리스트 테이블 ===== */
+/* ================== 리스트 테이블 ================== */
 .list-section {
   padding: 24px;
 }
@@ -179,7 +223,7 @@ body {
   background: rgba(0,122,255,0.05);
 }
 
-/* ===== 팀 관리 ===== */
+/* ================== 팀 관리 ================== */
 .team-manager {
   display: flex;
   gap: 20px;
@@ -204,7 +248,7 @@ body {
 .team-column input[type="text"] {
   padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--bg-soft);
   font-size: 0.9rem;
 }
@@ -234,6 +278,7 @@ body {
   color: #fff;
 }
 
+/* 이동 버튼 */
 .team-controls {
   display: flex;
   flex-direction: column;
@@ -243,29 +288,22 @@ body {
 }
 .team-controls .btn {
   width: 48px;
-  height: 36px;
+  height: 40px;
   font-size: 1rem;
   font-weight: bold;
 }
 
-.full {
-  width: 100%;
-  margin-top: auto;
-}
-
-/* ===== 팀 목록 (iOS 카드 스타일) ===== */
+/* ================== 팀 목록 (iOS 카드 스타일) ================== */
 .team-result {
   margin-top: 30px;
   padding: 0 20px;
 }
-
 .team-result h3 {
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 12px;
   color: var(--muted);
 }
-
 .team-result ul {
   list-style: none;
   margin: 0;
@@ -274,7 +312,6 @@ body {
   flex-direction: column;
   gap: 14px;
 }
-
 .team-result li {
   padding: 14px 16px;
   background: var(--bg-soft);
@@ -287,20 +324,61 @@ body {
   gap: 6px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-
 .team-result li:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-
 .team-name {
   font-weight: 600;
   font-size: 1rem;
   color: var(--text);
 }
-
 .team-members {
   font-size: 0.85rem;
   color: var(--muted);
   line-height: 1.4;
+}
+.team-meta {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.team-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* ================== 모달 (iOS 알림창 스타일) ================== */
+.modal {
+  border: none;
+  border-radius: 16px;
+  padding: 0;
+  width: min(360px, 90%);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+.modal::backdrop {
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(4px);
+}
+.modal-content {
+  background: var(--bg-soft);
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+}
+.modal-content p {
+  margin: 0 0 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.modal-actions .btn {
+  flex: 1;
+  border-radius: 12px;
+  font-weight: 600;
 }

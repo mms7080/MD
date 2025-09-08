@@ -46,157 +46,317 @@
   </div>
 
   <script>
-    // 페이지 정의
-    const pages = {
-      dashboard: `
-        <div class="dashboard">
-          <div class="card"><h3>총 유저 수</h3><p>124명</p></div>
-          <div class="card"><h3>등록된 Portfolios</h3><p>57개</p></div>
-          <div class="card"><h3>팀 수</h3><p>12개</p></div>
-          <div class="card"><h3>Filios</h3><p>34개</p></div>
+// =======================
+// 페이지 정의
+// =======================
+const pages = {
+  dashboard: `
+    <div class="dashboard">
+      <div class="card"><h3>총 유저 수</h3><p>124명</p></div>
+      <div class="card"><h3>등록된 Portfolios</h3><p>57개</p></div>
+      <div class="card"><h3>팀 수</h3><p>12개</p></div>
+      <div class="card"><h3>Filios</h3><p>34개</p></div>
+    </div>
+  `,
+  filios: `
+    <section class="list-section">
+      <h2>Filios 관리</h2>
+      <table class="list-table">
+        <thead>
+          <tr><th>ID</th><th>파일명</th><th>업로더</th><th>상태</th><th>업로드일</th><th>관리</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>F1</td><td>banner.png</td><td>admin</td><td>활성</td><td>2025-09-06</td>
+            <td>
+              <button class="btn ghost">수정</button>
+              <button class="btn primary">삭제</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  `,
+  portfolios: `
+    <section class="list-section">
+      <h2>Portfolios 관리</h2>
+      <table class="list-table">
+        <thead>
+          <tr><th>ID</th><th>제목</th><th>작성자</th><th>태그</th><th>등록일</th><th>관리</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>P1</td><td>웹 포트폴리오</td><td>박범수</td><td>#Landing</td><td>2025-09-05</td>
+            <td>
+              <button class="btn ghost">수정</button>
+              <button class="btn primary">삭제</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  `,
+  users: `
+    <section class="list-section">
+      <h2>유저 관리</h2>
+      <table class="list-table">
+        <thead>
+          <tr><th>ID</th><th>이메일</th><th>닉네임</th><th>역할</th><th>가입일</th><th>관리</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td><td>user1@example.com</td><td>범수</td><td>USER</td><td>2025-09-01</td>
+            <td>
+              <button class="btn ghost">수정</button>
+              <button class="btn primary">삭제</button>
+            </td>
+          </tr>
+          <tr>
+            <td>2</td><td>admin@example.com</td><td>관리자</td><td>ADMIN</td><td>2025-09-02</td>
+            <td>
+              <button class="btn ghost">수정</button>
+              <button class="btn primary">삭제</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  `,
+  teams: `
+    <section class="list-section">
+      <h2>팀 관리</h2>
+      <div class="team-manager">
+        <!-- 좌측: 회원 목록 -->
+        <div class="team-column">
+          <h3>회원 목록</h3>
+          <input type="search" id="memberSearch" placeholder="회원 검색" />
+          <ul id="memberList" class="list-box"></ul>
         </div>
-      `,
-      teams: `
-        <section class="list-section">
-          <h2>팀 관리</h2>
-          <div class="team-manager">
-            <!-- 좌측: 회원 목록 -->
-            <div class="team-column">
-              <h3>회원 목록</h3>
-              <input type="search" id="memberSearch" placeholder="회원 검색" />
-              <ul id="memberList" class="list-box">
-                <li data-id="1">박범수</li>
-                <li data-id="2">김철수</li>
-                <li data-id="3">이영희</li>
-                <li data-id="4">John Doe</li>
-              </ul>
-            </div>
 
-            <!-- 중앙: 이동 버튼 -->
-            <div class="team-controls">
-              <button id="btnAdd" class="btn primary">▶</button>
-              <button id="btnRemove" class="btn ghost">◀</button>
-            </div>
+        <!-- 중앙: 이동 버튼 -->
+        <div class="team-controls">
+          <button id="btnAdd" class="btn primary">▶</button>
+          <button id="btnRemove" class="btn ghost">◀</button>
+        </div>
 
-            <!-- 우측: 선택된 팀원 -->
-            <div class="team-column">
-              <h3>선택된 팀원</h3>
-              <ul id="selectedList" class="list-box"></ul>
-              <input type="text" id="teamName" placeholder="팀 이름 입력" />
-              <button id="btnSaveTeam" class="btn primary full">팀 저장</button>
-            </div>
+        <!-- 우측: 선택된 팀원 -->
+        <div class="team-column">
+          <h3>선택된 팀원</h3>
+          <ul id="selectedList" class="list-box"></ul>
+          <input type="text" id="teamName" placeholder="팀 이름 입력" />
+          <button id="btnSaveTeam" class="btn primary full">팀 저장</button>
+        </div>
+      </div>
+
+      <div class="team-result">
+        <h3>저장된 팀 목록</h3>
+        <ul id="teamList"></ul>
+      </div>
+
+      <!-- 삭제 확인 모달 -->
+      <dialog id="confirmModal" class="modal">
+        <div class="modal-content">
+          <p>정말 이 팀을 삭제하시겠습니까?</p>
+          <div class="modal-actions">
+            <button id="confirmYes" class="btn primary">삭제</button>
+            <button id="confirmNo" class="btn ghost">취소</button>
           </div>
+        </div>
+      </dialog>
+    </section>
+  `
+};
 
-          <div class="team-result">
-            <h3>저장된 팀 목록</h3>
-            <ul id="teamList"></ul>
-          </div>
-        </section>
-      `,
-      filios: `<section class="list-section"><h2>Filios 관리</h2>
-        <table class="list-table"><thead><tr><th>ID</th><th>파일명</th><th>업로더</th><th>상태</th><th>업로드일</th><th>관리</th></tr></thead>
-        <tbody><tr><td>F1</td><td>banner.png</td><td>admin</td><td>활성</td><td>2025-09-06</td>
-        <td><button class="btn ghost">수정</button><button class="btn primary">삭제</button></td></tr></tbody></table></section>`,
-      portfolios: `<section class="list-section"><h2>Portfolios 관리</h2>
-        <table class="list-table"><thead><tr><th>ID</th><th>제목</th><th>작성자</th><th>태그</th><th>등록일</th><th>관리</th></tr></thead>
-        <tbody><tr><td>P1</td><td>웹 포트폴리오</td><td>박범수</td><td>#Landing</td><td>2025-09-05</td>
-        <td><button class="btn ghost">수정</button><button class="btn primary">삭제</button></td></tr></tbody></table></section>`,
-      users: `<section class="list-section"><h2>유저 관리</h2>
-        <table class="list-table"><thead><tr><th>ID</th><th>이메일</th><th>닉네임</th><th>역할</th><th>가입일</th><th>관리</th></tr></thead>
-        <tbody><tr><td>1</td><td>user1@example.com</td><td>범수</td><td>USER</td><td>2025-09-01</td>
-        <td><button class="btn ghost">수정</button><button class="btn primary">삭제</button></td></tr>
-        <tr><td>2</td><td>admin@example.com</td><td>관리자</td><td>ADMIN</td><td>2025-09-02</td>
-        <td><button class="btn ghost">수정</button><button class="btn primary">삭제</button></td></tr></tbody></table></section>`
-    };
+// =======================
+// 멤버 데이터 (전체 목록)
+// =======================
+const allMembers = [
+  { id: 1, name: "박범수" },
+  { id: 2, name: "김철수" },
+  { id: 3, name: "이영희" },
+  { id: 4, name: "John Doe" },
+  { id: 5, name: "Jane Smith" },
+];
 
-    // 사이드바 클릭 이벤트
-    const sidebarLinks = document.querySelectorAll(".sidebar-nav a");
-    const content = document.getElementById("page-content");
-    const pageTitle = document.getElementById("page-title");
+// =======================
+// 사이드바 이벤트
+// =======================
+const sidebarLinks = document.querySelectorAll(".sidebar-nav a");
+const content = document.getElementById("page-content");
+const pageTitle = document.getElementById("page-title");
 
-    sidebarLinks.forEach((link) => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        sidebarLinks.forEach((l) => l.classList.remove("active"));
-        link.classList.add("active");
-        const page = link.dataset.page;
-        content.innerHTML = pages[page];
-        pageTitle.textContent = link.textContent;
+sidebarLinks.forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    sidebarLinks.forEach((l) => l.classList.remove("active"));
+    link.classList.add("active");
+    const page = link.dataset.page;
 
-        // 팀 관리 초기화
-        if (page === "teams") initTeamManager();
-      });
-    });
+    content.innerHTML = pages[page];
+    pageTitle.textContent = link.textContent;
 
-    // 팀 관리 기능
-    function initTeamManager() {
-      const memberList = document.getElementById("memberList");
-      const selectedList = document.getElementById("selectedList");
-      const btnAdd = document.getElementById("btnAdd");
-      const btnRemove = document.getElementById("btnRemove");
-      const btnSave = document.getElementById("btnSaveTeam");
-      const teamName = document.getElementById("teamName");
-      const teamList = document.getElementById("teamList");
-      const search = document.getElementById("memberSearch");
-
-      memberList.addEventListener("click", (e) => {
-        if (e.target.tagName === "LI") {
-          [...memberList.children].forEach(li => li.classList.remove("selected"));
-          e.target.classList.add("selected");
-        }
-      });
-
-      selectedList.addEventListener("click", (e) => {
-        if (e.target.tagName === "LI") {
-          [...selectedList.children].forEach(li => li.classList.remove("selected"));
-          e.target.classList.add("selected");
-        }
-      });
-
-      btnAdd.addEventListener("click", () => {
-        const selected = memberList.querySelector(".selected");
-        if (selected) {
-          selected.classList.remove("selected");
-          selectedList.appendChild(selected);
-        }
-      });
-
-      btnRemove.addEventListener("click", () => {
-        const selected = selectedList.querySelector(".selected");
-        if (selected) {
-          selected.classList.remove("selected");
-          memberList.appendChild(selected);
-        }
-      });
-
-      btnSave.addEventListener("click", () => {
-        const name = teamName.value.trim();
-        if (!name) {
-          alert("팀 이름을 입력하세요!");
-          return;
-        }
-        const members = [...selectedList.children].map(li => li.textContent);
-        if (members.length === 0) {
-          alert("팀원을 선택하세요!");
-          return;
-        }
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <div class="team-name">${name}</div>
-          <div class="team-members">${members.join(", ")}</div>
-        `;
-        teamList.appendChild(li);
-        teamName.value = "";
-        selectedList.innerHTML = "";
-      });
-
-      search.addEventListener("input", () => {
-        const keyword = search.value.toLowerCase();
-        [...memberList.children].forEach(li => {
-          li.style.display = li.textContent.toLowerCase().includes(keyword) ? "" : "none";
-        });
-      });
+    if (page === "teams") {
+      initTeamManager();
     }
+  });
+});
+
+// =======================
+// 팀 관리 기능
+// =======================
+function initTeamManager() {
+  const memberList = document.getElementById("memberList");
+  const selectedList = document.getElementById("selectedList");
+  const btnAdd = document.getElementById("btnAdd");
+  const btnRemove = document.getElementById("btnRemove");
+  const btnSave = document.getElementById("btnSaveTeam");
+  const teamName = document.getElementById("teamName");
+  const teamList = document.getElementById("teamList");
+  const search = document.getElementById("memberSearch");
+
+  const confirmModal = document.getElementById("confirmModal");
+  const confirmYes = document.getElementById("confirmYes");
+  const confirmNo = document.getElementById("confirmNo");
+
+  let editingTeam = null;
+  let teamToDelete = null;
+
+  // 전체 멤버 렌더링 함수
+  function renderAllMembers(excluded = []) {
+    memberList.innerHTML = "";
+    allMembers.forEach(m => {
+      if (!excluded.includes(m.name)) {
+        const li = document.createElement("li");
+        li.textContent = m.name;
+        li.dataset.id = m.id;
+        memberList.appendChild(li);
+      }
+    });
+  }
+
+  renderAllMembers();
+
+  // 멤버 선택
+  memberList.addEventListener("click", (e) => {
+    if (e.target.tagName === "LI") {
+      [...memberList.children].forEach(li => li.classList.remove("selected"));
+      e.target.classList.add("selected");
+    }
+  });
+
+  selectedList.addEventListener("click", (e) => {
+    if (e.target.tagName === "LI") {
+      [...selectedList.children].forEach(li => li.classList.remove("selected"));
+      e.target.classList.add("selected");
+    }
+  });
+
+  // 추가
+  btnAdd.addEventListener("click", () => {
+    const selected = memberList.querySelector(".selected");
+    if (selected) {
+      selected.classList.remove("selected");
+      selectedList.appendChild(selected);
+    }
+  });
+
+  // 제거
+  btnRemove.addEventListener("click", () => {
+    const selected = selectedList.querySelector(".selected");
+    if (selected) {
+      selected.classList.remove("selected");
+      selectedList.removeChild(selected);
+      renderAllMembers([...selectedList.children].map(li => li.textContent));
+    }
+  });
+
+  // 팀 저장
+  btnSave.addEventListener("click", () => {
+    const name = teamName.value.trim();
+    if (!name) {
+      alert("팀 이름을 입력하세요!");
+      return;
+    }
+    const members = [...selectedList.children].map(li => li.textContent);
+    if (members.length === 0) {
+      alert("팀원을 선택하세요!");
+      return;
+    }
+
+    if (editingTeam) {
+      editingTeam.querySelector(".team-name").textContent = name;
+      editingTeam.querySelector(".team-members").textContent = members.join(", ");
+      editingTeam = null;
+    } else {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="team-name">${name}</div>
+        <div class="team-members">${members.join(", ")}</div>
+        <div class="team-meta">${new Date().toLocaleDateString()}</div>
+        <div class="team-actions">
+          <button class="btn ghost btn-edit">수정</button>
+          <button class="btn primary btn-delete">삭제</button>
+        </div>
+      `;
+      teamList.appendChild(li);
+    }
+
+    teamName.value = "";
+    selectedList.innerHTML = "";
+    renderAllMembers();
+  });
+
+  // 팀 수정/삭제 이벤트
+  teamList.addEventListener("click", (e) => {
+    const li = e.target.closest("li");
+    if (!li) return;
+
+    if (e.target.classList.contains("btn-edit")) {
+      const name = li.querySelector(".team-name").textContent;
+      const members = li.querySelector(".team-members").textContent.split(", ");
+      teamName.value = name;
+
+      selectedList.innerHTML = "";
+      members.forEach((m, idx) => {
+        const memberLi = document.createElement("li");
+        memberLi.textContent = m;
+        memberLi.dataset.id = idx + 100;
+        selectedList.appendChild(memberLi);
+      });
+
+      renderAllMembers(members);
+      editingTeam = li;
+    }
+
+    if (e.target.classList.contains("btn-delete")) {
+      teamToDelete = li;
+      confirmModal.showModal();
+    }
+  });
+
+  // 모달 이벤트
+  confirmYes.addEventListener("click", () => {
+    if (teamToDelete) {
+      teamToDelete.remove();
+      teamToDelete = null;
+    }
+    confirmModal.close();
+  });
+
+  confirmNo.addEventListener("click", () => {
+    teamToDelete = null;
+    confirmModal.close();
+  });
+
+  // 검색
+  search.addEventListener("input", () => {
+    const keyword = search.value.toLowerCase();
+    [...memberList.children].forEach(li => {
+      li.style.display = li.textContent.toLowerCase().includes(keyword) ? "" : "none";
+    });
+  });
+}
+
   </script>
 </body>
 </html>
