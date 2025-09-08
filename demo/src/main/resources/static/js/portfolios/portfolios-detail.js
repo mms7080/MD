@@ -1,5 +1,17 @@
+
 document.addEventListener('DOMContentLoaded', () => {
-    // -----------------------------
+ 
+  
+  
+  const navToggle = document.querySelector('.site-header .nav-toggle');
+    const navList = document.getElementById('primary-menu');
+    if (navToggle && navList){
+      navToggle.addEventListener('click', ()=>{
+        const open = navList.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', String(open));
+      });
+    }
+  // -----------------------------
     // 공통: 좋아요 / 조회수
     // -----------------------------
     const likeBtn = document.getElementById('likeBtn');

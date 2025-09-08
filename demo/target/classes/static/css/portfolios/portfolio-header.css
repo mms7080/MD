@@ -1,0 +1,103 @@
+/* 헤더(기본: 다크톤 변수) */
+.site-header{
+    --bg-soft:#12131a; --card:#161821; --text:#e8ebf1; --muted:#9aa3b2;
+    --primary:#5b8cff; --primary-ink:#0b1a4a; --border:#24283a; --accent:#84ffd2;
+  }
+  
+  /* 라이트 모드일 때 헤더 변수만 덮어쓰기 */
+  html[data-theme="light"] .site-header{
+    --bg-soft:#ffffff; --card:#ffffff; --text:#0a0c12; --muted:#6b7280;
+    --border:#e6e9ef; --primary:#365cff; --primary-ink:#eef2ff; --accent:#10b981;
+  }
+  
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+  }
+  
+  /* 로고 */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    letter-spacing: .2px;
+  }
+  .brand-mark {
+    width: 20px;
+    height: 20px;
+    display: inline-grid;
+    place-items: center;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 50%;
+  }
+  .brand-text {
+    font-size: 18px;
+  }
+  
+  /* 네비게이션 */
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: 0;
+    padding: 8px;
+    border-radius: 10px;
+  }
+  .nav-toggle-bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--text);
+    margin: 4px 0;
+    border-radius: 1px;
+  }
+  
+  .nav-list {
+    display: flex;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .nav-list a {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 10px;
+  }
+  .nav-list a:hover {
+    background: var(--primary-ink);
+  }
+  .nav-list a.is-active {
+    background: var(--primary);
+    color: #fff;
+  }
+  
+  /* 헤더 오른쪽 버튼 영역 */
+  .header-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  /* 반응형 (모바일 네비게이션) */
+  @media (max-width:640px) {
+    .nav-toggle { display: inline-grid; }
+    .nav-list {
+      position: absolute;
+      right: 20px;
+      top: 60px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px;
+      display: none;
+      flex-direction: column;
+      min-width: 160px;
+    }
+    .nav-list.open { display: flex; }
+  }
+  

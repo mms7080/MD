@@ -59,7 +59,7 @@ private static final List<TeamMemberEntity> team3 = List.of(
             "https://pawple.kafolio.kr/","pawpleRe.zip"
         ));
             
-        PORTFOLIOS.put("2", new PortfoliosEntity("2", "Filmora", "S.Han",
+        PORTFOLIOS.put("5", new PortfoliosEntity("5", "Filmora", "S.Han",
             List.of("Next.js","SpringBoot","React","JPA","VSCode"),
             2, "2025-08-22",
             "https://kafolio.kr/static/requests/2025/7/9/boards/NmI2....png",
@@ -77,7 +77,7 @@ private static final List<TeamMemberEntity> team3 = List.of(
             ));
     
     
-        PORTFOLIOS.put("3", new PortfoliosEntity("3", "ModeMe", "A. Park",
+        PORTFOLIOS.put("9", new PortfoliosEntity("9", "ModeMe", "A. Park",
             List.of("Java","Thymeleaf","HTML","CSS","SpringBoot"),
             2, "2025-07-10",
             "https://kafolio.kr/static/requests/2025/7/9/boards/YWFm....png",
@@ -100,7 +100,7 @@ private static final List<TeamMemberEntity> team3 = List.of(
         if (portfolios == null) {
             model.addAttribute("notFound", true);
         } else {
-            model.addAttribute("project", portfolios);
+            model.addAttribute("portfolios", portfolios);
         }
         return "portfolios/portfolios"; // templates/detail/portfolio-detail.html
     }

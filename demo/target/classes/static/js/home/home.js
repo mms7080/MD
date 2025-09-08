@@ -17,39 +17,39 @@ const sampleProjects = [
   { id:"p1", title:"Pawple", creator:"J. Kim",
     tags:["React","SpringBoot","Tailwind","JPA","Lombok"], likes:98,
     createdAt:"2025-08-15", cover:"https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png",
-    desc:"반려동물 건강관리 및 펫 스토어", link:"/folio/1" },
+    desc:"반려동물 건강관리 및 펫 스토어", link:"/portfolios/1" },
   { id:"p2", title:"헬스케어 습관 트래커 웹앱", creator:"M. Lee",
     tags:["Next.js","React","Zustand","PWA","Analytics"], likes:203,
     createdAt:"2025-06-01", cover:"https://picsum.photos/seed/health/800/500",
-    desc:"개인 맞춤 습관 형성 UX를 반영한 웹앱. 오프라인 동기화 지원.", link:"/folio/2" },
+    desc:"개인 맞춤 습관 형성 UX를 반영한 웹앱. 오프라인 동기화 지원.", link:"/portfolios/2" },
   { id:"p3", title:"브랜드 사이트 – Cafe VERT", creator:"A. Park",
     tags:["Astro","Tailwind","SSR","SEO","Animation"], likes:96,
     createdAt:"2025-07-10", cover:"https://picsum.photos/seed/brand/800/500",
-    desc:"친환경 카페 브랜드의 모션 인터랙션과 SEO 최적화.", link:"/folio/3" },
+    desc:"친환경 카페 브랜드의 모션 인터랙션과 SEO 최적화.", link:"/portfolios/3" },
   { id:"p4", title:"3D 제품 뷰어(웹)", creator:"D. Choi",
     tags:["Three.js","WebGL","React","Product","Viewer"], likes:310,
     createdAt:"2025-05-20", cover:"https://picsum.photos/seed/3d/800/500",
-    desc:"브라우저에서 회전/재질 변경 가능한 3D 제품 뷰어.", link:"/folio/4" },
+    desc:"브라우저에서 회전/재질 변경 가능한 3D 제품 뷰어.", link:"/portfolios/4" },
   { id:"p5", title:"Filmora", creator:"S. Han",
     tags:["Next.js","SpringBoot","React","VSCode","JPA"], likes:77,
     createdAt:"2025-08-22", cover:"https://kafolio.kr/static/requests/2025/7/9/boards/ZTI0YmNkZTMxMjIzY2VkNmRlYmFkZDYyY2M4M2Q2NDJlNTE2MTdmZGUzZDE3MWVkMmE1ZTMxYTc0YjBmNWQ4Yw==.png",
-    desc:"영화 예매 및 스토어 이벤트.", link:"/folio/5" },
+    desc:"영화 예매 및 스토어 이벤트.", link:"/portfolios/5" },
   { id:"p6", title:"매거진 타이포 시스템(웹)", creator:"B. Yoo",
     tags:["Vue","Nuxt","SSR","Typography","WebFont"], likes:65,
     createdAt:"2025-02-18", cover:"https://picsum.photos/seed/type/800/500",
-    desc:"가독성 중심의 모듈형 타이포그래피 시스템.", link:"folio/6" },
+    desc:"가독성 중심의 모듈형 타이포그래피 시스템.", link:"/portfolios/6" },
   { id:"p7", title:"여행 계획 웹 서비스 UX 개편", creator:"H. Jung",
     tags:["React","Redux","REST","i18n","Admin"], likes:181,
     createdAt:"2025-04-02", cover:"https://picsum.photos/seed/travel/800/500",
-    desc:"검색→저장→공유 플로우 개선으로 예약 전환율 향상.", link:"folio/7" },
+    desc:"검색→저장→공유 플로우 개선으로 예약 전환율 향상.", link:"/portfolios/7" },
   { id:"p8", title:"러닝 코치 대시보드", creator:"R. Kwon",
     tags:["Svelte","Node.js","Express","MongoDB","Realtime"], likes:142,
     createdAt:"2025-03-12", cover:"https://picsum.photos/seed/run/800/500",
-    desc:"센서 데이터 실시간 시각화와 사용자 피드백 모듈.", link:"/folio/8" },
+    desc:"센서 데이터 실시간 시각화와 사용자 피드백 모듈.", link:"/portfolios/8" },
   { id:"p9", title:"ModeMe", creator:"Y. Song",
     tags:["JAVA","HTML","THYMELEAF","JS","SPRING"], likes:54,
     createdAt:"2025-07-25", cover:"https://kafolio.kr/static/requests/2025/3/27/boards/OTZjOTNiYWJkMjNhMjA0ZTI2MGI1YWZmMmNiYTlhNmVmOGZlODJlYjlhODBkNmU0OTdjZmY3ZTM1MmNmMTI2Mg==.jpg",
-    desc:"20대 남성 전문 쇼핑몰" },
+    desc:"20대 남성 전문 쇼핑몰" ,link:"portfolios/9"},
 ];
 
 const formatDate = iso => new Date(iso).toLocaleDateString('ko-KR');
@@ -227,6 +227,7 @@ function createCard(project){
   el.setAttribute("data-id", project.id);
   el.setAttribute("tabindex", "0");
   
+  
 
   el.innerHTML = `
     <figure class="card-media skeleton">
@@ -245,7 +246,8 @@ function createCard(project){
     </div>
     <div class="card-actions">
       <button class="btn view">자세히</button>
-      <a class="btn ghost" href="${project.link}" target="_blank" rel="noopener">원본</a>
+      <a class="btn ghost" href="${project.link}" rel="noopener">원본</a>
+      
     </div>
   `;
 
@@ -308,16 +310,7 @@ function openModal(project){
   $("#modalTitle") && ($("#modalTitle").textContent = project.title);
   $("#modalDesc") && ($("#modalDesc").textContent = project.desc);
   const tags = $("#modalTags"); if (tags) tags.innerHTML = renderTagBadges(project.tags);
-  const link = $("#modalLink");
-  if (link) {
-    // 서버에서 쓰는 실제 id라면 그대로:
-    link.href = `/portfolios/${project.id}`;
-
-    // 데모 id가 p1/p2…라면 간단 매핑:
-    // const map = { p1:"1", p2:"2", p3:"3" };
-    // link.href = `/portfolios/${map[project.id] || project.id}`;
-  }
-  $("#modal")?.showModal?.();
+  const link = $("#modalLink"); if (link) link.href = project.link;
 
   const dlg = $("#modal");
   if (dlg && typeof dlg.showModal === "function") dlg.showModal();
