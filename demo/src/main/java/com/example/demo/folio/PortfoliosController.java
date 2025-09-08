@@ -52,7 +52,7 @@ static {
             "https://pawple.kafolio.kr/","pawpleRe.zip"
     ));
 
-    PROJECTS.put("5", new Project("5", "Fimora", "S.Han",
+    PROJECTS.put("5", new Project("5", "Filmora", "S.Han",
             List.of("Next.js","SpringBoot","React","JPA","VSCode"),
             2, "2025-08-22",
             "https://kafolio.kr/static/requests/2025/7/9/boards/NmI2....png",

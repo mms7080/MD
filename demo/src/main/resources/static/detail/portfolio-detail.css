@@ -1,7 +1,8 @@
-@import url('https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css');
+@import url('//spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css');
+
 
 body {
-    font-family: 'SUIT', sans-serif;
+    font-family: 'SpoqaHanSans-kr', sans-serif;
     background-color: #f8f9fa;
     margin: 0;
     padding: 0;
