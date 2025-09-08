@@ -100,7 +100,7 @@ private static final List<TeamMemberEntity> team3 = List.of(
         if (portfolios == null) {
             model.addAttribute("notFound", true);
         } else {
-            model.addAttribute("portfolios", portfolios);
+            model.addAttribute("project", portfolios);
         }
         return "portfolios/portfolios"; // templates/detail/portfolio-detail.html
     }
