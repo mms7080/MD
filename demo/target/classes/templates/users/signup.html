@@ -1,141 +1,541 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <title>회원가입</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; }
-    form { border: 1px solid #e5e7eb; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
-    label { display:block; margin: 12px 0 6px; font-weight: 600; }
-    input { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; }
-    button { margin-top: 16px; padding: 10px 14px; border: 0; background: #111827; color: #fff; border-radius: 6px; cursor: pointer; }
-    .error { color: #b91c1c; font-size: 0.9rem; margin-top: 6px; }
-    .note  { color: #065f46; }
-    .gender-group label { display:inline-flex; align-items:center; margin-right:12px; }
-    .gender-group input[type="checkbox"] { width:auto; margin:0; }
-    .gender-group span { margin-left:6px; }
-  </style>
-</head>
-<body>
-  <h1>회원가입</h1>
+<html
+    lang="ko"
+    data-theme="light"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>kafolio – 회원가입</title>
+        <meta name="description" content="kafolio 계정 회원가입" />
 
-  <!-- 상단 메시지 -->
-  <p th:if="${msg}" th:text="${msg}" class="note"></p>
-  <p th:if="${error}" th:text="${error}" class="error"></p>
+        <!-- 전역/페이지 스타일 -->
+        <link rel="stylesheet" th:href="@{/css/home/home.css}" />
+        <link rel="stylesheet" th:href="@{/css/header.css}" />
+        <link rel="stylesheet" th:href="@{/css/users/signup.css}" />
 
-  <!-- 이메일 인증코드 발송 (EmailController @PostMapping("/send-code") 가정) -->
-  <form th:action="@{/send-code}" method="post">
-    <h3>이메일 인증</h3>
-    <label for="emailSend">이메일</label>
-    <!-- usersDTO.email 값을 유지해서 다시 안 적어도 되도록 -->
-    <input id="emailSend" type="email" name="email" th:value="${usersDTO != null ? usersDTO.email : ''}" required />
-    <!-- CSRF -->
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-    <button type="submit">인증코드 발송</button>
-    <p style="margin-top:8px;color:#6b7280;">인증코드는 5분 동안만 유효합니다.</p>
-  </form>
+        <!-- CSRF for fetch -->
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
-  <!-- 회원가입 본 폼 -->
-  <form th:action="@{/signup}" method="post" th:object="${usersDTO}">
-    <h3>계정 정보</h3>
-
-    <!-- 전역/필드 에러 출력 -->
-    <div th:if="${#fields.hasAnyErrors()}">
-      <ul>
-        <li class="error" th:each="e : ${#fields.errors('*')}" th:text="${e}">에러</li>
-      </ul>
-    </div>
-
-    <label for="username">아이디</label>
-    <input id="username" type="text" th:field="*{username}" placeholder="영문 소문자/숫자 4~16자" required />
-    <div class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
-
-    <label for="password">비밀번호</label>
-    <input id="password" type="password" th:field="*{password}" placeholder="10자 이상" required />
-    <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
-
-    <label for="confirmPassword">비밀번호 확인</label>
-    <input id="confirmPassword" type="password" th:field="*{confirmPassword}" placeholder="비밀번호를 한번 더 입력" required />
-    <div class="error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
-
-    <label for="name">이름</label>
-    <input id="name" type="text" th:field="*{name}" required />
-    <div class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-
-    <label for="email">이메일</label>
-    <input id="email" type="email" th:field="*{email}" required />
-    <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
-
-    <!-- 성별(M/W) - 체크박스(상호 배타) -->
-    <h3 style="margin-top:22px;">성별</h3>
-    <div role="group" aria-label="성별 선택" class="gender-group">
-      <label>
-        <input
-          type="checkbox"
-          name="gender"
-          id="genderM"
-          value="M"
-          th:checked="${usersDTO != null and usersDTO.gender == 'M'}"
+        <!-- 파비콘 -->
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="https://kafolio.kr/static/icon.ico"
         />
-        <span>남자</span>
-      </label>
+    </head>
+    <body data-page="signup">
+        <a class="skip-link" href="#content">본문 바로가기</a>
 
-      <label>
-        <input
-          type="checkbox"
-          name="gender"
-          id="genderW"
-          value="W"
-          th:checked="${usersDTO != null and usersDTO.gender == 'W'}"
-        />
-        <span>여자</span>
-      </label>
-    </div>
-    <div class="error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+        <!-- 헤더 -->
+        <header class="site-header">
+            <div class="container header-inner">
+                <a class="brand" th:href="@{/home}" aria-label="홈으로">
+                    <img
+                        class="brand-mark"
+                        src="https://kafolio.kr/static/icon.ico"
+                        alt=""
+                        width="20"
+                        height="20"
+                    />
+                    <span class="brand-text">kafolio</span>
+                </a>
 
-    <label for="age">나이</label>
-<input id="age" type="number" min="0" max="150" th:field="*{age}" required />
-<div class="error" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></div>
+                <nav class="nav">
+                    <button
+                        class="nav-toggle"
+                        aria-expanded="false"
+                        aria-controls="primary-menu"
+                        aria-label="메뉴 열기"
+                    >
+                        <span class="nav-toggle-bar"></span>
+                        <span class="nav-toggle-bar"></span>
+                        <span class="nav-toggle-bar"></span>
+                    </button>
+                    <ul id="primary-menu" class="nav-list">
+                        <li><a th:href="@{/home}">home</a></li>
+                        <li><a th:href="@{/detail}">detail</a></li>
+                    </ul>
+                </nav>
 
-    <h3 style="margin-top:22px;">이메일 인증코드</h3>
-    <label for="emailCode">인증코드</label>
-    <!-- DTO에는 없으니 name 속성으로만 전송 -->
-    <input id="emailCode" type="text" name="emailCode" placeholder="메일로 받은 6자리 코드" required />
+                <div class="header-actions">
+                    <button
+                        id="btnTheme"
+                        class="btn ghost"
+                        aria-pressed="false"
+                        aria-label="다크모드 전환"
+                    >
+                        🌓
+                    </button>
 
-    <!-- CSRF -->
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-    <button type="submit">가입하기</button>
-  </form>
+                    <!-- 로그인 전 -->
+                    <span sec:authorize="isAnonymous()">
+                        <a th:href="@{/signin}" class="btn ghost">로그인</a>
+                        <a
+                            th:href="@{/signup}"
+                            class="btn primary"
+                            aria-current="page"
+                            >회원가입</a
+                        >
+                    </span>
 
-  <p style="margin-top:16px;">
-    이미 계정이 있으신가요? <a th:href="@{/signin}">로그인</a>
-  </p>
+                    <!-- 로그인 후 -->
+                    <span sec:authorize="isAuthenticated()">
+                        <a th:href="@{/mypage}" class="btn ghost">마이페이지</a>
+                        <form
+                            th:action="@{/logout}"
+                            method="post"
+                            style="display: inline"
+                        >
+                            <input
+                                type="hidden"
+                                th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}"
+                            />
+                            <button type="submit" class="btn primary">
+                                로그아웃
+                            </button>
+                        </form>
+                    </span>
+                </div>
+            </div>
+        </header>
 
-  <script>
-    // 체크박스를 상호 배타적으로(라디오처럼) 동작시키기 + 제출 시 검증
-    (function () {
-      const m = document.getElementById("genderM");
-      const w = document.getElementById("genderW");
+        <!-- 본문 -->
+        <main id="content" class="auth">
+            <!-- 히어로 -->
+            <section class="auth-hero">
+                <div class="container">
+                    <h1>회원가입</h1>
+                    <p class="muted">필수 항목을 입력해 계정을 생성하세요.</p>
+                </div>
+            </section>
 
-      function enforceExclusive(e) {
-        if (e.target === m && m.checked) w.checked = false;
-        if (e.target === w && w.checked) m.checked = false;
-      }
-      m.addEventListener("change", enforceExclusive);
-      w.addEventListener("change", enforceExclusive);
+            <!-- 상단 메시지 -->
+            <div class="container" style="max-width: 720px">
+                <p
+                    th:if="${msg}"
+                    th:text="${msg}"
+                    class="note-banner"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+                <p
+                    th:if="${error}"
+                    th:text="${error}"
+                    class="note-banner error"
+                    role="alert"
+                ></p>
+            </div>
 
-      // 현재 문서 내 /signup 폼을 잡아서 제출 전 체크
-      const signupForm = document.querySelector('form[th\\:action="@{/signup}"]') || document.querySelector('form[action$="/signup"]');
-      if (signupForm) {
-        signupForm.addEventListener("submit", function (e) {
-          // 둘 다 체크 안됐으면 막기
-          if (!m.checked && !w.checked) {
-            e.preventDefault();
-            alert("성별을 선택하세요.");
-          }
-        });
-      }
-    })();
-  </script>
-</body>
+            <section class="auth-body">
+                <div class="container auth-container">
+                    <!-- 회원가입 본 폼 -->
+                    <form
+                        id="signupForm"
+                        class="auth-card"
+                        th:action="@{/signup}"
+                        method="post"
+                        th:object="${usersDTO}"
+                        aria-label="회원가입 폼"
+                        novalidate
+                    >
+                        <h3 style="margin: 0">계정 정보</h3>
+
+                        <!-- 전역/필드 에러 -->
+                        <div
+                            th:if="${#fields.hasAnyErrors()}"
+                            style="margin-top: 8px"
+                        >
+                            <ul style="padding-left: 18px; margin: 0">
+                                <li
+                                    class="field-error"
+                                    th:each="e : ${#fields.errors('*')}"
+                                    th:text="${e}"
+                                >
+                                    에러
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="field" style="margin-top: 10px">
+                            <label for="username"
+                                >아이디
+                                <span class="req" aria-hidden="true"
+                                    >*</span
+                                ></label
+                            >
+                            <input
+                                id="username"
+                                type="text"
+                                th:field="*{username}"
+                                placeholder="영문 소문자/숫자 4~16자"
+                                required
+                                autocomplete="username"
+                            />
+                            <p
+                                class="field-error"
+                                th:if="${#fields.hasErrors('username')}"
+                                th:errors="*{username}"
+                            ></p>
+                        </div>
+
+                        <div class="field">
+                            <label for="password"
+                                >비밀번호
+                                <span class="req" aria-hidden="true"
+                                    >*</span
+                                ></label
+                            >
+                            <input
+                                id="password"
+                                type="password"
+                                th:field="*{password}"
+                                placeholder="10자 이상"
+                                required
+                                autocomplete="new-password"
+                            />
+                            <p
+                                class="field-error"
+                                th:if="${#fields.hasErrors('password')}"
+                                th:errors="*{password}"
+                            ></p>
+                        </div>
+
+                        <div class="field">
+                            <label for="confirmPassword"
+                                >비밀번호 확인
+                                <span class="req" aria-hidden="true"
+                                    >*</span
+                                ></label
+                            >
+                            <input
+                                id="confirmPassword"
+                                type="password"
+                                th:field="*{confirmPassword}"
+                                placeholder="비밀번호를 한번 더 입력"
+                                required
+                                autocomplete="new-password"
+                            />
+                            <p
+                                class="field-error"
+                                th:if="${#fields.hasErrors('confirmPassword')}"
+                                th:errors="*{confirmPassword}"
+                            ></p>
+                        </div>
+
+                        <div class="field">
+                            <label for="name"
+                                >이름
+                                <span class="req" aria-hidden="true"
+                                    >*</span
+                                ></label
+                            >
+                            <input
+                                id="name"
+                                type="text"
+                                th:field="*{name}"
+                                required
+                            />
+                            <p
+                                class="field-error"
+                                th:if="${#fields.hasErrors('name')}"
+                                th:errors="*{name}"
+                            ></p>
+                        </div>
+
+                        <!-- 이메일 + 인증코드 발송 버튼 (인라인) -->
+                        <div class="field field-inline">
+                            <label for="email"
+                                >이메일
+                                <span class="req" aria-hidden="true"
+                                    >*</span
+                                ></label
+                            >
+                            <div class="inline-wrap">
+                                <input
+                                    id="email"
+                                    type="email"
+                                    th:field="*{email}"
+                                    required
+                                    autocomplete="email"
+                                />
+                                <button
+                                    id="btnSendCode"
+                                    type="button"
+                                    class="btn"
+                                    disabled
+                                >
+                                    인증코드 발송
+                                </button>
+                            </div>
+                            <p
+                                class="field-error"
+                                th:if="${#fields.hasErrors('email')}"
+                                th:errors="*{email}"
+                            ></p>
+                        </div>
+
+                        <!-- 인증코드 입력칸: 초기 숨김, 발송 후 표시 -->
+                        <div id="codeBlock" class="field" hidden>
+                            <label for="emailCode"
+                                >이메일 인증코드
+                                <span class="req" aria-hidden="true"
+                                    >*</span
+                                ></label
+                            >
+                            <input
+                                id="emailCode"
+                                name="emailCode"
+                                type="text"
+                                inputmode="numeric"
+                                pattern="\\d{6}"
+                                maxlength="6"
+                                placeholder="메일로 받은 6자리 코드"
+                            />
+                            <p class="muted" id="codeHint">
+                                인증코드는 5분 동안 유효합니다.
+                            </p>
+                            <p
+                                class="field-error"
+                                id="err-code"
+                                aria-live="polite"
+                            ></p>
+                        </div>
+
+                        <!-- 성별 -->
+                        <fieldset class="field">
+                            <legend id="genderLegend">
+                                성별
+                                <span class="req" aria-hidden="true">*</span>
+                            </legend>
+                            <div class="radios" aria-labelledby="genderLegend">
+                                <label class="radio">
+                                    <input
+                                        type="radio"
+                                        th:field="*{gender}"
+                                        value="M"
+                                        required
+                                    />
+                                    <span>남자</span>
+                                </label>
+                                <label class="radio">
+                                    <input
+                                        type="radio"
+                                        th:field="*{gender}"
+                                        value="W"
+                                        required
+                                    />
+                                    <span>여자</span>
+                                </label>
+                            </div>
+                            <p
+                                class="field-error"
+                                th:if="${#fields.hasErrors('gender')}"
+                                th:errors="*{gender}"
+                            ></p>
+                        </fieldset>
+
+                        <div class="field">
+                            <label for="age"
+                                >나이
+                                <span class="req" aria-hidden="true"
+                                    >*</span
+                                ></label
+                            >
+                            <input
+                                id="age"
+                                type="number"
+                                min="0"
+                                max="150"
+                                th:field="*{age}"
+                                required
+                            />
+                            <p
+                                class="field-error"
+                                th:if="${#fields.hasErrors('age')}"
+                                th:errors="*{age}"
+                            ></p>
+                        </div>
+
+                        <!-- CSRF for form submit -->
+                        <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"
+                        />
+
+                        <button type="submit" class="btn primary full">
+                            가입하기
+                        </button>
+
+                        <div class="alt">
+                            <span class="muted">이미 계정이 있으신가요?</span>
+                            <a class="link" th:href="@{/signin}">로그인</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- 푸터 -->
+        <footer class="site-footer">
+            <div class="container footer-inner">
+                <p>© <span id="year"></span> kafolio. All rights reserved.</p>
+                <ul class="footer-links">
+                    <li><a th:href="@{/terms}">이용약관</a></li>
+                    <li><a th:href="@{/privacy}">개인정보처리방침</a></li>
+                    <li><a th:href="@{/help}">도움말</a></li>
+                </ul>
+            </div>
+        </footer>
+
+        <!-- 공통 스크립트: 테마/모바일 메뉴 -->
+        <script>
+            (function () {
+                const root = document.documentElement;
+                const btn = document.getElementById("btnTheme");
+                const saved = localStorage.getItem("theme") || "light";
+                root.setAttribute("data-theme", saved);
+                if (btn) {
+                    btn.setAttribute("aria-pressed", saved === "dark");
+                    btn.addEventListener("click", () => {
+                        const next =
+                            root.getAttribute("data-theme") === "dark"
+                                ? "light"
+                                : "dark";
+                        root.setAttribute("data-theme", next);
+                        localStorage.setItem("theme", next);
+                        btn.setAttribute("aria-pressed", next === "dark");
+                    });
+                }
+                const y = document.getElementById("year");
+                if (y) y.textContent = new Date().getFullYear();
+
+                const t = document.querySelector(".nav-toggle");
+                const l = document.getElementById("primary-menu");
+                if (t && l)
+                    t.addEventListener("click", () => {
+                        const open = l.classList.toggle("open");
+                        t.setAttribute("aria-expanded", open);
+                    });
+            })();
+        </script>
+
+        <!-- 이메일 인증 UX 스크립트 -->
+        <script>
+            (function () {
+                const emailInput = document.getElementById("email");
+                const sendBtn = document.getElementById("btnSendCode");
+                const codeBlock = document.getElementById("codeBlock");
+                const codeInput = document.getElementById("emailCode");
+                const errCode = document.getElementById("err-code");
+                const hint = document.getElementById("codeHint");
+
+                const csrfToken =
+                    document.querySelector('meta[name="_csrf"]')?.content;
+                const csrfHeader = document.querySelector(
+                    'meta[name="_csrf_header"]'
+                )?.content;
+
+                const emailRe = /^\\S+@\\S+\\.\\S+$/;
+
+                function updateButtonState() {
+                    const ok = emailRe.test((emailInput.value || "").trim());
+                    sendBtn.disabled = !ok;
+                }
+                emailInput.addEventListener("input", updateButtonState);
+                updateButtonState();
+
+                let cooldown = 0,
+                    timer = null;
+                function startCooldown(sec = 60) {
+                    if (timer) clearInterval(timer);
+                    cooldown = sec;
+                    sendBtn.disabled = true;
+                    sendBtn.textContent = `재전송 ${cooldown}s`;
+                    timer = setInterval(() => {
+                        cooldown--;
+                        if (cooldown <= 0) {
+                            clearInterval(timer);
+                            sendBtn.textContent = "인증코드 발송";
+                            updateButtonState();
+                        } else {
+                            sendBtn.textContent = `재전송 ${cooldown}s`;
+                        }
+                    }, 1000);
+                }
+
+                sendBtn.addEventListener("click", async () => {
+                    errCode.textContent = "";
+                    const email = (emailInput.value || "").trim();
+                    if (!emailRe.test(email)) return;
+
+                    // 클릭 즉시 코드칸 노출 & 포커스
+                    codeBlock.hidden = false;
+                    codeInput?.focus();
+
+                    // 서버에 코드 발송 요청
+                    try {
+                        const res = await fetch("/send-code", {
+                            method: "POST",
+                            headers: Object.assign(
+                                {
+                                    "Content-Type":
+                                        "application/x-www-form-urlencoded",
+                                },
+                                csrfHeader && csrfToken
+                                    ? { [csrfHeader]: csrfToken }
+                                    : {}
+                            ),
+                            body: new URLSearchParams({ email }),
+                        });
+                        if (!res.ok) throw new Error("인증코드 발송 실패");
+                        startCooldown(60);
+                        hint.textContent =
+                            "인증코드를 보냈습니다. 5분 안에 입력해 주세요.";
+                    } catch (err) {
+                        errCode.textContent =
+                            "인증코드 발송에 실패했습니다. 이메일을 확인 후 다시 시도해 주세요.";
+                        setTimeout(updateButtonState, 5000);
+                    }
+                });
+
+                // 제출 시: 코드칸이 열려 있다면 코드 필수
+                const form = document.getElementById("signupForm");
+                form.addEventListener("submit", (e) => {
+                    if (!codeBlock.hidden && !codeInput.value.trim()) {
+                        e.preventDefault();
+                        errCode.textContent = "인증코드를 입력하세요.";
+                        codeInput.focus();
+                    }
+                });
+            })();
+        </script>
+
+        <!-- 페이지 전용: 배너 + 인라인 레이아웃 보강 -->
+        <style>
+            .note-banner {
+                margin: 12px auto 0;
+                padding: 10px 14px;
+                background: var(--primary-ink);
+                border: 1px solid var(--border);
+                border-radius: 10px;
+            }
+            .note-banner.error {
+                background: color-mix(in oklab, #ff6b6b 20%, transparent);
+                border-color: color-mix(in oklab, #ff6b6b 40%, var(--border));
+            }
+            /* 이메일 + 버튼 인라인 */
+            .field-inline .inline-wrap {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 10px;
+                align-items: center;
+            }
+        </style>
+    </body>
 </html>

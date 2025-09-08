@@ -1,0 +1,136 @@
+/* ===========================
+   Signup Page – signup.css
+   =========================== */
+
+.auth-hero {
+    padding: 40px 0 12px;
+    background: radial-gradient(
+            600px 200px at 10% 0%,
+            color-mix(in oklab, var(--primary) 14%, transparent),
+            transparent 60%
+        ),
+        radial-gradient(
+            700px 220px at 90% 0%,
+            color-mix(in oklab, var(--accent) 16%, transparent),
+            transparent 60%
+        );
+    text-align: center;
+}
+.auth-hero h1 {
+    margin: 0;
+    font-size: 32px;
+    letter-spacing: -0.4px;
+}
+.auth-hero .muted {
+    color: var(--muted);
+    margin: 6px 0 0;
+}
+
+.auth-body {
+    padding: 20px 0 60px;
+}
+.auth-container {
+    display: grid;
+    place-items: center;
+}
+.auth-card {
+    width: 100%;
+    max-width: 480px;
+    padding: 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: grid;
+    gap: 12px;
+}
+
+.field {
+    display: grid;
+    gap: 6px;
+}
+.field label,
+.field legend {
+    font-size: 14px;
+    color: var(--text);
+    opacity: 0.95;
+}
+.req {
+    color: var(--primary);
+    margin-left: 2px;
+}
+
+.field input {
+    height: 42px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text);
+    border-radius: 12px;
+    outline: none;
+}
+.field input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
+}
+
+.radios {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.radio input {
+    width: 16px;
+    height: 16px;
+}
+
+.field-error {
+    min-height: 16px;
+    font-size: 12px;
+    color: var(--danger, #ff6b6b);
+    margin: -2px 0 0;
+}
+
+.btn.full {
+    width: 100%;
+}
+.alt {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    font-size: 14px;
+}
+.link {
+    color: var(--primary);
+    text-decoration: none;
+}
+.link:hover {
+    text-decoration: underline;
+}
+
+.note {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.field-inline .inline-wrap {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+    .auth-card {
+        max-width: 100%;
+        border-radius: 12px;
+    }
+}

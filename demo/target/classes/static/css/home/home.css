@@ -1,4 +1,6 @@
-변수 & 리셋 :root {
+/* 변수 & 리셋 */
+
+:root {
     --bg: #0b0c10;
     --bg-soft: #12131a;
     --card: #161821;
@@ -8,6 +10,8 @@
     --primary-ink: #0b1a4a;
     --border: #24283a;
     --accent: #84ffd2;
+    --opti: #fff27f;
+    --opti-o: #bc16e5;
     --radius: 14px;
     --shadow: 0 7px 30px rgba(0, 0, 0, 0.25);
     --container: 1200px;
@@ -602,4 +606,26 @@ select {
 /* detail도 home과 동일한 3열(=12칸 그리드에서 카드 span 4) */
 body[data-page="detail"] .grid .card {
     grid-column: span 4;
+}
+
+@media (min-width: 961px) {
+    .hero h1 {
+        font-size: 48px;
+        line-height: 1.22;
+    }
+    .hero-sub {
+        opacity: 0.9;
+    }
+}
+
+:focus-visible {
+    outline: 3px solid color-mix(in oklab, var(--primary) 45%, transparent);
+    outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition: none !important;
+    }
 }
