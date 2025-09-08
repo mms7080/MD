@@ -1,49 +1,63 @@
 <!DOCTYPE html>
 <html lang="ko" data-theme="light">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>kafolio – Home</title>
   <meta name="description" content="웹페이지 제작 포트폴리오 갤러리" />
-  <link rel="stylesheet" href="home/home.css" />
-  <link rel="stylesheet" href="header.css" />
-<!-- <head> 안의 파비콘 교체 -->
-<link rel="icon" type="image/x-icon" href="https://kafolio.kr/static/icon.ico" />
+  <link rel="stylesheet" href="css/home/home.css" />
+  <link rel="stylesheet" href="/css/header.css" />
+  <!-- <head> 안의 파비콘 교체 -->
+  <link rel="icon" type="image/x-icon" href="https://kafolio.kr/static/icon.ico" />
 
 </head>
+
 <body data-page="home">
   <a class="skip-link" href="#content">본문 바로가기</a>
 
-  <!-- 헤더 -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <!-- 헤더 로고: 기존 점(●) 대신 아이콘 이미지 -->
-<a class="brand" href="home.html" aria-label="홈으로">
-  <img class="brand-mark" src="https://kafolio.kr/static/icon.ico" alt="" width="20" height="20" />
-  <span class="brand-text">kafolio</span>
-</a>
+<!-- 헤더 -->
+<header class="site-header" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+  <div class="container header-inner">
+    <!-- 헤더 로고 -->
+    <a class="brand" href="/home" aria-label="홈으로">
+      <img class="brand-mark" src="https://kafolio.kr/static/icon.ico" alt="" width="20" height="20" />
+      <span class="brand-text">kafolio</span>
+    </a>
 
+    <nav class="nav">
+      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-menu" aria-label="메뉴 열기">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+      <ul id="primary-menu" class="nav-list">
+        <li><a href="/home" class="is-active">home</a></li>
+        <li><a href="/detail">detail</a></li>
+      </ul>
+    </nav>
 
-      <nav class="nav">
-        <button class="nav-toggle" aria-expanded="false" aria-controls="primary-menu" aria-label="메뉴 열기">
-          <span class="nav-toggle-bar"></span>
-          <span class="nav-toggle-bar"></span>
-          <span class="nav-toggle-bar"></span>
-        </button>
-        <ul id="primary-menu" class="nav-list">
-          <li><a href="home.html" class="is-active">home</a></li> 
-          <li><a href="detail.html">detail</a></li>
-        </ul>
-      </nav>
+    <div class="header-actions">
+      <button id="btnTheme" class="btn ghost" aria-pressed="false" aria-label="다크모드 전환">🌓</button>
 
-      <div class="header-actions">
-  <button id="btnTheme" class="btn ghost" aria-pressed="false" aria-label="다크모드 전환">🌓</button>
-  <a href="login.html" class="btn ghost">로그인</a>
-  <a href="signup.html" class="btn primary">회원가입</a>
-</div>
+      <!-- 로그인 전 -->
+      <span sec:authorize="isAnonymous()">
+        <a href="/signin" class="btn ghost">로그인</a>
+        <a href="/signup" class="btn primary">회원가입</a>
+      </span>
 
+      <!-- 로그인 후 -->
+      <span sec:authorize="isAuthenticated()">
+        <a href="/mypage" class="btn ghost">마이페이지</a>
+        <form th:action="@{/logout}" method="post" style="display:inline">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <button type="submit" class="btn primary">로그아웃</button>
+        </form>
+      </span>
     </div>
-  </header>
+  </div>
+</header>
+
 
   <!-- 히어로 -->
   <section class="hero">
@@ -127,6 +141,7 @@
     </div>
   </footer>
 
-  <script src="home/home.js"></script>
+  <script src="js/home/home.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,476 @@
+:root{
+  --bg:#f6f7f9;
+  --page:#ffffff;
+  --rail:#ffffff;
+  --text:#111827;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --border-strong:#d1d5db;
+  --teal:#7bd7d0;            /* 스샷 느낌의 민트/티얼 버튼 */
+  --teal-ink:#64c7bf;
+  --teal-ghost:#e8faf8;
+  --danger:#ef4444;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+  --radius:10px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Pretendard,Apple SD Gothic Neo,Segoe UI Emoji,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ===== Shell ===== */
+.admin-shell{
+  display:grid;
+  grid-template-columns: 240px 1fr;
+  min-height:calc(100vh - 64px); /* 헤더 높이만큼 빼기(대략) */
+}
+
+/* ===== Left Rail (sidebar) ===== */
+.nav-rail{
+  background:var(--rail);
+  border-right:1px solid var(--border);
+  padding:20px 16px;
+}
+.org-name{
+  font-weight:700;
+  margin-bottom:14px;
+}
+.rail-menu{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.rail-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 10px;
+  border-radius:8px;
+  text-decoration:none;
+  color:var(--text);
+  transition:background .2s;
+}
+.rail-item:hover{ background:#f3f4f6; }
+.rail-item.is-active{
+  background:#eef2ff;
+  color:#1f2937;
+  font-weight:600;
+}
+.rail-item .dot{
+  width:8px;height:8px;border-radius:50%;background:#9ca3af;display:inline-block;
+}
+
+/* ===== Page ===== */
+.page{ padding:24px; }
+
+.page-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+.page-titles h1{
+  margin:0;
+  font-size:22px;
+  font-weight:700;
+}
+.page-titles .sub{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+/* teal button (우상단 추가) */
+.btn{
+  appearance:none;
+  border:1px solid var(--border);
+  background:#f9fafb;
+  color:var(--text);
+  padding:8px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  line-height:1;
+}
+.btn:hover{ background:#f3f4f6; }
+.btn:active{ background:#e5e7eb; }
+
+.btn-teal{
+  background:var(--teal);
+  color:#0b1211;
+  border:1px solid transparent;
+  box-shadow:var(--shadow);
+  padding:10px 16px;
+  border-radius:12px;
+}
+.btn-teal:hover{ background:var(--teal-ink); }
+
+/* ===== Panel ===== */
+.panel{
+  background:var(--page);
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  background:#fafafa;
+}
+.panel-head h2{
+  margin:0;
+  font-size:15px;
+  font-weight:700;
+}
+.panel-head .count{
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* ===== Table ===== */
+.table-wrap{ overflow:auto; }
+.table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:720px;
+}
+.table thead th{
+  text-align:left;
+  font-weight:600;
+  color:#374151;
+  font-size:13px;
+  padding:12px 14px;
+  background:#edf7f6;           /* 스샷처럼 아주 옅은 민트 헤더 */
+  border-bottom:1px solid var(--border);
+}
+.table tbody td{
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+  font-size:14px;
+  color:#111827;
+}
+.table tbody tr:hover td{ background:#f9fafb; }
+
+.cell-strong{ font-weight:600; }
+.th-actions,.td-actions{ width:80px; text-align:right; }
+.td-actions{ display:flex; justify-content:flex-end; }
+
+/* 아바타 */
+.avatar{
+  display:inline-block;
+  width:28px;height:28px;border-radius:50%;
+  background:#e5e7eb;
+  vertical-align:middle;
+  margin-right:8px;
+  border:1px solid var(--border-strong);
+}
+
+/* 아이콘 버튼(삭제) */
+.icon-btn{
+  appearance:none;
+  border:none;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:8px;
+  width:36px;height:32px;
+  display:inline-grid;place-items:center;
+  cursor:pointer;
+}
+.icon-btn:hover{ background:#fff5f5; }
+.icon-btn.danger{ color:var(--danger); border-color:#fecaca; }
+
+/* ===== Panel Footer / Pagination ===== */
+.panel-foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 16px;
+  background:#fafafa;
+}
+.hint{ color:var(--muted); font-size:12px; }
+
+.pager{
+  display:flex;align-items:center;gap:8px;
+}
+.pager-btn{
+  appearance:none;border:1px solid var(--border);
+  background:#fff;border-radius:8px; width:32px;height:32px;
+  display:grid;place-items:center; cursor:pointer;
+}
+.pager-btn:hover{ background:#f3f4f6; }
+.pager-page{
+  padding:6px 12px;border-radius:10px;background:#e6fffb;color:#03635d;
+  border:1px solid #c7f2ec;font-weight:700;min-width:32px;text-align:center;
+}
+.pager-page.is-current{ background:#bff1eb; }
+
+
+
+
+
+
+
+/* ==========================
+   Team Management (Teams)
+   ========================== */
+
+/* 전체 컨테이너 */
+.team-manager{
+  display:flex;
+  gap:20px;
+  padding:20px;
+  background:var(--page);
+}
+
+/* 좌/우 컬럼 */
+.team-column{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-width:280px;
+}
+
+/* 섹션 제목 */
+.team-column h3{
+  margin:0;
+  font-size:15px;
+  font-weight:700;
+  color:#0f172a;
+}
+
+/* 입력들 (검색/팀명) */
+.team-column input[type="search"],
+.team-column input[type="text"]{
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#fff;
+  font-size:14px;
+  color:var(--text);
+  outline:none;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.team-column input[type="search"]:focus,
+.team-column input[type="text"]:focus{
+  border-color:#c7f2ec;
+  box-shadow:0 0 0 4px #e6fffb;
+}
+
+/* 좌/우 리스트 박스 */
+.list-box {
+  flex: 1;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-height: 260px;
+  max-height: 400px;      /* ✅ 높이 제한 */
+  overflow-y: auto;       /* ✅ 세로 스크롤 강제 */
+  overflow-x: hidden;     /* 가로 스크롤 방지 */
+  box-shadow: var(--shadow);
+}
+
+/* 리스트 아이템 */
+.list-box li {
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  color: #111827;
+  white-space: nowrap;    /* 긴 이름도 줄바꿈 대신 가로 스크롤 */
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.list-box li:hover{
+  background:#f3f4f6;
+}
+.list-box li.selected{
+  background:#e6fffb;
+  color:#03635d;
+  border:1px solid #c7f2ec;
+}
+
+/* 중앙 이동 버튼 스택 */
+.team-controls{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+}
+.team-controls .btn{
+  width:46px;
+  height:38px;
+  border-radius:10px;
+  background:#f9fafb;
+  border:1px solid var(--border);
+  font-weight:700;
+  line-height:1;
+  transition:transform .08s ease, background .15s ease;
+}
+.team-controls .btn:hover{
+  background:#f3f4f6;
+  transform:translateY(-1px);
+}
+
+/* 저장 버튼 전체 너비 */
+.full{ width:100%; }
+
+/* 저장 버튼(iOS 민트 강조) */
+.btn.btn-teal{
+  background:var(--teal);
+  color:#0b1211;
+  border:1px solid transparent;
+  box-shadow:var(--shadow);
+  padding:10px 16px;
+  border-radius:12px;
+}
+.btn.btn-teal:hover{ background:var(--teal-ink); }
+
+/* 팀 목록 영역 */
+.team-result{
+  padding:0 20px 20px 20px;
+  background:var(--page);
+  border-top:1px solid var(--border);
+}
+.team-result h3{
+  font-size:14px;
+  font-weight:700;
+  color:#0f172a;
+  margin:10px 0 12px;
+}
+
+/* 팀 카드 리스트 */
+#teamList{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+#teamList > li{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  padding:12px 14px;
+}
+
+/* 팀 카드 내부 레이아웃 */
+.team-item{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.team-info{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.team-name{
+  font-size:15px;
+  font-weight:700;
+  color:#111827;
+}
+.team-members{
+  font-size:13px;
+  color:var(--muted);
+}
+.team-meta{
+  font-size:12px;
+  color:#64748b;
+}
+
+/* 팀 카드 액션 버튼 영역 */
+.team-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+/* 버튼 통일 스타일 */
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: #f9fafb;
+  color: var(--text);
+  padding: 8px 16px;            /* ← 좌우 패딩 늘려줌 */
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;             /* ← 글씨 높이 */
+  white-space: nowrap;          /* ← 줄바꿈 방지 */
+  display: inline-flex;         /* ← 가로 중앙정렬 */
+  align-items: center;
+  justify-content: center;
+  transition: background .15s ease, transform .08s ease;
+}
+.btn:hover { background: #f3f4f6; transform: translateY(-1px); }
+.btn:active { background: #e5e7eb; }
+
+/* 위험(삭제) 버튼 */
+.btn.danger {
+  color: var(--danger);
+  border-color: #fecaca;
+  background: #fff;
+}
+.btn.danger:hover {
+  background: #fff5f5;
+}
+
+
+/* 테이블 안 관리 버튼 간격 (Folice/Profolios/Users에도 적용) */
+.td-actions .btn{ margin-left:6px; }
+.td-actions .btn:first-child{ margin-left:0; }
+
+/* 반응형 */
+@media (max-width: 980px){
+  .team-manager{ flex-direction:column; }
+  .team-controls{ flex-direction:row; justify-content:flex-start; }
+}
+
+
+/* ===== 탭 바 ===== */
+.tabbar{
+  display:flex;
+  gap:8px;
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  background:#fafafa;
+}
+.tabbar .tab{
+  appearance:none;
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:700;
+  transition:background .15s ease, border-color .15s ease, transform .05s ease;
+}
+.tabbar .tab:hover{ background:#f3f4f6; }
+.tabbar .tab.is-active{
+  background:var(--teal-ghost);
+  border-color:#bfe9e5;
+  color:#0f4541;
+}

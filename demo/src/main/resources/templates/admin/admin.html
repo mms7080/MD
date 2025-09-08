@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>관리자 페이지 – kafolio</title>
+
+  <!-- 공통 헤더 스타일 -->
+  <link rel="stylesheet" href="/css/header.css" />
+  <!-- 관리자 디자인 CSS (rail/page/panel/table 등) -->
+  <link rel="stylesheet" href="/css/admin/admin.css" />
+</head>
+<body>
+  <!-- 공통 헤더 -->
+  <div th:replace="fragments/header :: site-header"></div>
+
+  <!-- 본문: 좌측 레일 + 페이지 -->
+  <div class="admin-shell">
+    <!-- 사이드바(레일) -->
+    <aside class="nav-rail">
+      <div class="org-name">관리자</div>
+      <nav class="rail-menu" id="sidebar">
+        <a href="#" class="rail-item is-active" data-page="folice"><span class="dot"></span> Folice 관리</a>
+        <a href="#" class="rail-item" data-page="profolios"><span class="dot"></span> 포토폴리오 관리</a>
+        <a href="#" class="rail-item" data-page="teams"><span class="dot"></span> 팀 관리</a>
+        <a href="#" class="rail-item" data-page="users"><span class="dot"></span> 유저 관리</a>
+      </nav>
+    </aside>
+
+    <!-- Page Area -->
+    <main class="page">
+      <div class="page-header">
+        <div class="page-titles">
+          <h1 id="pageTitle">Folice 관리</h1>
+          <p class="sub" id="pageSub">파일/배너 등 Folice 리소스를 관리합니다.</p>
+        </div>
+        <!-- ✅ 상단 primary 버튼(팀 저장) 제거됨 -->
+      </div>
+
+      <!-- 컨텐츠 패널 -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2 id="panelTitle">Folice 목록</h2>
+          <span class="count" id="panelCount">0건</span>
+        </div>
+
+        <!-- 동적 컨텐츠 들어갈 곳 -->
+        <div id="panelBody" class="table-wrap"></div>
+
+        <div class="panel-foot" id="panelFoot" style="display:none">
+          <span class="hint" id="rangeHint">0건 표시</span>
+          <div class="pager">
+            <button class="pager-btn" id="prevPage" aria-label="이전">‹</button>
+            <span class="pager-page is-current" id="pageIndex">1</span>
+            <button class="pager-btn" id="nextPage" aria-label="다음">›</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+/* ------------------ 더미 데이터 ------------------ */
+const allMembers = [
+  { id: 1,  name: "박범수" }, { id: 2,  name: "김철수" }, { id: 3,  name: "이영희" },
+  { id: 4,  name: "John Doe" }, { id: 5,  name: "Jane Smith" }, { id: 6,  name: "최민수" },
+  { id: 7,  name: "한가인" }, { id: 8,  name: "이준호" }, { id: 9,  name: "홍길동" },
+  { id:10,  name: "강하늘" }, { id:11,  name: "송지효" }, { id:12,  name: "유재석" },
+  { id:13,  name: "정형돈" }, { id:14,  name: "박명수" }, { id:15,  name: "이효리" },
+  { id:16,  name: "아이유" }, { id:17,  name: "손흥민" }, { id:18,  name: "김연아" },
+  { id:19,  name: "차은우" }, { id:20,  name: "전지현" }
+];
+let teams = []; // {id, name, members: [], createdAt}
+
+let foliceList = [
+  { id: "F1", name: "banner.png", owner: "admin", status: "활성",   created: "2025-09-06" },
+  { id: "F2", name: "hero.jpg",   owner: "admin", status: "비활성", created: "2025-09-01" },
+];
+let profoliosList = [
+  { id: "P1", title: "웹 포트폴리오",   author: "박범수", tag: "#Landing", created: "2025-09-05" },
+  { id: "P2", title: "어드민 리디자인", author: "이영희", tag: "#Admin",   created: "2025-08-27" },
+];
+let usersList = [
+  { id: 1, email: "user1@example.com",  nick: "범수",   role: "USER",  joined: "2025-09-01" },
+  { id: 2, email: "admin@example.com",  nick: "관리자", role: "ADMIN", joined: "2025-09-02" },
+];
+
+/* ------------------ 공통 엘리먼트 ------------------ */
+const $title = document.getElementById("pageTitle");
+const $sub = document.getElementById("pageSub");
+const $panelTitle = document.getElementById("panelTitle");
+const $panelCount = document.getElementById("panelCount");
+const $panelBody = document.getElementById("panelBody");
+const $panelFoot = document.getElementById("panelFoot");
+const $rangeHint = document.getElementById("rangeHint");
+const $pageIndex = document.getElementById("pageIndex");
+
+/* ------------------ 페이지 텍스트 ------------------ */
+const pageMeta = {
+  folice:     { title: "Folice 관리",     sub: "파일/배너 등 Folice 리소스를 관리합니다.", panelTitle: "Folice 목록" },
+  profolios:  { title: "Profolios 관리",  sub: "프로젝트 포트폴리오를 관리합니다.",         panelTitle: "Profolios 목록" },
+  teams:      { title: "팀 관리",          sub: "‘팀 편성’과 ‘팀 관리’ 탭에서 작업하세요.",   panelTitle: "팀" },
+  users:      { title: "유저 관리",        sub: "사용자 계정과 권한을 관리합니다.",           panelTitle: "유저 목록" }
+};
+
+/* ------------------ 사이드바 ------------------ */
+document.querySelectorAll("#sidebar .rail-item").forEach(a => {
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.querySelectorAll("#sidebar .rail-item").forEach(x => x.classList.remove("is-active"));
+    a.classList.add("is-active");
+    loadPage(a.dataset.page);
+  });
+});
+
+/* ------------------ 페이지 로더 ------------------ */
+function loadPage(page) {
+  const meta = pageMeta[page];
+  $title.textContent = meta.title;
+  $sub.textContent = meta.sub;
+  $panelTitle.textContent = meta.panelTitle;
+
+  if (page === "folice")     renderFolice();
+  if (page === "profolios")  renderProfolios();
+  if (page === "users")      renderUsers();
+  if (page === "teams")      renderTeamsPage(); // ✅ 탭 구조
+}
+
+/* ------------------ Folice ------------------ */
+function renderFolice() {
+  $panelFoot.style.display = "none";
+  $panelCount.textContent = `${foliceList.length}건`;
+  $panelBody.innerHTML = `
+    <table class="table">
+      <thead>
+        <tr><th>ID</th><th>파일명</th><th>업로더</th><th>상태</th><th>업로드일</th><th class="th-actions">관리</th></tr>
+      </thead>
+      <tbody>
+        ${foliceList.map(f => `
+          <tr>
+            <td class="cell-strong">${f.id}</td>
+            <td>${f.name}</td>
+            <td>${f.owner}</td>
+            <td>${f.status}</td>
+            <td>${f.created}</td>
+            <td class="td-actions">
+              <button class="btn">수정</button>
+              <button class="btn">삭제</button>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>`;
+}
+
+/* ------------------ Profolios ------------------ */
+function renderProfolios() {
+  $panelFoot.style.display = "none";
+  $panelCount.textContent = `${profoliosList.length}건`;
+  $panelBody.innerHTML = `
+    <table class="table">
+      <thead>
+        <tr><th>ID</th><th>제목</th><th>작성자</th><th>태그</th><th>등록일</th><th class="th-actions">관리</th></tr>
+      </thead>
+      <tbody>
+        ${profoliosList.map(p => `
+          <tr>
+            <td class="cell-strong">${p.id}</td>
+            <td>${p.title}</td>
+            <td>${p.author}</td>
+            <td>${p.tag}</td>
+            <td>${p.created}</td>
+            <td class="td-actions">
+              <button class="btn">수정</button>
+              <button class="btn">삭제</button>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>`;
+}
+
+/* ------------------ Users ------------------ */
+function renderUsers() {
+  $panelFoot.style.display = "none";
+  $panelCount.textContent = `${usersList.length}건`;
+  $panelBody.innerHTML = `
+    <table class="table">
+      <thead>
+        <tr><th>ID</th><th>이메일</th><th>닉네임</th><th>역할</th><th>가입일</th><th class="th-actions">관리</th></tr>
+      </thead>
+      <tbody>
+        ${usersList.map(u => `
+          <tr>
+            <td class="cell-strong">${u.id}</td>
+            <td>${u.email}</td>
+            <td>${u.nick}</td>
+            <td>${u.role}</td>
+            <td>${u.joined}</td>
+            <td class="td-actions">
+              <button class="btn">수정</button>
+              <button class="btn">삭제</button>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>`;
+}
+
+/* ======================================================
+   Teams – 탭(팀 편성 / 팀 관리) + 각각의 화면 렌더러
+   ====================================================== */
+let editingTeamId = null;
+
+function renderTeamsPage(activeTab = "compose") {
+  $panelFoot.style.display = "none";
+  $panelTitle.textContent = "팀";
+  $panelCount.textContent = `${teams.length}팀`;
+
+  // 탭 + 컨테이너
+  $panelBody.innerHTML = `
+    <div class="tabbar" role="tablist">
+      <button class="tab ${activeTab === "compose" ? "is-active":""}" data-tab="compose" role="tab" aria-selected="${activeTab==="compose"}">팀 편성</button>
+      <button class="tab ${activeTab === "manage" ? "is-active":""}"  data-tab="manage"  role="tab" aria-selected="${activeTab==="manage"}">팀 관리</button>
+    </div>
+    <div id="teamsTabContent"></div>
+  `;
+
+  // 이벤트
+  document.querySelectorAll(".tabbar .tab").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.querySelectorAll(".tabbar .tab").forEach(b=>b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      const tab = btn.dataset.tab;
+      renderTeamsTab(tab);
+    });
+  });
+
+  // 초기 탭
+  renderTeamsTab(activeTab);
+}
+
+function renderTeamsTab(tab){
+  const wrap = document.getElementById("teamsTabContent");
+  if(tab === "compose"){
+    renderTeamComposer(wrap);
+  }else{
+    renderTeamListView(wrap);
+  }
+}
+
+/* ---------- 팀 편성 탭 ---------- */
+function renderTeamComposer(rootEl){
+  rootEl.innerHTML = `
+    <div class="team-manager">
+      <!-- 좌: 회원 목록 -->
+      <div class="team-column">
+        <h3>회원 목록</h3>
+        <input type="search" id="memberSearch" placeholder="회원 검색" />
+        <ul id="memberList" class="list-box"></ul>
+      </div>
+
+      <!-- 중앙: 이동 버튼 -->
+      <div class="team-controls">
+        <button id="btnAdd" class="btn">▶</button>
+        <button id="btnRemove" class="btn">◀</button>
+      </div>
+
+      <!-- 우: 선택된 팀원 & 저장 -->
+      <div class="team-column">
+        <h3>선택된 팀원</h3>
+        <ul id="selectedList" class="list-box"></ul>
+        <input type="text" id="teamName" placeholder="팀 이름 입력" />
+        <button id="btnSaveTeam" class="btn btn-teal full">${editingTeamId? "팀 수정 완료":"팀 저장"}</button>
+      </div>
+    </div>
+  `;
+
+  const $memberList   = document.getElementById("memberList");
+  const $selectedList = document.getElementById("selectedList");
+  const $memberSearch = document.getElementById("memberSearch");
+  const $teamName     = document.getElementById("teamName");
+  const $btnAdd       = document.getElementById("btnAdd");
+  const $btnRemove    = document.getElementById("btnRemove");
+  const $btnSaveTeam  = document.getElementById("btnSaveTeam");
+
+  // 편집 모드라면 채우기
+  if(editingTeamId !== null){
+    const t = teams.find(v=>v.id===editingTeamId);
+    if(t){
+      $teamName.value = t.name;
+      t.members.forEach((nm,i)=>{
+        const li = document.createElement("li");
+        li.textContent = nm;
+        li.dataset.id = "sel-"+i;
+        $selectedList.appendChild(li);
+      });
+    }
+  }
+
+  function renderAllMembers(){
+    const selectedNames = [...$selectedList.children].map(li => li.textContent);
+    $memberList.innerHTML = "";
+    allMembers.forEach(m=>{
+      if(!selectedNames.includes(m.name)){
+        const li=document.createElement("li");
+        li.textContent=m.name;
+        li.dataset.id=m.id;
+        $memberList.appendChild(li);
+      }
+    });
+  }
+  function makeSelectable($ul){
+    $ul.addEventListener("click", (e) => {
+      if (e.target.tagName === "LI") {
+        [...$ul.children].forEach(li => li.classList.remove("selected"));
+        e.target.classList.add("selected");
+      }
+    });
+  }
+
+  $btnAdd.addEventListener("click", ()=>{
+    const sel=$memberList.querySelector(".selected");
+    if(!sel) return;
+    sel.classList.remove("selected");
+    $selectedList.appendChild(sel);
+  });
+  $btnRemove.addEventListener("click", ()=>{
+    const sel=$selectedList.querySelector(".selected");
+    if(!sel) return;
+    sel.remove();
+    renderAllMembers();
+  });
+
+  $btnSaveTeam.addEventListener("click", ()=>{
+    const name = $teamName.value.trim();
+    const members = [...$selectedList.children].map(li=>li.textContent);
+    if(!name){ alert("팀 이름을 입력하세요!"); return; }
+    if(members.length===0){ alert("팀원을 선택하세요!"); return; }
+
+    if(editingTeamId !== null){
+      const idx = teams.findIndex(t=>t.id===editingTeamId);
+      if(idx>=0){ teams[idx].name=name; teams[idx].members=members; }
+      editingTeamId = null;
+    }else{
+      const id=(teams.at(-1)?.id ?? 0)+1;
+      const createdAt=new Date().toLocaleString();
+      teams.push({ id, name, members, createdAt });
+    }
+    // 완료 후 ‘팀 관리’ 탭으로 이동
+    renderTeamsPage("manage");
+  });
+
+  $memberSearch.addEventListener("input", ()=>{
+    const q = $memberSearch.value.toLowerCase();
+    [...$memberList.children].forEach(li=>{
+      li.style.display = li.textContent.toLowerCase().includes(q) ? "" : "none";
+    });
+  });
+
+  makeSelectable($memberList);
+  makeSelectable($selectedList);
+  renderAllMembers();
+}
+
+/* ---------- 팀 관리 탭 ---------- */
+function renderTeamListView(rootEl){
+  rootEl.innerHTML = `
+    <div class="team-result">
+      <h3>저장된 팀 목록</h3>
+      <ul id="teamList"></ul>
+    </div>
+  `;
+  const $teamList = document.getElementById("teamList");
+
+  function draw(){
+    $teamList.innerHTML = teams.map(t=>`
+      <li>
+        <div class="team-item">
+          <div class="team-info">
+            <div class="team-name">${t.name}</div>
+            <div class="team-members">${t.members.join(", ")}</div>
+            <div class="team-meta">${t.createdAt}</div>
+          </div>
+          <div class="team-actions">
+            <button class="btn" data-act="edit" data-id="${t.id}">수정</button>
+            <button class="btn danger" data-act="delete" data-id="${t.id}">삭제</button>
+          </div>
+        </div>
+      </li>
+    `).join("");
+    $panelCount.textContent = `${teams.length}팀`;
+  }
+
+  $teamList.addEventListener("click",(e)=>{
+    const act = e.target.dataset.act;
+    const id  = Number(e.target.dataset.id);
+    if(!act || !id) return;
+
+    if(act==="edit"){
+      editingTeamId = id;      // 편집 대상 저장
+      renderTeamsPage("compose"); // 👉 팀 편성 탭으로 이동 + 데이터 주입
+    }
+    if(act==="delete"){
+      if(!confirm("정말 이 팀을 삭제하시겠습니까?")) return;
+      teams = teams.filter(t=>t.id!==id);
+      draw();
+    }
+  });
+
+  draw();
+}
+
+/* ------------------ 초기 진입 ------------------ */
+loadPage("folice");
+</script>
+
+</body>
+</html>

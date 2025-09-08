@@ -325,17 +325,18 @@ function attachModal(){
 
 // ===== Detail 페이지 전용 =====
 function attachDetailPage(){
-  // detail에서 기술 클릭 -> home.html?q=TECH 로 이동
+  // detail에서 기술 클릭 -> /home?q=TECH 로 이동
   $$(".tech").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       const tech = btn.dataset.tech;
-      const url = new URL("home.html", location.origin);
+      const url = new URL("/home", location.origin); // ✅ /home 으로 변경
       url.searchParams.set("q", tech);
       location.href = url.toString();
     });
     btn.setAttribute("aria-label", `${btn.textContent}로 검색`);
   });
 }
+
 
 // ===== 초기화 =====
 function init(){

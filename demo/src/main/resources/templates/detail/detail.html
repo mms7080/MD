@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>kafolio – detail</title>
+  <meta name="description" content="기술 스택으로 포트폴리오를 탐색하는 랜딩 페이지" />
+  <link rel="stylesheet" href="home/home.css" />
+  <link rel="stylesheet" href="header.css" />
+<!-- <head> 안의 파비콘 교체 -->
+<link rel="icon" type="image/x-icon" href="https://kafolio.kr/static/icon.ico" />
+</head>
+<body data-page="detail">
+  <a class="skip-link" href="#content">본문 바로가기</a>
+
+  <!-- 헤더 -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <!-- 헤더 로고: 기존 점(●) 대신 아이콘 이미지 -->
+<a class="brand" href="home.html" aria-label="홈으로">
+  <img class="brand-mark" src="https://kafolio.kr/static/icon.ico" alt="" width="20" height="20" />
+  <span class="brand-text">kafolio</span>
+</a>
+
+      <nav class="nav">
+        <button class="nav-toggle" aria-expanded="false" aria-controls="primary-menu" aria-label="메뉴 열기">
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+        </button>
+        <ul id="primary-menu" class="nav-list">
+          <li><a href="/home">home</a></li>
+          <li><a href="/detail" class="is-active">detail</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+  <button id="btnTheme" class="btn ghost" aria-pressed="false" aria-label="다크모드 전환">🌓</button>
+      <!-- 로그인 전 -->
+      <span sec:authorize="isAnonymous()">
+        <a href="/signin" class="btn ghost">로그인</a>
+        <a href="/signup" class="btn primary">회원가입</a>
+      </span>
+
+      <!-- 로그인 후 -->
+      <span sec:authorize="isAuthenticated()">
+        <a href="/mypage" class="btn ghost">마이페이지</a>
+        <form th:action="@{/logout}" method="post" style="display:inline">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+          <button type="submit" class="btn primary">로그아웃</button>
+        </form>
+      </span>
+</div>
+
+    </div>
+  </header>
+
+  <main id="content">
+    <!-- 기술 스택: LANGUAGE / TOOLS -->
+    <section class="detailband detailband--slim">
+      <div class="container detailband-inner">
+        <div class="stack-group">
+          <h3 class="stack-title">LANGUAGE</h3>
+          <div class="tech-cloud" role="list" aria-label="Language">
+            <button class="tech" data-tech="Java">JAVA</button>
+            <button class="tech" data-tech="JS">JS</button>
+            <button class="tech" data-tech="JavaScript">JAVASCRIPT</button>
+            <button class="tech" data-tech="TypeScript">TYPESCRIPT</button>
+            <button class="tech" data-tech="TS">TS</button>
+            <button class="tech" data-tech="HTML">HTML</button>
+            <button class="tech" data-tech="CSS">CSS</button>
+            <button class="tech" data-tech="HTML/CSS">HTML/CSS</button>
+            <button class="tech" data-tech="SCSS">SCSS</button>
+            <button class="tech" data-tech="Thymeleaf">THYMELEAF</button>
+            <button class="tech" data-tech="Spring">SPRING</button>
+            <button class="tech" data-tech="SpringBoot">SPRINGBOOT</button>
+            <button class="tech" data-tech="SQL">SQL</button>
+            <button class="tech" data-tech="XML">XML</button>
+            <button class="tech" data-tech="JSON">JSON</button>
+            <button class="tech" data-tech="NodeJS">NODEJS</button>
+            <button class="tech" data-tech="Tailwind">TAILWIND</button>
+            <button class="tech" data-tech="React">REACT</button>
+            <button class="tech" data-tech="React-Router-Dom">REACT-ROUTER-DOM</button>
+            <button class="tech" data-tech="NextJS">NEXTJS</button>
+          </div>
+        </div>
+
+        <hr class="stack-sep"/>
+
+        <div class="stack-group">
+          <h3 class="stack-title">TOOLS</h3>
+          <div class="tech-cloud" role="list" aria-label="Tools">
+            <button class="tech" data-tech="VSCode">VSCODE</button>
+            <button class="tech" data-tech="SQLDeveloper">SQLDEVELOPER</button>
+            <button class="tech" data-tech="Git">GIT</button>
+            <button class="tech" data-tech="GitHub">GITHUB</button>
+            <button class="tech" data-tech="Postman">POSTMAN</button>
+            <button class="tech" data-tech="React">REACT</button>
+            <button class="tech" data-tech="Spring">SPRING</button>
+            <button class="tech" data-tech="SpringBoot">SPRINGBOOT</button>
+            <button class="tech" data-tech="SpringSecurity">SPRINGSECURITY</button>
+            <button class="tech" data-tech="Thymeleaf">THYMELEAF</button>
+            <button class="tech" data-tech="SpringDataJPA">SPRINGDATAJPA</button>
+            <button class="tech" data-tech="JPA">JPA</button>
+            <button class="tech" data-tech="NextJS">NEXTJS</button>
+            <button class="tech" data-tech="TailwindCSS">TAILWINDCSS</button>
+            <button class="tech" data-tech="Lombok">LOMBOK</button>
+            <button class="tech" data-tech="Oracle">ORACLE</button>
+            <button class="tech" data-tech="GoogleOAuth2">GOOGLEOAUTH2</button>
+            <button class="tech" data-tech="KakaoOAuth2">KAKAOAUTH2</button>
+            <button class="tech" data-tech="NaverOAuth2">NAVEROAUTH2</button>
+            <button class="tech" data-tech="KakaoMap">KAKAOMAP</button>
+            <button class="tech" data-tech="NaverMap">NAVERMAP</button>
+            <button class="tech" data-tech="Toss">TOSS</button>
+            <button class="tech" data-tech="Maven">MAVEN</button>
+            <button class="tech" data-tech="SourceTree">SOURCETREE</button>
+            <button class="tech" data-tech="SpringOAuth2">SPRINGOAUTH2</button>
+            <button class="tech" data-tech="Brevo">BREVO</button>
+            <button class="tech" data-tech="Eclipse">ECLIPSE</button>
+            <button class="tech" data-tech="DevTools">DEVTOOLS</button>
+            <button class="tech" data-tech="Security">SECURITY</button>
+            <button class="tech" data-tech="OAuth2">OAUTH2</button>
+            <button class="tech" data-tech="Bootstrap">BOOTSTRAP</button>
+            <button class="tech" data-tech="Font-Awesome">FONT-AWESOME</button>
+            <button class="tech" data-tech="Express">EXPRESS</button>
+            <button class="tech" data-tech="Mongoose">MONGOOSE</button>
+            <button class="tech" data-tech="Redis">REDIS</button>
+            <button class="tech" data-tech="Vite">VITE</button>
+            <button class="tech" data-tech="Monaco">MONACO</button>
+            <button class="tech" data-tech="SpringDoc">SPRINGDOC</button>
+            <button class="tech" data-tech="Thumbnailator">THUMBNAILATOR</button>
+            <button class="tech" data-tech="WebSocket">WEBSOCKET</button>
+            <button class="tech" data-tech="Socket.io">SOCKET.IO</button>
+            <button class="tech" data-tech="ChakraUI">CHAKRAUI</button>
+            <button class="tech" data-tech="MongoDB">MONGODB</button>
+            <button class="tech" data-tech="EmailJS">EMAILJS</button>
+            <button class="tech" data-tech="Tailwind">TAILWIND</button>
+            <button class="tech" data-tech="Chakra">CHAKRA</button>
+            <button class="tech" data-tech="NodeJS">NODEJS</button>
+            <button class="tech" data-tech="FS">FS</button>
+            <button class="tech" data-tech="Multer">MULTER</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- detail 페이지용 그리드 (5개씩) -->
+    <section class="container grid-wrap grid-wrap--tight">
+      <div id="grid" class="grid" aria-live="polite" aria-busy="false"></div>
+      <div class="grid-footer">
+        <button id="btnLoadMore" class="btn" aria-controls="grid">더 보기</button>
+        <button id="btnToTop" class="fab" aria-label="맨 위로">↑</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© <span id="year"></span> kafolio. All rights reserved.</p>
+      <ul class="footer-links">
+        <li><a href="#">이용약관</a></li>
+        <li><a href="#">개인정보처리방침</a></li>
+        <li><a href="#">도움말</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script src="/home.js"></script>
+</body>
+</html>
