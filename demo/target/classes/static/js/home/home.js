@@ -424,24 +424,357 @@ function attachModal() {
     });
 }
 
-/* ===== Detail 페이지 전용 ===== */
+/* ===== Detail 페이지 전용 (완전 수정 버전) ===== */
 function attachDetailPage() {
-    // detail에서 기술 클릭 -> /home?q=TECH 로 이동
-    $$(".tech").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const tech = btn.dataset.tech;
-            const url = new URL("/home", location.origin);
-            url.searchParams.set("q", tech);
-            location.href = url.toString();
+    if (document.body.dataset.page !== "detail") {
+        return;
+    }
+
+    const LANG_OPTS = [
+        "Java",
+        "JS",
+        "JavaScript",
+        "TypeScript",
+        "TS",
+        "HTML",
+        "CSS",
+        "SCSS",
+        "Thymeleaf",
+        "Spring",
+        "SpringBoot",
+        "SQL",
+        "XML",
+        "JSON",
+        "NodeJS",
+        "Tailwind",
+        "React",
+        "React-Router-Dom",
+        "NextJS",
+    ];
+    const TOOL_OPTS = [
+        "VSCode",
+        "SQLDeveloper",
+        "Git",
+        "GitHub",
+        "Postman",
+        "React",
+        "Spring",
+        "SpringBoot",
+        "SpringSecurity",
+        "SpringDataJPA",
+        "JPA",
+        "NextJS",
+        "TailwindCSS",
+        "Lombok",
+        "Oracle",
+        "GoogleOAuth2",
+        "KakaoOAuth2",
+        "NaverOAuth2",
+        "KakaoMap",
+        "NaverMap",
+        "Toss",
+        "Maven",
+        "SourceTree",
+        "SpringOAuth2",
+        "Brevo",
+        "Eclipse",
+        "DevTools",
+        "Security",
+        "OAuth2",
+        "Bootstrap",
+        "Font-Awesome",
+        "Express",
+        "Mongoose",
+        "Redis",
+        "Vite",
+        "Monaco",
+        "SpringDoc",
+        "Thumbnailator",
+        "WebSocket",
+        "Socket.io",
+        "ChakraUI",
+        "MongoDB",
+        "EmailJS",
+        "Tailwind",
+        "Chakra",
+        "NodeJS",
+        "FS",
+        "Multer",
+    ];
+
+    initBlock(
+        "techSelectLang",
+        "techSearchLang",
+        "techListLang",
+        "selectedTechLang",
+        "clearTechLang",
+        "applyTechLang",
+        LANG_OPTS
+    );
+    initBlock(
+        "techSelectTools",
+        "techSearchTools",
+        "techListTools",
+        "selectedTechTools",
+        "clearTechTools",
+        "applyTechTools",
+        TOOL_OPTS
+    );
+
+    // 바깥 클릭 시 닫기 (pills 영역과 드롭다운 내부는 제외)
+    document.addEventListener("click", (e) => {
+        document.querySelectorAll(".multiselect.open").forEach((ms) => {
+            const dropdown = ms.querySelector(".ms-dropdown");
+            const pillsArea = ms.querySelector(".ms-pills");
+
+            // 클릭한 곳이 multiselect 내부가 아니면 닫기
+            if (!ms.contains(e.target)) {
+                closeDropdown(ms);
+            }
+            // multiselect 내부더라도 pills나 dropdown이 아닌 곳 클릭시 닫기 방지
         });
-        btn.setAttribute("aria-label", `${btn.textContent}로 검색`);
     });
 }
 
-/* ===== Signin 전용 (확장 지점) ===== */
-function initSigninPage() {
-    // 필요 시: 에러 배너 포커스 이동, CapsLock 감지 등 추가 가능
+function closeDropdown(multiselectElement) {
+    multiselectElement.classList.remove("open");
+    const dd = multiselectElement.querySelector(".ms-dropdown");
+    const trig = multiselectElement.querySelector(".ms-trigger");
+
+    if (dd) {
+        dd.hidden = true;
+        dd.style.display = "none";
+    }
+    if (trig) {
+        trig.setAttribute("aria-expanded", "false");
+    }
 }
+
+function openDropdown(multiselectElement) {
+    multiselectElement.classList.add("open");
+    const dd = multiselectElement.querySelector(".ms-dropdown");
+    const trig = multiselectElement.querySelector(".ms-trigger");
+    const search = multiselectElement.querySelector("input[type='search']");
+
+    if (dd) {
+        dd.hidden = false;
+        dd.style.display = "";
+    }
+    if (trig) {
+        trig.setAttribute("aria-expanded", "true");
+    }
+    if (search) {
+        setTimeout(() => search.focus({ preventScroll: true }), 50);
+    }
+}
+
+function initBlock(
+    rootId,
+    searchId,
+    listId,
+    pillsId,
+    clearId,
+    applyId,
+    OPTIONS
+) {
+    const root = document.getElementById(rootId);
+    if (!root) {
+        return;
+    }
+
+    console.log(`✅ ${rootId} 초기화 중...`);
+
+    const trig = root.querySelector(".ms-trigger");
+    const dd = root.querySelector(".ms-dropdown");
+    const search = document.getElementById(searchId);
+    const list = document.getElementById(listId);
+    const pills = document.getElementById(pillsId);
+    const btnClr = document.getElementById(clearId);
+    const btnApp = document.getElementById(applyId);
+
+    if (!trig || !dd) {
+        return;
+    }
+
+    // 초기 상태 설정
+    closeDropdown(root);
+
+    if (trig) {
+        trig.setAttribute("aria-haspopup", "listbox");
+
+        // 기존 이벤트 리스너 제거 후 새로 추가
+        const newTrig = trig.cloneNode(true);
+        trig.parentNode.replaceChild(newTrig, trig);
+
+        newTrig.addEventListener("click", (e) => {
+            console.log(`🖱️ ${rootId} 트리거 클릭됨`);
+            e.preventDefault();
+            e.stopPropagation();
+
+            const isOpen = root.classList.contains("open");
+
+            // 다른 모든 드롭다운 닫기
+            document.querySelectorAll(".multiselect.open").forEach((ms) => {
+                if (ms !== root) closeDropdown(ms);
+            });
+
+            // 현재 드롭다운 토글
+            if (isOpen) {
+                closeDropdown(root);
+            } else {
+                openDropdown(root);
+            }
+        });
+    }
+
+    let selected = [];
+
+    function renderList(filter = "") {
+        if (!list) return;
+        list.innerHTML = "";
+        OPTIONS.filter((o) =>
+            o.toLowerCase().includes(filter.toLowerCase())
+        ).forEach((opt) => {
+            const li = document.createElement("li");
+            li.textContent = opt;
+            if (selected.includes(opt)) li.style.fontWeight = "600";
+
+            // ⭐ 핵심: 항목 클릭해도 드롭다운 안 닫힘!
+            li.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation(); // 이벤트 버블링 방지
+
+                // 선택/해제 처리
+                if (selected.includes(opt)) {
+                    selected = selected.filter((s) => s !== opt);
+                } else {
+                    selected = [...selected, opt];
+                }
+
+                // UI 업데이트 (드롭다운은 열린 상태 유지)
+                renderList(search ? search.value : "");
+                renderPills();
+                console.log(`선택됨: ${opt}, 드롭다운 계속 열림`);
+            });
+
+            list.appendChild(li);
+        });
+    }
+
+    function renderPills() {
+        if (!pills) return;
+        pills.innerHTML = "";
+        selected.forEach((s) => {
+            const pill = document.createElement("span");
+            pill.className = "pill";
+            pill.innerHTML = `${s} <button type="button" aria-label="삭제">&times;</button>`;
+
+            // ⭐ 핵심: pill 삭제 버튼 클릭해도 드롭다운 안 닫힘!
+            pill.querySelector("button").addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation(); // 이벤트 버블링 방지
+
+                selected = selected.filter((x) => x !== s);
+                renderList(search ? search.value : "");
+                renderPills();
+                console.log(`삭제됨: ${s}, 드롭다운 계속 열림`);
+            });
+
+            pills.appendChild(pill);
+        });
+    }
+
+    // 이벤트 리스너 등록
+    if (search) {
+        search.addEventListener("input", (e) => {
+            renderList(e.target.value);
+        });
+
+        // 검색창 클릭해도 드롭다운 안 닫힘
+        search.addEventListener("click", (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    if (btnClr) {
+        btnClr.addEventListener("click", (e) => {
+            e.stopPropagation(); // 드롭다운 안 닫힘
+            selected = [];
+            renderList("");
+            renderPills();
+            console.log("초기화됨, 드롭다운 계속 열림");
+        });
+    }
+
+    if (btnApp) {
+        btnApp.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            const other = collectOther(rootId);
+            const keywords = [...selected, ...other];
+
+            if (typeof state !== "undefined") {
+                state.query = keywords.length ? keywords.join(" ") : "";
+                state.page = 1;
+            }
+            if (typeof renderGrid === "function") renderGrid();
+
+            // ⭐ 핵심: 적용 버튼 클릭시에만 드롭다운 닫힘!
+            closeDropdown(root);
+            console.log("적용됨, 드롭다운 닫힘");
+        });
+    }
+
+    // pills 영역 클릭 시 드롭다운 안 닫히게
+    if (pills) {
+        pills.addEventListener("click", (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    // 드롭다운 내부 클릭 시 안 닫히게
+    if (dd) {
+        dd.addEventListener("click", (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    // 초기 렌더링
+    renderList();
+    renderPills();
+
+    console.log(`✅ ${rootId} 초기화 완료`);
+
+    // 반대쪽 선택값 수집
+    function collectOther(currRootId) {
+        const otherPillsId =
+            currRootId === "techSelectLang"
+                ? "selectedTechTools"
+                : "selectedTechLang";
+        const spans =
+            document.getElementById(otherPillsId)?.querySelectorAll(".pill") ||
+            [];
+        return Array.from(spans).map((p) => p.firstChild.nodeValue.trim());
+    }
+}
+
+// 안전한 초기화
+function safeInit() {
+    console.log("🔄 safeInit 실행됨");
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("📄 DOMContentLoaded 이벤트 발생");
+            attachDetailPage();
+        });
+    } else {
+        console.log("📄 DOM이 이미 로드됨, 즉시 실행");
+        attachDetailPage();
+    }
+}
+
+// 실행
+safeInit();
 
 /* ===== Signup 전용: 이메일 인증 UX ===== */
 function initSignupPage() {
