@@ -35,12 +35,56 @@ private static final List<TeamMemberEntity> team2 = List.of(
 
 private static final List<TeamMemberEntity> team3 = List.of(
     new TeamMemberEntity("ModeMe","박범수","팀장",List.of("회원가입")),
-    new TeamMemberEntity("ModeMe","김정민","백엔드",List.of("상세페이지")),
-    new TeamMemberEntity("ModeMe","송용근","백엔드",List.of("장바구니")),
-    new TeamMemberEntity("ModeMe","손태웅","프론트",List.of("관리자페이지")),
-    new TeamMemberEntity("ModeMe","정채빈","프론트",List.of("마이페이지")),
+    new TeamMemberEntity("ModeMe","김정민","팀원",List.of("상세페이지")),
+    new TeamMemberEntity("ModeMe","송용근","팀원",List.of("장바구니")),
+    new TeamMemberEntity("ModeMe","손태웅","팀원",List.of("관리자페이지")),
+    new TeamMemberEntity("ModeMe","정채빈","팀원",List.of("마이페이지")),
     new TeamMemberEntity("ModeMe","김은채","팀원",List.of("Q&A"))
 );
+
+private static final List<TeamMemberEntity> team4 = List.of(
+    new TeamMemberEntity("OSPE","박범수","팀장",List.of("로그인","회원가입","마이페이지")),
+    new TeamMemberEntity("OSPE","김정민","팀원",List.of("처방전 작성 및 출력")),
+    new TeamMemberEntity("OSPE","송용근","팀원",List.of("의료이력 확인")),
+    new TeamMemberEntity("OSPE","손태웅","팀원",List.of("의사와 환자간의 메시지")),
+    new TeamMemberEntity("OSPE","정채빈","팀원",List.of("진료 예약 및 예약 조회")),
+    new TeamMemberEntity("OSPE","김은채","팀원",List.of("Header","Footer","메인페이지","Q&A 게시판"))
+);
+
+private static final List<TeamMemberEntity> team5 = List.of(
+    new TeamMemberEntity("NotePad","무명","팀장",List.of("회원가입","로그인","메모장"))
+    
+);
+
+private static final List<TeamMemberEntity> team6 = List.of(
+    new TeamMemberEntity("Planner for U","나호성","팀장",List.of("로그인","로그아웃","유저정보","방(생성,수정,삭제)","메모장")),
+    new TeamMemberEntity("Planner for U","정민석","팀원",List.of("게스트(검색, 추가)","채팅","캘린더","계산기","캘린더","검색")),
+    new TeamMemberEntity("Planner for U","이준오","팀원",List.of("메인화면","계산기","캘린더","스케쥴","방 생성 화면")),
+    new TeamMemberEntity("Planner for U","이욱재","팀원",List.of("방 메인화면","메모장","캘린더","채팅","방 정보수정화면")),
+    new TeamMemberEntity("Planner for U","조승우","팀원",List.of("Q&A"))
+);
+
+private static final List<TeamMemberEntity> team7 = List.of(
+    new TeamMemberEntity("취미존중","김의령","팀장",List.of("메인 페이지","클래스 등록","클래스 수정","마이페이지")),
+    new TeamMemberEntity("취미존중","이용현","팀원",List.of("클래스 등록","클래스 수정","로그인 및 DB 구조화")),
+    new TeamMemberEntity("취미존중","이도경","팀원",List.of("메인"," 마이페이지","클래스 예약","결제 페이지")),
+    new TeamMemberEntity("취미존중","문준혁","팀원",List.of("검색 페이지","클래스 예약","결제 페이지","마이페이지"))
+);
+
+private static final List<TeamMemberEntity> team8 = List.of(
+    new TeamMemberEntity("O_O 커뮤니티","장가은","팀장",List.of("토스 API","상점 페이지","프론트")),
+    new TeamMemberEntity("O_O 커뮤니티","정동혁","팀원",List.of("유저 관리","관리자 페이지","프론트")),
+    new TeamMemberEntity("O_O 커뮤니티","우준영","팀원",List.of("투표기능","채팅기능","프로젝트 전체 조율")),
+    new TeamMemberEntity("O_O 커뮤니티","양승환","팀원",List.of("게시판","신고기능","프론트"))
+);
+
+private static final List<TeamMemberEntity> team9 = List.of(
+    new TeamMemberEntity("Pickup","무명","팀장",List.of("모든 것"))
+    
+);
+
+
+
 
     private static final Map<String,PortfoliosEntity> PORTFOLIOS = new LinkedHashMap<>();
 
@@ -92,6 +136,109 @@ private static final List<TeamMemberEntity> team3 = List.of(
             ),team3,"https://kafolio.kr/static/requests/2025/3/27/icon/ZDZhMTIwNjYxMTgzMjYxMGJjYmViNDY1OTJjNzNlNGZmMmFiNjQ3NzJmOWY4MDJhYjI0MGYyZjhlNTBjYzliMQ==.png",
             "https://modeme.kafolio.kr","ModeMe.zip"
     ));
+
+
+    PORTFOLIOS.put("3", new PortfoliosEntity("3", "OSPE", "A. Park",
+    List.of("Java","Thymeleaf","HTML","JavaScript","SQL"),
+    2, "2025-07-10",
+    "https://kafolio.kr/static/requests/2025/7/9/boards/YWFm....png",
+    "진료 예약 및 처방전 출력",
+    List.of(
+        "https://kafolio.kr/static/requests/2024/12/30/boards/MGFiYzI1YmM1MzBlYmM2M2FjYzFkYzgxZmIyNWVkMzBkN2Q0MWEzODVmYzM0OTZlNzY4MjA0NjFiYTk2MDljOA==.png",
+        "https://kafolio.kr/static/requests/2024/12/30/boards/NzRiMTFlMjY5NmY3ZGY5MmM4MWQxODkyYjUwOGRmMDMzMzkyYjNmZGUwZDM5ZjhmNzQ3Y2YwZDlhZWUzZjI5Ng==.png",
+        "https://kafolio.kr/static/requests/2024/12/30/boards/ZDhiNjcxMTg0MjhkNWMyZmIzNjBlNmE5YmY3NGU2YjAxYzRhYjQwMzI1NWZkZTc1ZTVkNGY4ZjEzNGI0MjBlNA==.png",
+        "https://kafolio.kr/static/requests/2024/12/30/boards/ZTdmYmM0YWQyOWRhOTg3NDQxYzE5YjkzNjAxYTE0NjdkNTQzMDQ4NjhhNDI4OGZhN2ZmY2Y5NTRjYWQzNzQzNQ==.png",
+        "https://kafolio.kr/static/requests/2024/12/30/boards/ZmM1YmY4ZWM0OThiMWJhOGUwYjNmOGUyNTk1MWMwYzA1YTA4ZjU1YWZhNWJiM2U5ZmE2ZWZmY2QzYmVkMDYwNg==.png",
+        "https://kafolio.kr/static/requests/2024/12/30/boards/ZjA3Y2NlMmNjNWQzYzYzMzMxY2VhNWEyMGU4NTJhNjcyNWFhOWVhOGFiY2YyMjlmMjgwZTQ3MGUxZjY5ZWFiYg==.png"
+    ),team4,"https://kafolio.kr/static/requests/2024/12/30/icon/ZjczMjc0YzYxZGZjMGRhOTY4ZDlmZjdlMDRlMTEzYjg4Y2ZlNTI2ZWY1Mjc2NzNlMGVjODg3ZDljMzNlMDgxZA==.png",
+    "https://ospe.kafolio.kr","OSPE.zip"
+));
+
+    
+    PORTFOLIOS.put("2", new PortfoliosEntity("2", "NotePad", "A. Park",
+    List.of("JavaScript","Tailwind","HTML","CSS","NodeJS"),
+    2, "2025-07-10",
+    "https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg",
+    "진료 예약 및 처방전 출력",
+    List.of(
+        "https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg",
+        "https://kafolio.kr/static/requests/2024/9/5/boards/NDA1MzBlZTUyNzZlNzI2MzE5YzM0MTNlZGNjN2NjZDFhZjM4NTVkMDFiY2VhMmM1YzAxOWFlNTNjYWY2NzFmNA==.jpg",
+        "https://kafolio.kr/static/requests/2024/9/5/boards/ZDIwNGUxMzY2MmVkOGVmZDgyMmYzMmJjOTE1NzIxNjY0NTA0MDM3ZWQ5NzJmYTliNzRiZjIyNjA2YzMyYWQ2Mg==.jpg",
+        "https://kafolio.kr/static/requests/2024/9/5/boards/MTZlMWY4YmJhMDZiYmQ2YTQxOTMxYjdjNmExYTgxODIxZjVmYTE1ODIxZTM1NDRjZDkwOGI2M2RmMGY4Njc2Ng==.jpg",
+        "https://kafolio.kr/static/requests/2024/9/5/boards/MzZhZDEyMTZlODhjZDJlYThmM2UxOTA4N2JiYzc4YzgzMDY0YWViZWNiNjFmNGFjMDMwNTIxNjk3NjFhZWUxMw==.jpg",
+        "https://kafolio.kr/static/requests/2024/9/5/boards/NzkyMWU3YzM3NWNmZjEwZTU5NGI1NGM3ODIzYWVhYzE0MTE4ZjFlZDg1YzJlN2E3MWJkNzBiOTdhZTRjMjU2MA==.jpg"
+    ),team5,"https://kafolio.kr/static/requests/2024/9/5/icon/MzQ1MjBkMGJmNDE3ZTE3MDk5NzYyYjc2MTNmYTQ5Yzg4OGQ1NTU5ZjBlODg4Njg0MmEwYWZjNDJhMzQwMjZmZA==.webp",
+    "https://notepad.kafolio.kr","notepad.7z"
+    ));
+
+
+    PORTFOLIOS.put("4",new PortfoliosEntity("4","Planner for U","H.kim",
+                                List.of("Java","SCSS","JavaScript","TS","HTML","CSS","Thymeleaf"),
+                                10,"2025-08-15",
+                                "https://kafolio.kr/static/requests/2024/9/4/boards/NjRlNGMwMzJkZDc0OTJlYzZjYTdiYTk3ZTE5YjEyOTEyZmYwODhhZDE4NmM5MjExZDNkYzgzZmE4ZThmZjhkOA==.png",
+                                "공유 캘린더 및 팀채팅",
+                                List.of("https://kafolio.kr/static/requests/2024/9/4/boards/NjRlNGMwMzJkZDc0OTJlYzZjYTdiYTk3ZTE5YjEyOTEyZmYwODhhZDE4NmM5MjExZDNkYzgzZmE4ZThmZjhkOA==.png",
+                                        "https://kafolio.kr/static/requests/2024/9/4/boards/YzcxZDg2MmVhMzE3NWY4MDJiZGVmOGJlM2U5NWQwYWZkMWUzYzY0YzEyYjMxZGU3ZTYzNjg4NjVlMjBlZDVkMw==.png",
+                                        "https://kafolio.kr/static/requests/2024/9/4/boards/NTJlMjNkMzIxYzAyZTE1OTA0MjAxYmRkZjFkN2IyZTI0Y2YzN2M1MzJiYTJiZjc3MjU2MjRiMTVmZDllY2UzMg==.png",
+                                        "https://kafolio.kr/static/requests/2024/9/4/boards/NWZiNjgyYzc1NzAwNDRjYmQyZGFiMThlNTc5NmI2Y2JhMmQwYjQ2NjI1NjI3MWVkNmU1YjRlNTdiZjEyM2Q3NQ==.png",
+                                        "https://kafolio.kr/static/requests/2024/9/4/boards/MWIwYTNjY2RjYjJiNWI5YjhiOTRiMWUzMDM0NWUxNzgzZTVmNWM3ZjliYWQ4MzQ1MjUzMjYxMWIzY2ZjMDkxZg==.png",
+                                        "https://kafolio.kr/static/requests/2024/9/4/boards/OTZhNDU0N2NiMTMwZGZjNjQxMGY5MTEzOTQzMWNjM2NiNGU3NDY2NmY0ODQxMmI2OTllZjg2ZGViOGI0NzBlZA==.png"
+            ),team6,"https://kafolio.kr/static/requests/2024/9/4/icon/OWZmZGFiZWE3MWQ4ZDMxN2YxN2RhZTdlMWJkNTExOWY0YjRkNDE2YTUyZTQ4NGFiZTc1YjAzNDhmZDQxOGM3ZA==.png",
+
+            "https://plan4u.kafolio.kr/app/login","Plan_4_U.zip"
+        ));
+
+
+        PORTFOLIOS.put("7", new PortfoliosEntity("7", "취미존중", "A. Park",
+    List.of("Java","Thymeleaf","HTML","JavaScript","CSS","SCSS","TypeScript"),
+    2, "2025-07-10",
+    "https://kafolio.kr/static/requests/2024/9/5/boards/NmQ4OTU1OGMwZTQ4ODcyZTFmMTExY2M3ZTEwOTA4ZjBlNzAxMDBlMTJkZGEyZDg5MDBmMjM3NzA4ZmY2ZDYxMw==.png",
+    "원데이 클래스 예약 사이트",
+    List.of(
+        "https://kafolio.kr/static/requests/2024/9/5/boards/NmQ4OTU1OGMwZTQ4ODcyZTFmMTExY2M3ZTEwOTA4ZjBlNzAxMDBlMTJkZGEyZDg5MDBmMjM3NzA4ZmY2ZDYxMw==.png",
+        "https://kafolio.kr/static/requests/2024/9/5/boards/ZTM1NTUwNjBkM2FhMTIwMzE4YjlmYjY3MTE3NzY1NzZiZjYyNWM4NjM2N2VmMjhiMThmMTE5YjlkOTY4NjEyOA==.png",
+        "https://kafolio.kr/static/requests/2024/12/30/boards/ZDhiNjcxMTg0MjhkNWMyZmIzNjBlNmE5YmY3NGU2YjAxYzRhYjQwMzI1NWZkZTc1ZTVkNGY4ZjEzNGI0MjBlNA==.png",
+        "https://kafolio.kr/static/requests/2024/9/5/boards/YzA4ZDUyMDZjMjU5MmMyZmFlOWY5Njc3MTJjNmIxNTdiMDU5ZTVhMzNkMWE3ZmYzZDc0NjVkZDk5MjU3ZDY3MA==.png",
+        "https://kafolio.kr/static/requests/2024/9/5/boards/Y2IyMTcyNTUzOTZhZmNmNTJlYWNiMGYzZTNhMmI3ZjJkMWZkZGM0ZTA2OGQwZTYxYmM3NzhhZDYwMDRlZjI4NQ==.png",
+        "https://kafolio.kr/static/requests/2024/9/5/boards/ZDY1YWQ0NDdjNTQ5ZTBkZWZjZGQyOTc0ZTFkNzU5ZTYzYWQ2YTNiODJkZDllYjhkNGZlODc4NjZmNGI5ZmE0Yw==.png"
+    ),team7,"https://kafolio.kr/static/requests/2024/9/4/icon/ZGMzYmE5Y2Y1MWFlNjE3MjE2ZGFlMDYxODA0Y2FmOTA2ZjI0MzY5MzhlNDg3MjE5OTc5MDQ5MjBjYjI3NjBjMA==.png",
+    "https://cmjj.kafolio.kr/main","cmjj.zip"
+));
+
+
+PORTFOLIOS.put("8", new PortfoliosEntity("8", "O_O 커뮤니티", "A. Park",
+    List.of("JavaScript","HTML","CSS","React"),
+    2, "2025-07-10",
+    "https://kafolio.kr/static/requests/2024/5/3/boards/MjFhOWE5YzMxZmYxMjFmN2E0MzBlZDk1NmRmMDU2MGE5Y2ZkYzZkMmI1ZDIyMzBlNzRhYWE5Nzc5NzE0ODY1Yw==.png",
+    "커뮤니티 사이트",
+    List.of(
+        "https://kafolio.kr/static/requests/2024/5/3/boards/MjFhOWE5YzMxZmYxMjFmN2E0MzBlZDk1NmRmMDU2MGE5Y2ZkYzZkMmI1ZDIyMzBlNzRhYWE5Nzc5NzE0ODY1Yw==.png",
+        "https://kafolio.kr/static/requests/2024/5/3/boards/OGU4NGU5YzZlZDFhMDQ2OTQyNzE4MWE5MTgyYWY3Y2QyOWEwYzc5Mjg4NzNkNjQ4NmVlZDA1MTExYzM1OGFmMQ==.png",
+        "https://kafolio.kr/static/requests/2024/5/3/boards/MGY5MTZhYjYzYjk0MzU1MTZkNTZjNjYxYThjODJiODcxZGNjMzYxYjQyYmNjNDA0ODZlOTEzNzUyNGJhZWIxOA==.png",
+        "https://kafolio.kr/static/requests/2024/5/3/boards/YmU5ZmY1ZThkZmMzYTlkNDJhNGE5YWY3MDliMGZkM2Y2YTJjZjEwOWZmOTJhZDE2MzM0NTZkN2U0ZTk3ZjJkZg==.png",
+        "https://kafolio.kr/static/requests/2024/5/3/boards/ZTQyMDZkNTVhOWUzZWZjNjY5ZGZiZDJmMTVhYWNiNjA4ZDEyM2M3OTg4MDQxOWUwNDM5YzYxNGQ2ZTA0OGY3ZQ==.png",
+        "https://kafolio.kr/static/requests/2024/5/3/boards/NzFhZTRmYTdlMDVjY2NkOWYwM2YwNmUxOTg0MWIxYjllNjk0OWI3OTVhNDg0YWZjNjhmZDQ1MmIwZjRhYjExNQ==.png"
+    ),team8,"https://kafolio.kr/static/requests/2024/5/3/icon/MGY4ZGRhNTc0NjRjZmM3ZmM5NDM5OTFkOGUzMTQ3NDA3YjFiM2FiMjkyN2Y5NGNjMGRiMWQxNTk4M2Y2ZGU0Zg==.png",
+    "https://o-o.kafolio.kr/app","O-O.kafolio.kr.zip"
+));
+
+PORTFOLIOS.put("6", new PortfoliosEntity("6", "Pickup", "A. Park",
+    List.of("JavaScript","Express","React"),
+    2, "2025-07-10",
+    "https://kafolio.kr/static/requests/2024/4/26/boards/MTkyMzEwZTdiOTM2Mjk0NjQ3NDdhMjBiNGQ4OGEwNjdmYWI3YzlkMDk1MGQ5ODg5ZmIyMTBiNzg4NTBjOGIxZA==.jpg",
+    "리그오브레전드 아이템 계산기",
+    List.of(
+        "https://kafolio.kr/static/requests/2024/4/26/boards/MTkyMzEwZTdiOTM2Mjk0NjQ3NDdhMjBiNGQ4OGEwNjdmYWI3YzlkMDk1MGQ5ODg5ZmIyMTBiNzg4NTBjOGIxZA==.jpg",
+        "https://kafolio.kr/static/requests/2024/4/26/boards/NmQ5MDM0NzVjYjMyZGJiY2JhMDkwYzgzODgwMzI4ZGMwMTlmZmI5M2M3YWUwY2M3NGRjYjY1M2M3YmYxYmI0Nw==.jpg",
+        "https://kafolio.kr/static/requests/2024/4/26/boards/ZGJhYTc2MWM1ZjFkODY5N2RhZmMwYjYyYTA0ZGI1YzE3NmI4YmViNzZhODU0YjdkYTIxNzNkMjQyYzI5MDM1MQ==.jpg",
+        "https://kafolio.kr/static/requests/2024/4/26/boards/YzZhNTM2MGFlYzA4Y2EzMTk0MjQyNGZkZjZmNjg1NDNhN2RiNzBkMTk3ODljMjU5MDFhYWE5ZGZkNzQ3YmU2Mg==.jpg",
+        "https://kafolio.kr/static/requests/2024/4/26/boards/MTUxM2ZjZmMwYzQ4YTQwNmE0Mjc5MWJjYmIwNjM3NjBiMTRkYTRhMGM4ODM5OTMyYzViMmY0YmRmNDU4NTk4YQ==.jpg",
+        "https://kafolio.kr/static/requests/2024/4/26/boards/OGRjYzhjMjQ3MzkzNDAyMmVlMWI1MDdkYjE3NjE3NDRmZDgwN2Y0MTEzYTk1ZWI2ODkwODY1ZWQ5ZGQyNzJjNg==.jpg"
+    ),team9,"https://kafolio.kr/static/requests/2024/4/26/icon/YWQ4YzkxODZmMzM0MWIwYmQ2OWFhNjg4MGI5NDM3MjI2M2QyYjM2OGM1NDQ0YmM4NDA4NWMzMjBlNDQ3YWU1OQ==.jpg",
+    "https://pickup.kafolio.kr","ChlDmnGur09.zip"
+));
+
+
     }
 
     @GetMapping("/portfolios/{id}")
@@ -104,6 +251,7 @@ private static final List<TeamMemberEntity> team3 = List.of(
         }
         return "portfolios/portfolios"; // templates/detail/portfolio-detail.html
     }
+
 
 
 }
