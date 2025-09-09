@@ -43,7 +43,7 @@
     border-radius: 6px; /* 원형 원하면 50% 로 변경 */
 }
 .brand-text {
-    font-size: 18px;
+    font-size: 24px;
 }
 
 /* 내비게이션 */
@@ -71,18 +71,41 @@
     margin: 0;
 }
 .nav-list a {
-    display: inline-block;
-    padding: 8px 12px;
-    border-radius: 10px;
+    position: relative;
+    border-radius: 8px; /* pill 모양은 유지, 필요하면 0 으로 */
+    font-size: 18px;
 }
 .nav-list a:hover {
     background: var(--primary-ink);
 }
+/* 기존 파란 배경 제거 */
 .nav-list a.is-active {
-    background: var(--primary);
-    color: #fff;
+    background: transparent;
+    color: var(--text);
 }
 
+/* 밑줄 애니메이션 */
+.nav-list a::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    opacity: 0;
+    transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* 활성/호버 시 밑줄 노출 */
+.nav-list a.is-active::after,
+.nav-list a:hover::after {
+    transform: scaleX(1);
+    opacity: 1;
+}
 /* 헤더 우측 영역 */
 .header-actions {
     margin-left: auto;
