@@ -15,6 +15,7 @@
         />
         <script th:src="@{/js/home/home.js}" defer></script>
         <link rel="stylesheet" th:href="@{/css/home/home.css}" />
+        <link rel="stylesheet" th:href="@{/css/detail/detail.css}" />
         <link rel="stylesheet" th:href="@{/css/header.css}" />
 
         <!-- 파비콘 -->
@@ -101,82 +102,227 @@
         </header>
 
         <main id="content">
-            <!-- 기술 스택 멀티 셀렉트 -->
-            <section class="detailband detailband--slim">
-                <div class="container detailband-inner">
-                    <!-- ===== LANGUAGE ===== -->
-                    <div class="stack-group">
-                        <h3 class="stack-title">Filter</h3>
-                        <div class="multiselect" id="techSelectLang">
-                            <button class="ms-trigger" type="button">
-                                <span>LANGUAGE</span>
+            <!-- 필터 툴바 -->
+            <section class="filterbar">
+                <div class="container">
+                    <div class="filter-row">
+                        <!-- 정렬 -->
+                        <div class="chip sort" id="sortChip">
+                            <button
+                                class="ms-trigger"
+                                id="sortToggle"
+                                type="button"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
+                            >
+                                <span id="sortLabel">정렬</span>
+                                <svg
+                                    class="caret"
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                    style="
+                                        width: 14px;
+                                        height: 14px;
+                                        margin-left: 8px;
+                                        vertical-align: middle;
+                                        transition: transform 0.2s;
+                                    "
+                                >
+                                    <path
+                                        d="M7 10l5 5 5-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
                             </button>
-                            <div class="ms-dropdown">
-                                <input
-                                    type="search"
-                                    id="techSearchLang"
-                                    placeholder="Search"
-                                />
-                                <ul id="techListLang"></ul>
-                                <div class="ms-actions">
-                                    <button type="button" id="clearTechLang">
-                                        초기화
-                                    </button>
-                                    <button type="button" id="applyTechLang">
-                                        적용
-                                    </button>
+                            <div class="ms-dropdown" id="sortDropdown">
+                                <ul
+                                    id="sortList"
+                                    role="listbox"
+                                    aria-label="정렬"
+                                >
+                                    <li data-sort="latest">최신순</li>
+                                    <li data-sort="popular">인기순</li>
+                                    <li data-sort="title">이름순</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- LANGUAGE -->
+                        <div class="chip">
+                            <div class="multiselect" id="techSelectLang">
+                                <button
+                                    class="ms-trigger"
+                                    type="button"
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                >
+                                    <span>LANGUAGE</span>
+                                    <svg
+                                        class="caret"
+                                        aria-hidden="true"
+                                        viewBox="0 0 24 24"
+                                        style="
+                                            width: 14px;
+                                            height: 14px;
+                                            margin-left: 8px;
+                                            vertical-align: middle;
+                                            transition: transform 0.2s;
+                                        "
+                                    >
+                                        <path
+                                            d="M7 10l5 5 5-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                                <div class="ms-dropdown">
+                                    <input
+                                        type="search"
+                                        id="techSearchLang"
+                                        placeholder="Search"
+                                        autocomplete="off"
+                                    />
+                                    <ul id="techListLang" role="listbox"></ul>
+                                    <div class="ms-actions">
+                                        <button
+                                            type="button"
+                                            id="clearTechLang"
+                                            class="btn ghost btn-sm"
+                                        >
+                                            초기화
+                                        </button>
+                                        <button
+                                            type="button"
+                                            id="applyTechLang"
+                                            class="btn primary btn-sm"
+                                        >
+                                            적용
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="ms-pills" id="selectedTechLang"></div>
+                        </div>
+
+                        <!-- TOOLS -->
+                        <div class="chip">
+                            <div class="multiselect" id="techSelectTools">
+                                <button
+                                    class="ms-trigger"
+                                    type="button"
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                >
+                                    <span>TOOLS</span>
+                                    <svg
+                                        class="caret"
+                                        aria-hidden="true"
+                                        viewBox="0 0 24 24"
+                                        style="
+                                            width: 14px;
+                                            height: 14px;
+                                            margin-left: 8px;
+                                            vertical-align: middle;
+                                            transition: transform 0.2s;
+                                        "
+                                    >
+                                        <path
+                                            d="M7 10l5 5 5-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                                <div class="ms-dropdown">
+                                    <input
+                                        type="search"
+                                        id="techSearchTools"
+                                        placeholder="Search"
+                                        autocomplete="off"
+                                    />
+                                    <ul id="techListTools" role="listbox"></ul>
+                                    <div class="ms-actions">
+                                        <button
+                                            type="button"
+                                            id="clearTechTools"
+                                            class="btn ghost btn-sm"
+                                        >
+                                            초기화
+                                        </button>
+                                        <button
+                                            type="button"
+                                            id="applyTechTools"
+                                            class="btn primary btn-sm"
+                                        >
+                                            적용
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 초기화 칩 (칩과 동일 스타일, 오른쪽 정렬) -->
+                        <div class="chip" style="margin-left: auto">
+                            <button
+                                id="resetFilters"
+                                class="ms-trigger"
+                                type="button"
+                                aria-label="필터 초기화"
+                            >
+                                RESET ↺
+                            </button>
                         </div>
                     </div>
 
-                    <hr class="stack-sep" />
-
-                    <!-- ===== TOOLS ===== -->
-                    <div class="stack-group">
-                        <h3 class="stack-title">_</h3>
-                        <div class="multiselect" id="techSelectTools">
-                            <button class="ms-trigger" type="button">
-                                <span>TOOLS</span>
-                            </button>
-                            <div class="ms-dropdown">
-                                <input
-                                    type="search"
-                                    id="techSearchTools"
-                                    placeholder="Search"
-                                />
-                                <ul id="techListTools"></ul>
-                                <div class="ms-actions">
-                                    <button type="button" id="clearTechTools">
-                                        초기화
-                                    </button>
-                                    <button type="button" id="applyTechTools">
-                                        적용
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="ms-pills" id="selectedTechTools"></div>
+                    <!-- 선택 요약 (버튼 제거 버전) -->
+                    <div id="filterSummary" class="filter-summary" hidden>
+                        <div class="ms-pills">
+                            <div id="selectedTechLang"></div>
+                            <div id="selectedTechTools"></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- detail 페이지용 그리드 (5개씩) -->
-            <section class="container grid-wrap grid-wrap--tight">
+            <!-- 그리드 -->
+            <section class="container grid-wrap">
                 <div
                     id="grid"
                     class="grid"
                     aria-live="polite"
                     aria-busy="false"
                 ></div>
+
+                <!-- 더보기 버튼 -->
                 <div class="grid-footer">
-                    <button id="btnLoadMore" class="btn" aria-controls="grid">
-                        더 보기
+                    <button
+                        id="btnLoadMore"
+                        class="btn load-more"
+                        aria-controls="grid"
+                        aria-label="More"
+                    >
+                        More
                     </button>
+
                     <button id="btnToTop" class="fab" aria-label="맨 위로">
                         ↑
                     </button>
+                </div>
+            </section>
+
+            <!-- 하단 슬라이드 배너 -->
+            <section class="container carousel-wrap" aria-label="추천 슬라이드">
+                <div id="carouselMarquee" class="marquee-viewport">
+                    <div id="marqueeTrack" class="marquee-track"></div>
                 </div>
             </section>
         </main>

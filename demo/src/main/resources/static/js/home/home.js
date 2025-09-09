@@ -1,22 +1,24 @@
 /* =========================================================
-   KAFOLIO – Global + Page JS (home, detail, signin, signup)
-   - 기존 홈/디테일 로직 유지
-   - signin/signup 인라인 스크립트 통합 (data-page 분기)
+   KAFOLIO – Global + Page JS (home + detail)
+   - Home: 기존 검색/정렬/카드 그대로
+   - Detail: Dribbble-like grid, 12개 1차 노출, 썸네일 풀채움 + 하단 정보 상시
    ========================================================= */
 
 /* ===== 공통 유틸 ===== */
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
+/* ===== 상태 ===== */
 const state = {
     theme: localStorage.getItem("theme") || "light",
     query: "",
     sort: "latest",
     page: 1,
-    pageSize: 9, // Home 기본 9, Detail에서는 9로 유지(필요 시 5로 조정)
+    pageSize: 9, // home 기본
+    filters: { lang: [], tools: [] }, // detail에서 사용
 };
 
-const MAX_TAGS_PER_CARD = 3;
+const MAX_TAGS_PER_CARD = 4;
 
 /* ===== 데모 데이터 ===== */
 const sampleProjects = [
@@ -119,15 +121,49 @@ const sampleProjects = [
         desc: "디자인 시스템 문서화와 테스트 자동화 파이프라인.",
         link: "https://example.com/illu",
     },
+    {
+        id: "p10",
+        title: "Mono UI",
+        creator: "Mono Co",
+        tags: ["React", "Chakra"],
+        likes: 510,
+        views: 7400,
+        createdAt: "2024-12-11",
+        cover: "https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&h=500&fit=crop",
+    },
+    {
+        id: "p11",
+        title: "Portfolio Grid",
+        creator: "Mona",
+        tags: ["Vue", "SCSS"],
+        likes: 330,
+        views: 5000,
+        createdAt: "2024-11-02",
+        cover: "https://images.unsplash.com/photo-1558655146-364adfc985ee?w=800&h=500&fit=crop",
+    },
+    {
+        id: "p12",
+        title: "Neo Cards",
+        creator: "Neo",
+        tags: ["React", "NextJS"],
+        likes: 970,
+        views: 13200,
+        createdAt: "2024-10-24",
+        cover: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=500&fit=crop",
+    },
 ];
 
 const formatDate = (iso) => new Date(iso).toLocaleDateString("ko-KR");
+function formatNumber(n) {
+    if (n >= 10000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+    return String(n || 0);
+}
 
-/* ===== 공통 헤더/테마 ===== */
+/* ===== 헤더/테마 ===== */
 function applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme);
-    const btn = $("#btnTheme");
-    if (btn) btn.setAttribute("aria-pressed", theme === "dark");
+    $("#btnTheme")?.setAttribute("aria-pressed", theme === "dark");
 }
 function toggleTheme() {
     state.theme = state.theme === "dark" ? "light" : "dark";
@@ -135,10 +171,8 @@ function toggleTheme() {
     applyTheme(state.theme);
 }
 function initHeader() {
-    const themeBtn = $("#btnTheme");
-    if (themeBtn) themeBtn.addEventListener("click", toggleTheme);
+    $("#btnTheme")?.addEventListener("click", toggleTheme);
     applyTheme(state.theme);
-
     const navToggle = $(".nav-toggle");
     const navList = $("#primary-menu");
     if (navToggle && navList) {
@@ -147,21 +181,18 @@ function initHeader() {
             navToggle.setAttribute("aria-expanded", open);
         });
     }
-
     const year = $("#year");
     if (year) year.textContent = new Date().getFullYear();
 }
 
-/* ===== URL 파라미터 ===== */
+/* ===== 홈 전용(있으면 동작, 없으면 무시) ===== */
 function getQueryParam(name) {
-    const params = new URLSearchParams(location.search);
-    return params.get(name);
+    const p = new URLSearchParams(location.search);
+    return p.get(name);
 }
-
-/* ===== placeholder 길이에 맞춰 input/컨테이너 너비 조정 ===== */
 function measureTextWidth(text, font) {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
     ctx.font = font;
     return Math.ceil(ctx.measureText(text).width);
 }
@@ -170,65 +201,52 @@ function getFontFor(el) {
     return `${s.fontStyle} ${s.fontVariant} ${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
 }
 function fitInputToPlaceholder() {
-    const heroInput = $("#searchInputHero");
-    const listInput = $("#searchInput");
-
+    const heroInput = $("#searchInputHero"),
+        listInput = $("#searchInput");
     [heroInput, listInput].forEach((input) => {
         if (!input) return;
         if (window.matchMedia("(max-width:640px)").matches) {
             input.style.width = "100%";
             return;
         }
-        const font = getFontFor(input);
-        const text = input.getAttribute("placeholder") || "";
-        const w = measureTextWidth(text, font) + 28; // 좌우 패딩 보정
-        const min = input.id === "searchInputHero" ? 360 : 320;
-        const max = input.id === "searchInputHero" ? 880 : 720;
+        const w =
+            measureTextWidth(
+                input.getAttribute("placeholder") || "",
+                getFontFor(input)
+            ) + 28;
+        const min = input.id === "searchInputHero" ? 360 : 320,
+            max = input.id === "searchInputHero" ? 880 : 720;
         input.style.width = Math.max(min, Math.min(max, w)) + "px";
-
-        // 히어로 검색폼 전체 너비도 버튼 폭 포함해 보정
         if (input.id === "searchInputHero") {
             const form = $("#heroSearch");
             const btn = form?.querySelector("button");
             if (form && btn) {
-                const gap = 10;
-                const total =
-                    input.getBoundingClientRect().width +
-                    btn.getBoundingClientRect().width +
-                    gap;
+                const gap = 10,
+                    total =
+                        input.getBoundingClientRect().width +
+                        btn.getBoundingClientRect().width +
+                        gap;
                 form.style.width =
                     Math.min(total, max + btn.offsetWidth + gap) + "px";
             }
         }
     });
 }
-
-/* ===== 검색/정렬 (Home 전용) ===== */
 function attachToolbarHandlers() {
-    const input = $("#searchInput");
-    if (input) {
-        input.addEventListener("input", (e) => {
-            state.query = e.target.value.trim();
-            state.page = 1;
-            renderGrid();
-        });
-    }
-
-    const heroForm = $("#heroSearch");
-    if (heroForm) {
-        heroForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const q = $("#searchInputHero").value.trim();
-            applyQuery(q);
-        });
-    }
-
-    $$(".hero-tags .tag").forEach((tagBtn) => {
-        tagBtn.addEventListener("click", () => {
-            applyQuery(tagBtn.dataset.tag);
-        });
+    if (document.body.dataset.page !== "home") return;
+    $("#searchInput")?.addEventListener("input", (e) => {
+        state.query = e.target.value.trim();
+        state.page = 1;
+        renderGrid();
     });
-
+    $("#heroSearch")?.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const q = $("#searchInputHero").value.trim();
+        applyQuery(q);
+    });
+    $$(".hero-tags .tag").forEach((btn) =>
+        btn.addEventListener("click", () => applyQuery(btn.dataset.tag))
+    );
     const sort = $("#sortSelect");
     if (sort) {
         sort.addEventListener("change", (e) => {
@@ -237,22 +255,17 @@ function attachToolbarHandlers() {
             renderGrid();
         });
     }
-
-    const clear = $("#btnClear");
-    if (clear) {
-        clear.addEventListener("click", () => {
-            state.query = "";
-            state.sort = "latest";
-            state.page = 1;
-            const si = $("#searchInput");
-            if (si) si.value = "";
-            const ss = $("#sortSelect");
-            if (ss) ss.value = "latest";
-            renderGrid();
-        });
-    }
+    $("#btnClear")?.addEventListener("click", () => {
+        state.query = "";
+        state.sort = "latest";
+        state.page = 1;
+        const si = $("#searchInput");
+        if (si) si.value = "";
+        const ss = $("#sortSelect");
+        if (ss) ss.value = "latest";
+        renderGrid();
+    });
 }
-
 function applyQuery(q) {
     state.query = q || "";
     const si = $("#searchInput");
@@ -262,8 +275,6 @@ function applyQuery(q) {
     const bar = $("#section-projects");
     if (bar) window.scrollTo({ top: bar.offsetTop - 70, behavior: "smooth" });
 }
-
-/* ===== 데이터 처리 ===== */
 function getFilteredSortedData() {
     let data = [...sampleProjects];
     const q = state.query.toLowerCase();
@@ -272,164 +283,363 @@ function getFilteredSortedData() {
             const inTags = p.tags.some((t) => t.toLowerCase().includes(q));
             return (
                 p.title.toLowerCase().includes(q) ||
-                p.desc.toLowerCase().includes(q) ||
+                p.desc?.toLowerCase().includes(q) ||
                 p.creator.toLowerCase().includes(q) ||
                 inTags
             );
         });
     }
-
     if (state.sort === "latest") {
         data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (state.sort === "popular") {
-        data.sort((a, b) => b.likes - a.likes);
+        data.sort(
+            (a, b) =>
+                (b.likes || 0) +
+                (b.views || 0) * 0.05 -
+                ((a.likes || 0) + (a.views || 0) * 0.05)
+        );
+    } else if (state.sort === "title") {
+        data.sort((a, b) => a.title.localeCompare(b.title, "ko"));
+    }
+    return data;
+}
+function createHomeCard(p) {
+    const el = document.createElement("article");
+    el.className = "card";
+    el.innerHTML = `
+    <figure class="card-media skeleton"><img src="${p.cover}" alt="${
+        p.title
+    } 대표 이미지" loading="lazy"/></figure>
+    <div class="card-body">
+      <h3 class="card-title">${p.title}</h3>
+      <div class="card-meta"><span>by ${
+          p.creator
+      }</span><span aria-hidden="true">•</span><span>${formatDate(
+        p.createdAt
+    )}</span><span aria-hidden="true">•</span><span>❤ ${formatNumber(
+        p.likes
+    )}</span></div>
+      <div class="card-tags">${p.tags
+          .slice(0, MAX_TAGS_PER_CARD)
+          .map((t) => `<span class="tag-badge">${t}</span>`)
+          .join("")}</div>
+    </div>`;
+    const img = $("img", el);
+    img?.addEventListener("load", () =>
+        $(".card-media", el)?.classList?.remove("skeleton")
+    );
+    return el;
+}
+function renderGrid(append = false) {
+    if (document.body.dataset.page === "detail")
+        return renderGridDetail(append);
+    const grid = $("#grid");
+    if (!grid) return;
+    grid.setAttribute("aria-busy", "true");
+    if (!append) grid.innerHTML = "";
+    const all = getFilteredSortedData();
+    const end = state.page * state.pageSize;
+    const slice = all.slice(0, end);
+    if (slice.length === 0) {
+        grid.innerHTML = `<p class="note">조건에 맞는 포트폴리오가 없어요. 검색어를 변경해보세요.</p>`;
+        $("#btnLoadMore")?.classList.add("hidden");
+    } else {
+        slice.forEach((p) => grid.appendChild(createHomeCard(p)));
+        $("#btnLoadMore")?.classList.toggle("hidden", end >= all.length);
+    }
+    grid.setAttribute("aria-busy", "false");
+}
+
+/* ===== Detail: 정렬 드롭다운 ===== */
+function initSortDropdown() {
+    if (document.body.dataset.page !== "detail") return;
+    const sortChip = $("#sortChip"),
+        sortToggle = $("#sortToggle"),
+        sortDropdown = $("#sortDropdown"),
+        sortList = $("#sortList"),
+        sortLabel = $("#sortLabel");
+    if (!sortChip || !sortToggle || !sortDropdown || !sortList || !sortLabel)
+        return;
+    sortToggle.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isOpen = sortChip.classList.contains("open");
+        sortChip.classList.toggle("open", !isOpen);
+        sortDropdown.style.display = isOpen ? "none" : "block";
+        sortToggle.setAttribute("aria-expanded", String(!isOpen));
+    });
+    sortList.addEventListener("click", (e) => {
+        if (e.target.tagName === "LI") {
+            state.sort = e.target.dataset.sort;
+            sortLabel.textContent = e.target.textContent;
+            sortChip.classList.remove("open");
+            sortDropdown.style.display = "none";
+            sortToggle.setAttribute("aria-expanded", "false");
+            state.page = 1;
+            renderGridDetail(false);
+        }
+    });
+    document.addEventListener(
+        "click",
+        (e) => {
+            if (!e.target.closest("#sortChip")) {
+                sortChip.classList.remove("open");
+                sortDropdown.style.display = "none";
+                sortToggle.setAttribute("aria-expanded", "false");
+            }
+        },
+        { capture: true }
+    );
+}
+
+/* ===== Detail: 멀티셀렉트 ===== */
+function openDropdown(ms) {
+    ms.classList.add("open");
+    ms.querySelector(".ms-dropdown").style.display = "block";
+    ms.querySelector(".ms-trigger")?.setAttribute("aria-expanded", "true");
+    const search = ms.querySelector("input[type='search']");
+    if (search) setTimeout(() => search.focus({ preventScroll: true }), 30);
+}
+function closeDropdown(ms) {
+    ms.classList.remove("open");
+    ms.querySelector(".ms-dropdown").style.display = "none";
+    ms.querySelector(".ms-trigger")?.setAttribute("aria-expanded", "false");
+}
+function updateFilterSummary() {
+    const filterSummary = $("#filterSummary"),
+        langPills = $("#selectedTechLang"),
+        toolsPills = $("#selectedTechTools");
+    if (!filterSummary || !langPills || !toolsPills) return;
+    const hasSelection =
+        langPills.children.length > 0 || toolsPills.children.length > 0;
+    filterSummary.hidden = !hasSelection;
+}
+function initBlock(
+    rootId,
+    searchId,
+    listId,
+    pillsId,
+    clearId,
+    applyId,
+    OPTIONS,
+    key
+) {
+    if (document.body.dataset.page !== "detail") return;
+    const root = $("#" + rootId);
+    if (!root) return;
+    const trig = root.querySelector(".ms-trigger"),
+        dd = root.querySelector(".ms-dropdown"),
+        search = $("#" + searchId),
+        list = $("#" + listId),
+        pills = $("#" + pillsId),
+        btnClr = $("#" + clearId),
+        btnApp = $("#" + applyId);
+    closeDropdown(root);
+    trig.setAttribute("aria-haspopup", "listbox");
+
+    const newTrig = trig.cloneNode(true);
+    trig.parentNode.replaceChild(newTrig, trig);
+    newTrig.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        $$(".multiselect.open").forEach((ms) => {
+            if (ms !== root) closeDropdown(ms);
+        });
+        $$(".chip.sort.open").forEach((chip) => chip.classList.remove("open"));
+        root.classList.contains("open")
+            ? closeDropdown(root)
+            : openDropdown(root);
+    });
+
+    let selected = [];
+    function renderList(filter = "") {
+        list.innerHTML = "";
+        OPTIONS.filter((o) =>
+            o.toLowerCase().includes(filter.toLowerCase())
+        ).forEach((opt) => {
+            const li = document.createElement("li");
+            li.textContent = opt;
+            if (selected.includes(opt)) {
+                li.style.fontWeight = "600";
+                li.style.backgroundColor = "var(--primary-ink)";
+                li.style.color = "var(--primary)";
+            }
+            li.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                selected = selected.includes(opt)
+                    ? selected.filter((s) => s !== opt)
+                    : [...selected, opt];
+                renderList(search ? search.value : "");
+                renderPills();
+                updateFilterSummary();
+            });
+            list.appendChild(li);
+        });
+    }
+    function renderPills() {
+        pills.innerHTML = "";
+        selected.forEach((s) => {
+            const pill = document.createElement("span");
+            pill.className = "pill";
+            pill.innerHTML = `${s} <button type="button" aria-label="삭제">&times;</button>`;
+            pill.querySelector("button").addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                selected = selected.filter((x) => x !== s);
+                renderList(search ? search.value : "");
+                renderPills();
+                updateFilterSummary();
+            });
+            pills.appendChild(pill);
+        });
+    }
+    search?.addEventListener("input", (e) => renderList(e.target.value));
+    search?.addEventListener("click", (e) => e.stopPropagation());
+    btnClr?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selected = [];
+        renderList("");
+        renderPills();
+        updateFilterSummary();
+    });
+    btnApp?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        state.filters[key] = [...selected];
+        const all = [...state.filters.lang, ...state.filters.tools];
+        state.query = all.join(" ");
+        state.page = 1;
+        renderGridDetail(false);
+        closeDropdown(root);
+        updateFilterSummary();
+    });
+    dd.addEventListener("click", (e) => e.stopPropagation());
+    pills.addEventListener("click", (e) => e.stopPropagation());
+
+    renderList();
+    renderPills();
+    updateFilterSummary();
+}
+
+/* ===== Detail: 데이터/렌더 ===== */
+function getDetailData() {
+    let data = sampleProjects.slice();
+    // 멀티셀렉트 키워드 AND 필터
+    const keywords = (state.query || "")
+        .split(" ")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    if (keywords.length) {
+        data = data.filter((p) =>
+            keywords.every((k) =>
+                p.tags.map((t) => t.toLowerCase()).includes(k.toLowerCase())
+            )
+        );
+    }
+    // 정렬
+    if (state.sort === "latest") {
+        data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (state.sort === "popular") {
+        const score = (x) => (x.likes || 0) + (x.views || 0) * 0.05;
+        data.sort((a, b) => score(b) - score(a));
     } else if (state.sort === "title") {
         data.sort((a, b) => a.title.localeCompare(b.title, "ko"));
     }
     return data;
 }
 
-/* 태그 렌더링: 최대 3개 + 더보기 개수 */
-function renderTagBadges(tags) {
-    const show = tags.slice(0, MAX_TAGS_PER_CARD);
-    const hidden = Math.max(0, tags.length - MAX_TAGS_PER_CARD);
-    const html = show
-        .map(
-            (t) => `<span class="tag-badge" aria-label="태그 ${t}">${t}</span>`
-        )
-        .join("");
-    const more = hidden
-        ? `<span class="tag-badge more" aria-label="추가 태그 ${hidden}개">+${hidden}</span>`
-        : "";
-    return html + more;
-}
+function createShotCard(p) {
+    const card = document.createElement("article");
+    card.className = "shot-card";
 
-/* ===== 카드 렌더링 ===== */
-function createCard(project) {
-    const el = document.createElement("article");
-    el.className = "card";
-    el.setAttribute("data-id", project.id);
-    el.setAttribute("tabindex", "0");
-    el.innerHTML = `
-    <figure class="card-media skeleton">
-      <img src="${project.cover}" alt="${
-        project.title
-    } 대표 이미지" loading="lazy" />
-    </figure>
-    <div class="card-body">
-      <h3 class="card-title">${project.title}</h3>
-      <div class="card-meta">
-        <span>by ${project.creator}</span>
-        <span aria-hidden="true">•</span>
-        <span>${formatDate(project.createdAt)}</span>
-        <span aria-hidden="true">•</span>
-        <span>❤ ${project.likes.toLocaleString()}</span>
+    card.innerHTML = `
+    <a class="shot-thumb" href="${p.link || "#"}" aria-label="${
+        p.title
+    }" target="_blank" rel="noopener">
+      <img src="${p.cover}" alt="${p.title}">
+    </a>
+
+    <div class="shot-caption">
+      <h3 class="shot-title" title="${p.title}">${p.title}</h3>
+      <div class="shot-stats">
+        <span class="stat">👁 ${formatNumber(p.views || 0)}</span>
+        <span class="stat">❤️ ${formatNumber(p.likes || 0)}</span>
       </div>
-      <div class="card-tags">${renderTagBadges(project.tags)}</div>
-    </div>
-    <div class="card-actions">
-      <button class="btn view">자세히</button>
-      <a class="btn ghost" href="${
-          project.link
-      }" target="_blank" rel="noopener">원본</a>
     </div>
   `;
-
-    const img = $("img", el);
-    img.addEventListener("load", () =>
-        $(".card-media", el).classList.remove("skeleton")
-    );
-
-    $(".view", el).addEventListener("click", () => openModal(project));
-    el.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            openModal(project);
-        }
-    });
-
-    return el;
+    return card;
 }
 
-function renderGrid() {
+function renderGridDetail(append = false) {
     const grid = $("#grid");
     if (!grid) return;
     grid.setAttribute("aria-busy", "true");
-    grid.innerHTML = "";
-
-    const all = getFilteredSortedData();
-    const end = state.page * state.pageSize;
+    if (!append) grid.innerHTML = "";
+    const all = getDetailData();
+    const end = state.page * state.pageSize; // detail에서는 12로 세팅
     const slice = all.slice(0, end);
-
     if (slice.length === 0) {
-        grid.innerHTML = `<p class="note">조건에 맞는 포트폴리오가 없어요. 검색어를 변경해보세요.</p>`;
-        const moreBtn = $("#btnLoadMore");
-        if (moreBtn) moreBtn.classList.add("hidden");
+        grid.innerHTML = `<p class="note">조건에 맞는 포트폴리오가 없어요. 검색어나 필터를 조정해보세요.</p>`;
     } else {
-        slice.forEach((p) => grid.appendChild(createCard(p)));
-        const moreBtn = $("#btnLoadMore");
-        if (moreBtn) moreBtn.classList.toggle("hidden", end >= all.length);
+        slice.forEach((p) => grid.appendChild(createShotCard(p)));
     }
-
+    const moreBtn = $("#btnLoadMore");
+    if (moreBtn) moreBtn.classList.toggle("hidden", end >= all.length);
     grid.setAttribute("aria-busy", "false");
 }
 
-/* 더 보기 */
+/* ===== 공통: 더보기 / 맨위로 / 캐러셀 ===== */
 function attachLoadMore() {
     const btn = $("#btnLoadMore");
     if (!btn) return;
     btn.addEventListener("click", () => {
-        state.page++;
-        renderGrid();
+        state.page += 1;
+        if (document.body.dataset.page === "detail") renderGridDetail(true);
+        else renderGrid(true);
     });
 }
-
-/* 상단 이동 */
 function attachToTop() {
     const fab = $("#btnToTop");
     if (!fab) return;
-    window.addEventListener("scroll", () => {
-        const show = window.scrollY > 600;
-        fab.classList.toggle("hidden", !show);
-    });
+    window.addEventListener("scroll", () =>
+        fab.classList.toggle("hidden", window.scrollY <= 600)
+    );
     fab.addEventListener("click", () =>
         window.scrollTo({ top: 0, behavior: "smooth" })
     );
 }
-
-/* 모달 */
-function openModal(project) {
-    $("#modalImage")?.setAttribute("src", project.cover);
-    $("#modalImage")?.setAttribute("alt", `${project.title} 상세 이미지`);
-    $("#modalTitle") && ($("#modalTitle").textContent = project.title);
-    $("#modalDesc") && ($("#modalDesc").textContent = project.desc);
-    const tags = $("#modalTags");
-    if (tags) tags.innerHTML = renderTagBadges(project.tags);
-    const link = $("#modalLink");
-    if (link) link.href = project.link;
-
-    const dlg = $("#modal");
-    if (dlg && typeof dlg.showModal === "function") dlg.showModal();
-    else if (dlg) dlg.setAttribute("open", "");
-}
-function attachModal() {
-    const dlg = $("#modal");
-    if (!dlg) return;
-    $(".modal-close", dlg).addEventListener("click", () => dlg.close());
-    dlg.addEventListener("click", (e) => {
-        const card = $(".modal-card", dlg);
-        if (e.target === dlg && !card.contains(e.target)) dlg.close();
-    });
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && dlg.open) dlg.close();
-    });
+function initCarouselAutoplay() {
+    if (document.body.dataset.page !== "detail") return;
+    const track = $("#carousel");
+    if (!track) return;
+    let timer = null;
+    const step = () => {
+        track.scrollLeft += 2;
+        if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 1)
+            track.scrollLeft = 0;
+    };
+    const start = () => {
+        if (!timer) timer = setInterval(step, 20);
+    };
+    const stop = () => {
+        if (timer) {
+            clearInterval(timer);
+            timer = null;
+        }
+    };
+    start();
+    track.addEventListener("mouseenter", stop);
+    track.addEventListener("mouseleave", start);
 }
 
-/* ===== Detail 페이지 전용 (완전 수정 버전) ===== */
+/* ===== Detail 초기화 ===== */
 function attachDetailPage() {
-    if (document.body.dataset.page !== "detail") {
-        return;
-    }
+    if (document.body.dataset.page !== "detail") return;
 
+    // 정렬 드롭다운
+    initSortDropdown();
+
+    // 멀티셀렉트 옵션
     const LANG_OPTS = [
         "Java",
         "JS",
@@ -495,7 +705,6 @@ function attachDetailPage() {
         "ChakraUI",
         "MongoDB",
         "EmailJS",
-        "Tailwind",
         "Chakra",
         "NodeJS",
         "FS",
@@ -509,7 +718,8 @@ function attachDetailPage() {
         "selectedTechLang",
         "clearTechLang",
         "applyTechLang",
-        LANG_OPTS
+        LANG_OPTS,
+        "lang"
     );
     initBlock(
         "techSelectTools",
@@ -518,349 +728,31 @@ function attachDetailPage() {
         "selectedTechTools",
         "clearTechTools",
         "applyTechTools",
-        TOOL_OPTS
+        TOOL_OPTS,
+        "tools"
     );
 
-    // 바깥 클릭 시 닫기 (pills 영역과 드롭다운 내부는 제외)
-    document.addEventListener("click", (e) => {
-        document.querySelectorAll(".multiselect.open").forEach((ms) => {
-            const dropdown = ms.querySelector(".ms-dropdown");
-            const pillsArea = ms.querySelector(".ms-pills");
-
-            // 클릭한 곳이 multiselect 내부가 아니면 닫기
-            if (!ms.contains(e.target)) {
-                closeDropdown(ms);
-            }
-            // multiselect 내부더라도 pills나 dropdown이 아닌 곳 클릭시 닫기 방지
-        });
-    });
-}
-
-function closeDropdown(multiselectElement) {
-    multiselectElement.classList.remove("open");
-    const dd = multiselectElement.querySelector(".ms-dropdown");
-    const trig = multiselectElement.querySelector(".ms-trigger");
-
-    if (dd) {
-        dd.hidden = true;
-        dd.style.display = "none";
-    }
-    if (trig) {
-        trig.setAttribute("aria-expanded", "false");
-    }
-}
-
-function openDropdown(multiselectElement) {
-    multiselectElement.classList.add("open");
-    const dd = multiselectElement.querySelector(".ms-dropdown");
-    const trig = multiselectElement.querySelector(".ms-trigger");
-    const search = multiselectElement.querySelector("input[type='search']");
-
-    if (dd) {
-        dd.hidden = false;
-        dd.style.display = "";
-    }
-    if (trig) {
-        trig.setAttribute("aria-expanded", "true");
-    }
-    if (search) {
-        setTimeout(() => search.focus({ preventScroll: true }), 50);
-    }
-}
-
-function initBlock(
-    rootId,
-    searchId,
-    listId,
-    pillsId,
-    clearId,
-    applyId,
-    OPTIONS
-) {
-    const root = document.getElementById(rootId);
-    if (!root) {
-        return;
-    }
-
-    console.log(`✅ ${rootId} 초기화 중...`);
-
-    const trig = root.querySelector(".ms-trigger");
-    const dd = root.querySelector(".ms-dropdown");
-    const search = document.getElementById(searchId);
-    const list = document.getElementById(listId);
-    const pills = document.getElementById(pillsId);
-    const btnClr = document.getElementById(clearId);
-    const btnApp = document.getElementById(applyId);
-
-    if (!trig || !dd) {
-        return;
-    }
-
-    // 초기 상태 설정
-    closeDropdown(root);
-
-    if (trig) {
-        trig.setAttribute("aria-haspopup", "listbox");
-
-        // 기존 이벤트 리스너 제거 후 새로 추가
-        const newTrig = trig.cloneNode(true);
-        trig.parentNode.replaceChild(newTrig, trig);
-
-        newTrig.addEventListener("click", (e) => {
-            console.log(`🖱️ ${rootId} 트리거 클릭됨`);
+    // 전체 초기화 버튼(있으면)
+    const reset = $("#resetFilters");
+    if (reset) {
+        reset.addEventListener("click", (e) => {
             e.preventDefault();
-            e.stopPropagation();
-
-            const isOpen = root.classList.contains("open");
-
-            // 다른 모든 드롭다운 닫기
-            document.querySelectorAll(".multiselect.open").forEach((ms) => {
-                if (ms !== root) closeDropdown(ms);
-            });
-
-            // 현재 드롭다운 토글
-            if (isOpen) {
-                closeDropdown(root);
-            } else {
-                openDropdown(root);
-            }
+            $$(".multiselect.open").forEach((ms) => closeDropdown(ms));
+            $$(".chip.sort.open").forEach((chip) =>
+                chip.classList.remove("open")
+            );
+            $("#clearTechLang")?.click();
+            $("#clearTechTools")?.click();
+            state.filters = { lang: [], tools: [] };
+            state.query = "";
+            state.page = 1;
+            renderGridDetail(false);
+            updateFilterSummary();
         });
     }
 
-    let selected = [];
-
-    function renderList(filter = "") {
-        if (!list) return;
-        list.innerHTML = "";
-        OPTIONS.filter((o) =>
-            o.toLowerCase().includes(filter.toLowerCase())
-        ).forEach((opt) => {
-            const li = document.createElement("li");
-            li.textContent = opt;
-            if (selected.includes(opt)) li.style.fontWeight = "600";
-
-            // ⭐ 핵심: 항목 클릭해도 드롭다운 안 닫힘!
-            li.addEventListener("click", (e) => {
-                e.preventDefault();
-                e.stopPropagation(); // 이벤트 버블링 방지
-
-                // 선택/해제 처리
-                if (selected.includes(opt)) {
-                    selected = selected.filter((s) => s !== opt);
-                } else {
-                    selected = [...selected, opt];
-                }
-
-                // UI 업데이트 (드롭다운은 열린 상태 유지)
-                renderList(search ? search.value : "");
-                renderPills();
-                console.log(`선택됨: ${opt}, 드롭다운 계속 열림`);
-            });
-
-            list.appendChild(li);
-        });
-    }
-
-    function renderPills() {
-        if (!pills) return;
-        pills.innerHTML = "";
-        selected.forEach((s) => {
-            const pill = document.createElement("span");
-            pill.className = "pill";
-            pill.innerHTML = `${s} <button type="button" aria-label="삭제">&times;</button>`;
-
-            // ⭐ 핵심: pill 삭제 버튼 클릭해도 드롭다운 안 닫힘!
-            pill.querySelector("button").addEventListener("click", (e) => {
-                e.preventDefault();
-                e.stopPropagation(); // 이벤트 버블링 방지
-
-                selected = selected.filter((x) => x !== s);
-                renderList(search ? search.value : "");
-                renderPills();
-                console.log(`삭제됨: ${s}, 드롭다운 계속 열림`);
-            });
-
-            pills.appendChild(pill);
-        });
-    }
-
-    // 이벤트 리스너 등록
-    if (search) {
-        search.addEventListener("input", (e) => {
-            renderList(e.target.value);
-        });
-
-        // 검색창 클릭해도 드롭다운 안 닫힘
-        search.addEventListener("click", (e) => {
-            e.stopPropagation();
-        });
-    }
-
-    if (btnClr) {
-        btnClr.addEventListener("click", (e) => {
-            e.stopPropagation(); // 드롭다운 안 닫힘
-            selected = [];
-            renderList("");
-            renderPills();
-            console.log("초기화됨, 드롭다운 계속 열림");
-        });
-    }
-
-    if (btnApp) {
-        btnApp.addEventListener("click", (e) => {
-            e.stopPropagation();
-
-            const other = collectOther(rootId);
-            const keywords = [...selected, ...other];
-
-            if (typeof state !== "undefined") {
-                state.query = keywords.length ? keywords.join(" ") : "";
-                state.page = 1;
-            }
-            if (typeof renderGrid === "function") renderGrid();
-
-            // ⭐ 핵심: 적용 버튼 클릭시에만 드롭다운 닫힘!
-            closeDropdown(root);
-            console.log("적용됨, 드롭다운 닫힘");
-        });
-    }
-
-    // pills 영역 클릭 시 드롭다운 안 닫히게
-    if (pills) {
-        pills.addEventListener("click", (e) => {
-            e.stopPropagation();
-        });
-    }
-
-    // 드롭다운 내부 클릭 시 안 닫히게
-    if (dd) {
-        dd.addEventListener("click", (e) => {
-            e.stopPropagation();
-        });
-    }
-
-    // 초기 렌더링
-    renderList();
-    renderPills();
-
-    console.log(`✅ ${rootId} 초기화 완료`);
-
-    // 반대쪽 선택값 수집
-    function collectOther(currRootId) {
-        const otherPillsId =
-            currRootId === "techSelectLang"
-                ? "selectedTechTools"
-                : "selectedTechLang";
-        const spans =
-            document.getElementById(otherPillsId)?.querySelectorAll(".pill") ||
-            [];
-        return Array.from(spans).map((p) => p.firstChild.nodeValue.trim());
-    }
-}
-
-// 안전한 초기화
-function safeInit() {
-    console.log("🔄 safeInit 실행됨");
-
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-            console.log("📄 DOMContentLoaded 이벤트 발생");
-            attachDetailPage();
-        });
-    } else {
-        console.log("📄 DOM이 이미 로드됨, 즉시 실행");
-        attachDetailPage();
-    }
-}
-
-// 실행
-safeInit();
-
-/* ===== Signup 전용: 이메일 인증 UX ===== */
-function initSignupPage() {
-    const form = $("#signupForm");
-    const emailEl = $("#email");
-    const sendBtn = $("#btnSendCode");
-    const codeBlock = $("#codeBlock");
-    const codeInput = $("#emailCode");
-    const errCode = $("#err-code");
-    const hint = $("#codeHint");
-
-    if (!form || !emailEl || !sendBtn) return; // 안전 가드
-
-    const emailRe = /^\S+@\S+\.\S+$/;
-    const csrfToken = $('meta[name="_csrf"]')?.content;
-    const csrfHeader = $('meta[name="_csrf_header"]')?.content;
-
-    // 이메일 형식 → 버튼 활성/비활성
-    function updateSendBtn() {
-        const ok = emailRe.test((emailEl.value || "").trim());
-        sendBtn.disabled = !ok;
-    }
-    emailEl.addEventListener("input", updateSendBtn);
-    updateSendBtn();
-
-    // 재전송 쿨다운
-    let timer = null,
-        cooldown = 0;
-    function startCooldown(sec = 60) {
-        if (timer) clearInterval(timer);
-        cooldown = sec;
-        sendBtn.disabled = true;
-        sendBtn.textContent = `재전송 ${cooldown}s`;
-        timer = setInterval(() => {
-            cooldown--;
-            if (cooldown <= 0) {
-                clearInterval(timer);
-                sendBtn.textContent = "인증코드 발송";
-                updateSendBtn();
-            } else {
-                sendBtn.textContent = `재전송 ${cooldown}s`;
-            }
-        }, 1000);
-    }
-
-    // 인증코드 발송
-    sendBtn.addEventListener("click", async () => {
-        if (sendBtn.disabled) return;
-        errCode.textContent = "";
-
-        const email = (emailEl.value || "").trim();
-        if (!emailRe.test(email)) return;
-
-        // 클릭 즉시 코드칸 표시 & 포커스
-        if (codeBlock) codeBlock.hidden = false;
-        codeInput?.focus();
-
-        try {
-            const res = await fetch("/send-code", {
-                method: "POST",
-                headers: Object.assign(
-                    { "Content-Type": "application/x-www-form-urlencoded" },
-                    csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {}
-                ),
-                body: new URLSearchParams({ email }),
-            });
-            if (!res.ok) throw new Error("인증코드 발송 실패");
-            startCooldown(60);
-            if (hint)
-                hint.textContent =
-                    "인증코드를 보냈습니다. 5분 안에 입력해 주세요.";
-        } catch (err) {
-            errCode.textContent =
-                "인증코드 발송에 실패했습니다. 이메일을 확인 후 다시 시도해 주세요.";
-            setTimeout(updateSendBtn, 5000);
-        }
-    });
-
-    // 제출 시: 코드칸이 열려 있다면 코드 필수
-    form.addEventListener("submit", (e) => {
-        if (!codeBlock?.hidden && !codeInput?.value.trim()) {
-            e.preventDefault();
-            if (errCode) errCode.textContent = "인증코드를 입력하세요.";
-            codeInput?.focus();
-        }
-    });
+    // 캐러셀, 맨위로
+    initCarouselAutoplay();
 }
 
 /* ===== 초기화 ===== */
@@ -872,39 +764,83 @@ function init() {
     const page = document.body.dataset.page;
 
     if (page === "home") {
-        // Home
         state.pageSize = 9;
         attachToolbarHandlers();
         attachLoadMore();
         attachToTop();
-        attachModal();
-
         const initialQ = getQueryParam("q");
         if (initialQ) {
             const ss = $("#sortSelect");
             if (ss) ss.value = "latest";
             applyQuery(initialQ);
         } else {
-            renderGrid();
+            renderGrid(false);
         }
     }
 
     if (page === "detail") {
-        // Detail
-        state.pageSize = 9;
+        state.pageSize = 12; // ✅ 첫 로드 12개
         attachDetailPage();
         attachLoadMore();
         attachToTop();
-        renderGrid();
-    }
-
-    if (page === "signin") {
-        initSigninPage();
-    }
-
-    if (page === "signup") {
-        initSignupPage();
+        buildMarqueeFromProjects();
+        renderGridDetail(false); // ✅ 드리블 스타일 렌더링
     }
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+function buildMarqueeFromProjects() {
+    const viewport = document.getElementById("carouselMarquee");
+    const track = document.getElementById("marqueeTrack");
+    if (!viewport || !track) return;
+
+    // 1) 데이터 → DOM
+    const items = sampleProjects.slice(0, 12); // 원하는 개수만큼
+    const makeNode = (p) => {
+        const a = document.createElement("a");
+        a.className = "marquee-item";
+        a.href = p.link || "#";
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.innerHTML = `
+      <div class="mi-thumb"><img src="${p.cover}" alt="${p.title}"></div>
+      <div class="mi-title">${p.title}</div>
+    `;
+        return a;
+    };
+
+    track.innerHTML = "";
+    items.forEach((p) => track.appendChild(makeNode(p))); // 원본
+    items.forEach((p) => track.appendChild(makeNode(p))); // 복제 1세트(무한 루프용)
+
+    // 2) 속도/거리 계산 → CSS 변수로 주입
+    const updateMetrics = () => {
+        // 전체를 2세트로 만들었으므로 절반 길이가 실제 루프 거리
+        const halfWidth = track.scrollWidth / 2;
+        const pxPerSec = 80; // 속도(px/s) — 60~120 사이로 취향 조절
+        const duration = halfWidth / pxPerSec;
+
+        track.style.setProperty("--marquee-distance", `${halfWidth}px`);
+        track.style.setProperty("--marquee-duration", `${duration}s`);
+
+        // 애니메이션 리셋(리사이즈 시 깔끔하게)
+        track.style.animation = "none";
+        // reflow
+        void track.offsetWidth;
+        track.style.animation = "";
+    };
+
+    requestAnimationFrame(updateMetrics);
+    window.addEventListener("resize", updateMetrics, { passive: true });
+
+    // 3) hover 제어(추가 보장)
+    viewport.addEventListener(
+        "mouseenter",
+        () => (track.style.animationPlayState = "paused")
+    );
+    viewport.addEventListener(
+        "mouseleave",
+        () => (track.style.animationPlayState = "running")
+    );
+}

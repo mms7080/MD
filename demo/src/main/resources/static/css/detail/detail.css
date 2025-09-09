@@ -1,0 +1,351 @@
+/* ========== Detail 상단 칩 영역: 회색 라운드 배경 ========== */
+body[data-page="detail"] .filterbar {
+    background: transparent !important;
+    border-bottom: 0 !important;
+    padding: 20px 0 12px;
+}
+body[data-page="detail"] .filterbar .filter-row {
+    position: relative;
+    background: var(--chip-surface, #f5f7fb);
+    border: 1px solid var(--border-light, #e5e7eb);
+    border-radius: 10px;
+    padding: 8px 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    margin: 0;
+    gap: 8px; /* 칩 간격 조금 촘촘 */
+    overflow: visible;
+    z-index: 1;
+}
+[data-theme="dark"] body[data-page="detail"] .filterbar .filter-row {
+    --chip-surface: rgba(255, 255, 255, 0.06);
+    border-color: #2a2f3a;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* 선택 요약(구름 pill) 컨테이너는 배경 제거 */
+body[data-page="detail"] .filterbar .filter-summary {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 8px 0 0;
+    margin-top: 10px;
+    overflow: visible;
+    z-index: 1;
+}
+
+/* ========== Detail 전용 ‘기술 버튼’ 섹션(필요한 경우) ========== */
+.detailband {
+    padding: 36px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in oklab, var(--bg-soft) 90%, transparent);
+}
+.detailband--slim {
+    padding: 20px 0;
+}
+.detailband-inner {
+    display: grid;
+    gap: 10px;
+}
+.stack-group {
+    display: grid;
+    gap: 10px;
+}
+.stack-title {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin: 0;
+}
+.stack-sep {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 10px 0;
+}
+.tech-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.tech {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in oklab, var(--bg-soft) 92%, transparent);
+    cursor: pointer;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+}
+.tech:hover {
+    border-color: var(--primary);
+}
+
+/* ===== Detail: 더 넓은 컨테이너(헤더 제외) ===== */
+:root {
+    --container-wide: 1380px;
+}
+
+/* 이 페이지만 넓히고 싶은 구역만 지정 */
+body[data-page="detail"] .filterbar > .container,
+body[data-page="detail"] .container.grid-wrap,
+body[data-page="detail"] .container.carousel-wrap {
+    max-width: var(--container-wide);
+}
+
+@media (min-width: 1680px) {
+    body[data-page="detail"] .filterbar > .container,
+    body[data-page="detail"] .container.grid-wrap,
+    body[data-page="detail"] .container.carousel-wrap {
+        max-width: 1600px;
+    }
+}
+
+/* ===== Detail: Dribbble 카드 레이아웃(이미지 + 하단 한 줄) ===== */
+
+/* ===== Detail: 4열 고정 ===== */
+body[data-page="detail"] .grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 34px;
+}
+
+/* 예전 공용 카드 UI는 숨김(혹시 섞여 렌더될 경우 대비) */
+body[data-page="detail"] .card,
+body[data-page="detail"] .card-actions,
+body[data-page="detail"] .card-tags {
+    display: none !important;
+}
+
+/* shot 카드 자체는 배경/테두리 없이 — 이미지가 카드처럼 보이게 */
+body[data-page="detail"] .shot-card {
+    background: transparent;
+    border: 0;
+}
+
+/* 썸네일 상자: 라운드+오버플로우, 이미지가 상자를 꽉 채움 */
+body[data-page="detail"] .shot-thumb {
+    display: block;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #eef2f7;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+[data-theme="dark"] body[data-page="detail"] .shot-thumb {
+    background: #0f1117;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+body[data-page="detail"] .shot-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 4 / 3; /* 이미지 비율 고정 */
+    transform: scale(1.01);
+    transition: transform 0.28s ease;
+}
+body[data-page="detail"] .shot-card:hover .shot-thumb img {
+    transform: scale(1.05);
+}
+
+/* 캡션(제목 + 통계) — 이미지 아래, 좌우 정렬 */
+body[data-page="detail"] .shot-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px; /* 이미지와 간격 */
+    padding: 0 2px;
+}
+
+body[data-page="detail"] .shot-title {
+    margin: 0;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body[data-page="detail"] .shot-stats {
+    display: flex;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* 모바일 간격 약간 축소 */
+@media (max-width: 640px) {
+    body[data-page="detail"] .grid {
+        gap: 16px;
+    }
+    body[data-page="detail"] .shot-title {
+        font-size: 14px;
+    }
+}
+
+/* === Dribbble 스타일: 무한 마키 === */
+.marquee-viewport {
+    position: relative;
+    /* overflow: hidden; */
+    /* 양끝 페이드 (시각적 부드러움) */
+}
+.marquee-viewport::before,
+.marquee-viewport::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    pointer-events: none;
+}
+.marquee-viewport::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-soft), transparent);
+}
+.marquee-viewport::after {
+    right: 0;
+    /* background: linear-gradient(to left, var(--bg-soft), transparent); */
+}
+
+.marquee-track {
+    display: flex;
+    gap: 32px; /* 카드 간격 */
+    will-change: transform;
+    animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+.marquee-viewport:hover .marquee-track {
+    animation-play-state: paused; /* hover 시 멈춤 */
+}
+
+.marquee-item {
+    flex: 0 0 220px; /* 각 아이템 너비 (원하면 260~320px로 조절) */
+    text-decoration: none;
+    color: inherit;
+}
+.mi-thumb {
+    height: 160px; /* 썸네일 높이 */
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+.mi-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.mi-title {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 
+샤인 스윕 버전
+.marquee-item .mi-thumb {
+    position: relative;
+    overflow: hidden;
+}
+.marquee-item .mi-thumb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.22) 50%,
+        transparent 60%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.45s ease;
+    pointer-events: none;
+}
+.marquee-item:hover .mi-thumb::after {
+    transform: translateX(120%);
+} */
+
+/* 3D 원근감 부여: 부모 */
+.marquee-item {
+    perspective: 900px; /* 원근감 (크면 약해짐) */
+}
+
+/* 썸네일 기본 상태 */
+.marquee-item .mi-thumb {
+    transform-origin: center;
+    transform: rotateY(0deg);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    backface-visibility: hidden; /* 사파리/크롬 깜빡임 방지 */
+    will-change: transform, box-shadow;
+}
+
+/* 호버/포커스: 오른쪽으로 살짝 기울기 */
+.marquee-item:hover .mi-thumb,
+.marquee-item:focus-visible .mi-thumb {
+    transform: rotateY(8deg) translateY(-2px); /* -값이면 오른쪽이 앞/왼쪽이 뒤로 */
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+    outline: none;
+}
+
+/* 실제 이동 거리: JS에서 --marquee-distance, --marquee-duration 주입 */
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(calc(-1 * var(--marquee-distance, 1000px)));
+    }
+}
+
+/* 그리드 섹션 하단 여백을 크게 — 배너와 간격 ↑ */
+body[data-page="detail"] .grid-wrap {
+    padding: 32px 0 96px; /* 기존 32px 0 ?px → 96px로 확장 */
+}
+
+/* 하단 배너의 상단 패딩은 얕게(간격은 위에서 확보) */
+body[data-page="detail"] .carousel-wrap {
+    padding-top: 8px;
+}
+
+.carousel-wrap,
+.container.carousel-wrap {
+    border-top: 0 !important;
+    box-shadow: none !important; /* 얇은 선처럼 보이는 그림자도 차단 */
+}
+
+/* 그리드 푸터: 버튼 한 개만 화면 정중앙에 */
+body[data-page="detail"] .grid-footer {
+    display: grid;
+    place-items: center; /* 가로·세로 중앙정렬 */
+    margin-top: 80px;
+}
+
+/* MORE 버튼 모양(원하면 유지/조절 가능) */
+#btnLoadMore {
+    min-width: 120px;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    transition: transform 0.08s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+#btnLoadMore:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+/* 모바일에선 간격 살짝 줄이기 */
+@media (max-width: 640px) {
+    body[data-page="detail"] .grid-wrap {
+        padding-bottom: 64px;
+    }
+    body[data-page="detail"] .grid-footer {
+        margin-top: 40px;
+    }
+}
