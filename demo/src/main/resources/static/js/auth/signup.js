@@ -1,3 +1,41 @@
+    // 아이디 중복 확인 버튼
+    (function () {
+      const btn = document.getElementById("btnCheckId");
+      const input = document.getElementById("username");
+      const status = document.getElementById("usernameStatus");
+
+      function show(msg, ok) {
+        status.textContent = msg;
+        status.className = `auth-alert ${ok ? "is-success" : "is-error"}`;
+        status.style.display = "block";
+      }
+
+      btn?.addEventListener("click", async () => {
+        const username = (input?.value || "").trim();
+        if (!username) {
+          alert("아이디를 입력하세요.");
+          input?.focus();
+          return;
+        }
+
+        btn.disabled = true;
+        try {
+          const res = await fetch(`/api/check-username?username=${encodeURIComponent(username)}`);
+          const exists = await res.json(); // true = 이미 사용중
+          if (exists) {
+            show("이미 사용 중인 아이디입니다.", false);
+          } else {
+            show("사용 가능한 아이디입니다.", true);
+          }
+        } catch {
+          show("중복 확인 중 오류가 발생했습니다.", false);
+        } finally {
+          btn.disabled = false;
+        }
+      });
+    })();
+    
+    
     // 성별 체크박스: 상호 배타(라디오처럼)
     (function () {
       const m = document.getElementById("genderM");
@@ -55,33 +93,44 @@
 
     // 이메일 인증코드 발송(숨김 폼 방식, 보이는 input은 이메일 하나만)
     (function () {
-      const btn = document.getElementById("btnSendCode");
-      const emailInput = document.getElementById("email");
-      const csrfInput = document.getElementById("csrfTokenField");
+    const btn = document.getElementById("btnSendCode");
+    const emailInput = document.getElementById("email");
+    const csrfInput = document.getElementById("csrfTokenField");
+    const notice = document.getElementById("ajaxNotice");
 
-      btn?.addEventListener("click", function () {
-        const email = emailInput.value.trim();
-        if (!email) { alert("이메일을 입력하세요."); emailInput.focus(); return; }
+    // 버튼이 submit로 되어 있지 않도록 (안전)
+    if (btn && !btn.getAttribute("type")) btn.setAttribute("type", "button");
 
-        // 숨김 폼을 만들어 POST (CSRF 포함)
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "/send-code";
+    function show(msg, ok) {
+      if (!notice) return;
+      notice.textContent = msg;
+      notice.className = `auth-alert ${ok ? "is-success" : "is-error"}`;
+      notice.style.display = "block";
+    }
 
-        const emailField = document.createElement("input");
-        emailField.type = "hidden";
-        emailField.name = "email";
-        emailField.value = email;
-        form.appendChild(emailField);
+    btn?.addEventListener("click", async (e) => {
+      e.preventDefault(); // 혹시 모를 기본동작 차단
+      const email = (emailInput?.value || "").trim();
+      if (!email) { alert("이메일을 입력하세요."); emailInput?.focus(); return; }
 
-        // CSRF
-        const csrfField = document.createElement("input");
-        csrfField.type = "hidden";
-        csrfField.name = csrfInput.getAttribute("name");
-        csrfField.value = csrfInput.value;
-        form.appendChild(csrfField);
-
-        document.body.appendChild(form);
-        form.submit();
-      });
-    })();
+      btn.disabled = true;
+      try {
+        const res = await fetch("/api/send-code", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "X-CSRF-TOKEN": csrfInput?.value || "",
+            "Accept": "application/json"
+          },
+          body: new URLSearchParams({ email }).toString(),
+          credentials: "same-origin"
+        });
+        const ok = await res.json().catch(() => false);
+        show(ok ? "인증 코드가 발송되었습니다." : "메일 발송에 실패했습니다. 잠시 후 다시 시도하세요.", ok);
+      } catch {
+        show("네트워크 오류로 발송 실패", false);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  })();
