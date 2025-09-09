@@ -40,20 +40,30 @@
     <div class="header-actions">
       <button id="btnTheme" class="btn ghost" aria-pressed="false" aria-label="다크모드 전환">🌓</button>
 
-      <!-- 로그인 전 -->
-      <span sec:authorize="isAnonymous()">
-        <a href="/signin" class="btn ghost">로그인</a>
-        <a href="/signup" class="btn primary">회원가입</a>
-      </span>
+ <!-- 로그인 전 -->
+<span sec:authorize="isAnonymous()">
+  <a href="/signin" class="btn ghost">로그인</a>
+  <a href="/signup" class="btn primary">회원가입</a>
+</span>
 
-      <!-- 로그인 후 -->
-      <span sec:authorize="isAuthenticated()">
-        <a href="/mypage" class="btn ghost">마이페이지</a>
-        <form th:action="@{/logout}" method="post" style="display:inline">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-          <button type="submit" class="btn primary">로그아웃</button>
-        </form>
-      </span>
+<!-- 로그인 후: 관리자 -->
+<span sec:authorize="hasRole('ADMIN')">
+  <a href="/admin" class="btn ghost">관리자페이지</a>
+  <form th:action="@{/logout}" method="post" style="display:inline">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <button type="submit" class="btn primary">로그아웃</button>
+  </form>
+</span>
+
+<!-- 로그인 후: 일반 사용자 -->
+<span sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
+  <a href="/mypage" class="btn ghost">마이페이지</a>
+  <form th:action="@{/logout}" method="post" style="display:inline">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+    <button type="submit" class="btn primary">로그아웃</button>
+  </form>
+</span>
+
     </div>
   </div>
 </header>
