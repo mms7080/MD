@@ -425,18 +425,32 @@ function initBlock(
     key
 ) {
     if (document.body.dataset.page !== "detail") return;
+
     const root = $("#" + rootId);
     if (!root) return;
-    const trig = root.querySelector(".ms-trigger"),
-        dd = root.querySelector(".ms-dropdown"),
-        search = $("#" + searchId),
-        list = $("#" + listId),
-        pills = $("#" + pillsId),
-        btnClr = $("#" + clearId),
-        btnApp = $("#" + applyId);
+
+    const trig = root.querySelector(".ms-trigger");
+    const dd = root.querySelector(".ms-dropdown");
+    const search = $("#" + searchId);
+    const list = $("#" + listId);
+    const pills = $("#" + pillsId);
+    const btnClr = $("#" + clearId);
+    const btnApp = $("#" + applyId);
+
+    // 라벨 엘리먼트 확보 + 기본 텍스트 저장
+    const labelEl = trig.querySelector("span");
+    const BASE_LABEL = (labelEl?.textContent || "").split("(")[0].trim();
+
+    function setChipCount(n) {
+        if (!labelEl) return;
+        labelEl.textContent = n > 0 ? `${BASE_LABEL} (${n})` : BASE_LABEL;
+    }
+
+    // 최초 닫힘/접근성
     closeDropdown(root);
     trig.setAttribute("aria-haspopup", "listbox");
 
+    // 트리거 교체(중복리스너 방지)
     const newTrig = trig.cloneNode(true);
     trig.parentNode.replaceChild(newTrig, trig);
     newTrig.addEventListener("click", (e) => {
@@ -445,13 +459,18 @@ function initBlock(
         $$(".multiselect.open").forEach((ms) => {
             if (ms !== root) closeDropdown(ms);
         });
-        $$(".chip.sort.open").forEach((chip) => chip.classList.remove("open"));
+        $$(".chip.sort.open").forEach((chip) => {
+            chip.classList.remove("open");
+            $("#sortDropdown")?.style &&
+                ($("#sortDropdown").style.display = "none");
+        });
         root.classList.contains("open")
             ? closeDropdown(root)
             : openDropdown(root);
     });
 
     let selected = [];
+
     function renderList(filter = "") {
         list.innerHTML = "";
         OPTIONS.filter((o) =>
@@ -473,10 +492,12 @@ function initBlock(
                 renderList(search ? search.value : "");
                 renderPills();
                 updateFilterSummary();
+                setChipCount(selected.length); // ✅ 라벨 숫자 갱신
             });
             list.appendChild(li);
         });
     }
+
     function renderPills() {
         pills.innerHTML = "";
         selected.forEach((s) => {
@@ -490,19 +511,24 @@ function initBlock(
                 renderList(search ? search.value : "");
                 renderPills();
                 updateFilterSummary();
+                setChipCount(selected.length); // ✅ 라벨 숫자 갱신
             });
             pills.appendChild(pill);
         });
     }
+
     search?.addEventListener("input", (e) => renderList(e.target.value));
     search?.addEventListener("click", (e) => e.stopPropagation());
+
     btnClr?.addEventListener("click", (e) => {
         e.stopPropagation();
         selected = [];
         renderList("");
         renderPills();
         updateFilterSummary();
+        setChipCount(0); // ✅ 라벨 숫자 갱신
     });
+
     btnApp?.addEventListener("click", (e) => {
         e.stopPropagation();
         state.filters[key] = [...selected];
@@ -512,13 +538,15 @@ function initBlock(
         renderGridDetail(false);
         closeDropdown(root);
         updateFilterSummary();
+        setChipCount(selected.length); // ✅ 라벨 숫자 갱신
     });
+
     dd.addEventListener("click", (e) => e.stopPropagation());
-    pills.addEventListener("click", (e) => e.stopPropagation());
 
     renderList();
     renderPills();
     updateFilterSummary();
+    setChipCount(0);
 }
 
 /* ===== Detail: 데이터/렌더 ===== */
@@ -843,4 +871,67 @@ function buildMarqueeFromProjects() {
         "mouseleave",
         () => (track.style.animationPlayState = "running")
     );
+}
+
+function ensureGridHead() {
+    const wrap = document.querySelector(".container.grid-wrap");
+    if (!wrap) return null;
+    let head = wrap.querySelector(".grid-head");
+    if (!head) {
+        head = document.createElement("div");
+        head.className = "grid-head";
+        head.innerHTML = `<div id="resultCount" aria-live="polite"></div>`;
+        const grid = document.getElementById("grid");
+        wrap.insertBefore(head, grid);
+    }
+    return head;
+}
+
+function renderGridDetail(append = false) {
+    const grid = document.querySelector("#grid");
+    if (!grid) return;
+
+    grid.setAttribute("aria-busy", "true");
+
+    const keywords = (state.query || "")
+        .split(" ")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+    let data = sampleProjects.slice();
+
+    if (keywords.length) {
+        data = data.filter((p) =>
+            keywords.every((k) =>
+                p.tags.map((t) => t.toLowerCase()).includes(k.toLowerCase())
+            )
+        );
+    }
+
+    // 정렬
+    if (state.sort === "latest") {
+        data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (state.sort === "popular") {
+        const score = (x) => (x.likes || 0) + (x.views || 0) * 0.05;
+        data.sort((a, b) => score(b) - score(a));
+    } else if (state.sort === "title") {
+        data.sort((a, b) => a.title.localeCompare(b.title, "ko"));
+    }
+
+    // ✅ 결과 카운트 갱신
+    ensureGridHead();
+    const cnt = document.getElementById("resultCount");
+    if (cnt) cnt.textContent = `${data.length} results`;
+
+    // 페이징(12개씩)
+    const end = state.page * state.pageSize;
+    const slice = data.slice(0, end);
+
+    if (!append) grid.innerHTML = "";
+    slice.forEach((p) => grid.appendChild(createShotCard(p)));
+
+    const moreBtn = document.querySelector("#btnLoadMore");
+    if (moreBtn) moreBtn.classList.toggle("hidden", end >= data.length);
+
+    grid.setAttribute("aria-busy", "false");
 }
