@@ -1,5 +1,6 @@
 html,
 body {
+    width: 100%;
     background: var(--bg);
     color: var(--text);
 }
@@ -331,9 +332,11 @@ body {
 }
 
 .kf-card {
+    position: relative;
     background: transparent;
     border-radius: 14px;
 }
+
 .kf-card__thumb {
     display: block;
     background: var(--panel);
@@ -435,4 +438,99 @@ body {
     padding: 6px 10px;
     font-weight: 700;
     font-size: 12px;
+}
+
+/* 포트폴리오 마키 */
+.kf-mq-portfolios {
+    --speed: 40s; /* 숫자 작게 = 더 빠름 */
+    --gap: 20px;
+    --item-w: 220px; /* 카드 너비 */
+    --img-h: 140px; /* 이미지 높이 */
+    /* border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border); */
+    /* background: var(--panel); */
+    margin-top: 50px;
+}
+
+.kf-mq-portfolios .mq-mask {
+    position: relative;
+    /* overflow: hidden; */
+    padding: 14px 0;
+}
+
+.kf-mq-portfolios .mq-track {
+    display: flex;
+    width: max-content;
+    gap: var(--gap);
+    animation: mq-scroll var(--speed) linear infinite;
+}
+.kf-mq-portfolios:hover .mq-track {
+    animation-play-state: paused;
+}
+
+.kf-mq-portfolios .mq-seq {
+    display: flex;
+    gap: var(--gap);
+}
+
+.kf-mq-portfolios .mq-item {
+    display: block;
+    position: relative;
+    width: var(--item-w);
+    text-decoration: none;
+}
+.kf-mq-portfolios .mq-item:hover {
+    z-index: 2;
+}
+
+.kf-mq-portfolios .mq-item figure {
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    transform-origin: 60% 100%; /* 오른쪽으로 살짝 기운 느낌 */
+    will-change: transform;
+}
+
+/* 호버 시: 오른쪽으로 살짝 기울이기 + 살짝 띄우기 + 그림자 */
+.kf-mq-portfolios .mq-item:hover figure {
+    transform: rotate(2deg) translateY(-2px);
+}
+
+.kf-mq-portfolios figure {
+    margin: 0;
+}
+.kf-mq-portfolios img {
+    display: block;
+    width: 100%;
+    height: var(--img-h);
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #000;
+}
+
+/* 제목(작게) */
+.kf-mq-portfolios figcaption {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 무한 루프 */
+@keyframes mq-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    } /* 시퀀스 2개이므로 -50% 이동 */
+}
+
+/* 모션 최소화 존중 */
+@media (prefers-reduced-motion: reduce) {
+    .kf-mq-portfolios .mq-track {
+        animation: none;
+    }
 }
