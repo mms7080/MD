@@ -1,73 +1,222 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko" data-theme="light">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>로그인 – kafolio</title>
+<html
+    lang="ko"
+    data-theme="light"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>kafolio – 로그인</title>
+        <meta name="description" content="kafolio 계정 로그인" />
+        <script th:src="@{/js/home/home.js}" defer></script>
 
-  <!-- 공통 헤더 CSS -->
-  <link rel="stylesheet" href="/css/header.css" />
-  <!-- 로그인 전용 CSS -->
-  <link rel="stylesheet" href="/css/auth/signin.css" />
-</head>
-<body>
+        <link rel="stylesheet" th:href="@{/css/home/home.css}" />
+        <link rel="stylesheet" th:href="@{/css/header.css}" />
+        <link rel="stylesheet" th:href="@{/css/users/signin.css}" />
 
-  <!-- 공통 헤더 -->
-  <div th:replace="fragments/header :: site-header"></div>
+        <!-- 파비콘 -->
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="https://kafolio.kr/static/icon.ico"
+        />
+    </head>
 
-  <!-- 본문 -->
-  <main class="auth-wrap" role="main">
-    <section class="auth-card" aria-labelledby="loginTitle">
-      <header class="auth-head">
-        <h1 id="loginTitle">로그인</h1>
-      </header>
+    <body data-page="login">
+        <a class="skip-link" href="#content">본문 바로가기</a>
 
-      <!-- 글로벌 메시지 -->
-      <div class="auth-alert is-error" th:if="${param.error}">
-        아이디/비밀번호를 확인해주세요.
-      </div>
-      <div class="auth-alert is-success" th:if="${param.logout}">
-        로그아웃되었습니다.
-      </div>
+        <!-- 헤더 -->
+        <header class="site-header">
+            <div class="container header-inner">
+                <a class="brand" th:href="@{/home}" aria-label="홈으로">
+                    <img
+                        class="brand-mark"
+                        src="https://kafolio.kr/static/icon.ico"
+                        alt=""
+                        width="20"
+                        height="20"
+                    />
+                    <span class="brand-text">kafolio</span>
+                </a>
 
-      <!-- 로그인 폼 -->
-      <form th:action="@{/signin}" method="post" class="auth-form">
-        <div class="field">
-          <label for="username">아이디 / 이메일</label>
-          <input id="username" name="username" type="text" required />
-        </div>
+                <nav class="nav">
+                    <button
+                        class="nav-toggle"
+                        aria-expanded="false"
+                        aria-controls="primary-menu"
+                        aria-label="메뉴 열기"
+                    >
+                        <span class="nav-toggle-bar"></span>
+                        <span class="nav-toggle-bar"></span>
+                        <span class="nav-toggle-bar"></span>
+                    </button>
+                    <ul id="primary-menu" class="nav-list">
+                        <li><a th:href="@{/home}">home</a></li>
+                        <li><a th:href="@{/detail}">detail</a></li>
+                        <li>
+                            <a th:href="@{/write}">write</a>
+                        </li>
+                    </ul>
+                </nav>
 
-        <div class="field">
-          <label for="password">비밀번호</label>
-          <input id="password" name="password" type="password" placeholder="••••••••" required />
-        </div>
+                <div class="header-actions">
+                    <button
+                        id="btnTheme"
+                        class="btn ghost"
+                        aria-pressed="false"
+                        aria-label="다크모드 전환"
+                    >
+                        🌓
+                    </button>
 
-        <div class="row-between">
-          <!-- 왼쪽 -->
-          <label class="chk">
-            <input type="checkbox" name="remember-me" />
-            <span>로그인 유지</span>
-          </label>
-          <!-- 오른쪽 -->
-          <div class="find-links">
-            <a class="link-muted" th:href="@{/forgot/username}" aria-label="아이디 찾기">아이디 찾기</a>
-            <span class="sep">/</span>
-            <a class="link-muted" th:href="@{/forgot/password}" aria-label="비밀번호 찾기">비밀번호 찾기</a>
-          </div>
-        </div>
+                    <!-- 로그인 전 -->
+                    <span sec:authorize="isAnonymous()">
+                        <a
+                            th:href="@{/signin}"
+                            class="btn ghost"
+                            aria-current="page"
+                            >로그인</a
+                        >
+                        <a th:href="@{/signup}" class="btn ghost">회원가입</a>
+                    </span>
 
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <!-- 로그인 후 -->
+                    <span sec:authorize="isAuthenticated()">
+                        <a th:href="@{/mypage}" class="btn ghost">마이페이지</a>
+                        <form
+                            th:action="@{/logout}"
+                            method="post"
+                            style="display: inline"
+                        >
+                            <input
+                                type="hidden"
+                                th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}"
+                            />
+                            <button type="submit" class="btn primary">
+                                로그아웃
+                            </button>
+                        </form>
+                    </span>
+                </div>
+            </div>
+        </header>
 
-        <button type="submit" class="btn btn-blue full">로그인</button>
-      </form>
+        <!-- 본문 -->
+        <main id="content" class="auth">
+            <!-- 상단 히어로 -->
+            <section class="auth-hero">
+                <div class="container">
+                    <h1>로그인</h1>
+                    <p class="muted">
+                        kafolio 계정으로 포트폴리오를 더 편하게 관리하세요.
+                    </p>
+                </div>
+            </section>
 
-      <!-- 하단 링크 -->
-      <footer class="auth-foot">
-        <span>아직 계정이 없으신가요?</span>
-        <a th:href="@{/signup}" class="link-strong">회원가입</a>
-      </footer>
-    </section>
-  </main>
+            <!-- 알림 배너: 회원가입 성공/로그아웃/에러 -->
+            <div class="container" style="max-width: 720px">
+                <p
+                    th:if="${param.signup}"
+                    class="note-banner"
+                    role="status"
+                    aria-live="polite"
+                >
+                    회원가입이 완료되었습니다. 이제 로그인해 주세요.
+                </p>
+                <p
+                    th:if="${param.logout}"
+                    class="note-banner"
+                    role="status"
+                    aria-live="polite"
+                >
+                    로그아웃되었습니다.
+                </p>
+                <p
+                    th:if="${param.error}"
+                    class="note-banner error"
+                    role="alert"
+                >
+                    아이디/비밀번호를 확인해주세요.
+                </p>
+            </div>
 
-</body>
+            <!-- 로그인 카드 -->
+            <section class="auth-body">
+                <div class="container auth-container">
+                    <form
+                        class="auth-card"
+                        aria-label="로그인 폼"
+                        th:action="@{/signin}"
+                        method="post"
+                    >
+                        <div class="field">
+                            <input
+                                id="username"
+                                name="username"
+                                type="text"
+                                placeholder="아이디"
+                                required
+                                autocomplete="username"
+                            />
+                        </div>
+
+                        <div class="field">
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                placeholder="비밀번호"
+                                required
+                                autocomplete="current-password"
+                            />
+                        </div>
+
+                        <div class="row between">
+                            <label class="check">
+                                <input type="checkbox" name="remember-me" />
+                                <span>로그인 상태 유지</span>
+                            </label>
+                            <a
+                                class="link"
+                                th:href="@{/forgot}"
+                                aria-label="비밀번호 찾기"
+                                >비밀번호 찾기</a
+                            >
+                        </div>
+
+                        <!-- CSRF -->
+                        <input
+                            type="hidden"
+                            th:name="${_csrf.parameterName}"
+                            th:value="${_csrf.token}"
+                        />
+
+                        <button type="submit" class="btn primary full">
+                            로그인
+                        </button>
+
+                        <div class="alt">
+                            <span class="muted">계정이 없으신가요?</span>
+                            <a class="link" th:href="@{/signup}">회원가입</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- 푸터 -->
+        <footer class="site-footer">
+            <div class="container footer-inner">
+                <p>© <span id="year"></span> kafolio. All rights reserved.</p>
+                <ul class="footer-links">
+                    <li><a th:href="@{/terms}">이용약관</a></li>
+                    <li><a th:href="@{/privacy}">개인정보처리방침</a></li>
+                    <li><a th:href="@{/help}">도움말</a></li>
+                </ul>
+            </div>
+        </footer>
+    </body>
 </html>
