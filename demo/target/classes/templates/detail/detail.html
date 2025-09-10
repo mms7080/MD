@@ -78,7 +78,12 @@
 
                     <!-- 로그인 전 -->
                     <span sec:authorize="isAnonymous()">
-                        <a th:href="@{/signin}" class="btn ghost">로그인</a>
+                        <a
+                            th:href="@{/signin}"
+                            class="btn ghost"
+                            data-open-auth="login"
+                            >로그인</a
+                        >
                         <a th:href="@{/signup}" class="btn ghost">회원가입</a>
                     </span>
 

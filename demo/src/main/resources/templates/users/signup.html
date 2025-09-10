@@ -12,6 +12,7 @@
         <meta name="description" content="kafolio 계정 회원가입" />
 
         <script th:src="@{/js/home/home.js}" defer></script>
+        <script th:src="@{/js/users/sign.js}" defer></script>
         <link rel="stylesheet" th:href="@{/css/home/home.css}" />
         <link rel="stylesheet" th:href="@{/css/header.css}" />
         <link rel="stylesheet" th:href="@{/css/users/signup.css}" />
@@ -113,7 +114,6 @@
             <section class="auth-hero">
                 <div class="container">
                     <h1>회원가입</h1>
-                    <p class="muted">필수 항목을 입력해 계정을 생성하세요.</p>
                 </div>
             </section>
 
@@ -146,8 +146,6 @@
                         aria-label="회원가입 폼"
                         novalidate
                     >
-                        <h3 style="margin: 0">계정 정보</h3>
-
                         <!-- 전역/필드 에러 -->
                         <div
                             th:if="${#fields.hasAnyErrors()}"
@@ -175,7 +173,7 @@
                                 id="username"
                                 type="text"
                                 th:field="*{username}"
-                                placeholder="영문 소문자/숫자 4~16자"
+                                placeholder="영문 소문자와 숫자 조합(4~16자)"
                                 required
                                 autocomplete="username"
                             />
@@ -197,7 +195,7 @@
                                 id="password"
                                 type="password"
                                 th:field="*{password}"
-                                placeholder="10자 이상"
+                                placeholder="비밀번호를 입력하세요 (10자 이상)"
                                 required
                                 autocomplete="new-password"
                             />
@@ -219,7 +217,7 @@
                                 id="confirmPassword"
                                 type="password"
                                 th:field="*{confirmPassword}"
-                                placeholder="비밀번호를 한번 더 입력"
+                                placeholder="비밀번호를 다시 입력하세요"
                                 required
                                 autocomplete="new-password"
                             />
@@ -241,6 +239,7 @@
                                 id="name"
                                 type="text"
                                 th:field="*{name}"
+                                placeholder="이름을 입력하세요"
                                 required
                             />
                             <p
@@ -250,22 +249,58 @@
                             ></p>
                         </div>
 
-                        <!-- 이메일 + 인증코드 발송 버튼 (인라인) -->
+                        <!-- 이메일 + 인증코드 발송 버튼 (콤보) -->
                         <div class="field field-inline">
-                            <label for="email"
+                            <label for="emailLocal"
                                 >이메일
                                 <span class="req" aria-hidden="true"
                                     >*</span
                                 ></label
                             >
-                            <div class="inline-wrap">
+
+                            <div
+                                class="inline-wrap email-combo"
+                                id="emailCombo"
+                            >
+                                <!-- ① 아이디(앞부분) -->
                                 <input
-                                    id="email"
-                                    type="email"
-                                    th:field="*{email}"
-                                    required
-                                    autocomplete="email"
+                                    id="emailLocal"
+                                    type="text"
+                                    placeholder="아이디"
+                                    autocomplete="off"
                                 />
+
+                                <!-- ② 도메인: select ↔ custom input 토글 (한 칸 안에서 교체) -->
+                                <div class="domain-wrap">
+                                    <select
+                                        id="emailDomain"
+                                        aria-label="도메인 선택"
+                                    >
+                                        <option value="gmail.com">
+                                            gmail.com
+                                        </option>
+                                        <option value="naver.com">
+                                            naver.com
+                                        </option>
+                                        <option value="daum.net">
+                                            daum.net
+                                        </option>
+                                        <option value="kakao.com">
+                                            kakao.com
+                                        </option>
+                                        <option value="__custom__">
+                                            직접 입력
+                                        </option>
+                                    </select>
+                                    <input
+                                        id="emailDomainCustom"
+                                        type="text"
+                                        placeholder="example.com"
+                                        class="hidden"
+                                    />
+                                </div>
+
+                                <!-- ③ 버튼 -->
                                 <button
                                     id="btnSendCode"
                                     type="button"
@@ -275,6 +310,15 @@
                                     인증코드 발송
                                 </button>
                             </div>
+
+                            <!-- 실제 제출되는 진짜 이메일 (Thymeleaf 바인딩 유지) -->
+                            <input
+                                id="email"
+                                type="email"
+                                th:field="*{email}"
+                                hidden
+                            />
+
                             <p
                                 class="field-error"
                                 th:if="${#fields.hasErrors('email')}"
@@ -297,11 +341,11 @@
                                 inputmode="numeric"
                                 pattern="\\d{6}"
                                 maxlength="6"
-                                placeholder="메일로 받은 6자리 코드"
+                                placeholder="인증 코드를 입력하세요 (6자리)"
                             />
-                            <p class="muted" id="codeHint">
+                            <!-- <p class="muted" id="codeHint">
                                 인증코드는 5분 동안 유효합니다.
-                            </p>
+                            </p> -->
                             <p
                                 class="field-error"
                                 id="err-code"
@@ -342,21 +386,35 @@
                             ></p>
                         </fieldset>
 
+                        <!-- 생년월일 -->
                         <div class="field">
-                            <label for="age"
-                                >나이
+                            <label for="birth"
+                                >생년월일
                                 <span class="req" aria-hidden="true"
                                     >*</span
                                 ></label
                             >
+
+                            <!-- 직접 입력도 가능, 달력 팝업도 뜨는 네이티브 date -->
                             <input
-                                id="age"
-                                type="number"
-                                min="0"
-                                max="150"
-                                th:field="*{age}"
+                                id="birth"
+                                name="birth"
+                                type="date"
+                                placeholder="YYYY-MM-DD"
+                                inputmode="numeric"
+                                pattern="\d{4}-\d{2}-\d{2}"
                                 required
+                                aria-describedby="birthHelp"
                             />
+
+                            <!-- 서버 DTO가 age를 받는다면 그대로 유지: birth에서 자동 계산해서 채움 -->
+                            <input
+                                id="ageHidden"
+                                type="hidden"
+                                th:field="*{age}"
+                            />
+
+                            <!-- 서버가 age에 대한 검증 메시지를 내려보내는 경우 그대로 표시 -->
                             <p
                                 class="field-error"
                                 th:if="${#fields.hasErrors('age')}"
