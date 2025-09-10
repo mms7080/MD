@@ -1,238 +1,203 @@
+/* ========== 아이디 중복 확인 ========== */
 (function () {
-    const combo = document.getElementById("emailCombo");
-    const localEl = document.getElementById("emailLocal");
-    const selEl = document.getElementById("emailDomain");
-    const custEl = document.getElementById("emailDomainCustom");
-    const hidden = document.getElementById("email"); // 실제 제출용
-    const btnSend = document.getElementById("btnSendCode");
+  const btn = document.getElementById("btnCheckId");
+  const input = document.getElementById("username");
+  const status = document.getElementById("usernameStatus"); // 있으면 사용
 
-    // 이메일 유효성 체크
-    const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  function show(msg, ok) {
+    if (!status) { alert(msg); return; }
+    status.textContent = msg;
+    status.className = `note-banner${ok ? "" : " error"}`;
+    status.hidden = false;
+  }
 
-    // local + domain → hidden email 동기화
-    function syncEmail() {
-        const local = (localEl.value || "").trim();
-        const domain =
-            selEl.value === "__custom__"
-                ? (custEl.value || "").trim()
-                : selEl.value;
+  btn?.addEventListener("click", async () => {
+    const username = (input?.value || "").trim();
+    if (!username) { alert("아이디를 입력하세요."); input?.focus(); return; }
 
-        const val = local && domain ? `${local}@${domain}` : "";
-        hidden.value = val;
-
-        // 인증코드 버튼 활성화
-        btnSend.disabled = !isEmail(val);
+    btn.disabled = true;
+    try {
+      const res = await fetch(`/api/check-username?username=${encodeURIComponent(username)}`);
+      const exists = await res.json(); // 서버가 true/false 반환한다고 가정
+      if (exists) show("이미 사용 중인 아이디입니다.", false);
+      else show("사용 가능한 아이디입니다.", true);
+    } catch {
+      show("중복 확인 중 오류가 발생했습니다.", false);
+    } finally {
+      btn.disabled = false;
     }
-
-    // “직접 입력” 선택시 토글
-    selEl.addEventListener("change", () => {
-        const custom = selEl.value === "__custom__";
-        combo.classList.toggle("is-custom", custom);
-        if (custom) custEl.focus();
-        syncEmail();
-    });
-
-    // 입력 이벤트들
-    [localEl, custEl].forEach((el) => el.addEventListener("input", syncEmail));
-
-    // “aaa@gmail.com” 전체 붙여넣기 케어 (자동 분해)
-    localEl.addEventListener("input", () => {
-        const raw = localEl.value;
-        if (raw.includes("@")) {
-            const [id, ...rest] = raw.split("@");
-            localEl.value = id;
-            selEl.value = "__custom__";
-            combo.classList.add("is-custom");
-            custEl.value = rest.join("@");
-        }
-        syncEmail();
-    });
-
-    // 초기값
-    selEl.value = selEl.value || "gmail.com";
-    syncEmail();
+  });
 })();
 
+/* ========== 생년월일 → 만 나이 자동 계산 ========== */
 (function () {
-    const birth = document.getElementById("birth");
-    const ageHidden = document.getElementById("ageHidden");
+  const birth = document.getElementById("birth");
+  const ageHidden = document.getElementById("ageHidden");
+  if (!birth || !ageHidden) return;
 
-    if (!birth || !ageHidden) return;
+  // 미래 금지 / 최소연도
+  const today = new Date();
+  birth.max = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+  birth.min = `1900-01-01`;
 
-    // 오늘까지 허용(미래 날짜 금지), 최솟값은 취향껏
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    birth.max = `${yyyy}-${mm}-${dd}`;
-    birth.min = `1900-01-01`;
+  function syncAge() {
+    const val = birth.value; // yyyy-mm-dd
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) { ageHidden.value = ""; return; }
+    const [y, m, d] = val.split("-").map(Number);
+    const b = new Date(y, m - 1, d);
+    if (isNaN(b)) { ageHidden.value = ""; return; }
 
-    // 날짜 지원 안 하는 브라우저를 위한 하이픈 자동 삽입(직접 입력 보강)
-    const isDateSupported = birth.type === "date";
-    if (!isDateSupported) {
-        birth.placeholder = "YYYY-MM-DD";
-        birth.addEventListener("input", (e) => {
-            let v = e.target.value.replace(/[^\d]/g, "").slice(0, 8);
-            if (v.length >= 5)
-                v = `${v.slice(0, 4)}-${v.slice(4, 6)}${
-                    v.length > 6 ? "-" + v.slice(6) : ""
-                }`;
-            else if (v.length >= 4) v = `${v.slice(0, 4)}-${v.slice(4)}`;
-            e.target.value = v;
-            syncAge();
-        });
-    }
+    const now = new Date();
+    let age = now.getFullYear() - b.getFullYear();
+    const beforeBirthday = (now.getMonth() < b.getMonth()) ||
+                           (now.getMonth() === b.getMonth() && now.getDate() < b.getDate());
+    if (beforeBirthday) age--;
+    ageHidden.value = (age >= 0 && age < 200) ? String(age) : "";
+  }
 
-    function syncAge() {
-        const val = birth.value; // yyyy-mm-dd
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) {
-            ageHidden.value = "";
-            return;
-        }
-        const [y, m, d] = val.split("-").map(Number);
-        const b = new Date(y, m - 1, d);
-        if (isNaN(b)) {
-            ageHidden.value = "";
-            return;
-        }
-
-        // 만 나이 계산
-        const now = new Date();
-        let age = now.getFullYear() - b.getFullYear();
-        const hasntHadBirthday =
-            now.getMonth() < b.getMonth() ||
-            (now.getMonth() === b.getMonth() && now.getDate() < b.getDate());
-        if (hasntHadBirthday) age--;
-
-        // 음수/비정상 guard
-        ageHidden.value = age >= 0 && age < 200 ? String(age) : "";
-    }
-
-    birth.addEventListener("change", syncAge);
-    birth.addEventListener("input", syncAge);
-
-    // 초기 동기화(서버가 age를 채워줬다면 그대로 유지)
-    if (!ageHidden.value) syncAge();
+  birth.addEventListener("change", syncAge);
+  birth.addEventListener("input", syncAge);
+  if (!ageHidden.value) syncAge();
 })();
 
+/* ========== 이메일 콤보(아이디/도메인) → hidden email 동기화 + 인증코드 발송 ========== */
 (function () {
-    const combo = document.getElementById("emailCombo");
-    const localEl = document.getElementById("emailLocal");
-    const selEl = document.getElementById("emailDomain");
-    const custEl = document.getElementById("emailDomainCustom");
-    const hiddenMail = document.getElementById("email"); // 최종 이메일(hidden)
-    const btnSend = document.getElementById("btnSendCode"); // 인증코드 발송 버튼
-    const codeBlock = document.getElementById("codeBlock"); // 인증코드 블록
-    const emailCode = document.getElementById("emailCode"); // 인증코드 입력칸
+  const combo     = document.getElementById("emailCombo");
+  const localEl   = document.getElementById("emailLocal");
+  const selEl     = document.getElementById("emailDomain");
+  const custEl    = document.getElementById("emailDomainCustom");
+  const hidden    = document.getElementById("email");        
+  const btnSend   = document.getElementById("btnSendCode");  // 인증코드 발송 버튼
+  const codeBlock = document.getElementById("codeBlock");    // 인증코드 입력 블록
+  const emailCode = document.getElementById("emailCode");    // 인증코드 입력칸
+  const notice    = document.getElementById("ajaxNotice");   // 상태 표시
 
-    const csrfHeader = document.querySelector(
-        'meta[name="_csrf_header"]'
-    )?.content;
-    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+  const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+  const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
 
-    const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 
-    // 이메일 동기화(기존 콤보 로직과 동일)
-    function syncEmail() {
-        const local = (localEl?.value || "").trim();
-        const domain =
-            selEl?.value === "__custom__"
-                ? (custEl?.value || "").trim()
-                : selEl?.value || "";
+  function setNotice(msg, ok) {
+    if (!notice) { alert(msg); return; }
+    notice.textContent = msg;
+    notice.className = `note-banner${ok ? "" : " error"}`;
+    notice.hidden = false;
+  }
 
-        const val = local && domain ? `${local}@${domain}` : "";
-        hiddenMail.value = val;
+  // 이메일 동기화
+  function syncEmail() {
+    const local = (localEl?.value || "").trim();
+    const domain = selEl?.value === "__custom__"
+      ? (custEl?.value || "").trim()
+      : (selEl?.value || "");
+    const val = (local && domain) ? `${local}@${domain}` : "";
+    hidden.value = val;
 
-        // 발송 버튼 활성화/비활성
-        btnSend.disabled = !isEmail(val);
+    // 버튼 활성화
+    btnSend.disabled = !isEmail(val);
 
-        // 이메일 바뀌면 코드 블록/타이머 초기화
-        hideCodeBlock();
-    }
+    // 이메일 변경 시 코드 입력 영역 초기화
+    hideCodeBlock();
+  }
 
-    // 도메인 선택
-    selEl?.addEventListener("change", () => {
-        const custom = selEl.value === "__custom__";
-        combo?.classList.toggle("is-custom", custom);
-        if (custom) custEl?.focus();
-        syncEmail();
-    });
-
-    // 입력 변화
-    [localEl, custEl].forEach((el) => el?.addEventListener("input", syncEmail));
-
-    // 붙여넣기 보정(aaa@gmail.com 형식)
-    localEl?.addEventListener("input", () => {
-        const raw = localEl.value;
-        if (raw.includes("@")) {
-            const [id, ...rest] = raw.split("@");
-            localEl.value = id;
-            selEl.value = "__custom__";
-            combo?.classList.add("is-custom");
-            if (custEl) custEl.value = rest.join("@");
-        }
-        syncEmail();
-    });
-
-    // ===== 인증코드 발송/표시/타이머 =====
-    let cooldownTimer = null;
-    function startCooldown(seconds = 60) {
-        let left = seconds;
-        btnSend.disabled = true;
-        btnSend.textContent = `재발송(${left}s)`;
-        cooldownTimer = setInterval(() => {
-            left--;
-            btnSend.textContent = `재발송(${left}s)`;
-            if (left <= 0) {
-                clearInterval(cooldownTimer);
-                cooldownTimer = null;
-                btnSend.disabled = !isEmail(hiddenMail.value);
-                btnSend.textContent = "인증코드 발송";
-            }
-        }, 1000);
-    }
-    function stopCooldown() {
-        if (cooldownTimer) {
-            clearInterval(cooldownTimer);
-            cooldownTimer = null;
-        }
-        btnSend.textContent = "인증코드 발송";
-    }
-    function showCodeBlock() {
-        codeBlock.hidden = false;
-        emailCode?.focus({ preventScroll: true });
-    }
-    function hideCodeBlock() {
-        codeBlock.hidden = true;
-        if (emailCode) emailCode.value = "";
-        stopCooldown();
-    }
-
-    btnSend?.addEventListener("click", async () => {
-        if (!isEmail(hiddenMail.value)) return;
-
-        // --- 실제 발송 요청(백엔드 엔드포인트에 맞게 수정) ---
-        try {
-            // 예시: /auth/email-code 로 POST
-            // await fetch('/auth/email-code', {
-            //   method: 'POST',
-            //   headers: {
-            //     'Content-Type': 'application/json',
-            //     ...(csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {})
-            //   },
-            //   body: JSON.stringify({ email: hiddenMail.value })
-            // });
-
-            // 발송 성공 시 UI 표시
-            showCodeBlock();
-            startCooldown(60); // 60초 쿨다운
-        } catch (e) {
-            console.error(e);
-            // 에러 메시지 표시를 원하면 여기에서 처리
-        }
-    });
-
-    // 초기화
-    if (selEl && !selEl.value) selEl.value = "gmail.com";
+  // 직접 입력 토글
+  selEl?.addEventListener("change", () => {
+    const custom = selEl.value === "__custom__";
+    combo?.classList.toggle("is-custom", custom);
+    // 보조: display 토글(프로젝트 CSS에 맞춰 hidden 클래스를 쓰고 있다면 그대로 두세요)
+    if (custEl) custEl.classList.toggle("hidden", !custom);
+    if (custom) custEl?.focus();
     syncEmail();
+  });
+
+  // 로컬/커스텀 입력 변화
+  [localEl, custEl].forEach(el => el?.addEventListener("input", syncEmail));
+
+  // 'aaa@gmail.com' 전체 붙여넣기 보정
+  localEl?.addEventListener("input", () => {
+    const raw = localEl.value;
+    if (raw.includes("@")) {
+      const [id, ...rest] = raw.split("@");
+      localEl.value = id;
+      if (selEl) selEl.value = "__custom__";
+      combo?.classList.add("is-custom");
+      if (custEl) {
+        custEl.classList.remove("hidden");
+        custEl.value = rest.join("@");
+      }
+    }
+    syncEmail();
+  });
+
+  // 인증코드 영역 / 타이머
+  let cooldownTimer = null;
+  function showCodeBlock() {
+    if (codeBlock) codeBlock.hidden = false;
+    emailCode?.focus({ preventScroll: true });
+  }
+  function hideCodeBlock() {
+    if (codeBlock) codeBlock.hidden = true;
+    if (emailCode) emailCode.value = "";
+    stopCooldown();
+  }
+  function startCooldown(seconds = 60) {
+    let left = seconds;
+    btnSend.disabled = true;
+    const original = "인증코드 발송";
+    btnSend.textContent = `재발송(${left}s)`;
+    cooldownTimer = setInterval(() => {
+      left--;
+      btnSend.textContent = `재발송(${left}s)`;
+      if (left <= 0) {
+        clearInterval(cooldownTimer);
+        cooldownTimer = null;
+        btnSend.textContent = original;
+        btnSend.disabled = !isEmail(hidden.value);
+      }
+    }, 1000);
+  }
+  function stopCooldown() {
+    if (cooldownTimer) {
+      clearInterval(cooldownTimer);
+      cooldownTimer = null;
+    }
+    btnSend.textContent = "인증코드 발송";
+  }
+
+  // 인증코드 발송 (AJAX)
+  btnSend?.addEventListener("click", async () => {
+    const email = hidden.value;
+    if (!isEmail(email)) return;
+
+    btnSend.disabled = true;
+    const body = new URLSearchParams({ email }); 
+    try {
+      const res = await fetch("/api/send-code", {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+          ...(csrfHeader && csrfToken ? { [csrfHeader]: csrfToken } : {})
+        },
+        body
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && (data.ok ?? true)) {
+        setNotice(data.message || "인증 코드가 발송되었습니다. (5분 유효)", true);
+        showCodeBlock();
+        startCooldown(60);
+      } else {
+        setNotice(data.message || `메일 발송에 실패했습니다. (status ${res.status})`, false);
+        btnSend.disabled = !isEmail(hidden.value);
+      }
+    } catch (e) {
+      setNotice("네트워크 오류로 발송 실패", false);
+      btnSend.disabled = !isEmail(hidden.value);
+    }
+  });
+
+  // 초기값 세팅
+  if (selEl && !selEl.value) selEl.value = "gmail.com";
+  syncEmail();
 })();
