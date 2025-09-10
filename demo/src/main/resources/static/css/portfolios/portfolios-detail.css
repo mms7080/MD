@@ -604,7 +604,7 @@ body {
 .lb-close{ position: absolute; top: 8px; right: 8px; }
 .lb-prev, .lb-next{ position: fixed; top: 50%; transform: translateY(-50%); }
 .lb-prev{ left: 24px; }
-lb-next{ right: 24px; }
+.lb-next{ right: 24px; }
 .lb-btn:hover{ filter: brightness(0.95); }
 
 /* 다크에서 버튼 톤 낮추기 */

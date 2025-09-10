@@ -16,57 +16,8 @@
 <body data-page="home">
   <a class="skip-link" href="#content">본문 바로가기</a>
 
-<!-- 헤더 -->
-<header class="site-header" xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
-  <div class="container header-inner">
-    <!-- 헤더 로고 -->
-    <a class="brand" href="/home" aria-label="홈으로">
-      <img class="brand-mark" src="https://kafolio.kr/static/icon.ico" alt="" width="20" height="20" />
-      <span class="brand-text">kafolio</span>
-    </a>
-
-    <nav class="nav">
-      <button class="nav-toggle" aria-expanded="false" aria-controls="primary-menu" aria-label="메뉴 열기">
-        <span class="nav-toggle-bar"></span>
-        <span class="nav-toggle-bar"></span>
-        <span class="nav-toggle-bar"></span>
-      </button>
-      <ul id="primary-menu" class="nav-list">
-        <li><a href="/home" class="is-active">home</a></li>
-        <li><a href="/detail">detail</a></li>
-      </ul>
-    </nav>
-
-    <div class="header-actions">
-      <button id="btnTheme" class="btn ghost" aria-pressed="false" aria-label="다크모드 전환">🌓</button>
-
- <!-- 로그인 전 -->
-<span sec:authorize="isAnonymous()">
-  <a href="/signin" class="btn ghost">로그인</a>
-  <a href="/signup" class="btn primary">회원가입</a>
-</span>
-
-<!-- 로그인 후: 관리자 -->
-<span sec:authorize="hasRole('ADMIN')">
-  <a href="/admin" class="btn ghost">관리자페이지</a>
-  <form th:action="@{/logout}" method="post" style="display:inline">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-    <button type="submit" class="btn primary">로그아웃</button>
-  </form>
-</span>
-
-<!-- 로그인 후: 일반 사용자 -->
-<span sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
-  <a href="/mypage" class="btn ghost">마이페이지</a>
-  <form th:action="@{/logout}" method="post" style="display:inline">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-    <button type="submit" class="btn primary">로그아웃</button>
-  </form>
-</span>
-
-    </div>
-  </div>
-</header>
+  <!-- 공통 헤더 -->
+  <div th:replace="fragments/header :: site-header"></div>
 
 
   <!-- 히어로 -->
