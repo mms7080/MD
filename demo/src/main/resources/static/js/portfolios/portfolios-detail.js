@@ -482,6 +482,4 @@ if (likeSigninTrigger) {
     openLoginRequiredModal('/signin');
   });
 }
-
-
 });
