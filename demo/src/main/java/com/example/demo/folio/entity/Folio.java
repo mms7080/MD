@@ -26,7 +26,7 @@ public class Folio {
     @Column(name = "skill")
     private List<String> skills;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "CLOB")
     private String introduction;
 
     private String thumbnail;
