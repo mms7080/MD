@@ -7,8 +7,10 @@
         <link rel="stylesheet" href="css/header.css" />
         <link rel="stylesheet" href="css/footer.css" />
         <link rel="stylesheet" href="css/detail/detail.css" />
+        <link rel="stylesheet" href="css/users/auth-modal.css" />
     </head>
     <body>
+        <div th:replace="fragments/modals :: authModals"></div>
         <div th:replace="fragments/header :: header('portfolio')"></div>
 
         <main class="kf-main">
