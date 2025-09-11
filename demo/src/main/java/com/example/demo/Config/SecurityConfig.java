@@ -34,6 +34,7 @@ public class SecurityConfig {
                     "/signup",
                     "/error",   
                     "/api/**",
+                    "/detail",
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/home/**"
                     //  ,"/**" 
