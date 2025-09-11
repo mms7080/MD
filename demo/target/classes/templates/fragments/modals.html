@@ -104,10 +104,53 @@
               <input name="name" type="text" placeholder="홍길동" required>
             </label>
 
-            <label class="auth-field">
-              <span class="auth-label">이메일</span>
-              <input name="email" type="email" placeholder="you@example.com" required>
-            </label>
+            <!-- 이메일 + 인증코드 발송 UI -->
+<div class="auth-field">
+  <span class="auth-label">이메일 <span class="req" aria-hidden="true">*</span></span>
+
+  <!-- 이메일 콤보: [아이디] @ [도메인 선택 or 직접입력] + [인증코드 발송] -->
+  <div class="email-combo">
+    <!-- 아이디(앞부분) -->
+    <input id="emailLocal" name="emailLocal" type="text" placeholder="아이디" autocomplete="off" />
+
+    <span class="at">@</span>
+
+    <!-- 도메인: 셀렉트 ↔ 커스텀 입력 (CSS만으로 토글) -->
+    <div class="domain-wrap">
+      <select id="emailDomain" name="emailDomainSel" aria-label="도메인 선택">
+        <option value="gmail.com">gmail.com</option>
+        <option value="naver.com">naver.com</option>
+        <option value="daum.net">daum.net</option>
+        <option value="kakao.com">kakao.com</option>
+        <option value="__custom__">직접 입력</option>
+      </select>
+      <input id="emailDomainCustom" name="emailDomainCustom" type="text" placeholder="example.com" />
+    </div>
+
+    <!-- 인증코드 입력창 열기 토글 (라벨=버튼) -->
+    <input id="code-open" type="checkbox" hidden />
+    <label class="btn small" for="code-open">인증코드 발송</label>
+  </div>
+
+  <!-- 인증코드 입력칸: 버튼 클릭 전에는 숨김 -->
+  <div class="code-block">
+    <input
+      id="emailCode"
+      name="emailCode"
+      type="text"
+      inputmode="numeric"
+      pattern="\\d{6}"
+      maxlength="6"
+      placeholder="인증코드 6자리"
+      aria-label="이메일 인증코드"
+    />
+    <button type="button" class="btn">코드 확인</button>
+  </div>
+
+  <!-- (선택) 검증 메시지 자리 -->
+  <small class="field-error" id="err-code" aria-live="polite"></small>
+</div>
+
 
             <fieldset class="auth-field">
               <legend class="auth-label">성별</legend>

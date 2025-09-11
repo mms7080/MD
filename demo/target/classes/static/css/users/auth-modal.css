@@ -217,3 +217,83 @@
     height: 100vh;
     overflow: hidden;
 }
+
+/* 이메일 콤보 레이아웃 */
+.email-combo {
+    display: grid;
+    grid-template-columns: 1fr auto minmax(180px, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+}
+.email-combo .at {
+    opacity: 0.7;
+    color: var(--muted, #9aa1a9);
+    font-weight: 800;
+}
+
+.domain-wrap {
+    position: relative;
+    display: grid;
+}
+/* 기본은 select 보이고, custom input 숨김 */
+.domain-wrap input {
+    display: none;
+}
+/* select에서 '직접 입력' 선택하면 input 보이고 select 숨김 (CSS :has 이용) */
+.domain-wrap:has(select option[value="__custom__"]:checked) select {
+    display: none;
+}
+.domain-wrap:has(select option[value="__custom__"]:checked) input {
+    display: block;
+}
+
+/* 인증코드 입력칸: 기본 숨김, code-open 체크되면 표시 */
+.code-block {
+    margin-top: 10px;
+    display: none;
+    gap: 10px;
+}
+#code-open:checked ~ .code-block {
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+
+.code-block input {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border, #2a2f38);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text, #fff);
+}
+
+/* 버튼 공통(모달 안 전용) */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border, #2a2f38);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text, #fff);
+    font-weight: 800;
+    cursor: pointer;
+}
+.btn.small {
+    height: 38px;
+}
+.btn:hover {
+    filter: brightness(1.06);
+}
+
+/* 작은 화면 최적화 */
+@media (max-width: 760px) {
+    .email-combo {
+        grid-template-columns: 1fr auto 1fr;
+    }
+    .email-combo .btn.small {
+        grid-column: 1 / -1; /* 버튼을 다음 줄로 내려 폭 확보 */
+    }
+}
