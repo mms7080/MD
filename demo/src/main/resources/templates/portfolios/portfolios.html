@@ -54,32 +54,32 @@
         <p><span class="label">Views:</span> <span id="viewCount">0</span></p>
 
         <!-- ❤️ Likes: 라벨 텍스트 + 하트만 클릭 -->
-<p class="likes-line">
-  <span class="label">Likes:</span>
-
-  <!-- 로그인 상태: 하트 버튼만 클릭 가능 -->
-  <button sec:authorize="isAuthenticated()"
-          id="likeBtn"
-          class="heart-btn"
-          title="좋아요"
-          aria-label="좋아요"
-          th:attr="data-id=${portfolios.id}">
-    ❤️
-  </button>
-
-  <!-- 비회원: 하트 클릭 시 로그인으로 -->
-  <a sec:authorize="isAnonymous()"
-     href="/signin"
-     id="likeSigninTrigger"
-     class="heart-btn"
-     title="로그인 후 좋아요 가능"
-     aria-label="로그인 후 좋아요">
-    ❤️
-  </a>
-
-  <!-- 좋아요 수는 버튼 밖 텍스트 -->
-  <span id="likeCount" th:text="${portfolios.likes}">0</span>
-</p>
+        <p class="likes-line">
+          <span class="label">Likes:</span>
+        
+          <!-- 로그인 상태: 하트 버튼만 클릭 가능 -->
+          <button sec:authorize="isAuthenticated()"
+                  id="likeBtn"
+                  class="heart-btn"
+                  title="좋아요"
+                  aria-label="좋아요"
+                  th:attr="data-id=${portfolios.id}">
+            ❤️
+          </button>
+        
+          <!-- 비회원: 하트 클릭 시 로그인으로 -->
+          <a sec:authorize="isAnonymous()"
+             href="/signin"
+             id="likeSigninTrigger"
+             class="heart-btn"
+             title="로그인 후 좋아요 가능"
+             aria-label="로그인 후 좋아요">
+            ❤️
+          </a>
+        
+          <!-- 좋아요 수는 버튼 밖 텍스트 -->
+          <span id="likeCount" th:text="${portfolios.likes}">0</span>
+        </p>
 
 
         <!-- 🏷 태그 -->
