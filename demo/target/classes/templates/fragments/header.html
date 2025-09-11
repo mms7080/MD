@@ -1,8 +1,13 @@
+<!-- templates/fragments/header.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+>
     <th:block th:fragment="header">
         <header class="kf-header">
             <div class="kf-header__inner">
+                <!-- 왼쪽: 로고 + 내비 -->
                 <div class="kf-header__left">
                     <a class="kf-logo" th:href="@{/}" aria-label="kafolio 홈">
                         kafolio<span class="kf-star">✶</span>
@@ -17,6 +22,7 @@
                     </nav>
                 </div>
 
+                <!-- 오른쪽: 테마 토글 + 인증 메뉴 -->
                 <div class="kf-header__right">
                     <!-- Theme toggle (CSS-only) -->
                     <input
@@ -41,25 +47,77 @@
                         </svg>
                     </label>
 
-                    <!-- <nav class="kf-auth" aria-label="인증 메뉴">
-                        <a class="kf-link" th:href="@{/signin}">로그인</a>
-                        <a class="kf-link" th:href="@{/signup}">회원가입</a>
-                    </nav> -->
-
+                    <!-- 인증 메뉴 -->
                     <nav class="kf-auth" aria-label="인증 메뉴">
-                        <!-- 이 라벨들이 라디오를 토글하여 모달을 엽니다 -->
-                        <label
-                            for="modal-signin"
-                            class="kf-link"
-                            style="cursor: pointer"
-                            >로그인</label
+                        <!-- 비로그인 상태: 모달 토글 (링크 구분선 없이) -->
+                        <div sec:authorize="isAnonymous()">
+                            <label
+                                for="modal-signin"
+                                class="kf-link"
+                                style="cursor: pointer"
+                                >로그인</label
+                            >
+                            <label
+                                for="modal-signup"
+                                class="kf-link"
+                                style="cursor: pointer"
+                                >회원가입</label
+                            >
+                        </div>
+
+                        <!-- 로그인 상태 (일반 사용자) -->
+                        <div
+                            sec:authorize="isAuthenticated() and !hasRole('ADMIN')"
                         >
-                        <label
-                            for="modal-signup"
-                            class="kf-link"
-                            style="cursor: pointer"
-                            >회원가입</label
-                        >
+                            <a class="kf-link" th:href="@{/mypage}"
+                                >마이페이지</a
+                            >
+                            <form
+                                th:action="@{/logout}"
+                                method="post"
+                                th:csrf
+                                style="display: inline"
+                            >
+                                <button
+                                    type="submit"
+                                    class="kf-link"
+                                    style="
+                                        background: none;
+                                        border: none;
+                                        padding: 0;
+                                        cursor: pointer;
+                                    "
+                                >
+                                    로그아웃
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- 로그인 상태 (관리자) -->
+                        <div sec:authorize="hasRole('ADMIN')">
+                            <a class="kf-link" th:href="@{/admin}"
+                                >관리자페이지</a
+                            >
+                            <form
+                                th:action="@{/logout}"
+                                method="post"
+                                th:csrf
+                                style="display: inline"
+                            >
+                                <button
+                                    type="submit"
+                                    class="kf-link"
+                                    style="
+                                        background: none;
+                                        border: none;
+                                        padding: 0;
+                                        cursor: pointer;
+                                    "
+                                >
+                                    로그아웃
+                                </button>
+                            </form>
+                        </div>
                     </nav>
                 </div>
             </div>
