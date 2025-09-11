@@ -136,3 +136,35 @@ body:has(#theme-toggle:checked) {
 .kf-link:hover {
     opacity: 1;
 }
+
+/* === Global reset & page colors === */
+html, body { height: 100%; }
+body {
+  margin: 0;                 /* 상단 빈틈 제거 */
+  background: var(--bg);
+  color: var(--text);
+  transition: background .2s ease, color .2s ease;
+}
+
+/* === JS로 붙일 라이트 테마(페이지 간 유지용) === */
+/* :has(#theme-toggle:checked) 는 그대로 두고,
+   아래 클래스가 있으면 우선 적용되도록 한다 */
+body.theme-light {
+  --bg: #f8fafc;
+  --page: #ffffff;
+  --rail: #f3f4f6;
+  --panel: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --accent: #111827;
+  --accent-ghost: #e5e7eb;
+  --chip: #f9fafb;
+  --chip-text: #374151;
+  --danger: #dc2626;
+  --shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+/* 헤더 배경은 변수 사용(기존과 동일) */
+.kf-header { background: var(--bg); }

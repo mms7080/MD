@@ -55,11 +55,13 @@
 
         <!-- ❤️ 좋아요 -->
         <div class="like-wrap">
+          
           <button sec:authorize="isAuthenticated()"
                   id="likeBtn"
                   class="like-btn"
                   title="좋아요"
                   th:attr="data-id=${portfolios.id}">
+            <span class="label">Likes:</span>
             ❤️ <span id="likeCount" th:text="${portfolios.likes}">0</span>
           </button>
           <a sec:authorize="isAnonymous()"

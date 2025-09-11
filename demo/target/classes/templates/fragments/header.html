@@ -44,6 +44,30 @@
             </nav>
         </div>
     </div>
+
+    <!-- 페이지 간 테마 유지 스크립트 -->
+<script>
+(function () {
+  const KEY = 'theme';
+  function apply(light) {
+    document.body.classList.toggle('theme-light', light);
+    localStorage.setItem(KEY, light ? 'light' : 'dark');
+    const cb = document.getElementById('theme-toggle');
+    if (cb) cb.checked = !!light;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // 저장된 테마 반영
+    const saved = localStorage.getItem(KEY);
+    if (saved) apply(saved === 'light');
+
+    // 토글 변화 감지
+    const cb = document.getElementById('theme-toggle');
+    if (cb) cb.addEventListener('change', () => apply(cb.checked));
+  });
+})();
+</script>
+
 </header>
 </body>
 </html>
