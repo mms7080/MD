@@ -12,7 +12,7 @@
     <main class="notice-container">
       <h1 class="notice-title">공지사항</h1>
 
-      <!-- 🔍 검색 영역 -->
+      <!-- 검색 영역 -->
       <div class="notice-search">
         <form
           th:action="@{/notice}"
@@ -38,7 +38,7 @@
         <a th:href="@{/notice/new}" class="btn-write">작성하기</a>
       </div>
 
-      <!-- 📋 공지사항 테이블 -->
+      <!-- 공지사항 테이블 -->
       <table class="notice-table">
         <thead>
           <tr>
@@ -69,7 +69,7 @@
                 th:text="${notice.title}"
               ></a>
 
-              <!-- 오늘 작성된 공지일 때만 NEW 뱃지 -->
+              <!-- NEW 뱃지 -->
               <span
                 class="badge-new"
                 th:if="${#temporals.format(notice.createdAt, 'yyyy-MM-dd') == #temporals.format(T(java.time.LocalDate).now(), 'yyyy-MM-dd')}"
@@ -81,7 +81,7 @@
             <td
               th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd')}"
             ></td>
-            <td>1</td>
+            <td th:text="${notice.views}"></td>
           </tr>
         </tbody>
       </table>
@@ -115,4 +115,12 @@
       </div>
     </main>
   </body>
+
+  <script>
+  window.onpageshow = function(event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  };
+</script>
 </html>
