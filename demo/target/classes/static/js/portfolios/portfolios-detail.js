@@ -483,3 +483,121 @@ if (likeSigninTrigger) {
   });
 }
 });
+
+
+const images = Array.from(document.querySelectorAll(".main-photo img, .thumb-list img"));
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImage = document.getElementById("lightboxImage");
+  const closeBtn = document.querySelector(".lb-close");
+  const prevBtn = document.querySelector(".lb-prev");
+  const nextBtn = document.querySelector(".lb-next");
+
+  let currentIndex = 0;
+
+  // 모달 열기
+  function openLightbox(index) {
+    currentIndex = index;
+    lightboxImage.src = images[currentIndex].src;
+    lightbox.removeAttribute("hidden");
+  }
+
+  // 모달 닫기
+  function closeLightbox() {
+    lightbox.setAttribute("hidden", true);
+  }
+
+  // 이전 이미지
+  function showPrev() {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    lightboxImage.src = images[currentIndex].src;
+  }
+
+  // 다음 이미지
+  function showNext() {
+    currentIndex = (currentIndex + 1) % images.length;
+    lightboxImage.src = images[currentIndex].src;
+  }
+
+  // 이미지 클릭 이벤트
+  images.forEach((img, index) => {
+    img.addEventListener("click", () => openLightbox(index));
+  });
+
+  // 버튼 이벤트
+  closeBtn.addEventListener("click", closeLightbox);
+  prevBtn.addEventListener("click", showPrev);
+  nextBtn.addEventListener("click", showNext);
+
+  // 배경 클릭 시 닫기
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) {
+      closeLightbox();
+    }
+  });
+
+  // 키보드 ← → ESC 지원
+  document.addEventListener("keydown", (e) => {
+    if (lightbox.hasAttribute("hidden")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") showPrev();
+    if (e.key === "ArrowRight") showNext();
+  });
+
+
+  // 별점 입력
+  const writeStars = document.getElementById("writeStars");
+  const myScoreText = document.getElementById("myScoreText");
+  let myScore = 0;
+
+  if (writeStars) {
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement("span");
+      star.textContent = "★";
+      star.classList.add("star");
+      star.dataset.value = i;
+      star.addEventListener("click", () => {
+        myScore = i;
+        myScoreText.textContent = i;
+        updateStars(writeStars, i);
+      });
+      writeStars.appendChild(star);
+    }
+  }
+
+  function updateStars(container, score) {
+    const stars = container.querySelectorAll(".star");
+    stars.forEach(star => {
+      star.classList.toggle("filled", star.dataset.value <= score);
+    });
+  }
+
+  // 댓글 폼 제출
+  const commentForm = document.getElementById("commentForm");
+  const commentList = document.getElementById("commentList");
+
+  if (commentForm) {
+    commentForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const content = document.getElementById("commentContent").value.trim();
+      if (!content || myScore === 0) {
+        alert("별점과 댓글을 모두 입력하세요.");
+        return;
+      }
+
+      // 새 댓글 DOM 추가 (임시)
+      const comment = document.createElement("div");
+      comment.classList.add("comment");
+      comment.innerHTML = `
+        <div class="meta">내 별점: ${"★".repeat(myScore)}</div>
+        <div class="text">${content}</div>
+      `;
+      commentList.prepend(comment);
+
+      // 입력 초기화
+      document.getElementById("commentContent").value = "";
+      myScore = 0;
+      myScoreText.textContent = "0";
+      updateStars(writeStars, 0);
+    });
+  }
+

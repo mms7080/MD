@@ -46,8 +46,6 @@
       <p class="desc" th:text="${portfolios.desc}">설명</p>
 
       <div class="meta-box">
-        <p><span class="label">Writer:</span> <span th:text="${portfolios.creator}"></span></p>
-        <p><span class="label">WriterDate:</span> <span th:text="${portfolios.createdAt}"></span></p>
 
         <p><span class="label">Link:</span>
           <a th:href="${portfolios.link}" target="_blank" th:text="${portfolios.link}" class="custom-link"></a>
@@ -101,15 +99,45 @@
     </div>
   </div>
 
-  <!-- 👥 팀원 소개 -->
-  <div class="team-section">
-    ...
+  
+ 
+
+  <div class="comment-section">
+  <h2>댓글</h2>
+
+  <!-- 평균 별점(모두에게 보임) -->
+  <div class="rating-summary">
+    <div class="stars readonly" id="avgStars" aria-label="평균 별점"></div>
+    <span class="star-symbol">⭐</span>
+    <span id="avgScore">0.0</span>
+    <span class="count">(<span id="ratingCount">0</span>)</span>
   </div>
 
-  <!-- 💬 댓글/별점 -->
-  <div class="comment-section">
-    ...
+  <!-- 로그인 사용자 전용: 별점 + 댓글 폼 -->
+  <div sec:authorize="isAuthenticated()">
+    <div class="rate-input">
+      <label class="rate-label">내 별점: </label>
+      <div id="writeStars" class="stars write" role="radiogroup" aria-label="별점 선택(1~5)">
+        <!-- JS가 5개 별을 만들어줍니다 -->
+      </div>
+      <span id="myScoreText">0</span>/5
+    </div>
+
+    <form id="commentForm">
+      <textarea id="commentContent" placeholder="댓글을 입력하세요..." rows="4" required></textarea>
+      <button type="submit">등록</button>
+    </form>
   </div>
+
+  <!-- 비회원 안내 -->
+  <div sec:authorize="isAnonymous()">
+    <p class="muted">로그인 후 댓글/별점을 남길 수 있습니다. <a href="/signin">로그인</a></p>
+  </div>
+
+  <!-- 댓글 리스트 -->
+  <div id="commentList" class="comments"></div>
+</div>
+
 </main>
 
 <!-- 🔗 JavaScript -->
