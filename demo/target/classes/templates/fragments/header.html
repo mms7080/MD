@@ -1,197 +1,49 @@
+<!-- src/main/resources/templates/fragments/header.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8" />
+</head>
 <body>
-<header th:fragment="site-header" class="mega-header">
-  <div class="mega-container">
-    <!-- 로고 -->
-    <a class="brand" th:href="@{/home}" aria-label="홈으로">
-      <img class="brand-mark" src="https://kafolio.kr/static/icon.ico" alt="" width="28" height="28"/>
-      <span class="brand-text">kafolio</span>
-    </a>
-
-    <!-- 글로벌 네비 -->
-    <nav class="g-nav" aria-label="주요 메뉴">
-      <ul id="g-nav-list" class="g-nav-list">
-        <li><a th:href="@{/home}" th:classappend="${page=='home'} ? ' is-active'">홈</a></li>
-
-        <li class="has-mega">
-          <a th:href="@{/detail}" th:classappend="${page=='detail'} ? ' is-active'">디테일</a>
-          <!-- 메가메뉴 (예시 콘텐츠) -->
-          <div class="mega" role="dialog" aria-label="디테일 메뉴">
-            <div class="mega-grid">
-              <aside class="mega-lead">
-                <h3>디테일</h3>
-                <p>프로젝트 상세와 작업 히스토리를 모아봤어요.</p>
-                <a th:href="@{/detail}" class="btn-primary">바로가기</a>
-              </aside>
-              <div class="mega-col">
-                <h4>개요</h4>
-                <a th:href="@{/detail#overview}">프로젝트 개요</a>
-                <a th:href="@{/detail#milestones}">마일스톤</a>
-                <a th:href="@{/detail#stack}">기술 스택</a>
-              </div>
-              <div class="mega-col">
-                <h4>문서</h4>
-                <a href="#">요구사항</a>
-                <a href="#">UI 가이드</a>
-                <a href="#">배포노트</a>
-              </div>
-              <div class="mega-col">
-                <h4>미디어</h4>
-                <a href="#">스크린샷</a>
-                <a href="#">데모 영상</a>
-                <a href="#">리소스</a>
-              </div>
-            </div>
-          </div>
-        </li>
-
-        <li class="has-mega">
-          <a th:href="@{/folio}" th:classappend="${page=='folio'} ? ' is-active'">폴리오</a>
-          <div class="mega" role="dialog" aria-label="폴리오 메뉴">
-            <div class="mega-grid">
-              <aside class="mega-lead">
-                <h3>폴리오</h3>
-                <p>작업물과 아카이브를 카테고리로 살펴보세요.</p>
-                <a th:href="@{/folio}" class="btn-primary">폴리오 전체</a>
-              </aside>
-              <div class="mega-col">
-                <h4>웹</h4>
-                <a href="#">Landing</a>
-                <a href="#">Product</a>
-                <a href="#">Admin</a>
-              </div>
-              <div class="mega-col">
-                <h4>기능</h4>
-                <a href="#">SEO</a>
-                <a href="#">Accessibility</a>
-                <a href="#">Animation</a>
-              </div>
-              <div class="mega-col">
-                <h4>태그</h4>
-                <a href="#">#React</a>
-                <a href="#">#Spring</a>
-                <a href="#">#Design</a>
-              </div>
-            </div>
-          </div>
-        </li>
-
-        <li class="has-mega">
-          <a th:href="@{/portfolio}" th:classappend="${page=='portfolio'} ? ' is-active'">포토폴리오</a>
-          <div class="mega" role="dialog" aria-label="포토폴리오 메뉴">
-            <div class="mega-grid">
-              <aside class="mega-lead">
-                <h3>포토폴리오</h3>
-                <p>이미지 중심의 작업을 카테고리로 탐색하세요.</p>
-                <a th:href="@{/portfolio}" class="btn-primary">포토폴리오 전체</a>
-              </aside>
-              <div class="mega-col">
-                <h4>카테고리</h4>
-                <a href="#">브랜딩</a><a href="#">캠페인</a><a href="#">일러스트</a>
-              </div>
-              <div class="mega-col">
-                <h4>정렬</h4>
-                <a href="#">최신순</a><a href="#">인기순</a><a href="#">제목순</a>
-              </div>
-              <div class="mega-col">
-                <h4>태그</h4>
-                <a href="#">#Landing</a><a href="#">#Admin</a><a href="#">#Motion</a>
-              </div>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </nav>
-
-    <!-- 우측 아이콘들 -->
-    <div class="actions">
-      <!-- 계정 아이콘 + 말풍선 -->
-      <div class="account hover-pop">
-        <button class="icon-btn" aria-haspopup="true" aria-expanded="false" aria-label="계정">
-          <!-- 사람 아이콘 (간단한 SVG) -->
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="12" cy="8" r="4"></circle>
-            <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
-          </svg>
-        </button>
-        <div class="pop-card">
-          <div class="pop-arrow"></div>
-          <div class="pop-inner" sec:authorize="isAnonymous()">
-            <a th:href="@{/signin}">로그인</a>
-            <a th:href="@{/signup}">회원가입</a>
-          </div>
-          <div class="pop-inner" sec:authorize="isAuthenticated()">
-            <a th:href="@{/mypage}">마이페이지</a>
-            <form th:action="@{/logout}" method="post" class="logout-inline">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-              <button type="submit">로그아웃</button>
-            </form>
-          </div>
+<header class="kf-header" th:fragment="site-header">
+    <div class="kf-header__inner">
+        <div class="kf-header__left">
+            <a class="kf-logo" th:href="@{/}" aria-label="kafolio 홈">
+                kafolio<span class="kf-star">✶</span>
+            </a>
+            <nav class="kf-nav" aria-label="주요 메뉴">
+                <ul>
+                    <li><a th:href="@{/detail}">portfolio</a></li>
+                    <li><a th:href="@{/folios}">folio</a></li>
+                    <li><a th:href="@{/notice}">공지사항</a></li>
+                </ul>
+            </nav>
         </div>
-      </div>
 
-      <!-- 검색 아이콘 (데모용) -->
-      <button class="icon-btn" aria-label="검색">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8">
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="M20 20l-3.2-3.2"></path>
-        </svg>
-      </button>
+        <div class="kf-header__right">
+            <!-- Theme toggle (CSS-only) -->
+            <input
+                id="theme-toggle"
+                type="checkbox"
+                hidden
+                aria-hidden="true"
+            />
+            <label
+                class="kf-iconbtn"
+                for="theme-toggle"
+                aria-label="다크/라이트 모드 전환"
+            >
+                <svg class="kf-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z"/>
+                </svg>
+            </label>
 
-      <!-- 글로벌 아이콘 (데모용) -->
-      <button class="icon-btn" aria-label="언어">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8">
-          <circle cx="12" cy="12" r="9"></circle>
-          <path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"></path>
-        </svg>
-      </button>
+            <nav class="kf-auth" aria-label="인증 메뉴">
+                <a class="kf-link" th:href="@{/signin}">로그인</a>
+                <a class="kf-link" th:href="@{/signup}">회원가입</a>
+            </nav>
+        </div>
     </div>
-  </div>
 </header>
-
-<script>
-  // 모바일 내비 토글
-  (function () {
-    const btn = document.querySelector('.hamburger');
-    const list = document.getElementById('g-nav-list');
-    if (!btn || !list) return;
-    btn.addEventListener('click', () => {
-      const open = list.classList.toggle('open');
-      btn.setAttribute('aria-expanded', String(open));
-    });
-  })();
-
-  // 키보드 접근성(포커스 안에서 유지 시 메가메뉴 열림)
-  document.querySelectorAll('.has-mega > a').forEach(trigger => {
-    const li = trigger.parentElement;
-    const mega = li.querySelector('.mega');
-    if (!mega) return;
-
-    // 포커스 진입 시 열기/벗어나면 닫기
-    trigger.addEventListener('focus', () => li.classList.add('focus'));
-    mega.addEventListener('focusin', () => li.classList.add('focus'));
-    li.addEventListener('mouseleave', () => li.classList.remove('focus'));
-    mega.addEventListener('focusout', (e) => {
-      if (!mega.contains(e.relatedTarget)) li.classList.remove('focus');
-    });
-  });
-
-  // 계정 말풍선(호버/포커스)
-  document.querySelectorAll('.hover-pop').forEach(w => {
-    const btn = w.querySelector('.icon-btn');
-    const card = w.querySelector('.pop-card');
-    let timer;
-    const open = () => { clearTimeout(timer); card.classList.add('open'); };
-    const close = () => { timer = setTimeout(()=>card.classList.remove('open'), 120); };
-
-    w.addEventListener('mouseenter', open);
-    w.addEventListener('mouseleave', close);
-    btn.addEventListener('focus', open);
-    card.addEventListener('focusin', open);
-    card.addEventListener('focusout', (e)=>{ if(!card.contains(e.relatedTarget)) close(); });
-  });
-</script>
 </body>
 </html>

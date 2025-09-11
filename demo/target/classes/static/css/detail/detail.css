@@ -1,0 +1,537 @@
+/* 전역 리셋 */
+* {
+    box-sizing: border-box;
+}
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+}
+
+.kf-main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* Search + filter */
+.kf-hero {
+    margin-top: 0px;
+}
+.kf-search {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    /* ⬇ 왼쪽→오른쪽 여백 방향만 바꿈 */
+    padding: 0 44px 0 16px;
+}
+
+.kf-search__icon {
+    position: absolute;
+    /* ⬇ 왼쪽 고정 → 오른쪽 고정 */
+    right: 14px;
+    left: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: var(--muted);
+    pointer-events: none; /* 입력 클릭 방해 방지 */
+}
+
+.kf-search__input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 0;
+    outline: none;
+    color: var(--text);
+    font-size: 15px;
+}
+.kf-search__input::placeholder {
+    color: var(--muted);
+}
+
+/* 바 & 폼 */
+.kf-filterbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+.kf-filterform {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+/* 칩 버튼 (이전 디자인 유지) */
+.kf-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--chip);
+    color: var(--chip-text);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* 드롭다운 묶음 */
+.kf-dd {
+    position: relative;
+}
+.kf-dd__panel {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 8px);
+    width: 300px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 10px;
+    z-index: 30;
+    display: none;
+}
+
+/* 🔽 열림 토글: 체크되면 해당 패널 열기 */
+#open-lang:checked ~ .kf-dd--lang .kf-dd__panel {
+    display: block;
+}
+#open-tools:checked ~ .kf-dd--tools .kf-dd__panel {
+    display: block;
+}
+
+/* 패널 내부 */
+.opt-search {
+    width: 100%;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    padding: 0 10px;
+    margin-bottom: 8px;
+}
+.opt-search::placeholder {
+    color: var(--muted);
+}
+.opt-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 220px;
+    overflow: auto;
+}
+.opt {
+    display: block;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 400;
+    color: var(--text);
+}
+.opt:hover {
+    background: var(--chip);
+}
+
+/* 패널 하단 버튼 */
+.dd-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+}
+.btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+}
+.btn.ghost {
+    background: transparent;
+}
+.btn.primary {
+    background: var(--chip);
+    color: var(--chip-text);
+}
+
+/* ✅ 선택된 항목 하이라이트(패널 옵션) */
+#lang-js:checked ~ .kf-dd--lang label[for="lang-js"],
+#lang-ts:checked ~ .kf-dd--lang label[for="lang-ts"],
+#lang-java:checked ~ .kf-dd--lang label[for="lang-java"],
+#lang-python:checked ~ .kf-dd--lang label[for="lang-python"],
+#tool-react:checked ~ .kf-dd--tools label[for="tool-react"],
+#tool-next:checked ~ .kf-dd--tools label[for="tool-next"],
+#tool-spring:checked ~ .kf-dd--tools label[for="tool-spring"],
+#tool-tailwind:checked ~ .kf-dd--tools label[for="tool-tailwind"],
+#tool-express:checked ~ .kf-dd--tools label[for="tool-express"],
+#tool-thymeleaf:checked ~ .kf-dd--tools label[for="tool-thymeleaf"] {
+    background: var(--chip);
+    color: var(--chip-text);
+}
+
+/* ✅ 선택된 항목 ‘구름’ */
+.kf-selected {
+    flex-basis: 100%;
+}
+.kf-selected__cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+.chip {
+    display: none;
+    background: var(--chip);
+    border: 1px solid var(--border);
+    color: var(--chip-text);
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    line-height: 1;
+}
+.chip .x {
+    margin-left: 6px;
+    opacity: 0.75;
+}
+
+/* 체크되면 구름칩 노출 */
+#lang-js:checked ~ .kf-selected label[for="lang-js"],
+#lang-ts:checked ~ .kf-selected label[for="lang-ts"],
+#lang-java:checked ~ .kf-selected label[for="lang-java"],
+#lang-python:checked ~ .kf-selected label[for="lang-python"],
+#tool-react:checked ~ .kf-selected label[for="tool-react"],
+#tool-next:checked ~ .kf-selected label[for="tool-next"],
+#tool-spring:checked ~ .kf-selected label[for="tool-spring"],
+#tool-tailwind:checked ~ .kf-selected label[for="tool-tailwind"],
+#tool-express:checked ~ .kf-selected label[for="tool-express"],
+#tool-thymeleaf:checked ~ .kf-selected label[for="tool-thymeleaf"] {
+    display: inline-flex;
+}
+
+/* Toolbar */
+/* 툴바 간격(필요 시 숫자만 조절) */
+.kf-toolbar {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 드롭다운 컨테이너 */
+.kf-dd {
+    position: relative;
+}
+
+/* 버튼 */
+.kf-dd__button {
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none; /* 테두리 제거 */
+    color: var(--text);
+    padding: 8px 6px;
+    font-weight: 400;
+    cursor: pointer;
+}
+.kf-dd__button::-webkit-details-marker {
+    display: none;
+}
+.kf-caret {
+    width: 14px;
+    height: 14px;
+    opacity: 0.8;
+    transition: transform 0.15s ease;
+}
+.kf-dd[open] .kf-caret {
+    transform: rotate(180deg);
+}
+
+/* 드롭다운 메뉴: 버튼의 '왼쪽' 기준으로 정렬되게 변경 */
+.kf-dd {
+    position: relative;
+    display: inline-block;
+}
+.kf-dd__menu {
+    position: absolute;
+    left: 0; /* ← 기존 right:0 을 left:0 으로 변경 */
+    right: auto;
+    top: 100%;
+    margin-top: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    min-width: 160px;
+    padding: 6px;
+    box-shadow: var(--shadow);
+    display: none;
+}
+.kf-dd[open] .kf-dd__menu {
+    display: block;
+}
+
+.kf-dd__menu li {
+    list-style: none;
+}
+.kf-dd__menu a {
+    display: block;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 800;
+}
+.kf-dd__menu a[aria-selected="true"] {
+    background: var(--chip);
+    color: var(--chip-text);
+}
+.kf-dd__menu a:hover,
+.kf-dd__menu a:focus {
+    background: var(--chip);
+    outline: none;
+}
+
+/* Grid of cards */
+
+.kf-grid {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 3열 */
+    gap: 20px;
+}
+
+/* 반응형(선택) */
+@media (max-width: 980px) {
+    .kf-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 620px) {
+    .kf-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.kf-card {
+    position: relative;
+    background: transparent;
+    border-radius: 14px;
+}
+
+.kf-card__thumb {
+    display: block;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 16/10;
+}
+.kf-card__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+}
+.kf-card__thumb:hover img {
+    transform: scale(1.02);
+}
+
+.kf-card__body {
+    padding: 3px 2px 10px;
+}
+/* 제목(왼쪽) + 인라인메타 + 하트(오른쪽) */
+.kf-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* 왼쪽: 제목 + 작성자/날짜 한 줄 */
+.kf-card__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0; /* 말줄임 위해 필요 */
+}
+.kf-card__title {
+    margin: 8px 0 4px;
+    font-size: 16px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.kf-card__title a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+.kf-card__inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    flex: 0 0 auto;
+}
+.kf-dot {
+    opacity: 0.7;
+}
+
+/* 오른쪽 하트 */
+.kf-like-right {
+    font-weight: 700;
+    color: var(--muted);
+    flex: 0 0 auto;
+}
+
+.kf-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
+.kf-like {
+    margin-left: auto;
+    color: var(--muted);
+    font-weight: 700;
+}
+.kf-card__desc {
+    margin: 4px 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+.kf-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.kf-tag {
+    background: var(--chip);
+    border: 1px solid var(--border);
+    color: var(--chip-text);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+/* 포트폴리오 마키 */
+.kf-mq-portfolios {
+    --speed: 40s; /* 숫자 작게 = 더 빠름 */
+    --gap: 20px;
+    --item-w: 220px; /* 카드 너비 */
+    --img-h: 140px; /* 이미지 높이 */
+    /* border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border); */
+    /* background: var(--panel); */
+    margin-top: 50px;
+}
+
+.kf-mq-portfolios .mq-mask {
+    position: relative;
+    /* overflow: hidden; */
+    padding: 14px 0;
+}
+
+.kf-mq-portfolios .mq-track {
+    display: flex;
+    width: max-content;
+    gap: var(--gap);
+    animation: mq-scroll var(--speed) linear infinite;
+}
+.kf-mq-portfolios:hover .mq-track {
+    animation-play-state: paused;
+}
+
+.kf-mq-portfolios .mq-seq {
+    display: flex;
+    gap: var(--gap);
+}
+
+.kf-mq-portfolios .mq-item {
+    display: block;
+    position: relative;
+    width: var(--item-w);
+    text-decoration: none;
+}
+.kf-mq-portfolios .mq-item:hover {
+    z-index: 2;
+}
+
+.kf-mq-portfolios .mq-item figure {
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    transform-origin: 60% 100%; /* 오른쪽으로 살짝 기운 느낌 */
+    will-change: transform;
+}
+
+/* 호버 시: 오른쪽으로 살짝 기울이기 + 살짝 띄우기 + 그림자 */
+.kf-mq-portfolios .mq-item:hover figure {
+    transform: rotate(2deg) translateY(-2px);
+}
+
+.kf-mq-portfolios figure {
+    margin: 0;
+}
+.kf-mq-portfolios img {
+    display: block;
+    width: 100%;
+    height: var(--img-h);
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #000;
+}
+
+/* 제목(작게) */
+.kf-mq-portfolios figcaption {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 무한 루프 */
+@keyframes mq-scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    } /* 시퀀스 2개이므로 -50% 이동 */
+}
+
+/* 모션 최소화 존중 */
+@media (prefers-reduced-motion: reduce) {
+    .kf-mq-portfolios .mq-track {
+        animation: none;
+    }
+}

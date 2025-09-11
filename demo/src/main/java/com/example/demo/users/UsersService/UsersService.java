@@ -69,4 +69,8 @@ public class UsersService {
 
         usersRepository.save(users);
     }
+
+    public boolean isUsernameTaken(String username) {
+        return usersRepository.existsByUsername(username);
+    }
 }
