@@ -57,8 +57,9 @@
           <!-- 로그인 상태일 때 -->
           <button sec:authorize="isAuthenticated()"
                   id="likeBtn"
-                  class="like-btn"
+                  class="heart-btn"
                   title="좋아요"
+                  aria-label="좋아요"
                   th:attr="data-id=${portfolios.id}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                  stroke-width="1.5" stroke="currentColor" class="heart-icon">
