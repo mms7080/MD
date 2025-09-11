@@ -1,807 +1,348 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="dark">
+<html
+    lang="ko"
+    data-theme="light"
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+>
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>kafolio – 포트폴리오</title>
-        <link rel="stylesheet" href="css/header.css" />
-        <link rel="stylesheet" href="css/footer.css" />
-        <link rel="stylesheet" href="css/detail/detail.css" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>kafolio – detail</title>
+        <meta
+            name="description"
+            content="기술 스택으로 포트폴리오를 탐색하는 랜딩 페이지"
+        />
+        <script th:src="@{/js/home/home.js}" defer></script>
+        <link rel="stylesheet" th:href="@{/css/home/home.css}" />
+        <link rel="stylesheet" th:href="@{/css/detail/detail.css}" />
+        <link rel="stylesheet" th:href="@{/css/header.css}" />
+
+        <!-- 파비콘 -->
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="https://kafolio.kr/static/icon.ico"
+        />
     </head>
-    <body>
-        <!-- 나중에 헤더 삽입 -->
-        <header class="kf-header">
-            <div class="kf-header__inner">
-                <div class="kf-header__left">
-                    <a class="kf-logo" href="/" aria-label="kafolio 홈"
-                        >kafolio<span class="kf-star">✶</span></a
-                    >
-                    <nav class="kf-nav" aria-label="주요 메뉴">
-                        <ul>
-                            <li><a href="/detail">portfolio</a></li>
-                            <li><a href="/folios">folio</a></li>
-                            <li><a href="/notice">공지사항</a></li>
-                        </ul>
-                    </nav>
-                </div>
 
-                <div class="kf-header__right">
-                    <!-- Theme toggle (CSS-only) -->
-                    <input
-                        id="theme-toggle"
-                        type="checkbox"
-                        hidden
-                        aria-hidden="true"
+    <body data-page="detail">
+        <a class="skip-link" href="#content">본문 바로가기</a>
+
+        <!-- 헤더 -->
+        <header class="site-header">
+            <div class="container header-inner">
+                <!-- 헤더 로고 -->
+                <a class="brand" th:href="@{/home}" aria-label="홈으로">
+                    <img
+                        class="brand-mark"
+                        src="https://kafolio.kr/static/icon.ico"
+                        alt=""
+                        width="20"
+                        height="20"
                     />
-                    <label
-                        class="kf-iconbtn"
-                        for="theme-toggle"
-                        aria-label="다크/라이트 모드 전환"
-                    >
-                        <svg
-                            class="kf-icon"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z"
-                            />
-                        </svg>
-                    </label>
+                    <span class="brand-text">kafolio</span>
+                </a>
 
-                    <nav class="kf-auth" aria-label="인증 메뉴">
-                        <a class="kf-link" href="/signin">로그인</a>
-                        <a class="kf-link" href="/signup">회원가입</a>
-                    </nav>
+                <nav class="nav">
+                    <button
+                        class="nav-toggle"
+                        aria-expanded="false"
+                        aria-controls="primary-menu"
+                        aria-label="메뉴 열기"
+                    >
+                        <span class="nav-toggle-bar"></span>
+                        <span class="nav-toggle-bar"></span>
+                        <span class="nav-toggle-bar"></span>
+                    </button>
+                    <ul id="primary-menu" class="nav-list">
+                        <li><a th:href="@{/home}">home</a></li>
+                        <li>
+                            <a th:href="@{/detail}" class="is-active">detail</a>
+                        </li>
+                        <li>
+                            <a th:href="@{/write}">write</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="header-actions">
+                    <button
+                        id="btnTheme"
+                        class="btn ghost"
+                        aria-pressed="false"
+                        aria-label="다크모드 전환"
+                    >
+                        🌓
+                    </button>
+
+                    <!-- 로그인 전 -->
+                    <span sec:authorize="isAnonymous()">
+                        <a
+                            th:href="@{/signin}"
+                            class="btn ghost"
+                            data-open-auth="login"
+                            >로그인</a
+                        >
+                        <a th:href="@{/signup}" class="btn ghost">회원가입</a>
+                    </span>
+
+                    <!-- 로그인 후 -->
+                    <span sec:authorize="isAuthenticated()">
+                        <a th:href="@{/mypage}" class="btn ghost">마이페이지</a>
+                        <form
+                            th:action="@{/logout}"
+                            method="post"
+                            style="display: inline"
+                        >
+                            <input
+                                type="hidden"
+                                th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}"
+                            />
+                            <button type="submit" class="btn primary">
+                                로그아웃
+                            </button>
+                        </form>
+                    </span>
                 </div>
             </div>
         </header>
 
-        <main class="kf-main">
-            <section class="kf-hero">
-                <div class="kf-search">
-                    <svg
-                        class="kf-search__icon"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
-                        <path
-                            d="M21 21l-4.35-4.35m1.1-4.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0z"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                        />
-                    </svg>
-                    <input
-                        class="kf-search__input"
-                        placeholder="URL 또는 서비스명, 필터를 입력해보세요"
-                    />
-                </div>
-
-                <!-- 필터 바 -->
-                <div class="kf-filterbar">
-                    <!-- 전부 같은 form 안에 넣기 (reset도 가능) -->
-                    <form id="filters" class="kf-filterform">
-                        <!-- 🔒 드롭다운 '열림' 토글 (칩을 라벨로 사용) -->
-                        <input id="open-lang" type="checkbox" hidden />
-                        <input id="open-tools" type="checkbox" hidden />
-
-                        <!-- ✅ 전역 선택 체크박스 (LANGUAGE) -->
-                        <input id="lang-js" type="checkbox" hidden />
-                        <input id="lang-ts" type="checkbox" hidden />
-                        <input id="lang-java" type="checkbox" hidden />
-                        <input id="lang-python" type="checkbox" hidden />
-
-                        <!-- ✅ 전역 선택 체크박스 (TOOLS) -->
-                        <input id="tool-react" type="checkbox" hidden />
-                        <input id="tool-next" type="checkbox" hidden />
-                        <input id="tool-spring" type="checkbox" hidden />
-                        <input id="tool-tailwind" type="checkbox" hidden />
-                        <input id="tool-express" type="checkbox" hidden />
-                        <input id="tool-thymeleaf" type="checkbox" hidden />
-
-                        <!-- LANGUAGE: 칩 버튼(라벨) + 패널 -->
-                        <div class="kf-dd kf-dd--lang">
-                            <label class="kf-chip" for="open-lang"
-                                >LANGUAGE</label
+        <main id="content">
+            <!-- 필터 툴바 -->
+            <section class="filterbar">
+                <div class="container">
+                    <div class="filter-row">
+                        <!-- 정렬 -->
+                        <div class="chip sort" id="sortChip">
+                            <button
+                                class="ms-trigger"
+                                id="sortToggle"
+                                type="button"
+                                aria-haspopup="listbox"
+                                aria-expanded="false"
                             >
-
-                            <div class="kf-dd__panel">
-                                <input
-                                    class="opt-search"
-                                    type="search"
-                                    placeholder="언어 검색 (예: Java)"
-                                />
-                                <ul class="opt-list">
-                                    <li>
-                                        <label class="opt" for="lang-js"
-                                            >JavaScript</label
-                                        >
-                                    </li>
-                                    <li>
-                                        <label class="opt" for="lang-ts"
-                                            >TypeScript</label
-                                        >
-                                    </li>
-                                    <li>
-                                        <label class="opt" for="lang-java"
-                                            >Java</label
-                                        >
-                                    </li>
-                                    <li>
-                                        <label class="opt" for="lang-python"
-                                            >Python</label
-                                        >
-                                    </li>
+                                <span id="sortLabel">정렬</span>
+                                <svg
+                                    class="caret"
+                                    aria-hidden="true"
+                                    viewBox="0 0 24 24"
+                                    style="
+                                        width: 14px;
+                                        height: 14px;
+                                        margin-left: 8px;
+                                        vertical-align: middle;
+                                        transition: transform 0.2s;
+                                    "
+                                >
+                                    <path
+                                        d="M7 10l5 5 5-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    />
+                                </svg>
+                            </button>
+                            <div class="ms-dropdown" id="sortDropdown">
+                                <ul
+                                    id="sortList"
+                                    role="listbox"
+                                    aria-label="정렬"
+                                >
+                                    <li data-sort="latest">최신순</li>
+                                    <li data-sort="popular">인기순</li>
+                                    <li data-sort="title">이름순</li>
                                 </ul>
+                            </div>
+                        </div>
 
-                                <div class="dd-actions">
-                                    <button class="btn ghost" type="reset">
-                                        초기화
-                                    </button>
-                                    <!-- 적용 = 열림 토글 끄기 -->
-                                    <label class="btn primary" for="open-lang"
-                                        >적용</label
+                        <!-- LANGUAGE -->
+                        <div class="chip">
+                            <div class="multiselect" id="techSelectLang">
+                                <button
+                                    class="ms-trigger"
+                                    type="button"
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                >
+                                    <span>LANGUAGE</span>
+                                    <svg
+                                        class="caret"
+                                        aria-hidden="true"
+                                        viewBox="0 0 24 24"
+                                        style="
+                                            width: 14px;
+                                            height: 14px;
+                                            margin-left: 8px;
+                                            vertical-align: middle;
+                                            transition: transform 0.2s;
+                                        "
                                     >
+                                        <path
+                                            d="M7 10l5 5 5-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                                <div class="ms-dropdown">
+                                    <input
+                                        type="search"
+                                        id="techSearchLang"
+                                        placeholder="Search"
+                                        autocomplete="off"
+                                    />
+                                    <ul id="techListLang" role="listbox"></ul>
+                                    <div class="ms-actions">
+                                        <button
+                                            type="button"
+                                            id="clearTechLang"
+                                            class="btn ghost btn-sm"
+                                        >
+                                            초기화
+                                        </button>
+                                        <button
+                                            type="button"
+                                            id="applyTechLang"
+                                            class="btn primary btn-sm"
+                                        >
+                                            적용
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- TOOLS: 칩 버튼(라벨) + 패널 -->
-                        <div class="kf-dd kf-dd--tools">
-                            <label class="kf-chip" for="open-tools"
-                                >TOOLS</label
+                        <!-- TOOLS -->
+                        <div class="chip">
+                            <div class="multiselect" id="techSelectTools">
+                                <button
+                                    class="ms-trigger"
+                                    type="button"
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                >
+                                    <span>TOOLS</span>
+                                    <svg
+                                        class="caret"
+                                        aria-hidden="true"
+                                        viewBox="0 0 24 24"
+                                        style="
+                                            width: 14px;
+                                            height: 14px;
+                                            margin-left: 8px;
+                                            vertical-align: middle;
+                                            transition: transform 0.2s;
+                                        "
+                                    >
+                                        <path
+                                            d="M7 10l5 5 5-5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+                                    </svg>
+                                </button>
+                                <div class="ms-dropdown">
+                                    <input
+                                        type="search"
+                                        id="techSearchTools"
+                                        placeholder="Search"
+                                        autocomplete="off"
+                                    />
+                                    <ul id="techListTools" role="listbox"></ul>
+                                    <div class="ms-actions">
+                                        <button
+                                            type="button"
+                                            id="clearTechTools"
+                                            class="btn ghost btn-sm"
+                                        >
+                                            초기화
+                                        </button>
+                                        <button
+                                            type="button"
+                                            id="applyTechTools"
+                                            class="btn primary btn-sm"
+                                        >
+                                            적용
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 초기화 칩 (칩과 동일 스타일, 오른쪽 정렬) -->
+                        <div class="chip" style="margin-left: auto">
+                            <button
+                                id="resetFilters"
+                                class="ms-trigger"
+                                type="button"
+                                aria-label="필터 초기화"
                             >
-
-                            <div class="kf-dd__panel">
-                                <input
-                                    class="opt-search"
-                                    type="search"
-                                    placeholder="툴 검색 (예: React)"
-                                />
-                                <ul class="opt-list">
-                                    <li>
-                                        <label class="opt" for="tool-react"
-                                            >React</label
-                                        >
-                                    </li>
-                                    <li>
-                                        <label class="opt" for="tool-next"
-                                            >Next.js</label
-                                        >
-                                    </li>
-                                    <li>
-                                        <label class="opt" for="tool-spring"
-                                            >Spring Boot</label
-                                        >
-                                    </li>
-                                    <li>
-                                        <label class="opt" for="tool-tailwind"
-                                            >Tailwind</label
-                                        >
-                                    </li>
-                                    <li>
-                                        <label class="opt" for="tool-express"
-                                            >Express</label
-                                        >
-                                    </li>
-                                    <li>
-                                        <label class="opt" for="tool-thymeleaf"
-                                            >Thymeleaf</label
-                                        >
-                                    </li>
-                                </ul>
-
-                                <div class="dd-actions">
-                                    <button class="btn ghost" type="reset">
-                                        초기화
-                                    </button>
-                                    <!-- 적용 = 열림 토글 끄기 -->
-                                    <label class="btn primary" for="open-tools"
-                                        >적용</label
-                                    >
-                                </div>
-                            </div>
+                                RESET ↺
+                            </button>
                         </div>
+                    </div>
 
-                        <!-- 선택된 항목 ‘구름’ (라벨 = 클릭 시 해제) -->
-                        <div class="kf-selected">
-                            <div class="kf-selected__cloud">
-                                <label class="chip" for="lang-js"
-                                    >JavaScript
-                                    <span class="x" aria-hidden="true"
-                                        >×</span
-                                    ></label
-                                >
-                                <label class="chip" for="lang-ts"
-                                    >TypeScript <span class="x">×</span></label
-                                >
-                                <label class="chip" for="lang-java"
-                                    >Java <span class="x">×</span></label
-                                >
-                                <label class="chip" for="lang-python"
-                                    >Python <span class="x">×</span></label
-                                >
-
-                                <label class="chip" for="tool-react"
-                                    >React <span class="x">×</span></label
-                                >
-                                <label class="chip" for="tool-next"
-                                    >Next.js <span class="x">×</span></label
-                                >
-                                <label class="chip" for="tool-spring"
-                                    >Spring Boot <span class="x">×</span></label
-                                >
-                                <label class="chip" for="tool-tailwind"
-                                    >Tailwind <span class="x">×</span></label
-                                >
-                                <label class="chip" for="tool-express"
-                                    >Express <span class="x">×</span></label
-                                >
-                                <label class="chip" for="tool-thymeleaf"
-                                    >Thymeleaf <span class="x">×</span></label
-                                >
-                            </div>
+                    <!-- 선택 요약 (버튼 제거 버전) -->
+                    <div id="filterSummary" class="filter-summary" hidden>
+                        <div class="ms-pills">
+                            <div id="selectedTechLang"></div>
+                            <div id="selectedTechTools"></div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </section>
 
-            <section class="kf-toolbar">
-                <details class="kf-dd">
-                    <summary
-                        class="kf-dd__button"
-                        role="button"
-                        aria-haspopup="listbox"
+            <!-- 그리드 -->
+            <section class="container grid-wrap">
+                <div
+                    id="grid"
+                    class="grid"
+                    aria-live="polite"
+                    aria-busy="false"
+                ></div>
+
+                <!-- 더보기 버튼 -->
+                <div class="grid-footer">
+                    <button
+                        id="btnLoadMore"
+                        class="btn load-more"
+                        aria-controls="grid"
+                        aria-label="More"
                     >
-                        최신순
-                        <svg
-                            class="kf-caret"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                d="M6 9l6 6 6-6"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </summary>
-                    <ul
-                        class="kf-dd__menu"
-                        role="listbox"
-                        aria-label="정렬 기준"
-                    >
-                        <li>
-                            <a
-                                href="?sort=latest"
-                                role="option"
-                                aria-selected="true"
-                                >최신순</a
-                            >
-                        </li>
-                        <li>
-                            <a href="?sort=likes" role="option">좋아요순</a>
-                        </li>
-                    </ul>
-                </details>
+                        More
+                    </button>
+
+                    <button id="btnToTop" class="fab" aria-label="맨 위로">
+                        ↑
+                    </button>
+                </div>
             </section>
 
-            <section class="kf-grid">
-                <!-- 1 -->
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="/portfolios/1">
-                        <img
-                            src="https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png"
-                            alt="Pawple 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="/portfolios/1">Pawple</a>
-                                </h3>
-                                <div class="kf-card__inline">
-                                    <span class="kf-card__author">H.kim</span>
-                                    <span class="kf-dot">·</span>
-                                    <time class="kf-card__date"
-                                        >2025.08.15</time
-                                    >
-                                </div>
-                            </div>
-                            <span class="kf-like-right" aria-label="좋아요"
-                                >♥ 10</span
-                            >
-                        </div>
-                        <p class="kf-card__desc">
-                            반려동물 건강 관리 웹사이트 프로젝트
-                        </p>
-                        <div class="kf-card__tags">
-                            <span class="kf-tag">#React</span>
-                            <span class="kf-tag">#Next.js</span>
-                            <span class="kf-tag">#SpringBoot</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 5 -->
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="/portfolios/5">
-                        <img
-                            src="https://kafolio.kr/static/requests/2025/7/9/boards/ZTI0YmNkZTMxMjIzY2VkNmRlYmFkZDYyY2M4M2Q2NDJlNTE2MTdmZGUzZDE3MWVkMmE1ZTMxYTc0YjBmNWQ4Yw==.png"
-                            alt="Filmora 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="/portfolios/5">Filmora</a>
-                                </h3>
-                                <div class="kf-card__inline">
-                                    <span class="kf-card__author">S.Han</span>
-                                    <span class="kf-dot">·</span>
-                                    <time class="kf-card__date"
-                                        >2025.08.22</time
-                                    >
-                                </div>
-                            </div>
-                            <span class="kf-like-right" aria-label="좋아요"
-                                >♥ 2</span
-                            >
-                        </div>
-                        <p class="kf-card__desc">영화 예매 사이트</p>
-                        <div class="kf-card__tags">
-                            <span class="kf-tag">#Next.js</span>
-                            <span class="kf-tag">#SpringBoot</span>
-                            <span class="kf-tag">#React</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 9 -->
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="/portfolios/9">
-                        <img
-                            src="https://kafolio.kr/static/requests/2025/3/27/boards/OTZjOTNiYWJkMjNhMjA0ZTI2MGI1YWZmMmNiYTlhNmVmOGZlODJlYjlhODBkNmU0OTdjZmY3ZTM1MmNmMTI2Mg==.jpg"
-                            alt="ModeMe 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="/portfolios/9">ModeMe</a>
-                                </h3>
-                                <div class="kf-card__inline">
-                                    <span class="kf-card__author">A. Park</span>
-                                    <span class="kf-dot">·</span>
-                                    <time class="kf-card__date"
-                                        >2025.07.10</time
-                                    >
-                                </div>
-                            </div>
-                            <span class="kf-like-right" aria-label="좋아요"
-                                >♥ 2</span
-                            >
-                        </div>
-                        <p class="kf-card__desc">패션 커머스 사이트</p>
-                        <div class="kf-card__tags">
-                            <span class="kf-tag">#Java</span>
-                            <span class="kf-tag">#Thymeleaf</span>
-                            <span class="kf-tag">#HTML</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 3 -->
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="/portfolios/3">
-                        <img
-                            src="https://kafolio.kr/static/requests/2024/12/30/boards/MGFiYzI1YmM1MzBlYmM2M2FjYzFkYzgxZmIyNWVkMzBkN2Q0MWEzODVmYzM0OTZlNzY4MjA0NjFiYTk2MDljOA==.png"
-                            alt="OSPE 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="/portfolios/3">OSPE</a>
-                                </h3>
-                                <div class="kf-card__inline">
-                                    <span class="kf-card__author">A. Park</span>
-                                    <span class="kf-dot">·</span>
-                                    <time class="kf-card__date"
-                                        >2025.07.10</time
-                                    >
-                                </div>
-                            </div>
-                            <span class="kf-like-right" aria-label="좋아요"
-                                >♥ 2</span
-                            >
-                        </div>
-                        <p class="kf-card__desc">부동산 분양 사이트</p>
-                        <div class="kf-card__tags">
-                            <span class="kf-tag">#Java</span>
-                            <span class="kf-tag">#Thymeleaf</span>
-                            <span class="kf-tag">#HTML</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 2 -->
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="/portfolios/2">
-                        <img
-                            src="https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg"
-                            alt="NotePad 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="/portfolios/2">NotePad</a>
-                                </h3>
-                                <div class="kf-card__inline">
-                                    <span class="kf-card__author">A. Park</span>
-                                    <span class="kf-dot">·</span>
-                                    <time class="kf-card__date"
-                                        >2025.07.10</time
-                                    >
-                                </div>
-                            </div>
-                            <span class="kf-like-right" aria-label="좋아요"
-                                >♥ 2</span
-                            >
-                        </div>
-                        <p class="kf-card__desc">메모장 웹앱</p>
-                        <div class="kf-card__tags">
-                            <span class="kf-tag">#JavaScript</span>
-                            <span class="kf-tag">#Tailwind</span>
-                            <span class="kf-tag">#HTML</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 4 -->
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="/portfolios/4">
-                        <img
-                            src="https://kafolio.kr/static/requests/2024/9/4/boards/NjRlNGMwMzJkZDc0OTJlYzZjYTdiYTk3ZTE5YjEyOTEyZmYwODhhZDE4NmM5MjExZDNkYzgzZmE4ZThmZjhkOA==.png"
-                            alt="Planner for U 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="/portfolios/4">Planner for U</a>
-                                </h3>
-                                <div class="kf-card__inline">
-                                    <span class="kf-card__author">H.kim</span>
-                                    <span class="kf-dot">·</span>
-                                    <time class="kf-card__date"
-                                        >2025.08.15</time
-                                    >
-                                </div>
-                            </div>
-                            <span class="kf-like-right" aria-label="좋아요"
-                                >♥ 10</span
-                            >
-                        </div>
-                        <p class="kf-card__desc">일정 관리 웹앱</p>
-                        <div class="kf-card__tags">
-                            <span class="kf-tag">#Java</span>
-                            <span class="kf-tag">#SCSS</span>
-                            <span class="kf-tag">#JavaScript</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 7 -->
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="/portfolios/7">
-                        <img
-                            src="https://kafolio.kr/static/requests/2024/9/5/boards/NmQ4OTU1OGMwZTQ4ODcyZTFmMTExY2M3ZTEwOTA4ZjBlNzAxMDBlMTJkZGEyZDg5MDBmMjM3NzA4ZmY2ZDYxMw==.png"
-                            alt="취미존중 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="/portfolios/7">취미존중</a>
-                                </h3>
-                                <div class="kf-card__inline">
-                                    <span class="kf-card__author">A. Park</span>
-                                    <span class="kf-dot">·</span>
-                                    <time class="kf-card__date"
-                                        >2025.07.10</time
-                                    >
-                                </div>
-                            </div>
-                            <span class="kf-like-right" aria-label="좋아요"
-                                >♥ 2</span
-                            >
-                        </div>
-                        <p class="kf-card__desc">게시판 커뮤니티</p>
-                        <div class="kf-card__tags">
-                            <span class="kf-tag">#Java</span>
-                            <span class="kf-tag">#Thymeleaf</span>
-                            <span class="kf-tag">#HTML</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 8 -->
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="/portfolios/8">
-                        <img
-                            src="https://kafolio.kr/static/requests/2024/5/3/boards/MjFhOWE5YzMxZmYxMjFmN2E0MzBlZDk1NmRmMDU2MGE5Y2ZkYzZkMmI1ZDIyMzBlNzRhYWE5Nzc5NzE0ODY1Yw==.png"
-                            alt="O_O 커뮤니티 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="/portfolios/8">O_O 커뮤니티</a>
-                                </h3>
-                                <div class="kf-card__inline">
-                                    <span class="kf-card__author">A. Park</span>
-                                    <span class="kf-dot">·</span>
-                                    <time class="kf-card__date"
-                                        >2025.07.10</time
-                                    >
-                                </div>
-                            </div>
-                            <span class="kf-like-right" aria-label="좋아요"
-                                >♥ 2</span
-                            >
-                        </div>
-                        <p class="kf-card__desc">커뮤니티 사이트</p>
-                        <div class="kf-card__tags">
-                            <span class="kf-tag">#JavaScript</span>
-                            <span class="kf-tag">#HTML</span>
-                            <span class="kf-tag">#CSS</span>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 6 -->
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="/portfolios/6">
-                        <img
-                            src="https://kafolio.kr/static/requests/2024/4/26/boards/MTkyMzEwZTdiOTM2Mjk0NjQ3NDdhMjBiNGQ4OGEwNjdmYWI3YzlkMDk1MGQ5ODg5ZmIyMTBiNzg4NTBjOGIxZA==.jpg"
-                            alt="Pickup 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="/portfolios/6">Pickup</a>
-                                </h3>
-                                <div class="kf-card__inline">
-                                    <span class="kf-card__author">A. Park</span>
-                                    <span class="kf-dot">·</span>
-                                    <time class="kf-card__date"
-                                        >2025.07.10</time
-                                    >
-                                </div>
-                            </div>
-                            <span class="kf-like-right" aria-label="좋아요"
-                                >♥ 2</span
-                            >
-                        </div>
-                        <p class="kf-card__desc">
-                            리그오브레전드 아이템 계산기
-                        </p>
-                        <div class="kf-card__tags">
-                            <span class="kf-tag">#JavaScript</span>
-                            <span class="kf-tag">#Express</span>
-                            <span class="kf-tag">#React</span>
-                        </div>
-                    </div>
-                </article>
-            </section>
-            <!-- 포트폴리오 마키 (그리드 대신 이 섹션을 넣으면 됩니다) -->
-            <section class="kf-mq-portfolios" aria-label="포트폴리오">
-                <div class="mq-mask">
-                    <div class="mq-track">
-                        <!-- 시퀀스 A -->
-                        <div class="mq-seq">
-                            <a class="mq-item" href="/portfolios/1">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png"
-                                        alt="Pawple 썸네일"
-                                    />
-                                    <figcaption>Pawple</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/5">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2025/7/9/boards/ZTI0YmNkZTMxMjIzY2VkNmRlYmFkZDYyY2M4M2Q2NDJlNTE2MTdmZGUzZDE3MWVkMmE1ZTMxYTc0YjBmNWQ4Yw==.png"
-                                        alt="Filmora 썸네일"
-                                    />
-                                    <figcaption>Filmora</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/9">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2025/3/27/boards/OTZjOTNiYWJkMjNhMjA0ZTI2MGI1YWZmMmNiYTlhNmVmOGZlODJlYjlhODBkNmU0OTdjZmY3ZTM1MmNmMTI2Mg==.jpg"
-                                        alt="ModeMe 썸네일"
-                                    />
-                                    <figcaption>ModeMe</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/3">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/12/30/boards/MGFiYzI1YmM1MzBlYmM2M2FjYzFkYzgxZmIyNWVkMzBkN2Q0MWEzODVmYzM0OTZlNzY4MjA0NjFiYTk2MDljOA==.png"
-                                        alt="OSPE 썸네일"
-                                    />
-                                    <figcaption>OSPE</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/2">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg"
-                                        alt="NotePad 썸네일"
-                                    />
-                                    <figcaption>NotePad</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/4">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/9/4/boards/NjRlNGMwMzJkZDc0OTJlYzZjYTdiYTk3ZTE5YjEyOTEyZmYwODhhZDE4NmM5MjExZDNkYzgzZmE4ZThmZjhkOA==.png"
-                                        alt="Planner for U 썸네일"
-                                    />
-                                    <figcaption>Planner for U</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/7">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/9/5/boards/NmQ4OTU1OGMwZTQ4ODcyZTFmMTExY2M3ZTEwOTA4ZjBlNzAxMDBlMTJkZGEyZDg5MDBmMjM3NzA4ZmY2ZDYxMw==.png"
-                                        alt="취미존중 썸네일"
-                                    />
-                                    <figcaption>취미존중</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/8">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/5/3/boards/MjFhOWE5YzMxZmYxMjFmN2E0MzBlZDk1NmRmMDU2MGE5Y2ZkYzZkMmI1ZDIyMzBlNzRhYWE5Nzc5NzE0ODY1Yw==.png"
-                                        alt="O_O 커뮤니티 썸네일"
-                                    />
-                                    <figcaption>O_O 커뮤니티</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/6">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/4/26/boards/MTkyMzEwZTdiOTM2Mjk0NjQ3NDdhMjBiNGQ4OGEwNjdmYWI3YzlkMDk1MGQ5ODg5ZmIyMTBiNzg4NTBjOGIxZA==.jpg"
-                                        alt="Pickup 썸네일"
-                                    />
-                                    <figcaption>Pickup</figcaption>
-                                </figure>
-                            </a>
-                        </div>
-
-                        <!-- 시퀀스 B (A 복제: 끊김 없는 루프용) -->
-                        <div class="mq-seq" aria-hidden="true">
-                            <a class="mq-item" href="/portfolios/1">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png"
-                                        alt="Pawple 썸네일"
-                                    />
-                                    <figcaption>Pawple</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/5">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2025/7/9/boards/ZTI0YmNkZTMxMjIzY2VkNmRlYmFkZDYyY2M4M2Q2NDJlNTE2MTdmZGUzZDE3MWVkMmE1ZTMxYTc0YjBmNWQ4Yw==.png"
-                                        alt="Filmora 썸네일"
-                                    />
-                                    <figcaption>Filmora</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/9">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2025/3/27/boards/OTZjOTNiYWJkMjNhMjA0ZTI2MGI1YWZmMmNiYTlhNmVmOGZlODJlYjlhODBkNmU0OTdjZmY3ZTM1MmNmMTI2Mg==.jpg"
-                                        alt="ModeMe 썸네일"
-                                    />
-                                    <figcaption>ModeMe</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/3">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/12/30/boards/MGFiYzI1YmM1MzBlYmM2M2FjYzFkYzgxZmIyNWVkMzBkN2Q0MWEzODVmYzM0OTZlNzY4MjA0NjFiYTk2MDljOA==.png"
-                                        alt="OSPE 썸네일"
-                                    />
-                                    <figcaption>OSPE</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/2">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg"
-                                        alt="NotePad 썸네일"
-                                    />
-                                    <figcaption>NotePad</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/4">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/9/4/boards/NjRlNGMwMzJkZDc0OTJlYzZjYTdiYTk3ZTE5YjEyOTEyZmYwODhhZDE4NmM5MjExZDNkYzgzZmE4ZThmZjhkOA==.png"
-                                        alt="Planner for U 썸네일"
-                                    />
-                                    <figcaption>Planner for U</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/7">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/9/5/boards/NmQ4OTU1OGMwZTQ4ODcyZTFmMTExY2M3ZTEwOTA4ZjBlNzAxMDBlMTJkZGEyZDg5MDBmMjM3NzA4ZmY2ZDYxMw==.png"
-                                        alt="취미존중 썸네일"
-                                    />
-                                    <figcaption>취미존중</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/8">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/5/3/boards/MjFhOWE5YzMxZmYxMjFmN2E0MzBlZDk1NmRmMDU2MGE5Y2ZkYzZkMmI1ZDIyMzBlNzRhYWE5Nzc5NzE0ODY1Yw==.png"
-                                        alt="O_O 커뮤니티 썸네일"
-                                    />
-                                    <figcaption>O_O 커뮤니티</figcaption>
-                                </figure>
-                            </a>
-                            <a class="mq-item" href="/portfolios/6">
-                                <figure>
-                                    <img
-                                        src="https://kafolio.kr/static/requests/2024/4/26/boards/MTkyMzEwZTdiOTM2Mjk0NjQ3NDdhMjBiNGQ4OGEwNjdmYWI3YzlkMDk1MGQ5ODg5ZmIyMTBiNzg4NTBjOGIxZA==.jpg"
-                                        alt="Pickup 썸네일"
-                                    />
-                                    <figcaption>Pickup</figcaption>
-                                </figure>
-                            </a>
-                        </div>
-                    </div>
+            <!-- 하단 슬라이드 배너 -->
+            <section class="container carousel-wrap" aria-label="추천 슬라이드">
+                <div id="carouselMarquee" class="marquee-viewport">
+                    <div id="marqueeTrack" class="marquee-track"></div>
                 </div>
             </section>
         </main>
 
-        <!-- 푸터 삭제후 삽입 -->
-        <footer class="kf-footer">
-            <div class="kf-footer__inner">
-                <div class="kf-footer__left">
-                    <span>© 2025 kafolio. All rights reserved.</span>
-                </div>
-                <nav class="kf-footer__right" aria-label="푸터 메뉴">
-                    <a href="/terms">이용약관</a>
-
-                    <a href="/privacy">개인정보처리방침</a>
-
-                    <a href="/help">도움말</a>
-                </nav>
+        <footer class="site-footer">
+            <div class="container footer-inner">
+                <p>© <span id="year"></span> kafolio. All rights reserved.</p>
+                <ul class="footer-links">
+                    <li><a href="#">이용약관</a></li>
+                    <li><a href="#">개인정보처리방침</a></li>
+                    <li><a href="#">도움말</a></li>
+                </ul>
             </div>
         </footer>
     </body>
