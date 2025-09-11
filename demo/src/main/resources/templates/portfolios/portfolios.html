@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${portfolios != null} ? ${portfolios.title} : '포트폴리오 없음'">Portfolio</title>
+  <title th:text="${portfolios != null} ? portfolios.title : '포트폴리오 없음'">Portfolio</title>
   <meta name="_csrf" th:content="${_csrf.token}" />
   <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
@@ -11,7 +11,7 @@
 </head>
 <body class="portfolio-detail">
   <!-- 헤더 -->
-  <div th:replace="fragments/header :: site-header"></div>
+  <div th:replace="fragments/header :: header"></div>
 
 <main class="container">
 
@@ -115,6 +115,8 @@
           </figure>
         </aside>
       </div>
+
+      
     </div>
   </div>
 
