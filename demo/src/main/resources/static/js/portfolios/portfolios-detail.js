@@ -483,3 +483,21 @@ if (likeSigninTrigger) {
   });
 }
 });
+
+// 비로그인 좋아요 버튼 눌렀을 때
+const likeSigninTrigger = document.getElementById("likeSigninTrigger");
+const loginModal = document.getElementById("loginModal");
+const goSigninBtn = document.getElementById("goSigninBtn");
+
+if (likeSigninTrigger) {
+  likeSigninTrigger.addEventListener("click", function(e) {
+    e.preventDefault(); // 기본 이동 막기
+    loginModal.hidden = false; // 모달 열기
+  });
+}
+
+if (goSigninBtn) {
+  goSigninBtn.addEventListener("click", function() {
+    window.location.href = "/signin"; // 확인 시 /signin 이동
+  });
+}
