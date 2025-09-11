@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body th:replace="fragments/layout :: body" th:with="title='Folios', active='folios'">
-    
+<html lang="ko" th:replace="~{fragments/layout :: html(
+    title = 'Folio 관리',
+    active = 'append',
+    css = ~{},
+    content = ~{::#page-content},
+    js = ~{}
+)}">
+<body>
+    <main id="page-content" class="dev-container">
+        <h1>Folio 관리자 페이지</h1>
+        <p>이곳에 관리자용 Folio 템플릿 추가 기능이 들어갈 예정입니다.</p>
+    </main>
 </body>
 </html>

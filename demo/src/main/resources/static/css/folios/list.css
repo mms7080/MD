@@ -1,0 +1,31 @@
+/* 카드 링크 전체를 클릭 가능하게 하고 기본 스타일을 설정합니다. */
+.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 카드에 마우스를 올리면 살짝 위로 뜨고 그림자가 생깁니다. */
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,.08);
+}
+
+/* 카드 이미지에 마우스를 올리면 이미지가 살짝 커지는 효과를 줍니다. */
+.card:hover .media img {
+    transform: scale(1.05);
+}
+
+/* 이미지 확대 효과를 부드럽게 만듭니다. */
+.card .media img {
+    transition: transform 0.3s ease;
+}
+
+/* 카드 제목 스타일을 조정합니다. */
+.card .title {
+    font-size: 1.1rem;
+    margin: 0 0 8px;
+    font-weight: 700;
+}

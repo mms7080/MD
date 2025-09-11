@@ -134,7 +134,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
     ));
 
 
-    PORTFOLIOS.put("4", new PortfoliosEntity("4S", "OSPE", "A. Park",
+    PORTFOLIOS.put("4", new PortfoliosEntity("4", "OSPE", "A. Park",
     List.of("Java","Thymeleaf","HTML","JavaScript","SQL"),
     2, "2025-07-10",
     "https://kafolio.kr/static/requests/2025/7/9/boards/YWFm....png",

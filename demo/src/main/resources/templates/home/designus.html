@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Designus Clone</title>
+  <link rel="stylesheet" href="css/home/designus.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="#">Designus*</a>
+
+      <nav class="gnb">
+        <a href="#">토픽</a>
+        <a href="#">앱 레퍼런스</a>
+        <a href="#">웹 레퍼런스</a>
+        <a href="#">스토어 레퍼런스</a>
+        <a class="gnb-new" href="#">챌린지</a>
+      </nav>
+
+      <div class="actions">
+        <button class="btn ghost">문의하기</button>
+        <button class="btn pill">로그인/회원가입</button>
+      </div>
+    </div>
+    <hr class="divider" />
+  </header>
+
+  <!-- Main -->
+  <main class="container">
+    <!-- 상단: 인기 토픽 / 최신 댓글 -->
+    <section class="top-grid">
+      <!-- 인기 토픽 -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>인기 토픽</h2>
+          <a class="inline-link" href="#">모든 토픽 보기 &gt;</a>
+        </div>
+
+        <div class="topic-grid">
+          <!-- 카드 -->
+          <article class="topic-card">
+            <div class="thumb"></div>
+            <h3 class="topic-title">
+              핸드폰 남은 데이터 표현<br>어떻게 보여주는 것이 더 적합할까?
+            </h3>
+            <div class="topic-meta">
+              <span>👍 2,066</span>
+              <span>💬 17</span>
+            </div>
+          </article>
+
+          <article class="topic-card">
+            <div class="thumb"></div>
+            <h3 class="topic-title">동일한 내용의 에러메시지, 어디에 띄우시겠어요?</h3>
+            <div class="topic-meta">
+              <span>👍 2,573</span>
+              <span>💬 4</span>
+            </div>
+          </article>
+
+          <article class="topic-card">
+            <div class="thumb"></div>
+            <h3 class="topic-title">로그인 폼 라벨/플레이스홀더, 모범 패턴은?</h3>
+            <div class="topic-meta">
+              <span>👍 933</span>
+              <span>💬 27</span>
+            </div>
+          </article>
+
+          <article class="topic-card">
+            <div class="thumb"></div>
+            <h3 class="topic-title">그래프 유형: 원형 vs 막대형, 언제 무엇을?</h3>
+            <div class="topic-meta">
+              <span>👍 1,201</span>
+              <span>💬 9</span>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- 최신 댓글 -->
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>최신 댓글</h2>
+        </div>
+        <ul class="comment-list">
+          <li class="comment-item">
+            <p class="comment-text">
+              온보딩은 첫 실행에 앱의 주요 가치를 빠르게 보여주는 과정이라고 봐요. 투어는 그 다음…
+            </p>
+            <div class="comment-meta">· 토픽 · 12분 전</div>
+          </li>
+          <li class="comment-item">
+            <p class="comment-text">
+              날짜 입력은 A안이 시각적 그룹이 좋아서 실수 줄이기 유리하네요. B안은 연도도 들어있어…
+            </p>
+            <div class="comment-meta">· 토픽 · 39분 전</div>
+          </li>
+          <li class="comment-item">
+            <p class="comment-text">
+              선택형은 리스트가 한눈에 들어와요. 특히 모바일에선 스크롤 대비 인지부하를 줄여주고요.
+            </p>
+            <div class="comment-meta">· 토픽 · 1시간 전</div>
+          </li>
+          <li class="comment-item">
+            <p class="comment-text">
+              버튼 간격이 좁으면 오조작 나옵니다. 최소 44px 터치 타겟을 권장해요.
+            </p>
+            <div class="comment-meta">· 토픽 · 2시간 전</div>
+          </li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- 레퍼런스 -->
+    <section class="refs">
+      <h2 class="section-title">레퍼런스</h2>
+
+      <div class="ref-row">
+        <div class="ref-block">
+          <div class="ref-head">
+            <div class="ref-icon icon-green"></div>
+            <div>
+              <div class="ref-name">올리브영</div>
+              <div class="ref-desc">대한민국 No.1 뷰티&헬스 스토어</div>
+            </div>
+          </div>
+          <div class="shots">
+            <div class="shot tall"></div>
+            <div class="shot"></div>
+            <div class="shot"></div>
+          </div>
+        </div>
+
+        <div class="ref-block">
+          <div class="ref-head">
+            <div class="ref-icon icon-mint"></div>
+            <div>
+              <div class="ref-name">치지직</div>
+              <div class="ref-desc">지금, 스트리밍이 시작됩니다. 치지직</div>
+            </div>
+          </div>
+          <div class="shots">
+            <div class="shot tall dark"></div>
+            <div class="shot dark"></div>
+            <div class="shot dark"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ref-row">
+        <div class="ref-block">
+          <div class="ref-head">
+            <div class="ref-icon icon-red"></div>
+            <div>
+              <div class="ref-name">올웨이즈</div>
+              <div class="ref-desc">함께 모아 만드는 저렴한 가격</div>
+            </div>
+          </div>
+          <div class="shots">
+            <div class="shot"></div>
+            <div class="shot"></div>
+            <div class="shot"></div>
+          </div>
+        </div>
+
+        <div class="ref-block">
+          <div class="ref-head">
+            <div class="ref-icon icon-blue"></div>
+            <div>
+              <div class="ref-name">트래블월렛</div>
+              <div class="ref-desc">해외에서 쓸카드 담다</div>
+            </div>
+          </div>
+          <div class="shots">
+            <div class="shot"></div>
+            <div class="shot"></div>
+            <div class="shot"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="f-left">
+        <div class="brand">Designus*</div>
+        <p class="f-copy">© Designus. All rights reserved.</p>
+      </div>
+      <div class="f-links">
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+        <a href="#">문의하기</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

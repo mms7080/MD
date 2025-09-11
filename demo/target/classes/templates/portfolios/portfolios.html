@@ -2,17 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title th:text="${portfolios != null} ? ${portfolios.title} : '포트폴리오 없음'">Portfolio</title>
+  <title th:text="${portfolios != null} ? portfolios.title : '포트폴리오 없음'">Portfolio</title>
   <meta name="_csrf" th:content="${_csrf.token}" />
   <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="/css/portfolios/portfolios-detail.css">
-  
 </head>
-<body>
+<body class="portfolio-detail">
   <!-- 헤더 -->
-  <div th:replace="fragments/header :: site-header"></div>
+  <div th:replace="fragments/header :: header"></div>
+
 <main class="container">
 
   <!-- ❌ Not Found -->
@@ -22,195 +22,108 @@
   </div>
 
   <!-- ✅ Portfolio Content -->
-  <div th:if="${portfolios != null}" class="card">
-  
-    <h1 class="title" th:text="${portfolios.title}">제목</h1>
-    
-    <!-- 기존 <p class="creator">...</p> 과 meta-right(작성일) 대신 사용 -->
-      <p class="header-meta">
-        <span class="creator-name">
-          Writer: <span th:text="${portfolios.creator}"></span>
-        </span>
-        <span class="created-date"> WriterDate: <span th:text="${portfolios.createdAt}"></span></span>
-      </p>
-    
-      <!-- 여기 안에 강조하고 싶은 콘텐츠들 -->
-    
-      <!-- 🖼 썸네일 카드 그리드 -->
-      <!-- 프로젝트 스크린샷 개수 사용 -->
-        <div class="gallery-box">
-          <div class="thumb-grid"
-              th:style="'--cols:' + ${#lists.size(portfolios.screenshots)}">
-            <div class="thumb-card" th:each="img : ${portfolios.screenshots}">
-              <img th:src="${img}" th:attr="data-original=${img}" class="thumb" alt="screenshot">
-            </div>
-          </div>
-        </div>
+  <div th:if="${portfolios != null}" class="portfolio-detail-grid">
 
+    <!-- 왼쪽: 이미지 -->
+    <div class="gallery">
+      <!-- 대표 이미지 -->
+      <figure class="main-photo">
+        <img id="mainImage" th:src="${portfolios.screenshots[0]}" alt="대표 이미지">
+      </figure>
 
-      <!-- 🔍 라이트박스 모달 (반드시 body 직속) -->
-    <!-- 🔍 라이트박스 모달 (반드시 body 직속) -->
-    <div id="lightbox" class="lightbox" hidden aria-hidden="true">
-      <button class="lb-btn lb-prev" aria-label="이전">‹</button>
-    
-      <div class="lb-content">
-        <button class="lb-btn lb-close" aria-label="닫기">×</button>
-        <img class="lb-img" alt="preview" />
+      <!-- 썸네일 -->
+      <div class="thumb-list">
+        <img th:each="img : ${portfolios.screenshots}"
+             th:src="${img}"
+             alt="썸네일"
+             onmouseover="changeMainImage(this.src)">
       </div>
-    
-      <button class="lb-btn lb-next" aria-label="다음">›</button>
     </div>
 
+    <!-- 오른쪽: 정보 -->
+    <div class="info-box">
+      <h1 class="title" th:text="${portfolios.title}">제목</h1>
+      <p class="desc" th:text="${portfolios.desc}">설명</p>
 
+      <div class="meta-box">
 
+        <p><span class="label">Link:</span>
+          <a th:href="${portfolios.link}" target="_blank" th:text="${portfolios.link}" class="custom-link"></a>
+        </p>
 
-    <div>
-      <p class="desc" th:text="${portfolios.desc}"></p>
-    </div>
+        <p><span class="label">Views:</span> <span id="viewCount">0</span></p>
 
-    <!-- 요약 섹션 래퍼 -->
-<div class="summary-grid">
-  <!-- 왼쪽: 기존 내용 전부를 이 div 안으로 옮겨 주세요 -->
-  <div class="summary-left">
+        <div class="like-wrap">
+          <!-- 로그인 상태일 때 -->
+          <button sec:authorize="isAuthenticated()"
+                  id="likeBtn"
+                  class="heart-btn"
+                  title="좋아요"
+                  aria-label="좋아요"
+                  th:attr="data-id=${portfolios.id}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke-width="1.5" stroke="currentColor" class="heart-icon">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 
+                       0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 
+                       3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+            <span id="likeCount" th:text="${portfolios.likes}">0</span>
+          </button>
+        
+          <!-- 비로그인 상태일 때 -->
+          <a sec:authorize="isAnonymous()"
+          href="/signin"
+          id="likeSigninTrigger"
+          class="like-btn"
+          title="로그인 후 좋아요 가능">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.5" stroke="currentColor" class="heart-icon">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 
+                    0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 
+                    3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+          </svg>
+          <span th:text="${portfolios.likes}">0</span>
+          </a>
 
-    <!-- 접속 링크 -->
-    <div class="links">
-      <span class="link-label">Link : </span>
-      <a th:href="${portfolios.link}" target="_blank" th:text="${portfolios.link}" class="custom-link"></a>
-     </div>
+        </div>
+        
 
-    <!-- 조회수  -->
-    <div class="view-count-box">
-      <span class="view-label">Views:</span>
-      <span id="viewCount">0</span>
-    </div>
-
-
-   <!-- 🏷️ 태그 -->
+        <!-- 🏷 태그 -->
         <div class="tags">
-            <strong>Tags:</strong>
-            <div class="tag-wrap">
+          <span class="label">Tags:</span>
+          <div class="tag-wrap">
             <a th:each="tag : ${portfolios.tags}"
-                th:href="@{/home(q=${tag})}"
-                th:text="${tag}"
-                class="tag"></a>
-            </div>
-        </div>
-  
-        <div><div></div></div>
-
-  
-  
-
-   <!-- 👁️ 조회수 / ❤️ 좋아요 / 📅 작성일 -->
-
-
-    <!-- ❤️ 좋아요 -->
-<div class="meta-bar">
-  <div class="meta-left">
-
-    <!-- 로그인 상태일 때만 보이는 버튼 -->
-    <button sec:authorize="isAuthenticated()"
-            id="likeBtn"
-            class="like-btn"
-            title="좋아요"
-            th:attr="data-id=${portfolios.id}">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-           stroke-width="1.5" stroke="currentColor" class="heart-icon">
-        <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 
-              2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 
-              8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-      </svg>
-      <span id="likeCount" th:text="${portfolios.likes}">0</span>
-    </button>
-
-    <!-- 비로그인 상태일 때만 보이는 링크 -->
-    <a sec:authorize="isAnonymous()"
-       href="/signin"
-       id="likeSigninTrigger"
-       class="like-btn"
-       title="로그인 후 좋아요 가능">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-           stroke-width="1.5" stroke="currentColor" class="heart-icon">
-        <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 
-              2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 
-              8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-      </svg>
-      <span th:text="${portfolios.likes}">0</span>
-    </a>
-
-  </div>
-</div>
-
-
-
-    <!-- 다운로드 -->
-     <div class="downloads">
-      <span class="download-label">Download : </span>
-      <a th:href="${portfolios.download}" download th:text="${portfolios.download}" class="download-link"></a>
-    </div>
-
-  </div>
-  <!-- 오른쪽: 아이콘(있을 때만) -->
-  <aside class="summary-logo" th:if="${portfolios.icon}">
-    <figure class="logo-card" title="portfolios Logo">
-      <img th:src="${portfolios.icon}"
-           th:alt="|${portfolios.title} 아이콘|"
-           loading="lazy" decoding="async">
-    </figure>
-  </aside>
-</div>
-    
-
-
-
-<!-- 👥 팀원 소개 (전체 2열 그리드) -->
-<div class="team-section">
-    <h2>
-      <!-- 링크가 있으면 a, 없으면 span (클래스 추가/변경 없음) -->
-      <a th:if="${portfolios.link}"
-         th:href="${portfolios.link}"
-         th:text="${#lists.isEmpty(portfolios.team) ? 'Team' : portfolios.team[0].teamName}">
-        Team
-      </a>
-      <span th:unless="${portfolios.link}"
-            th:text="${#lists.isEmpty(portfolios.team) ? 'Team' : portfolios.team[0].teamName}">
-        Team
-      </span>
-    </h2>
-  
-    <!-- 팀원 -->
-    <div class="team-card">
-      <div class="team-rows">
-        <div class="team-row" th:each="member : ${portfolios.team}">
-          <!-- 왼쪽: 이름 + 역할뱃지 -->
-          <div class="team-name-cell">
-            <!-- 클래스 name 유지하면서 a로 변경 -->
-            <a th:if="${portfolios.link}"
-               th:href="${portfolios.link}"
-               class="name"
-               th:text="${member.name}">이름</a>
-            <span th:unless="${portfolios.link}"
-                  class="name"
-                  th:text="${member.name}">이름</span>
-  
-            <span class="role-badge" th:text="${member.role}">Role</span>
-          </div>
-  
-          <!-- 오른쪽: 담당(칩) -->
-          <div class="team-parts-cell">
-            <span class="part-chip" th:each="p : ${member.parts}" th:text="${p}">파트</span>
+               th:href="@{/home(q=${tag})}"
+               th:text="${tag}"
+               class="tag"></a>
           </div>
         </div>
+
+        <!-- 다운로드 -->
+        <p><span class="label">Download:</span>
+          <a th:href="${portfolios.download}" download th:text="${portfolios.download}" class="download-link"></a>
+        </p>
+
+        <!-- 아이콘 -->
+        <aside class="summary-logo" th:if="${portfolios.icon}">
+          <figure class="logo-card" title="portfolios Logo">
+            <img th:src="${portfolios.icon}"
+                 th:alt="|${portfolios.title} 아이콘|"
+                 loading="lazy" decoding="async">
+          </figure>
+        </aside>
       </div>
+
+      
     </div>
   </div>
-  
 
-    <!-- 💬 댓글/별점 -->
-<div class="comment-section">
+  
+ 
+
+  <div class="comment-section">
   <h2>댓글</h2>
 
   <!-- 평균 별점(모두에게 보임) -->
@@ -239,21 +152,30 @@
 
   <!-- 비회원 안내 -->
   <div sec:authorize="isAnonymous()">
-    <p class="muted">로그인 후 댓글/별점을 남길 수 있습니다.
-      <a href="/signin">로그인</a>
-    </p>
+    <p class="muted">로그인 후 댓글/별점을 남길 수 있습니다. <a href="/signin">로그인</a></p>
   </div>
 
   <!-- 댓글 리스트 -->
   <div id="commentList" class="comments"></div>
 </div>
 
+
+<!-- 로그인 필요 모달 -->
+<div id="loginModal" class="login-modal" hidden>
+  <div class="modal-content">
+    <p>로그인이 필요한 서비스입니다.</p>
+    <button id="goSigninBtn">확인</button>
+  </div>
+</div>
+
 </main>
 
-
 <!-- 🔗 JavaScript -->
+<script>
+  function changeMainImage(src) {
+    document.getElementById("mainImage").src = src;
+  }
+</script>
 <script src="/js/portfolios/portfolios-detail.js"></script>
-
-
 </body>
 </html>
