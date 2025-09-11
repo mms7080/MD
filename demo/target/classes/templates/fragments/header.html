@@ -1,56 +1,134 @@
 <!-- templates/fragments/header.html -->
 <!DOCTYPE html>
 <html
+    lang="ko"
     xmlns:th="http://www.thymeleaf.org"
     xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
 >
-    <th:block th:fragment="header">
+    <th:block th:fragment="header(active)">
         <header class="kf-header">
             <div class="kf-header__inner">
-                <!-- 왼쪽: 로고 + 내비 -->
+                <!-- 왼쪽: 로고 + 1차 메뉴 -->
                 <div class="kf-header__left">
                     <a class="kf-logo" th:href="@{/}" aria-label="kafolio 홈">
-                        kafolio<span class="kf-star">✶</span>
+                        kafolio <span class="kf-star">✶</span>
                     </a>
 
                     <nav class="kf-nav" aria-label="주요 메뉴">
                         <ul>
-                            <li><a th:href="@{/detail}">portfolio</a></li>
-                            <li><a th:href="@{/folios}">folio</a></li>
-                            <li><a th:href="@{/notice}">공지사항</a></li>
+                            <li>
+                                <a
+                                    th:href="@{/detail}"
+                                    th:classappend="${active}=='portfolio' ? ' is-active' : null"
+                                    >portfolio</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    th:href="@{/folios}"
+                                    th:classappend="${active}=='folio' ? ' is-active' : null"
+                                    >folio</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    th:href="@{/notice}"
+                                    th:classappend="${active}=='notice' ? ' is-active' : null"
+                                    >공지사항</a
+                                >
+                            </li>
                         </ul>
                     </nav>
                 </div>
 
-                <!-- 오른쪽: 테마 토글 + 인증 메뉴 -->
+                <!-- 오른쪽: 테마 토글 + 인증 -->
                 <div class="kf-header__right">
-                    <!-- Theme toggle (CSS-only) -->
-                    <input
-                        id="theme-toggle"
-                        type="checkbox"
-                        hidden
-                        aria-hidden="true"
-                    />
+                    <!-- Sun/Moon 순수 CSS 토글 -->
                     <label
-                        class="kf-iconbtn"
-                        for="theme-toggle"
-                        aria-label="다크/라이트 모드 전환"
+                        for="themeToggle"
+                        class="themeToggle st-sunMoonThemeToggleBtn"
+                        aria-label="다크/라이트 전환"
                     >
+                        <input
+                            type="checkbox"
+                            id="themeToggle"
+                            class="themeToggleInput"
+                        />
                         <svg
-                            class="kf-icon"
-                            viewBox="0 0 24 24"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            stroke="none"
                             aria-hidden="true"
                         >
-                            <path
-                                d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z"
-                            />
+                            <mask id="moon-mask">
+                                <rect
+                                    x="0"
+                                    y="0"
+                                    width="20"
+                                    height="20"
+                                    fill="white"
+                                ></rect>
+                                <circle
+                                    cx="11"
+                                    cy="3"
+                                    r="8"
+                                    fill="black"
+                                ></circle>
+                            </mask>
+                            <circle
+                                class="sunMoon"
+                                cx="10"
+                                cy="10"
+                                r="8"
+                                mask="url(#moon-mask)"
+                            ></circle>
+                            <g>
+                                <circle
+                                    class="sunRay sunRay1"
+                                    cx="18"
+                                    cy="10"
+                                    r="1.5"
+                                ></circle>
+                                <circle
+                                    class="sunRay sunRay2"
+                                    cx="14"
+                                    cy="16.928"
+                                    r="1.5"
+                                ></circle>
+                                <circle
+                                    class="sunRay sunRay3"
+                                    cx="6"
+                                    cy="16.928"
+                                    r="1.5"
+                                ></circle>
+                                <circle
+                                    class="sunRay sunRay4"
+                                    cx="2"
+                                    cy="10"
+                                    r="1.5"
+                                ></circle>
+                                <circle
+                                    class="sunRay sunRay5"
+                                    cx="6"
+                                    cy="3.1718"
+                                    r="1.5"
+                                ></circle>
+                                <circle
+                                    class="sunRay sunRay6"
+                                    cx="14"
+                                    cy="3.1718"
+                                    r="1.5"
+                                ></circle>
+                            </g>
                         </svg>
                     </label>
 
-                    <!-- 인증 메뉴 -->
                     <nav class="kf-auth" aria-label="인증 메뉴">
-                        <!-- 비로그인 상태: 모달 토글 (링크 구분선 없이) -->
+                        <!-- 비로그인 -->
                         <div sec:authorize="isAnonymous()">
+                            <!-- 모달 사용시: 라디오 토글과 연결 (modal-signin / modal-signup) -->
                             <label
                                 for="modal-signin"
                                 class="kf-link"
@@ -65,7 +143,7 @@
                             >
                         </div>
 
-                        <!-- 로그인 상태 (일반 사용자) -->
+                        <!-- 로그인(일반) -->
                         <div
                             sec:authorize="isAuthenticated() and !hasRole('ADMIN')"
                         >
@@ -83,7 +161,7 @@
                                     class="kf-link"
                                     style="
                                         background: none;
-                                        border: none;
+                                        border: 0;
                                         padding: 0;
                                         cursor: pointer;
                                     "
@@ -93,7 +171,7 @@
                             </form>
                         </div>
 
-                        <!-- 로그인 상태 (관리자) -->
+                        <!-- 로그인(관리자) -->
                         <div sec:authorize="hasRole('ADMIN')">
                             <a class="kf-link" th:href="@{/admin}"
                                 >관리자페이지</a
@@ -109,7 +187,7 @@
                                     class="kf-link"
                                     style="
                                         background: none;
-                                        border: none;
+                                        border: 0;
                                         padding: 0;
                                         cursor: pointer;
                                     "
