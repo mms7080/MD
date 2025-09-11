@@ -36,7 +36,7 @@ public class SecurityConfig {
                     "/api/**",
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/home/**"
-                     ,"/**" 
+                    //  ,"/**" 
                     //일단 테스트로 전체허용해놨다
                 ).permitAll()
 
