@@ -277,6 +277,72 @@ body.portfolio-detail * {
   .lb-prev { left: 20px; top: 50%; transform: translateY(-50%); }
   .lb-next { right: 20px; top: 50%; transform: translateY(-50%); }
   
+/* === Like 영역: 테마 변수로 색/배경 통일 === */
+.like-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 8px;
+  color: var(--text);                 /* 글자색: 테마 따라감 */
+}
+
+.like-wrap .like-btn {
+  color: var(--text);                 /* 버튼 텍스트 */
+  background: var(--chip);            /* 다른 라벨/칩과 동일 톤 */
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 10px;
+  line-height: 1;
+  text-decoration: none;              /* a.like-btn 대비 */
+}
+.like-wrap .like-btn:hover {
+  background: var(--accent-ghost);
+}
+ /* === Likes 라인: Views와 톤/간격 통일 === */
+.likes-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;                 /* 라벨–하트–숫자 간 간격 */
+  margin: 2px 0 0;           /* 위/아래 메타와 균형 */
+  color: var(--text);
+}
+.likes-line .label {
+  color: var(--muted);       /* Views: 와 동일한 라벨 톤 */
+  white-space: nowrap;
+}
+
+/* 하트만 클릭 가능하도록 최소 버튼 스타일 */
+.heart-btn {
+  background: var(--chip);   /* 다른 칩/라벨과 톤 맞춤 */
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+  text-decoration: none;     /* <a>일 때 */
+}
+.heart-btn:hover { background: var(--accent-ghost); }
+
+/* 카운트는 텍스트만 강조 */
+#likeCount { font-weight: 600; }
+
+/* (기존 정의와 충돌 방지) 이전 .like-wrap 스타일이 있다면 무시되도록 */
+.like-wrap { display: contents; }   /* 안전하게 해제 */
+
+/* 하트 아이콘은 포인트 컬러 유지 */
+.like-wrap .heart-icon { stroke: var(--danger); }
+
+/* 숫자는 살짝 강조 */
+#likeCount { font-weight: 600; }
+
+/* === 메타 라벨 톤(다른 라벨과 동일) === */
+.meta-box .label { color: var(--muted); }  /* Link:, Views:, Tags: 등 */
+
+
   /* ======================
      Responsive
      ====================== */
