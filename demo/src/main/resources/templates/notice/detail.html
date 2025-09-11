@@ -31,17 +31,28 @@
         </tr>
     </table>
 
-    <!-- 이전글/다음글 -->
-    <table class="notice-nav">
-        <tr>
-            <th>이전글</th>
-            <td><a href="#">단체 관람 안내</a></td>
-        </tr>
-        <tr>
-            <th>다음글</th>
-            <td class="no-link">다음 게시글이 없습니다.</td>
-        </tr>
-    </table>
+<!-- 이전글/다음글 -->
+<table class="notice-nav">
+    <tr>
+        <th>이전글</th>
+        <td>
+            <a th:if="${prevNotice != null}"
+               th:href="@{|/notice/${prevNotice.id}|}"
+               th:text="${prevNotice.title}"></a>
+            <span th:if="${prevNotice == null}" class="no-link">이전 게시글이 없습니다.</span>
+        </td>
+    </tr>
+    <tr>
+        <th>다음글</th>
+        <td>
+            <a th:if="${nextNotice != null}"
+               th:href="@{|/notice/${nextNotice.id}|}"
+               th:text="${nextNotice.title}"></a>
+            <span th:if="${nextNotice == null}" class="no-link">다음 게시글이 없습니다.</span>
+        </td>
+    </tr>
+</table>
+
 
     <!-- 목록 버튼 -->
     <div class="notice-actions">

@@ -139,29 +139,41 @@
 .pagination {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 6px;
+    margin-top: 20px;
 }
 
 .page-btn {
     display: inline-block;
-    padding: 6px 12px;
+    min-width: 36px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    min-width: 32px;
-    text-align: center;
-    background: var(--panel);   /* 패널색 배경 */
     color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
     text-decoration: none;
-    transition: background 0.2s, color 0.2s;
-}
-
-.page-btn.active {
-    background: var(--text);  
-    color: var(--bg);          
-    border-color: var(--text);
+    transition: all 0.2s ease;
 }
 
 .page-btn:hover {
     background: var(--accent-ghost);
     color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.page-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);   /* 배경색과 반대색 */
+    cursor: default;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.notice-search .btn-search,
+.notice-search .btn-all {
+    text-decoration: none;   /* a 태그도 밑줄 제거 */
 }

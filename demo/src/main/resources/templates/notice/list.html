@@ -1,63 +1,118 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>공지사항</title>
-    <link rel="stylesheet" href="/css/header.css">
-    <link rel="stylesheet" href="/css/notice/list.css">
-</head>
-<body>
-<div th:replace="fragments/header :: header"></div>
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/notice/list.css" />
+  </head>
+  <body>
+    <div th:replace="fragments/header :: header"></div>
 
-<main class="notice-container">
-    <h1 class="notice-title">공지사항</h1>
+    <main class="notice-container">
+      <h1 class="notice-title">공지사항</h1>
 
-    <div class="notice-search">
-        <select>
-            <option>제목</option>
-            <option>작성자</option>
-        </select>
-        <input type="text" placeholder="검색어를 입력하세요" />
-        <button class="btn-search">검색</button>
-        <button class="btn-all">전체보기</button>
+      <!-- 🔍 검색 영역 -->
+      <div class="notice-search">
+        <form
+          th:action="@{/notice}"
+          method="get"
+          style="display: flex; gap: 8px"
+        >
+          <select name="type">
+            <option value="title" th:selected="${type == 'title'}">제목</option>
+            <option value="writer" th:selected="${type == 'writer'}">
+              작성자
+            </option>
+          </select>
+          <input
+            type="text"
+            name="keyword"
+            placeholder="검색어를 입력하세요"
+            th:value="${keyword}"
+          />
+          <button type="submit" class="btn-search">검색</button>
+          <a th:href="@{/notice}" class="btn-all">전체보기</a>
+        </form>
 
-         <a th:href="@{/notice/new}" class="btn-write">작성하기</a>
-    </div>
+        <a th:href="@{/notice/new}" class="btn-write">작성하기</a>
+      </div>
 
-    <table class="notice-table">
+      <!-- 📋 공지사항 테이블 -->
+      <table class="notice-table">
         <thead>
-        <tr>
+          <tr>
             <th>번호</th>
             <th>제목</th>
             <th>작성자</th>
             <th>작성일</th>
             <th>조회수</th>
-        </tr>
+          </tr>
         </thead>
         <tbody>
-        <tr th:each="notice : ${notices}">
+          <!-- 검색 결과 없음 -->
+          <tr th:if="${isEmpty}">
+            <td
+              colspan="5"
+              style="text-align: center; padding: 20px; color: var(--muted)"
+            >
+              검색 결과가 없습니다.
+            </td>
+          </tr>
+
+          <!-- 검색 결과 있을 때 -->
+          <tr th:each="notice : ${notices}">
             <td th:text="${notice.id}"></td>
             <td class="notice-subject">
-                <a th:href="@{|/notice/${notice.id}|}" th:text="${notice.title}"></a>
-                <span class="badge-new">NEW</span>
+              <a
+                th:href="@{|/notice/${notice.id}|}"
+                th:text="${notice.title}"
+              ></a>
+
+              <!-- 오늘 작성된 공지일 때만 NEW 뱃지 -->
+              <span
+                class="badge-new"
+                th:if="${#temporals.format(notice.createdAt, 'yyyy-MM-dd') == #temporals.format(T(java.time.LocalDate).now(), 'yyyy-MM-dd')}"
+              >
+                NEW
+              </span>
             </td>
             <td th:text="${notice.writer}"></td>
-            <td th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd')}"></td>
+            <td
+              th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd')}"
+            ></td>
             <td>1</td>
-        </tr>
+          </tr>
         </tbody>
-    </table>
+      </table>
 
-    <div class="pagination">
-        <a href="#" class="page-btn">&lt;</a>
-        <a href="#" class="page-btn active">1</a>
-        <a href="#" class="page-btn">2</a>
-        <a href="#" class="page-btn">3</a>
-        <a href="#" class="page-btn">4</a>
-        <a href="#" class="page-btn">5</a>
-        <a href="#" class="page-btn">6</a>
-        <a href="#" class="page-btn">&gt;</a>
-    </div>
-</main>
-</body>
+      <!-- 📑 페이지네이션 -->
+      <div class="pagination">
+        <!-- 이전 블록 버튼 -->
+        <a
+          th:if="${startPage > 0}"
+          th:href="@{|/notice?page=${startPage - 1}|}"
+          class="page-btn"
+          >&lt;</a
+        >
+
+        <!-- 페이지 번호 버튼 -->
+        <a
+          th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
+          th:href="@{|/notice?page=${pageNum}|}"
+          th:text="${pageNum + 1}"
+          th:classappend="${pageNum == currentPage} ? 'active' : ''"
+          class="page-btn"
+        ></a>
+
+        <!-- 다음 블록 버튼 -->
+        <a
+          th:if="${endPage < totalPages - 1}"
+          th:href="@{|/notice?page=${endPage + 1}|}"
+          class="page-btn"
+          >&gt;</a
+        >
+      </div>
+    </main>
+  </body>
 </html>
