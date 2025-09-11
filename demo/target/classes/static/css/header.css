@@ -1,41 +1,40 @@
 /* header.css */
 :root {
-  /* 다크 모드 기본 */
-  --bg: #0f1114;             /* 전체 배경 */
-  --page: rgba(255,255,255,0.03); /* 패널 배경 */
-  --rail: rgba(255,255,255,0.02); /* 사이드바 */
-  --panel: #14181d;          /* 헤더/패널 */
-  --text: #f9fafb;
-  --muted: #9ca3af;
-  --border: rgba(255,255,255,0.1);
-  --border-strong: rgba(255,255,255,0.2);
-  --accent: #ffffff;         /* 화이트 포인트 */
-  --accent-ghost: rgba(255,255,255,0.12);
-  --chip: rgba(255,255,255,0.08);
-  --chip-text: #f9fafb;
-  --danger: #ef4444;
-  --shadow: 0 6px 18px rgba(0,0,0,.6);
-  --radius: 12px;
+    /* 다크 모드 기본 */
+    --bg: #0f1114; /* 전체 배경 */
+    --page: rgba(255, 255, 255, 0.03); /* 패널 배경 */
+    --rail: rgba(255, 255, 255, 0.02); /* 사이드바 */
+    --panel: #14181d; /* 헤더/패널 */
+    --text: #f9fafb;
+    --muted: #9ca3af;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.2);
+    --accent: #ffffff; /* 화이트 포인트 */
+    --accent-ghost: rgba(255, 255, 255, 0.12);
+    --chip: rgba(255, 255, 255, 0.08);
+    --chip-text: #f9fafb;
+    --danger: #ef4444;
+    --shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    --radius: 12px;
 }
 
 /* 라이트 모드 */
 body:has(#theme-toggle:checked) {
-  --bg: #f8fafc;
-  --page: #ffffff;
-  --rail: #f3f4f6;
-  --panel: #ffffff;
-  --text: #111827;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --border-strong: #d1d5db;
-  --accent: #111827;
-  --accent-ghost: #e5e7eb;
-  --chip: #f9fafb;
-  --chip-text: #374151;
-  --danger: #dc2626;
-  --shadow: 0 4px 14px rgba(0,0,0,0.08);
+    --bg: #f8fafc;
+    --page: #ffffff;
+    --rail: #f3f4f6;
+    --panel: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --border-strong: #d1d5db;
+    --accent: #111827;
+    --accent-ghost: #e5e7eb;
+    --chip: #f9fafb;
+    --chip-text: #374151;
+    --danger: #dc2626;
+    --shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
-
 
 .kf-header {
     position: sticky;

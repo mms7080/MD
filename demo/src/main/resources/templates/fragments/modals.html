@@ -1,0 +1,183 @@
+<!-- src/main/resources/templates/fragments/modals.html -->
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="authModals">
+
+  <!-- CSS-only 토글 라디오 (기본 닫힘) -->
+  <input type="radio" name="modal" id="modal-none" hidden checked>
+  <input type="radio" name="modal" id="modal-signin" hidden>
+  <input type="radio" name="modal" id="modal-signup" hidden>
+
+  <!-- 로그인 모달 -->
+  <div class="kf-auth-modal signin" role="dialog" aria-modal="true" aria-labelledby="signin-title">
+    <!-- 오버레이(클릭 시 닫힘) -->
+    <label class="kf-auth__overlay" for="modal-none"></label>
+
+    <div class="kf-auth__content">
+      <label class="kf-auth__close" for="modal-none" aria-label="닫기">×</label>
+
+      <div class="kf-auth__grid">
+        <!-- 좌측 브랜딩 -->
+        <aside class="auth-left">
+          <div class="auth-left__inner">
+            <p class="auth-welcome">Welcome!</p>
+            <div class="brand-title">kafolio</div>
+            <p class="brand-sub">portfolio gallery</p>
+            <p class="auth-cta">Not a member yet?
+              <label class="link" for="modal-signup">Register now</label>
+            </p>
+          </div>
+        </aside>
+
+        <!-- 우측 폼 -->
+        <section class="auth-right">
+          <h3 id="signin-title" class="auth-title">Log in</h3>
+
+          <!-- 알림 배너(원할 때 타임리프로 살릴 수 있음) -->
+          <!-- <p th:if="${param.signup}" class="note-banner">회원가입이 완료되었습니다. 이제 로그인해 주세요.</p> -->
+
+          <form class="auth-form" action="#" th:action="@{/signin}" method="post" aria-label="로그인 폼">
+            <label class="auth-field">
+              <span class="auth-label">EMAIL OR USERNAME</span>
+              <input name="username" type="text" placeholder="아이디 또는 이메일" required autocomplete="username">
+            </label>
+            <label class="auth-field">
+              <span class="auth-label">PASSWORD</span>
+              <input name="password" type="password" placeholder="비밀번호" required autocomplete="current-password">
+            </label>
+            <label class="auth-keep"><input type="checkbox" name="remember-me"><span>로그인 상태 유지</span></label>
+
+            <!-- CSRF (스프링 보안 켜질 때만 자동 주입) -->
+            <input type="hidden" th:if="${_csrf != null}"
+                   th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <button type="submit" class="auth-btn">Log in now</button>
+            <div class="auth-row"><a class="link small" href="#" th:href="@{/forgot}">Forgot your password?</a></div>
+
+            <p class="kf-switch">계정이 없나요?
+              <label for="modal-signup" class="link">회원가입</label>
+            </p>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- 회원가입 모달 -->
+  <div class="kf-auth-modal signup" role="dialog" aria-modal="true" aria-labelledby="signup-title">
+    <label class="kf-auth__overlay" for="modal-none"></label>
+
+    <div class="kf-auth__content">
+      <label class="kf-auth__close" for="modal-none" aria-label="닫기">×</label>
+
+      <div class="kf-auth__grid">
+        <aside class="auth-left">
+          <div class="auth-left__inner">
+            <p class="auth-welcome">Join us</p>
+            <div class="brand-title">kafolio</div>
+            <p class="brand-sub">portfolio gallery</p>
+            <p class="auth-cta">Already have an account?
+              <label class="link" for="modal-signin">Log in</label>
+            </p>
+          </div>
+        </aside>
+
+        <section class="auth-right">
+          <h3 id="signup-title" class="auth-title">Sign up</h3>
+
+          <form class="auth-form" action="#" th:action="@{/signup}" method="post" aria-label="회원가입 폼" novalidate>
+            <label class="auth-field">
+              <span class="auth-label">아이디</span>
+              <input name="username" type="text" placeholder="영문/숫자 4~16자" required autocomplete="username">
+            </label>
+
+            <label class="auth-field">
+              <span class="auth-label">비밀번호</span>
+              <input name="password" type="password" placeholder="10자 이상" required autocomplete="new-password">
+            </label>
+
+            <label class="auth-field">
+              <span class="auth-label">비밀번호 확인</span>
+              <input name="confirmPassword" type="password" placeholder="비밀번호 재입력" required autocomplete="new-password">
+            </label>
+
+            <label class="auth-field">
+              <span class="auth-label">이름</span>
+              <input name="name" type="text" placeholder="홍길동" required>
+            </label>
+
+            <!-- 이메일 + 인증코드 발송 UI -->
+<div class="auth-field">
+  <span class="auth-label">이메일 <span class="req" aria-hidden="true">*</span></span>
+
+  <!-- 이메일 콤보: [아이디] @ [도메인 선택 or 직접입력] + [인증코드 발송] -->
+  <div class="email-combo">
+    <!-- 아이디(앞부분) -->
+    <input id="emailLocal" name="emailLocal" type="text" placeholder="아이디" autocomplete="off" />
+
+    <span class="at">@</span>
+
+    <!-- 도메인: 셀렉트 ↔ 커스텀 입력 (CSS만으로 토글) -->
+    <div class="domain-wrap">
+      <select id="emailDomain" name="emailDomainSel" aria-label="도메인 선택">
+        <option value="gmail.com">gmail.com</option>
+        <option value="naver.com">naver.com</option>
+        <option value="daum.net">daum.net</option>
+        <option value="kakao.com">kakao.com</option>
+        <option value="__custom__">직접 입력</option>
+      </select>
+      <input id="emailDomainCustom" name="emailDomainCustom" type="text" placeholder="example.com" />
+    </div>
+
+    <!-- 인증코드 입력창 열기 토글 (라벨=버튼) -->
+    <input id="code-open" type="checkbox" hidden />
+    <label class="btn small" for="code-open">인증코드 발송</label>
+  </div>
+
+  <!-- 인증코드 입력칸: 버튼 클릭 전에는 숨김 -->
+  <div class="code-block">
+    <input
+      id="emailCode"
+      name="emailCode"
+      type="text"
+      inputmode="numeric"
+      pattern="\\d{6}"
+      maxlength="6"
+      placeholder="인증코드 6자리"
+      aria-label="이메일 인증코드"
+    />
+    <button type="button" class="btn">코드 확인</button>
+  </div>
+
+  <!-- (선택) 검증 메시지 자리 -->
+  <small class="field-error" id="err-code" aria-live="polite"></small>
+</div>
+
+
+            <fieldset class="auth-field">
+              <legend class="auth-label">성별</legend>
+              <div class="radios">
+                <label class="radio"><input type="radio" name="gender" value="M" required><span>남자</span></label>
+                <label class="radio"><input type="radio" name="gender" value="W" required><span>여자</span></label>
+              </div>
+            </fieldset>
+
+            <label class="auth-field">
+              <span class="auth-label">생년월일</span>
+              <input name="birth" type="date" placeholder="YYYY-MM-DD" required>
+            </label>
+
+            <!-- CSRF -->
+            <input type="hidden" th:if="${_csrf != null}"
+                   th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <button type="submit" class="auth-btn">회원가입</button>
+
+            <p class="kf-switch">이미 계정이 있나요?
+              <label for="modal-signin" class="link">로그인</label>
+            </p>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+
+</th:block>

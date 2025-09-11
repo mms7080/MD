@@ -1,51 +1,68 @@
-<!-- src/main/resources/templates/fragments/header.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<head>
-    <meta charset="UTF-8" />
-</head>
-<body>
-<header class="kf-header" th:fragment="site-header">
-    <div class="kf-header__inner">
-        <div class="kf-header__left">
-            <a class="kf-logo" th:href="@{/}" aria-label="kafolio 홈">
-                kafolio<span class="kf-star">✶</span>
-            </a>
-            <nav class="kf-nav" aria-label="주요 메뉴">
-                <ul>
-                    <li><a th:href="@{/detail}">portfolio</a></li>
-                    <li><a th:href="@{/folios}">folio</a></li>
-                    <li><a th:href="@{/notice}">공지사항</a></li>
-                </ul>
-            </nav>
-        </div>
+<html xmlns:th="http://www.thymeleaf.org">
+    <th:block th:fragment="header">
+        <header class="kf-header">
+            <div class="kf-header__inner">
+                <div class="kf-header__left">
+                    <a class="kf-logo" th:href="@{/}" aria-label="kafolio 홈">
+                        kafolio<span class="kf-star">✶</span>
+                    </a>
 
-        <div class="kf-header__right">
-            <!-- Theme toggle (CSS-only) -->
-            <input
-                id="theme-toggle"
-                type="checkbox"
-                hidden
-                aria-hidden="true"
-            />
-            <label
-                class="kf-iconbtn"
-                for="theme-toggle"
-                aria-label="다크/라이트 모드 전환"
-            >
-                <svg class="kf-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z"/>
-                </svg>
-            </label>
+                    <nav class="kf-nav" aria-label="주요 메뉴">
+                        <ul>
+                            <li><a th:href="@{/detail}">portfolio</a></li>
+                            <li><a th:href="@{/folios}">folio</a></li>
+                            <li><a th:href="@{/notice}">공지사항</a></li>
+                        </ul>
+                    </nav>
+                </div>
 
-            <nav class="kf-auth" aria-label="인증 메뉴">
-                <a class="kf-link" th:href="@{/signin}">로그인</a>
-                <a class="kf-link" th:href="@{/signup}">회원가입</a>
-            </nav>
-        </div>
-    </div>
+                <div class="kf-header__right">
+                    <!-- Theme toggle (CSS-only) -->
+                    <input
+                        id="theme-toggle"
+                        type="checkbox"
+                        hidden
+                        aria-hidden="true"
+                    />
+                    <label
+                        class="kf-iconbtn"
+                        for="theme-toggle"
+                        aria-label="다크/라이트 모드 전환"
+                    >
+                        <svg
+                            class="kf-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z"
+                            />
+                        </svg>
+                    </label>
 
+                    <!-- <nav class="kf-auth" aria-label="인증 메뉴">
+                        <a class="kf-link" th:href="@{/signin}">로그인</a>
+                        <a class="kf-link" th:href="@{/signup}">회원가입</a>
+                    </nav> -->
 
-</header>
-</body>
+                    <nav class="kf-auth" aria-label="인증 메뉴">
+                        <!-- 이 라벨들이 라디오를 토글하여 모달을 엽니다 -->
+                        <label
+                            for="modal-signin"
+                            class="kf-link"
+                            style="cursor: pointer"
+                            >로그인</label
+                        >
+                        <label
+                            for="modal-signup"
+                            class="kf-link"
+                            style="cursor: pointer"
+                            >회원가입</label
+                        >
+                    </nav>
+                </div>
+            </div>
+        </header>
+    </th:block>
 </html>
