@@ -11,10 +11,9 @@
         <title>kafolio – 회원가입</title>
         <meta name="description" content="kafolio 계정 회원가입" />
 
-        <script th:src="@{/js/home/home.js}" defer></script>
-        <script th:src="@{/js/users/sign.js}" defer></script>
         <link rel="stylesheet" th:href="@{/css/home/home.css}" />
         <link rel="stylesheet" th:href="@{/css/header.css}" />
+        <link rel="stylesheet" th:href="@{/css/footer.css}" />
         <link rel="stylesheet" th:href="@{/css/users/signup.css}" />
 
         <!-- CSRF for fetch -->
@@ -29,10 +28,7 @@
         />
     </head>
     <body data-page="signup">
-        <a class="skip-link" href="#content">본문 바로가기</a>
-
-        <!-- 헤더 -->
-        <div th:replace="fragments/header :: site-header"></div>
+        <div th:replace="fragments/header :: header"></div>
 
         <!-- 본문 -->
         <main id="content" class="auth">
@@ -368,16 +364,6 @@
             </section>
         </main>
 
-        <!-- 푸터 -->
-        <footer class="site-footer">
-            <div class="container footer-inner">
-                <p>© <span id="year"></span> kafolio. All rights reserved.</p>
-                <ul class="footer-links">
-                    <li><a th:href="@{/terms}">이용약관</a></li>
-                    <li><a th:href="@{/privacy}">개인정보처리방침</a></li>
-                    <li><a th:href="@{/help}">도움말</a></li>
-                </ul>
-            </div>
-        </footer>
+        <div th:replace="fragments/footer :: footer"></div>
     </body>
 </html>

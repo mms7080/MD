@@ -7,56 +7,13 @@
         <link rel="stylesheet" href="css/header.css" />
         <link rel="stylesheet" href="css/footer.css" />
         <link rel="stylesheet" href="css/home/home.css" />
+        <link rel="stylesheet" href="css/users/auth-modal.css" />
     </head>
 
     <body>
-        <!-- header.html -->
-        <header class="kf-header">
-            <div class="kf-header__inner">
-                <div class="kf-header__left">
-                    <a class="kf-logo" href="/" aria-label="kafolio 홈"
-                        >kafolio<span class="kf-star">✶</span></a
-                    >
-                    <nav class="kf-nav" aria-label="주요 메뉴">
-                        <ul>
-                            <li><a href="/detail">portfolio</a></li>
-                            <li><a href="/folios">folio</a></li>
-                            <li><a href="/notice">공지사항</a></li>
-                        </ul>
-                    </nav>
-                </div>
+        <div th:replace="fragments/modals :: authModals"></div>
 
-                <div class="kf-header__right">
-                    <!-- Theme toggle (CSS-only) -->
-                    <input
-                        id="theme-toggle"
-                        type="checkbox"
-                        hidden
-                        aria-hidden="true"
-                    />
-                    <label
-                        class="kf-iconbtn"
-                        for="theme-toggle"
-                        aria-label="다크/라이트 모드 전환"
-                    >
-                        <svg
-                            class="kf-icon"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path
-                                d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 1 0 9.79 9.79z"
-                            />
-                        </svg>
-                    </label>
-
-                    <nav class="kf-auth" aria-label="인증 메뉴">
-                        <a class="kf-link" href="/signin">로그인</a>
-                        <a class="kf-link" href="/signup">회원가입</a>
-                    </nav>
-                </div>
-            </div>
-        </header>
+        <div th:replace="fragments/header :: header"></div>
 
         <!-- home.html (본문만) -->
         <main class="kf-home">
@@ -533,20 +490,6 @@
             </div>
         </main>
 
-        <!-- footer.html (pure HTML) -->
-        <footer class="kf-footer">
-            <div class="kf-footer__inner">
-                <div class="kf-footer__left">
-                    <span>© 2025 kafolio. All rights reserved.</span>
-                </div>
-                <nav class="kf-footer__right" aria-label="푸터 메뉴">
-                    <a href="/terms">이용약관</a>
-
-                    <a href="/privacy">개인정보처리방침</a>
-
-                    <a href="/help">도움말</a>
-                </nav>
-            </div>
-        </footer>
+        <div th:replace="fragments/footer :: footer"></div>
     </body>
 </html>

@@ -1,15 +1,17 @@
-<!-- footer.html (pure HTML) -->
-<footer class="kf-footer">
-    <div class="kf-footer__inner">
-        <div class="kf-footer__left">
-            <span>© 2025 kafolio. All rights reserved.</span>
-        </div>
-        <nav class="kf-footer__right" aria-label="푸터 메뉴">
-            <a href="/terms">이용약관</a>
-
-            <a href="/privacy">개인정보처리방침</a>
-
-            <a href="/help">도움말</a>
-        </nav>
-    </div>
-</footer>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <th:block th:fragment="footer">
+        <footer class="kf-footer">
+            <div class="kf-footer__inner">
+                <div class="kf-footer__left">
+                    <span>© 2025 kafolio. All rights reserved.</span>
+                </div>
+                <nav class="kf-footer__right" aria-label="푸터 메뉴">
+                    <a th:href="@{/terms}">이용약관</a>
+                    <a th:href="@{/privacy}">개인정보처리방침</a>
+                    <a th:href="@{/help}">도움말</a>
+                </nav>
+            </div>
+        </footer>
+    </th:block>
+</html>
