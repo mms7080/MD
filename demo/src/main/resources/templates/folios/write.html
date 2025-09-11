@@ -1,11 +1,55 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" th:replace="~{fragments/layout :: html(
+    title = 'Folio 작성',
+    active = 'write',
+    css = ~{::#page-css},
+    content = ~{::#page-content},
+    js = ~{}
+)}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <th:block id="page-css">
+        <link th:href="@{/css/folios/write.css}" rel="stylesheet" />
+    </th:block>
 </head>
-<body th:replace="fragments/layout :: body" th:with="title='Folios', active='folios'">
-    
+<body>
+    <main id="page-content">
+        <div class="folio-create-main">
+            <div class="folio-create-container">
+                <div class="folio-create-header">
+                    <h1>어떤 템플릿으로 Folio를 만들고 싶으신가요?</h1>
+                    <p>원하는 템플릿을 선택하면 그에 최적화된 Folio를 만들어드려요.</p>
+                </div>
+
+                <div class="template-grid">
+                    <a href="#" class="template-card">
+                        <div class="template-card-visual">
+                            <img src="https://picsum.photos/seed/template1/400/600" alt="기본 템플릿">
+                        </div>
+                        <div class="template-card-footer">
+                            <span>기본 템플릿 1</span>
+                        </div>
+                    </a>
+
+                    <a href="#" class="template-card">
+                        <div class="template-card-visual">
+                            <img src="https://picsum.photos/seed/template2/400/600" alt="심플 템플릿">
+                        </div>
+                        <div class="template-card-footer">
+                            <span>기본 템플릿 2</span>
+                        </div>
+                    </a>
+
+                    <a href="#" class="template-card">
+                        <div class="template-card-visual">
+                            <img src="https://picsum.photos/seed/template3/400/600" alt="크리에이티브 템플릿">
+                        </div>
+                        <div class="template-card-footer">
+                            <span>기본 템플릿 3</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
 </body>
 </html>

@@ -40,7 +40,7 @@ public class FolioService {
     }
 
     public List<FoliosSummaryDto> getFolioSummaries() {
-        return folioRepository.findAll()
+        return folioRepository.findAllWithDetails()
                 .stream()
                 .map(FoliosSummaryDto::new)
                 .collect(Collectors.toList());
