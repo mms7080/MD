@@ -200,5 +200,21 @@
                 </div>
             </div>
         </header>
+            <!-- ✅ 추가 1: 모달 조각 포함 -->
+    <th:block th:replace="fragments/modals :: authModals"></th:block>
+
+    <!-- ✅ 추가 2: 쿼리파라미터로 모달 자동 오픈 -->
+    <script>
+      (function () {
+        var modal = new URLSearchParams(window.location.search).get('modal');
+        if (modal === 'signin') {
+          var r = document.getElementById('modal-signin');
+          if (r) r.checked = true; 
+        } else if (modal === 'signup') {
+          var r2 = document.getElementById('modal-signup');
+          if (r2) r2.checked = true;
+        }
+      })();
+    </script>
     </th:block>
 </html>
