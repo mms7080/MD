@@ -262,75 +262,117 @@
   
   
   /* ======================
-     Comment Section
-     ====================== */
-  .comment-section {
-    margin-top: 60px;
-    border-top: 1px solid var(--border);
-    padding-top: 20px;
-  }
-  .comment-section h2 {
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-    font-weight: 700;
-  }
-  .comment-section textarea {
-    width: 100%;
-    resize: none;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--rail);
-    color: var(--text);
-  }
-  .comment-section button {
-    margin-top: 10px;
-    padding: 8px 16px;
-    background: var(--accent);
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    color: var(--bg);
-  }
-  .comment-section button:hover {
-    background: #2563eb;
-  }
-  
-  /* 댓글 리스트 */
-  .comments {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .comment {
-    background: var(--page);
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-  }
-  .comment .meta {
-    font-size: 0.85rem;
-    color: #aaa !important;
-    margin-bottom: 6px;
-  }
-  
-  
-  /* 별점 */
-  .stars {
-    display: inline-flex;
-    gap: 6px;
-    cursor: pointer;
-  }
-  .stars .star {
-    font-size: 20px;
-    color: #555 !important;
-    transition: color 0.2s;
-  }
-  .stars .star.filled {
-    color: gold !important;
-  }
-  .stars.readonly { cursor: default; }
+   Comment Section (Redesign)
+   ====================== */
+.comment-section {
+  margin-top: 50px;
+  background: var(--card);   /* 카드 스타일 배경 */
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.comment-section h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+/* 평균 별점 */
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.rating-summary .star-symbol {
+  color: gold;
+  font-size: 1.2rem;
+}
+
+/* 별점 입력 */
+.rate-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.stars.write .star {
+  font-size: 24px;
+  cursor: pointer;
+  color: #444;
+  transition: color 0.2s;
+}
+.stars.write .star:hover,
+.stars.write .star.filled {
+  color: gold;
+}
+
+/* 댓글 입력창 */
+#commentForm textarea {
+  width: 100%;
+  resize: none;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: border 0.2s;
+}
+#commentForm textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(91,140,255,0.3);
+}
+
+/* 등록 버튼 */
+#commentForm button {
+  margin-top: 12px;
+  padding: 10px 18px;
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+#commentForm button:hover {
+  background: #2563eb;
+}
+
+/* 댓글 리스트 */
+.comments {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.comment {
+  background: var(--bg-soft);
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.comment .meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.comment .content {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
   
   
   /* ======================
