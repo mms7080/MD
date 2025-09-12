@@ -1,18 +1,37 @@
 /* ======================
    Global (Portfolio Detail)
    ====================== */
-body.portfolio-detail {
-  background: var(--bg);   /* 테마 변수 사용 */
-  color: var(--text);
-  font-family: "Spoqa Han Sans", sans-serif;
-}
-
-body.portfolio-detail * {
-  color: inherit;          /* 본문 기본 색 = var(--text) */
-  text-decoration: none;
-  box-sizing: border-box;
-}
-
+   body.portfolio-detail {
+    background: var(--bg);   /* 테마 변수 사용 */
+    color: var(--text);
+    font-family: "Spoqa Han Sans", sans-serif;
+  }
+  
+  body.portfolio-detail * {
+    color: inherit;          /* 본문 기본 색 = var(--text) */
+    text-decoration: none;
+    box-sizing: border-box;
+  }
+  
+  
+  /* 상단 타이틀 영역 */
+  .portfolio-header {
+    text-align: center;
+    margin-bottom: 30px; /* 아래쪽 콘텐츠와 간격 */
+  }
+  
+  .portfolio-header .title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  
+  .portfolio-header .desc {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  
   
   /* ======================
      Layout
@@ -29,6 +48,7 @@ body.portfolio-detail * {
     gap: 40px;
     align-items: start;
   }
+  
   
   /* ======================
      Gallery (이미지 고정 크기)
@@ -75,6 +95,7 @@ body.portfolio-detail * {
     border-color: #3b82f6;
   }
   
+  
   /* ======================
      Info Box
      ====================== */
@@ -84,55 +105,82 @@ body.portfolio-detail * {
     gap: 18px;
   }
   
+  /* 중앙 정렬 적용 */
   .title {
     font-size: 1.8rem;
     font-weight: 700;
+    text-align: center;
   }
   
   .desc {
     font-size: 1rem;
     line-height: 1.6;
+    text-align: center;   /* 설명도 중앙 정렬 */
+    margin-bottom: 8px;   /* 아래쪽 간격 줄이기 */
+    line-height: 1.5;
   }
-
-
+  
   /* 제목과 설명 사이 간격 줄이기 */
-.info-box .title {
-  margin-bottom: 6px;  /* 기존에 아마 16~24px일 텐데 줄임 */
-}
-
-/* 설명과 다음 섹션 간격 줄이기 */
-.info-box .desc {
-  margin-bottom: 8px; /* 기존보다 작게 */
-  line-height: 1.5;    /* 가독성은 유지 */
-}
-
-/* 팀원 & 역할 섹션 위쪽 간격 줄이기 */
-.team-section {
-  margin-top: 16px;  /* 기존 24~32px → 줄임 */
-}
-
-/* 팀원 카드 간격 줄이기 */
-.team-grid {
-  gap: 10px; /* 카드 사이 간격 줄이기 */
-}
-
-
-
-
-
-
+  .info-box .title {
+    margin-bottom: 6px;
+  }
+  
+  /* 팀원 & 역할 섹션 위쪽 간격 줄이기 */
+  .team-section {
+    margin-top: 1px;  /* 기존 24~32px → 줄임 */
+  }
+  
+  /* 팀원 카드 간격 줄이기 */
+  .team-grid {
+    gap: 10px; /* 카드 사이 간격 줄이기 */
+  }
+  
+  
+  /* ======================
+     Meta Box
+     ====================== */
   .meta-box {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    font-size: 0.95rem;
-  }
-  .meta-box .label {
-    font-weight: bold;
+    align-items: flex-start;
+    gap: 14px;
+    margin-top: 16px;
+    position: relative; /* 아이콘 고정용 */
   }
   
+  .meta-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  
+  .meta-item .label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  
+  .meta-item .value {
+    font-size: 1rem;
+    font-weight: 600;
+    word-break: break-all;
+  }
+  
+  /* 태그는 그대로 칩 스타일 */
+  .meta-item .tag-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  
   /* ======================
-     Like Button (SVG 그대로)
+     Like Button
      ====================== */
   .like-btn {
     background: none;
@@ -152,6 +200,7 @@ body.portfolio-detail * {
     height: 22px;
     stroke: #f44336;
   }
+  
   
   /* ======================
      Tags
@@ -177,14 +226,21 @@ body.portfolio-detail * {
     filter: brightness(1.2);
   }
   
+  
   /* ======================
-     Icon
+     Icon (오른쪽 상단 고정)
      ====================== */
+  .summary-logo {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
   .summary-logo img {
-    max-width: 120px;
+    max-width: 100px;
     height: auto;
     border-radius: 8px;
   }
+  
   
   /* ======================
      Comment Section
@@ -240,6 +296,7 @@ body.portfolio-detail * {
     margin-bottom: 6px;
   }
   
+  
   /* 별점 */
   .stars {
     display: inline-flex;
@@ -255,6 +312,7 @@ body.portfolio-detail * {
     color: gold !important;
   }
   .stars.readonly { cursor: default; }
+  
   
   /* ======================
      Lightbox
@@ -303,116 +361,54 @@ body.portfolio-detail * {
   .lb-close { top: 20px; right: 20px; }
   .lb-prev { left: 20px; top: 50%; transform: translateY(-50%); }
   .lb-next { right: 20px; top: 50%; transform: translateY(-50%); }
-
-
-
-
-  /* 로그인 필요 모달 */
-.login-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-}
-
-.login-modal[hidden] { display: none !important; }
-
-.login-modal .modal-content {
-  background: #111;
-  padding: 24px;
-  border-radius: 10px;
-  text-align: center;
-  color: #fff;
-  min-width: 280px;
-}
-
-.login-modal .modal-content p {
-  margin-bottom: 16px;
-  font-size: 1rem;
-}
-
-.login-modal .modal-content button {
-  background: #3b82f6;
-  border: none;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.login-modal .modal-content button:hover {
-  background: #2563eb;
-}
-
   
-/* === Like 영역: 테마 변수로 색/배경 통일 === */
+  
+/* Like 영역 (별점 평균) */
 .like-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 4px 0 8px;
-  color: var(--text);                 /* 글자색: 테마 따라감 */
-}
-
-.like-wrap .like-btn {
-  color: var(--text);                 /* 버튼 텍스트 */
-  background: var(--chip);            /* 다른 라벨/칩과 동일 톤 */
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 10px;
-  line-height: 1;
-  text-decoration: none;              /* a.like-btn 대비 */
-}
-.like-wrap .like-btn:hover {
-  background: var(--accent-ghost);
-}
- /* === Likes 라인: Views와 톤/간격 통일 === */
-.likes-line {
-  display: flex;
-  align-items: center;
-  gap: 10px;                 /* 라벨–하트–숫자 간 간격 */
-  margin: 2px 0 0;           /* 위/아래 메타와 균형 */
+  gap: 8px;
+  font-size: 0.95rem;   /* meta-box와 동일한 크기 */
+  margin: 6px 0;
   color: var(--text);
 }
-.likes-line .label {
-  color: var(--muted);       /* Views: 와 동일한 라벨 톤 */
-  white-space: nowrap;
+
+.likes-label {
+  font-size: 0.85rem;   /* meta-box 라벨과 동일 */
+  font-weight: 500;     /* meta-box 라벨과 동일 */
+  color: var(--muted);  /* 톤도 동일 */
 }
 
-/* 하트만 클릭 가능하도록 최소 버튼 스타일 */
-.heart-btn {
-  background: var(--chip);   /* 다른 칩/라벨과 톤 맞춤 */
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 4px 10px;
-  line-height: 1;
+.stars.readonly {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text);
-  text-decoration: none;     /* <a>일 때 */
+  gap: 4px;
 }
-.heart-btn:hover { background: var(--accent-ghost); }
 
-/* 카운트는 텍스트만 강조 */
-#likeCount { font-weight: 600; }
+.stars.readonly .star {
+  font-size: 18px;
+  color: #ccc; /* 기본 회색 */
+}
 
-/* (기존 정의와 충돌 방지) 이전 .like-wrap 스타일이 있다면 무시되도록 */
-.like-wrap { display: contents; }   /* 안전하게 해제 */
+.stars.readonly .star.filled {
+  color: gold; /* 채워진 별 */
+}
 
-/* 하트 아이콘은 포인트 컬러 유지 */
-.like-wrap .heart-icon { stroke: var(--danger); }
+#avgScore {
+  font-weight: 600;   /* 수치는 강조 */
+  margin-left: 4px;
+}
 
-/* 숫자는 살짝 강조 */
-#likeCount { font-weight: 600; }
+.count {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
 
-/* === 메타 라벨 톤(다른 라벨과 동일) === */
-.meta-box .label { color: var(--muted); }  /* Link:, Views:, Tags: 등 */
 
 
+  /* === 메타 라벨 톤 === */
+  .meta-box .label { color: var(--muted); }
+  
+  
   /* ======================
      Responsive
      ====================== */
@@ -421,21 +417,49 @@ body.portfolio-detail * {
     .main-photo { max-width: 100%; height: auto; }
     .thumb-list img { width: 70px; height: 70px; }
   }
-
-  .team-section { margin-top: 24px; }
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-}
-.team-card {
-  padding: 12px;
-  border-radius: 10px;
-  background: var(--card);
-  box-shadow: 0 2px 6px rgba(0,0,0,.15);
-}
-.team-card .name { font-weight: 600; }
-.team-card .role { color: var(--muted); margin-left: 6px; }
-.team-card .parts { margin-top: 4px; font-size: 0.9rem; }
-
+  
+  
+  /* 팀원 리스트 */
+  .team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .team-card {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--card);
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .team-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(0,0,0,.25);
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .member-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .member-header .name {
+    font-weight: 600;
+  }
+  
+  .member-header .role {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  
+  .team-card .parts {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
   
