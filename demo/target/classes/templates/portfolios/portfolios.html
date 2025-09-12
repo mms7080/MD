@@ -54,23 +54,24 @@
                 <!-- 오른쪽: 정보 -->
                 <div class="info-box">
                     <h1 class="title" th:text="${portfolios.title}">제목</h1>
-                    <p class="desc" th:text="${portfolios.desc}">설명</p>
+                    <p class="desc" th:text="|&quot;${portfolios.desc}&quot;|">설명</p>
 
-                    <div class="meta-box">
-                        <p>
-                            <span class="label">Link:</span>
-                            <a
-                                th:href="${portfolios.link}"
-                                target="_blank"
-                                th:text="${portfolios.link}"
-                                class="custom-link"
-                            ></a>
-                        </p>
 
-                        <p>
-                            <span class="label">Views:</span>
-                            <span id="viewCount">0</span>
-                        </p>
+                    
+                        <!-- 👥 팀원 정보 -->
+                        <div class="team-section">
+                            <h3>팀원 & 역할</h3>
+                            <div class="team-grid">
+                              <div class="team-card" th:each="member : ${portfolios.team}">
+                                <strong class="name" th:text="${member.name}"></strong>
+                                <span class="role" th:text="${member.role}"></span>
+                                <p class="parts" th:text="${#strings.arrayJoin(member.parts, ', ')}"></p>
+                              </div>
+                            </div>
+                          </div>
+                          
+
+                        
 
                         <div class="like-wrap">
                             <!-- 로그인 상태일 때 -->
@@ -132,7 +133,7 @@
                                 <span th:text="${portfolios.likes}">0</span>
                             </a>
                         </div>
-
+                        <div class="meta-box">
                         <!-- 🏷 태그 -->
                         <div class="tags">
                             <span class="label">Tags:</span>
@@ -145,6 +146,20 @@
                                 ></a>
                             </div>
                         </div>
+                        <p>
+                            <span class="label">Link:</span>
+                            <a
+                                th:href="${portfolios.link}"
+                                target="_blank"
+                                th:text="${portfolios.link}"
+                                class="custom-link"
+                            ></a>
+                        </p>
+
+                        <p>
+                            <span class="label">Views:</span>
+                            <span id="viewCount">0</span>
+                        </p>
 
                         <!-- 다운로드 -->
                         <p>
@@ -171,7 +186,7 @@
                     </div>
                 </div>
             </div>
-
+        </div>
             <div class="comment-section">
                 <h2>댓글</h2>
 
@@ -225,14 +240,7 @@
                 <div id="commentList" class="comments"></div>
             </div>
 
-            <!-- 로그인 필요 모달 -->
-            <div id="loginModal" class="login-modal" hidden>
-                <div class="modal-content">
-                    <p>로그인이 필요한 서비스입니다.</p>
-                    <button id="goSigninBtn">확인</button>
-                </div>
-            </div>
-        </main>
+            
 
         <!-- 🔗 JavaScript -->
         <script>

@@ -93,7 +93,34 @@ body.portfolio-detail * {
     font-size: 1rem;
     line-height: 1.6;
   }
-  
+
+
+  /* 제목과 설명 사이 간격 줄이기 */
+.info-box .title {
+  margin-bottom: 6px;  /* 기존에 아마 16~24px일 텐데 줄임 */
+}
+
+/* 설명과 다음 섹션 간격 줄이기 */
+.info-box .desc {
+  margin-bottom: 8px; /* 기존보다 작게 */
+  line-height: 1.5;    /* 가독성은 유지 */
+}
+
+/* 팀원 & 역할 섹션 위쪽 간격 줄이기 */
+.team-section {
+  margin-top: 16px;  /* 기존 24~32px → 줄임 */
+}
+
+/* 팀원 카드 간격 줄이기 */
+.team-grid {
+  gap: 10px; /* 카드 사이 간격 줄이기 */
+}
+
+
+
+
+
+
   .meta-box {
     display: flex;
     flex-direction: column;
@@ -394,4 +421,21 @@ body.portfolio-detail * {
     .main-photo { max-width: 100%; height: auto; }
     .thumb-list img { width: 70px; height: 70px; }
   }
+
+  .team-section { margin-top: 24px; }
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.team-card {
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--card);
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.team-card .name { font-weight: 600; }
+.team-card .role { color: var(--muted); margin-left: 6px; }
+.team-card .parts { margin-top: 4px; font-size: 0.9rem; }
+
   
