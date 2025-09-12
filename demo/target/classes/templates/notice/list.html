@@ -4,12 +4,12 @@
         <meta charset="UTF-8" />
         <title>공지사항</title>
         <link rel="stylesheet" href="/css/header.css" />
+        <link rel="stylesheet" href="/css/footer.css" />
         <link rel="stylesheet" href="/css/notice/list.css" />
-        <link rel="stylesheet" href="css/users/auth-modal.css" />
+        <link rel="stylesheet" href="/css/users/auth-modal.css" />
     </head>
     <body>
         <div th:replace="fragments/modals :: authModals"></div>
-
         <div th:replace="fragments/header :: header('notice')"></div>
 
         <main class="notice-container">
@@ -126,6 +126,7 @@
                 >
             </div>
         </main>
+        <div th:replace="fragments/footer :: footer"></div>
     </body>
 
     <script>

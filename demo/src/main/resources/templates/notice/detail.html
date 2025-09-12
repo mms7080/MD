@@ -1,83 +1,110 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title th:text="${notice.title}">공지사항 상세</title>
-    <link rel="stylesheet" href="/css/header.css">
-    <link rel="stylesheet" href="/css/notice/detail.css">
-</head>
-<body>
-<div th:replace="fragments/header :: header"></div>
+    <head>
+        <meta charset="UTF-8" />
+        <title th:text="${notice.title}">공지사항 상세</title>
+        <link rel="stylesheet" href="/css/header.css" />
+        <link rel="stylesheet" href="/css/footer.css" />
+        <link rel="stylesheet" href="/css/notice/detail.css" />
+        <link rel="stylesheet" href="/css/users/auth-modal.css" />
+    </head>
+    <body>
+        <div th:replace="fragments/modals :: authModals"></div>
+        <div th:replace="fragments/header :: header('notice')"></div>
 
-<main class="notice-container">
-    <h1 class="notice-title">공지사항</h1>
+        <main class="notice-container">
+            <h1 class="notice-title">공지사항</h1>
 
-    <!-- 상세 테이블 -->
-    <table class="notice-detail">
-        <tr>
-            <th>제목</th>
-            <td th:text="${notice.title}"></td>
-        </tr>
-        <tr>
-            <th>작성자</th>
-            <td th:text="${notice.writer}"></td>
-        </tr>
-        <tr>
-            <th>작성일</th>
-            <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}"></td>
-        </tr>
-        <tr>
-            <th>조회수</th>
-            <td th:text="${notice.views}"></td>
-        </tr>
-        <tr class="notice-content-row">
-            <td colspan="2" class="notice-content" th:text="${notice.content}"></td>
-        </tr>
-    </table>
+            <!-- 상세 테이블 -->
+            <table class="notice-detail">
+                <tr>
+                    <th>제목</th>
+                    <td th:text="${notice.title}"></td>
+                </tr>
+                <tr>
+                    <th>작성자</th>
+                    <td th:text="${notice.writer}"></td>
+                </tr>
+                <tr>
+                    <th>작성일</th>
+                    <td
+                        th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd')}"
+                    ></td>
+                </tr>
+                <tr>
+                    <th>조회수</th>
+                    <td th:text="${notice.views}"></td>
+                </tr>
+                <tr class="notice-content-row">
+                    <td
+                        colspan="2"
+                        class="notice-content"
+                        th:text="${notice.content}"
+                    ></td>
+                </tr>
+            </table>
 
-    <!-- 이전글/다음글 -->
-    <table class="notice-nav">
-        <tr>
-            <th>이전글</th>
-            <td>
-                <a th:if="${prevNotice != null}"
-                   th:href="@{|/notice/${prevNotice.id}|}"
-                   th:text="${prevNotice.title}"></a>
-                <span th:if="${prevNotice == null}" class="no-link">이전 게시글이 없습니다.</span>
-            </td>
-        </tr>
-        <tr>
-            <th>다음글</th>
-            <td>
-                <a th:if="${nextNotice != null}"
-                   th:href="@{|/notice/${nextNotice.id}|}"
-                   th:text="${nextNotice.title}"></a>
-                <span th:if="${nextNotice == null}" class="no-link">다음 게시글이 없습니다.</span>
-            </td>
-        </tr>
-    </table>
+            <!-- 이전글/다음글 -->
+            <table class="notice-nav">
+                <tr>
+                    <th>이전글</th>
+                    <td>
+                        <a
+                            th:if="${prevNotice != null}"
+                            th:href="@{|/notice/${prevNotice.id}|}"
+                            th:text="${prevNotice.title}"
+                        ></a>
+                        <span th:if="${prevNotice == null}" class="no-link"
+                            >이전 게시글이 없습니다.</span
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <th>다음글</th>
+                    <td>
+                        <a
+                            th:if="${nextNotice != null}"
+                            th:href="@{|/notice/${nextNotice.id}|}"
+                            th:text="${nextNotice.title}"
+                        ></a>
+                        <span th:if="${nextNotice == null}" class="no-link"
+                            >다음 게시글이 없습니다.</span
+                        >
+                    </td>
+                </tr>
+            </table>
 
-    <!-- 목록 / 수정 / 삭제 버튼 -->
-    <div class="notice-actions">
-        <a th:href="@{/notice}" class="btn-list">목록</a>
-        <a th:href="@{|/notice/${notice.id}/edit|}" class="btn-list">수정</a>
+            <!-- 목록 / 수정 / 삭제 버튼 -->
+            <div class="notice-actions">
+                <a th:href="@{/notice}" class="btn-list">목록</a>
+                <a th:href="@{|/notice/${notice.id}/edit|}" class="btn-list"
+                    >수정</a
+                >
 
-        <form th:action="@{|/notice/${notice.id}/delete|}" method="post" style="display:inline;">
-            <button type="submit" class="btn-list btn-danger"
-                    onclick="return confirm('정말 삭제하시겠습니까?');">
-                삭제
-            </button>
-        </form>
-    </div>
-</main>
+                <form
+                    th:action="@{|/notice/${notice.id}/delete|}"
+                    method="post"
+                    style="display: inline"
+                >
+                    <button
+                        type="submit"
+                        class="btn-list btn-danger"
+                        onclick="return confirm('정말 삭제하시겠습니까?');"
+                    >
+                        삭제
+                    </button>
+                </form>
+            </div>
+        </main>
 
-<!-- 뒤로가기 시 새로고침 (조회수 반영 보장) -->
-<script>
-  window.onpageshow = function(event) {
-    if (event.persisted) {
-      window.location.reload();
-    }
-  };
-</script>
-</body>
+        <!-- 뒤로가기 시 새로고침 (조회수 반영 보장) -->
+        <script>
+            window.onpageshow = function (event) {
+                if (event.persisted) {
+                    window.location.reload();
+                }
+            };
+        </script>
+        <div th:replace="fragments/footer :: footer"></div>
+    </body>
 </html>
