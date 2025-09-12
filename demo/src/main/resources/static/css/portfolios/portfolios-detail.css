@@ -395,3 +395,158 @@ body.portfolio-detail * {
     .thumb-list img { width: 70px; height: 70px; }
   }
   
+  /* === 접근성: 시각적으로 숨김(스크린리더/JS는 유지) === */
+.sr-only{
+  position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+
+/* 제목 행: 왼쪽 정렬(제목 + 버튼이 나란히) */
+.pf-title-row{
+  display:flex; align-items:center; gap:10px;
+  justify-content:flex-start;       /* ← 왼쪽 정렬 */
+}
+.pf-title-row .title{ margin:0; }
+
+/* From Uiverse.io by vinodjangid07 (원형 버튼) */
+.Btn{
+  width:50px; height:50px;
+  border:none; border-radius:50%;
+  background-color: rgb(27,27,27);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  cursor:pointer; position:relative; transition-duration:.3s;
+  box-shadow:2px 2px 10px rgba(0,0,0,.11);
+  text-decoration:none;             /* a 태그 대비 */
+}
+.svgIcon{ fill: rgb(214,178,255); }
+.icon2{
+  width:18px; height:5px;
+  border-bottom:2px solid rgb(182,143,255);
+  border-left:2px solid rgb(182,143,255);
+  border-right:2px solid rgb(182,143,255);
+}
+.tooltip{
+  position:absolute; right:-105px; opacity:0;
+  background-color: rgb(12,12,12); color:#fff;
+  padding:5px 10px; border-radius:5px;
+  display:flex; align-items:center; justify-content:center;
+  transition-duration:.2s; pointer-events:none; letter-spacing:.5px;
+}
+.tooltip::before{
+  position:absolute; content:""; width:10px; height:10px;
+  background-color: rgb(12,12,12); transform:rotate(45deg); left:-5%;
+  transition-duration:.3s;
+}
+.Btn:hover .tooltip{ opacity:1; transition-duration:.3s; }
+.Btn:hover{ background-color: rgb(150,94,255); transition-duration:.3s; }
+.Btn:hover .icon2{
+  border-bottom:2px solid rgb(235,235,235);
+  border-left:2px solid rgb(235,235,235);
+  border-right:2px solid rgb(235,235,235);
+}
+.Btn:hover .svgIcon{
+  fill:#fff; animation: slide-in-top .6s cubic-bezier(.25,.46,.45,.94) both;
+}
+@keyframes slide-in-top{
+  0%{ transform:translateY(-10px); opacity:0; }
+  100%{ transform:translateY(0); opacity:1; }
+}
+
+/* 페이지 디자인에 맞게 '작게' 보이도록 사이즈 다운 */
+.dl-btn--sm{ width:20px; height:20px; min-width:20px; min-height:20px; }
+
+/* From Uiverse.io by Priyanshu02020 */
+#heart { display: none; }                 /* 원본 */
+.like-button .on { display: none; }       /* id 불일치 대비 */
+
+.like-button {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  height: 48px;
+  width: 136px;
+  border-radius: 16px;
+  border: none;
+  background-color: #1d1d1d;
+  overflow: hidden;
+  box-shadow:
+    inset -2px -2px 5px rgba(255, 255, 255, 0.2),
+    inset 2px 2px 5px rgba(0, 0, 0, 0.1),
+    4px 4px 10px rgba(0, 0, 0, 0.4),
+    -2px -2px 8px rgba(255, 255, 255, 0.1);
+}
+
+/* 페이지 톤에 맞게 약간만 조정 (옵션) */
+body.portfolio-detail .like-button { background: var(--panel); }
+body.portfolio-detail .like-text { color: var(--text); }
+body.portfolio-detail .like-count { color: var(--muted); border-left: 1px solid var(--border); }
+body.portfolio-detail .like-icon { fill: #505050; }
+
+.like { width: 70%; height: 100%; display: flex; align-items: center; justify-content: space-evenly; }
+.like-icon { height: 28px; width: 28px; }
+.like-text { font-size: 16px; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+
+.like-count {
+  position: absolute; right: 0; width: 30%; height: 100%;
+  display: flex; justify-content: center; align-items: center;
+  color: #717070; font-size: 16px; border-left: 2px solid #4e4e4e;
+  transition: all 0.5s ease-out;
+}
+.like-count.two { transform: translateY(40px); }
+
+.on:checked ~ .like .like-icon { fill: #fc4e4e; animation: enlarge 0.2s ease-out 1; transition: all 0.2s ease-out; }
+.on:checked ~ .like-count.two { transform: translateX(0); color: #fcfcfc; }
+.on:checked ~ .like-count.one { transform: translateY(-40px); }
+
+@keyframes enlarge { 0%{ transform: scale(0.5);} 100%{ transform: scale(1.2);} }
+
+/* 링크 버전(비로그인)용: a를 버튼처럼 보이게 */
+.like-button.as-link { text-decoration: none; }
+.like-button.as-link .like { width: 70%; }
+.like-button.as-link .like-text { pointer-events: none; }
+
+/* 설명 아래 여백 정돈 */
+.like-area{ margin: 10px 0 6px; }
+
+/* === Like 버튼 컴팩트 오버라이드 === */
+/* 버튼 크기 축소 + 그림자 제거 + 테마 톤 맞춤 */
+.like-area .like-button{
+  height: 34px;
+  width: 105px;
+  border-radius: 12px;
+  background: var(--panel);          /* 다크/라이트 테마 변수 사용 */
+  border: 1px solid var(--border);
+  box-shadow: none;                  /* ← 하얀 그림자 제거 */
+}
+
+/* 내부 요소 간격/크기 축소 */
+.like-area .like{ gap: 6px; }
+.like-area .like-icon{ width: 22px; height: 22px; }
+.like-area .like-text{ font-size: 14px; }
+
+/* 카운트도 작게 + 테마 보더 */
+.like-area .like-count{
+  width: 30%;
+  font-size: 14px;
+  border-left: 1px solid var(--border);  /* 기존 2px → 1px */
+  color: var(--muted);
+}
+
+/* 체크 시 하트 색을 테마 danger로 */
+.like-area .on:checked ~ .like .like-icon{ fill: var(--danger); }
+
+/* 비로그인(링크) 변형에도 동일 적용 */
+.like-area .like-button.as-link{
+  height: 36px;
+  width: 100px;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+/* (선택) 호버 시 약한 강조만 */
+.like-area .like-button:hover{ background: var(--accent-ghost); }
+
+

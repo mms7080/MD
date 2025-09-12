@@ -51,140 +51,112 @@
                     </div>
                 </div>
 
-                <!-- 오른쪽: 정보 -->
                 <div class="info-box">
-                    <h1 class="title" th:text="${portfolios.title}">제목</h1>
-                    <p class="desc" th:text="${portfolios.desc}">설명</p>
+  <!-- 제목 + 다운로드(제목 오른쪽, 왼쪽정렬) -->
+<div class="pf-title-row">
+  <h1 class="title" th:text="${portfolios.title}">제목</h1>
 
-                    <div class="meta-box">
-                        <!-- 👥 팀원 정보 -->
-                        <div class="team-section">
-                            <h3>팀원 & 역할</h3>
-                            <div class="team-grid">
-                              <div class="team-card" th:each="member : ${portfolios.team}">
-                                <strong class="name" th:text="${member.name}"></strong>
-                                <span class="role" th:text="${member.role}"></span>
-                                <p class="parts" th:text="${#strings.arrayJoin(member.parts, ', ')}"></p>
-                              </div>
-                            </div>
-                          </div>
-                          
+  <!-- From Uiverse.io by vinodjangid07  -->
+  <!-- 버튼을 <a>로 바꿔 다운로드 링크 연결 -->
+  <a th:if="${portfolios.download}"
+     th:href="${portfolios.download}"
+     download
+     class="Btn dl-btn dl-btn--sm"
+     aria-label="Download"
+     title="Download">
+    <svg class="svgIcon" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg">
+      <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path>
+    </svg>
+    <span class="icon2"></span>
+    <span class="tooltip">Download</span>
+  </a>
+</div>
 
-                        
 
-                        <div class="like-wrap">
-                            <!-- 로그인 상태일 때 -->
-                            <button
-                                sec:authorize="isAuthenticated()"
-                                id="likeBtn"
-                                class="heart-btn"
-                                title="좋아요"
-                                aria-label="좋아요"
-                                th:attr="data-id=${portfolios.id}"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    class="heart-icon"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 
-                       0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 
-                       3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                                    />
-                                </svg>
-                                <span
-                                    id="likeCount"
-                                    th:text="${portfolios.likes}"
-                                    >0</span
-                                >
-                            </button>
+  <!-- 설명 -->
+  <div class="desc" th:text="${portfolios.desc}">설명</div>
 
-                            <!-- 비로그인 상태일 때 -->
-                            <a
-                                sec:authorize="isAnonymous()"
-                                href="/signin"
-                                id="likeSigninTrigger"
-                                class="like-btn"
-                                title="로그인 후 좋아요 가능"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    class="heart-icon"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 
-                    0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 
-                    3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                                    />
-                                </svg>
-                                <span th:text="${portfolios.likes}">0</span>
-                            </a>
-                        </div>
+  <!-- 좋아요 버튼 (Uiverse) : 로그인 사용자 -->
+<div class="like-area">
+  <div class="like-button">
+    <!-- 체크박스는 애니메이션용, 클릭 타깃은 label -->
+    <input class="on" id="heart" type="checkbox" />
 
-                        <!-- 🏷 태그 -->
-                        <div class="tags">
-                            <span class="label">Tags:</span>
-                            <div class="tag-wrap">
-                                <a
-                                    th:each="tag : ${portfolios.tags}"
-                                    th:href="@{/home(q=${tag})}"
-                                    th:text="${tag}"
-                                    class="tag"
-                                ></a>
-                            </div>
-                        </div>
-                        <p>
-                            <span class="label">Link:</span>
-                            <a
-                                th:href="${portfolios.link}"
-                                target="_blank"
-                                th:text="${portfolios.link}"
-                                class="custom-link"
-                            ></a>
-                        </p>
+    <!-- 서버 호출을 위해 id=likeBtn 유지 + 포트폴리오 id 바인딩 -->
+    <label id="likeBtn"
+           class="like"
+           for="heart"
+           th:attr="data-id=${portfolios.id}"
+           title="좋아요"
+           aria-label="좋아요">
+      <svg class="like-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"></path>
+      </svg>
+      <span class="like-text">Likes</span>
+    </label>
 
-                        <p>
-                            <span class="label">Views:</span>
-                            <span id="viewCount">0</span>
-                        </p>
+    <!-- 애니메이션용 현재/다음 카운트 -->
+    <span id="likeCount" class="like-count one" th:text="${portfolios.likes}">0</span>
+    <span id="likeCountNext" class="like-count two" th:text="${portfolios.likes + 1}">1</span>
+  </div>
+</div>
 
-                        <!-- 다운로드 -->
-                        <p>
-                            <span class="label">Download:</span>
-                            <a
-                                th:href="${portfolios.download}"
-                                download
-                                th:text="${portfolios.download}"
-                                class="download-link"
-                            ></a>
-                        </p>
 
-                        <!-- 아이콘 -->
-                        <aside class="summary-logo" th:if="${portfolios.icon}">
-                            <figure class="logo-card" title="portfolios Logo">
-                                <img
-                                    th:src="${portfolios.icon}"
-                                    th:alt="|${portfolios.title} 아이콘|"
-                                    loading="lazy"
-                                    decoding="async"
-                                />
-                            </figure>
-                        </aside>
-                    </div>
+    <!-- 좋아요 버튼 (Uiverse) : 비로그인 → 로그인 유도 -->
+<div class="like-area" sec:authorize="isAnonymous()">
+  <a href="/signin" id="likeSigninTrigger" class="like-button as-link" title="로그인 후 좋아요 가능" aria-label="로그인 후 좋아요 가능">
+    <div class="like">
+      <svg class="like-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"></path>
+      </svg>
+      <span class="like-text">Likes</span>
+    </div>
+    <span class="like-count one" th:text="${portfolios.likes}">0</span>
+  </a>
+</div>
+
+
+  <!-- 태그 -->
+  <div class="tags">
+    <span class="label">Tags:</span>
+    <div class="tag-wrap">
+      <a th:each="tag : ${portfolios.tags}" th:href="@{/home(q=${tag})}"
+         th:text="${tag}" class="tag"></a>
+    </div>
+  </div>
+
+  <!-- Link: (기존 유지) -->
+  <p>
+    <span class="label">Link:</span>
+    <a th:href="${portfolios.link}" target="_blank"
+       th:text="${portfolios.link}" class="custom-link"></a>
+  </p>
+
+  <!-- Views (그대로) -->
+  <p><span class="label">Views:</span> <span id="viewCount">0</span></p>
+
+  <!-- 아이콘 (그대로) -->
+  <aside class="summary-logo" th:if="${portfolios.icon}">
+    <figure class="logo-card" title="portfolios Logo">
+      <img th:src="${portfolios.icon}" th:alt="|${portfolios.title} 아이콘|" loading="lazy" decoding="async"/>
+    </figure>
+  </aside>
+</div>
+
                 </div>
             </div>
+
+            <!-- 팀원 & 역할 (댓글 위, 나열형) -->
+<section class="team-list-section">
+  <h2>팀원 & 역할</h2>
+  <ul class="team-list" role="list">
+    <li class="team-item" th:each="m : ${portfolios.team}">
+      <strong class="member-name" th:text="${m.name}"></strong>
+      <span class="member-role" th:text="${m.role}"></span>
+    </li>
+  </ul>
+</section>
+
 
             <div class="comment-section">
                 <h2>댓글</h2>

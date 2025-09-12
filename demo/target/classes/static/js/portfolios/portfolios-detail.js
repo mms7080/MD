@@ -501,3 +501,14 @@ if (goSigninBtn) {
     window.location.href = "/signin"; // 확인 시 /signin 이동
   });
 }
+// 예시: 좋아요 성공 핸들러 내부
+const countEl = document.getElementById('likeCount');
+const nextEl  = document.getElementById('likeCountNext');
+if (countEl) {
+  const n = Number(countEl.textContent || '0') + 1; // 서버 응답 값으로 대체 권장
+  countEl.textContent = String(n);
+  if (nextEl) nextEl.textContent = String(n + 1);
+  // 체크박스 토글로 애니메이션 트리거 (선택)
+  const heart = document.getElementById('heart');
+  if (heart && !heart.checked) heart.checked = true;
+}
