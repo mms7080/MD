@@ -41,164 +41,64 @@
                     </nav>
                 </div>
 
-                <!-- 오른쪽: 테마 토글 + 인증 -->
-                <div class="kf-header__right">
-                    <!-- Sun/Moon 순수 CSS 토글 -->
-                    <label
-                        for="themeToggle"
-                        class="themeToggle st-sunMoonThemeToggleBtn"
-                        aria-label="다크/라이트 전환"
-                    >
-                        <input
-                            type="checkbox"
-                            id="themeToggle"
-                            class="themeToggleInput"
-                        />
-                        <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            stroke="none"
-                            aria-hidden="true"
-                        >
-                            <mask id="moon-mask">
-                                <rect
-                                    x="0"
-                                    y="0"
-                                    width="20"
-                                    height="20"
-                                    fill="white"
-                                ></rect>
-                                <circle
-                                    cx="11"
-                                    cy="3"
-                                    r="8"
-                                    fill="black"
-                                ></circle>
-                            </mask>
-                            <circle
-                                class="sunMoon"
-                                cx="10"
-                                cy="10"
-                                r="8"
-                                mask="url(#moon-mask)"
-                            ></circle>
-                            <g>
-                                <circle
-                                    class="sunRay sunRay1"
-                                    cx="18"
-                                    cy="10"
-                                    r="1.5"
-                                ></circle>
-                                <circle
-                                    class="sunRay sunRay2"
-                                    cx="14"
-                                    cy="16.928"
-                                    r="1.5"
-                                ></circle>
-                                <circle
-                                    class="sunRay sunRay3"
-                                    cx="6"
-                                    cy="16.928"
-                                    r="1.5"
-                                ></circle>
-                                <circle
-                                    class="sunRay sunRay4"
-                                    cx="2"
-                                    cy="10"
-                                    r="1.5"
-                                ></circle>
-                                <circle
-                                    class="sunRay sunRay5"
-                                    cx="6"
-                                    cy="3.1718"
-                                    r="1.5"
-                                ></circle>
-                                <circle
-                                    class="sunRay sunRay6"
-                                    cx="14"
-                                    cy="3.1718"
-                                    r="1.5"
-                                ></circle>
-                            </g>
-                        </svg>
-                    </label>
+                <!-- 오른쪽: 테마 토글 + (folios 전용 액션 or 기존 인증 메뉴) -->
+<div class="kf-header__right" th:with="isFolios=${active} == 'folio'">
 
-                    <nav class="kf-auth" aria-label="인증 메뉴">
-                        <!-- 비로그인 -->
-                        <div sec:authorize="isAnonymous()">
-                            <!-- 모달 사용시: 라디오 토글과 연결 (modal-signin / modal-signup) -->
-                            <label
-                                for="modal-signin"
-                                class="kf-link"
-                                style="cursor: pointer"
-                                >로그인</label
-                            >
-                            <label
-                                for="modal-signup"
-                                class="kf-link"
-                                style="cursor: pointer"
-                                >회원가입</label
-                            >
-                        </div>
+  <!-- Sun/Moon 순수 CSS 토글 (그대로 유지) -->
+  <label for="themeToggle" class="themeToggle st-sunMoonThemeToggleBtn" aria-label="다크/라이트 전환">
+    <input type="checkbox" id="themeToggle" class="themeToggleInput" />
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" stroke="none" aria-hidden="true">
+      <mask id="moon-mask">
+        <rect x="0" y="0" width="20" height="20" fill="white"></rect>
+        <circle cx="11" cy="3" r="8" fill="black"></circle>
+      </mask>
+      <circle class="sunMoon" cx="10" cy="10" r="8" mask="url(#moon-mask)"></circle>
+      <g>
+        <circle class="sunRay sunRay1" cx="18" cy="10" r="1.5"></circle>
+        <circle class="sunRay sunRay2" cx="14" cy="16.928" r="1.5"></circle>
+        <circle class="sunRay sunRay3" cx="6" cy="16.928" r="1.5"></circle>
+        <circle class="sunRay sunRay4" cx="2" cy="10" r="1.5"></circle>
+        <circle class="sunRay sunRay5" cx="6" cy="3.1718" r="1.5"></circle>
+        <circle class="sunRay sunRay6" cx="14" cy="3.1718" r="1.5"></circle>
+      </g>
+    </svg>
+  </label>
 
-                        <!-- 로그인(일반) -->
-                        <div
-                            sec:authorize="isAuthenticated() and !hasRole('ADMIN')"
-                        >
-                            <a class="kf-link" th:href="@{/mypage}"
-                                >마이페이지</a
-                            >
-                            <form
-                                th:action="@{/logout}"
-                                method="post"
-                                th:csrf
-                                style="display: inline"
-                            >
-                                <button
-                                    type="submit"
-                                    class="kf-link"
-                                    style="
-                                        background: none;
-                                        border: 0;
-                                        padding: 0;
-                                        cursor: pointer;
-                                    "
-                                >
-                                    로그아웃
-                                </button>
-                            </form>
-                        </div>
+  <nav class="kf-auth" aria-label="오른쪽 메뉴">
+    <!-- ✅ Folios 전용 메뉴: header('folio')일 때만 표시 -->
+    <th:block th:if="${isFolios}">
+      <a class="kf-link" th:href="@{/folios}" th:classappend="${active}=='folio' ? ' is-active' : null">Folios</a>
+      <a class="kf-link" th:href="@{/folios/write}">Write</a>
+      <a class="kf-link" th:href="@{/folios/append}">Append</a>
+    </th:block>
 
-                        <!-- 로그인(관리자) -->
-                        <div sec:authorize="hasRole('ADMIN')">
-                            <a class="kf-link" th:href="@{/admin}"
-                                >관리자페이지</a
-                            >
-                            <form
-                                th:action="@{/logout}"
-                                method="post"
-                                th:csrf
-                                style="display: inline"
-                            >
-                                <button
-                                    type="submit"
-                                    class="kf-link"
-                                    style="
-                                        background: none;
-                                        border: 0;
-                                        padding: 0;
-                                        cursor: pointer;
-                                    "
-                                >
-                                    로그아웃
-                                </button>
-                            </form>
-                        </div>
-                    </nav>
-                </div>
-            </div>
+    <!-- ▶ 그 외 페이지: 기존 인증 메뉴 유지 -->
+    <th:block th:unless="${isFolios}">
+      <!-- 비로그인 -->
+      <div sec:authorize="isAnonymous()">
+        <label for="modal-signin" class="kf-link" style="cursor:pointer">로그인</label>
+        <label for="modal-signup" class="kf-link" style="cursor:pointer">회원가입</label>
+      </div>
+
+      <!-- 로그인(일반) -->
+      <div sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
+        <a class="kf-link" th:href="@{/mypage}">마이페이지</a>
+        <form th:action="@{/logout}" method="post" th:csrf style="display:inline">
+          <button type="submit" class="kf-link" style="background:none;border:0;padding:0;cursor:pointer">로그아웃</button>
+        </form>
+      </div>
+
+      <!-- 로그인(관리자) -->
+      <div sec:authorize="hasRole('ADMIN')">
+        <a class="kf-link" th:href="@{/admin}">관리자페이지</a>
+        <form th:action="@{/logout}" method="post" th:csrf style="display:inline">
+          <button type="submit" class="kf-link" style="background:none;border:0;padding:0;cursor:pointer">로그아웃</button>
+        </form>
+      </div>
+    </th:block>
+  </nav>
+</div>
+
         </header>
             <!-- ✅ 추가 1: 모달 조각 포함 -->
     <th:block th:replace="fragments/modals :: authModals"></th:block>
