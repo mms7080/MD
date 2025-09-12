@@ -350,28 +350,59 @@
   background: #2563eb;
 }
 
+/* 다크 모드 (기본) */
+html[data-theme="dark"] #commentForm button {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+html[data-theme="dark"] #commentForm button:hover {
+  background: #2563eb; /* hover 효과 */
+}
+
+/* 라이트 모드 */
+html[data-theme="light"] #commentForm button {
+  background: var(--primary);
+  color: white; /* 글씨 흰색 */
+}
+
+html[data-theme="light"] #commentForm button:hover {
+  background: #1d4ed8; /* hover 시 더 진한 파랑 */
+}
+
+
 /* 댓글 리스트 */
 .comments {
-  margin-top: 24px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px; /* 카드 간격 줄임 */
 }
+
 .comment {
   background: var(--bg-soft);
-  padding: 14px 16px;
-  border-radius: 10px;
+  padding: 10px 12px;   /* 내부 여백 줄임 */
+  border-radius: 8px;
   border: 1px solid var(--border);
+  font-size: 0.9rem;   /* 폰트 살짝 작게 */
 }
+
 .comment .meta {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--muted);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
+
+.comment .author {
+  font-weight: 600;
+  color: var(--text);
+}
+
 .comment .content {
-  font-size: 1rem;
+  margin: 4px 0 0;
   line-height: 1.4;
 }
+
 
   
   
