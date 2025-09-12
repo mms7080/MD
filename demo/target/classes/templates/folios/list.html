@@ -1,27 +1,31 @@
 <!DOCTYPE html>
-<html lang="ko" th:replace="~{fragments/layout :: html(
+<html
+    lang="ko"
+    th:replace="~{fragments/layout :: html(
     title = 'Folios 목록',
     active = 'folios',
     css = ~{::#page-css},
     js = ~{::#page-js},
     content = ~{::#page-content}
-)}">
+)}"
+>
+    <head>
+        <th:block id="page-css">
+            <link th:href="@{/css/folios/list.css}" rel="stylesheet" />
+        </th:block>
+    </head>
+    <body>
+        <main id="page-content" class="dev-container">
+            <h1 style="margin: 2rem 0">Folio 둘러보기</h1>
+            <div id="folio-grid" class="grid">
+                <p class="loading-message muted">
+                    데이터를 불러오는 중입니다...
+                </p>
+            </div>
+        </main>
 
-<head>
-    <th:block id="page-css">
-        <link th:href="@{/css/folios/list.css}" rel="stylesheet" />
-    </th:block>
-</head>
-<body>
-    <main id="page-content" class="dev-container">
-        <h1 style="margin: 2rem 0;">Folio 둘러보기</h1>
-        <div id="folio-grid" class="grid">
-            <p class="loading-message muted">데이터를 불러오는 중입니다...</p>
-        </div>
-    </main>
-    
-    <th:block id="page-js">
-        <script th:src="@{/js/folios/list.js}"></script>
-    </th:block>
-</body>
+        <th:block id="page-js">
+            <script th:src="@{/js/folios/list.js}"></script>
+        </th:block>
+    </body>
 </html>
