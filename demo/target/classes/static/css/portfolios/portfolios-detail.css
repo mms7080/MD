@@ -177,6 +177,25 @@
     flex-wrap: wrap;
     gap: 8px;
   }
+  .tag {
+    background: var(--chip);
+    color: var(--chip-text);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease; /* hover 애니메이션 */
+    cursor: pointer;
+  }
+  
+  .tag:hover {
+    background: var(--accent);       /* hover 시 메인 포인트 컬러 */
+    color: var(--bg);                /* 텍스트 대비 색상 */
+    border-color: var(--accent);
+    transform: translateY(-2px);     /* 살짝 위로 튀는 효과 */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* 버튼 느낌 */
+  }
+  
   
   
   /* ======================
@@ -236,7 +255,7 @@
     right: 0;
   }
   .summary-logo img {
-    max-width: 100px;
+    max-width: 160px;
     height: auto;
     border-radius: 8px;
   }

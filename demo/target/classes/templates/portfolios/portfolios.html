@@ -84,7 +84,7 @@
                             <div class="tag-wrap">
                                 <a
                                     th:each="tag : ${portfolios.tags}"
-                                    th:href="@{/home(q=${tag})}"
+                                    th:href="@{/detail(q=${tag})}"
                                     th:text="${tag}"
                                     class="tag"
                                 ></a>
@@ -101,15 +101,6 @@
                             />
                         </figure>
                     </aside>
-                        
-                        <!-- 평균 별점 요약을 Like 영역처럼 표시 -->
-                        <div class="like-wrap">
-                            <span class="label">Likes:</span>
-                            <div class="stars readonly" id="avgStars" aria-label="평균 별점"></div>
-                            <span class="star-symbol">⭐</span>
-                            <span id="avgScore">0.0</span>
-                            <span class="count">(<span id="ratingCount">0</span>)</span>
-                        </div>
                         <!-- Links -->
                         <p>
                             <span class="label">Links :</span>
@@ -125,6 +116,15 @@
                             <span class="label">Views :</span>
                             <span id="viewCount">0</span>
                         </p>
+                        <!-- 평균 별점 요약을 Like 영역처럼 표시 -->
+                        <div class="like-wrap">
+                            <span class="label">Likes:</span>
+                            <div class="stars readonly" id="avgStars" aria-label="평균 별점"></div>
+                            <span class="star-symbol">⭐</span>
+                            <span id="avgScore">0.0</span>
+                            <span class="count">(<span id="ratingCount">0</span>)</span>
+                        </div>
+                        
 
                         <!-- 다운로드 -->
                         <p>
