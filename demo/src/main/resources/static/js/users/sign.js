@@ -61,89 +61,85 @@
 })();
 
 /* ========== 이메일 콤보(아이디/도메인) → hidden email 동기화 + 인증코드 발송 ========== */
-(function () {
+/* ========== 이메일 합성 + 코드 발송 성공 시 입력칸 표시 ========== */
+(() => {
+  // 회원가입 모달 안의 요소들
   const combo     = document.getElementById("emailCombo");
   const localEl   = document.getElementById("emailLocal");
   const selEl     = document.getElementById("emailDomain");
   const custEl    = document.getElementById("emailDomainCustom");
-  const hidden    = document.getElementById("email");        
-  const btnSend   = document.getElementById("btnSendCode");  // 인증코드 발송 버튼
-  const codeBlock = document.getElementById("codeBlock");    // 인증코드 입력 블록
-  const emailCode = document.getElementById("emailCode");    // 인증코드 입력칸
-  const notice    = document.getElementById("ajaxNotice");   // 상태 표시
+  const hidden    = document.getElementById("email");
+  const btnSend   = document.getElementById("btnSendCode");
+  const codeBlock = document.getElementById("codeBlock");
+  const emailCode = document.getElementById("emailCode");
+  const notice    = document.getElementById("ajaxNotice");
+
+  // 필수 요소 없으면 리턴
+  if (!combo || !localEl || !selEl || !hidden || !btnSend || !codeBlock || !emailCode) return;
+
+  // 기본은 숨김 (HTML에서 codeBlock에 hidden 넣어두세요)
+  codeBlock.hidden = true;
 
   const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
   const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
 
   const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-
-  function setNotice(msg, ok) {
+  const setNotice = (msg, ok) => {
     if (!notice) { alert(msg); return; }
     notice.textContent = msg;
     notice.className = `note-banner${ok ? "" : " error"}`;
     notice.hidden = false;
-  }
+  };
 
-  // 이메일 동기화
-  function syncEmail() {
-    const local = (localEl?.value || "").trim();
-    const domain = selEl?.value === "__custom__"
+  // 이메일 합성/동기화
+  const composeEmail = () => {
+    const local  = (localEl.value || "").trim();
+    const domain = selEl.value === "__custom__"
       ? (custEl?.value || "").trim()
-      : (selEl?.value || "");
-    const val = (local && domain) ? `${local}@${domain}` : "";
+      : (selEl.value || "");
+    return (local && domain) ? `${local}@${domain}` : "";
+  };
+  const syncEmail = () => {
+    const val = composeEmail();
     hidden.value = val;
+    btnSend.disabled  = !isEmail(val);
+    // 이메일이 바뀌면 입력칸 초기화/숨김
+    emailCode.value = "";
+    codeBlock.hidden = true;
+    codeBlock.classList.remove("is-open");
+  };
 
-    // 버튼 활성화
-    btnSend.disabled = !isEmail(val);
-
-    // 이메일 변경 시 코드 입력 영역 초기화
-    hideCodeBlock();
-  }
-
-  // 직접 입력 토글
-  selEl?.addEventListener("change", () => {
+  // 도메인 select ↔ custom input 토글
+  selEl.addEventListener("change", () => {
     const custom = selEl.value === "__custom__";
-    combo?.classList.toggle("is-custom", custom);
-    // 보조: display 토글(프로젝트 CSS에 맞춰 hidden 클래스를 쓰고 있다면 그대로 두세요)
-    if (custEl) custEl.classList.toggle("hidden", !custom);
-    if (custom) custEl?.focus();
+    combo.classList.toggle("is-custom", custom);
+    if (custEl) {
+      custEl.classList.toggle("hidden", !custom);
+      if (custom) custEl.focus();
+    }
     syncEmail();
   });
-
-  // 로컬/커스텀 입력 변화
   [localEl, custEl].forEach(el => el?.addEventListener("input", syncEmail));
 
-  // 'aaa@gmail.com' 전체 붙여넣기 보정
-  localEl?.addEventListener("input", () => {
+  // 'id@domain.com' 통째로 붙여넣기 보정
+  localEl.addEventListener("input", () => {
     const raw = localEl.value;
     if (raw.includes("@")) {
       const [id, ...rest] = raw.split("@");
       localEl.value = id;
-      if (selEl) selEl.value = "__custom__";
-      combo?.classList.add("is-custom");
-      if (custEl) {
-        custEl.classList.remove("hidden");
-        custEl.value = rest.join("@");
-      }
+      selEl.value = "__custom__";
+      combo.classList.add("is-custom");
+      if (custEl) { custEl.classList.remove("hidden"); custEl.value = rest.join("@"); }
     }
     syncEmail();
   });
 
-  // 인증코드 영역 / 타이머
+  // 쿨다운
   let cooldownTimer = null;
-  function showCodeBlock() {
-    if (codeBlock) codeBlock.hidden = false;
-    emailCode?.focus({ preventScroll: true });
-  }
-  function hideCodeBlock() {
-    if (codeBlock) codeBlock.hidden = true;
-    if (emailCode) emailCode.value = "";
-    stopCooldown();
-  }
-  function startCooldown(seconds = 60) {
+  const startCooldown = (seconds = 60) => {
     let left = seconds;
-    btnSend.disabled = true;
     const original = "인증코드 발송";
+    btnSend.disabled = true;
     btnSend.textContent = `재발송(${left}s)`;
     cooldownTimer = setInterval(() => {
       left--;
@@ -155,22 +151,23 @@
         btnSend.disabled = !isEmail(hidden.value);
       }
     }, 1000);
-  }
-  function stopCooldown() {
-    if (cooldownTimer) {
-      clearInterval(cooldownTimer);
-      cooldownTimer = null;
-    }
+  };
+  const stopCooldown = () => {
+    if (cooldownTimer) clearInterval(cooldownTimer);
+    cooldownTimer = null;
     btnSend.textContent = "인증코드 발송";
-  }
+  };
 
-  // 인증코드 발송 (AJAX)
-  btnSend?.addEventListener("click", async () => {
-    const email = hidden.value;
-    if (!isEmail(email)) return;
+  // 발송
+  btnSend.addEventListener("click", async () => {
+    const email = composeEmail();
+    hidden.value = email;
+
+    if (!isEmail(email)) { setNotice("올바른 이메일을 입력하세요.", false); return; }
 
     btnSend.disabled = true;
-    const body = new URLSearchParams({ email }); 
+    const body = new URLSearchParams({ email });
+
     try {
       const res = await fetch("/api/send-code", {
         method: "POST",
@@ -182,22 +179,31 @@
         body
       });
 
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && (data.ok ?? true)) {
-        setNotice(data.message || "인증 코드가 발송되었습니다. (5분 유효)", true);
-        showCodeBlock();
+      let data = null; try { data = await res.json(); } catch {}
+      const ok = (typeof data === "boolean") ? data
+               : (data && typeof data.ok !== "undefined") ? !!data.ok
+               : res.ok;
+
+      if (ok) {
+        setNotice((data && data.message) || "인증 코드가 발송되었습니다. (5분 유효)", true);
+        // ✅ 여기서만 보이게
+        codeBlock.hidden = false;
+        codeBlock.classList.add("is-open"); // CSS에 .code-block.is-open { display:grid } 있으면 더 안전
+        emailCode.disabled = false;
+        requestAnimationFrame(() => emailCode.focus({ preventScroll: true }));
         startCooldown(60);
       } else {
-        setNotice(data.message || `메일 발송에 실패했습니다. (status ${res.status})`, false);
+        setNotice((data && data.message) || `메일 발송 실패 (status ${res.status})`, false);
         btnSend.disabled = !isEmail(hidden.value);
       }
-    } catch (e) {
+    } catch {
       setNotice("네트워크 오류로 발송 실패", false);
       btnSend.disabled = !isEmail(hidden.value);
     }
   });
 
-  // 초기값 세팅
-  if (selEl && !selEl.value) selEl.value = "gmail.com";
+  // 초기화
+  if (!selEl.value) selEl.value = "gmail.com";
+  stopCooldown();
   syncEmail();
 })();

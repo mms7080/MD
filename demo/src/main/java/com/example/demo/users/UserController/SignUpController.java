@@ -27,16 +27,16 @@ public class SignUpController {
     /** 회원가입 폼 */
     @GetMapping("/signup")
     public String signupForm(@ModelAttribute("usersDTO") UsersDTO usersDTO) {
-        return "users/signup";
+        return "redirect:/home?modal=signup";
     }
 
-    /** 회원가입 처리 */
+
+     /** ✅ 이메일 인증 없이 회원가입 처리 */
     @PostMapping("/signup")
     public String signupProcess(
             @Validated(UsersDTO.Create.class)
             @ModelAttribute("usersDTO") UsersDTO usersDTO,
             BindingResult bindingResult,
-            @RequestParam("emailCode") String emailCode,
             HttpSession httpSession,
             RedirectAttributes redirectAttributes
     ) {
@@ -49,23 +49,63 @@ public class SignUpController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.usersDTO", bindingResult);
             redirectAttributes.addFlashAttribute("usersDTO", usersDTO);
-            return "redirect:/signup";
+            return "redirect:/home?modal=signup";
         }
 
         try {
-            usersService.registerUser(usersDTO, emailCode, httpSession); // ⬅️ 세션 전달
+            // ⚡ 이메일 인증코드 검증 없이 바로 회원가입 실행
+            usersService.registerUserWithoutEmailCode(usersDTO, httpSession);
+
             redirectAttributes.addFlashAttribute("msg", "회원가입이 완료되었습니다. 로그인해 주세요.");
-            return "redirect:/signin";
+            return "redirect:/home?modal=signin";
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             redirectAttributes.addFlashAttribute("usersDTO", usersDTO);
-            return "redirect:/signup";
+            return "redirect:/home?modal=signup";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "알 수 없는 오류가 발생했습니다.");
             redirectAttributes.addFlashAttribute("usersDTO", usersDTO);
-            return "redirect:/signup";
+            return "redirect:/home?modal=signup";
         }
     }
+
+
+    /** 회원가입 처리 */
+    // @PostMapping("/signup")
+    // public String signupProcess(
+    //         @Validated(UsersDTO.Create.class)
+    //         @ModelAttribute("usersDTO") UsersDTO usersDTO,
+    //         BindingResult bindingResult,
+    //         @RequestParam("emailCode") String emailCode,
+    //         HttpSession httpSession,
+    //         RedirectAttributes redirectAttributes
+    // ) {
+    //     // 비밀번호 확인 검증
+    //     if (usersDTO.getConfirmPassword() != null &&
+    //         !usersDTO.getConfirmPassword().equals(usersDTO.getPassword())) {
+    //         bindingResult.rejectValue("confirmPassword", "Mismatch", "비밀번호가 일치하지 않습니다.");
+    //     }
+
+    //     if (bindingResult.hasErrors()) {
+    //         redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.usersDTO", bindingResult);
+    //         redirectAttributes.addFlashAttribute("usersDTO", usersDTO);
+    //         return "redirect:/home?modal=signup";
+    //     }
+
+    //     try {
+    //         usersService.registerUser(usersDTO, emailCode, httpSession); // ⬅️ 세션 전달
+    //         redirectAttributes.addFlashAttribute("msg", "회원가입이 완료되었습니다. 로그인해 주세요.");
+    //         return "redirect:/home?modal=signin";
+    //     } catch (IllegalArgumentException | IllegalStateException e) {
+    //         redirectAttributes.addFlashAttribute("error", e.getMessage());
+    //         redirectAttributes.addFlashAttribute("usersDTO", usersDTO);
+    //         return "redirect:/home?modal=signup";
+    //     } catch (Exception e) {
+    //         redirectAttributes.addFlashAttribute("error", "알 수 없는 오류가 발생했습니다.");
+    //         redirectAttributes.addFlashAttribute("usersDTO", usersDTO);
+    //         return "redirect:/home?modal=signup";
+    //     }
+    // }
 
     @GetMapping("/api/check-username")
     @ResponseBody
