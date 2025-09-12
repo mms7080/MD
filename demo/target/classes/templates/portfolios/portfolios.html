@@ -26,10 +26,6 @@
                 <h1>포트폴리오를 찾을 수 없습니다.</h1>
                 <a href="/home">← 홈으로</a>
             </div>
-            <div class="portfolio-header">
-                <h1 class="title" th:text="${portfolios.title}">제목</h1>
-                <p class="desc" th:text="|&quot;${portfolios.desc}&quot;|">설명</p>
-            </div>
 
             <!-- ✅ Portfolio Content -->
             <div th:if="${portfolios != null}" class="portfolio-detail-grid">
@@ -53,57 +49,104 @@
                             onmouseover="changeMainImage(this.src)"
                         />
                     </div>
-                    
                 </div>
+
                 <!-- 오른쪽: 정보 -->
                 <div class="info-box">
-                    <!-- 👥 팀원 정보 -->
-                    <div class="team-section">
-                        <h3>팀원 & 역할</h3>
-                        <div class="team-list">
-                        <div class="team-card" th:each="member : ${portfolios.team}">
-                            <div class="member-header">
-                            <strong class="name" th:text="${member.name}"></strong>
-                            <span class="role" th:text="|(${member.role})|"></span>
-                            </div>
-                            <p class="parts" th:text="${#strings.arrayJoin(member.parts, ', ')}"></p>
-                        </div>
-                        </div>
-                    </div>
-                    
- 
-                </div>
-            </div>
+                    <h1 class="title" th:text="${portfolios.title}">제목</h1>
+                    <p class="desc" th:text="${portfolios.desc}">설명</p>
 
-                
                     <div class="meta-box">
+                        <!-- 👥 팀원 정보 -->
+                        <div class="team-section">
+                            <h3>팀원 & 역할</h3>
+                            <div class="team-grid">
+                              <div class="team-card" th:each="member : ${portfolios.team}">
+                                <strong class="name" th:text="${member.name}"></strong>
+                                <span class="role" th:text="${member.role}"></span>
+                                <p class="parts" th:text="${#strings.arrayJoin(member.parts, ', ')}"></p>
+                              </div>
+                            </div>
+                          </div>
+                          
+
                         
+
+                        <div class="like-wrap">
+                            <!-- 로그인 상태일 때 -->
+                            <button
+                                sec:authorize="isAuthenticated()"
+                                id="likeBtn"
+                                class="heart-btn"
+                                title="좋아요"
+                                aria-label="좋아요"
+                                th:attr="data-id=${portfolios.id}"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="heart-icon"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 
+                       0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 
+                       3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                                    />
+                                </svg>
+                                <span
+                                    id="likeCount"
+                                    th:text="${portfolios.likes}"
+                                    >0</span
+                                >
+                            </button>
+
+                            <!-- 비로그인 상태일 때 -->
+                            <a
+                                sec:authorize="isAnonymous()"
+                                href="/signin"
+                                id="likeSigninTrigger"
+                                class="like-btn"
+                                title="로그인 후 좋아요 가능"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="heart-icon"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 
+                    0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 
+                    3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                                    />
+                                </svg>
+                                <span th:text="${portfolios.likes}">0</span>
+                            </a>
+                        </div>
+
                         <!-- 🏷 태그 -->
                         <div class="tags">
                             <span class="label">Tags:</span>
                             <div class="tag-wrap">
                                 <a
                                     th:each="tag : ${portfolios.tags}"
-                                    th:href="@{/detail(q=${tag})}"
+                                    th:href="@{/home(q=${tag})}"
                                     th:text="${tag}"
                                     class="tag"
                                 ></a>
                             </div>
                         </div>
-                        <!-- 아이콘 -->
-                    <aside class="summary-logo" th:if="${portfolios.icon}">
-                        <figure class="logo-card" title="portfolios Logo">
-                            <img
-                                th:src="${portfolios.icon}"
-                                th:alt="|${portfolios.title} 아이콘|"
-                                loading="lazy"
-                                decoding="async"
-                            />
-                        </figure>
-                    </aside>
-                        <!-- Links -->
                         <p>
-                            <span class="label">Links :</span>
+                            <span class="label">Link:</span>
                             <a
                                 th:href="${portfolios.link}"
                                 target="_blank"
@@ -113,18 +156,9 @@
                         </p>
 
                         <p>
-                            <span class="label">Views :</span>
+                            <span class="label">Views:</span>
                             <span id="viewCount">0</span>
                         </p>
-                        <!-- 평균 별점 요약을 Like 영역처럼 표시 -->
-                        <div class="like-wrap">
-                            <span class="label">Likes:</span>
-                            <div class="stars readonly" id="avgStars" aria-label="평균 별점"></div>
-                            <span class="star-symbol">⭐</span>
-                            <span id="avgScore">0.0</span>
-                            <span class="count">(<span id="ratingCount">0</span>)</span>
-                        </div>
-                        
 
                         <!-- 다운로드 -->
                         <p>
@@ -137,8 +171,21 @@
                             ></a>
                         </p>
 
-                        
+                        <!-- 아이콘 -->
+                        <aside class="summary-logo" th:if="${portfolios.icon}">
+                            <figure class="logo-card" title="portfolios Logo">
+                                <img
+                                    th:src="${portfolios.icon}"
+                                    th:alt="|${portfolios.title} 아이콘|"
+                                    loading="lazy"
+                                    decoding="async"
+                                />
+                            </figure>
+                        </aside>
                     </div>
+                </div>
+            </div>
+
             <div class="comment-section">
                 <h2>댓글</h2>
 
@@ -149,6 +196,9 @@
                         id="avgStars"
                         aria-label="평균 별점"
                     ></div>
+                    <span class="star-symbol">⭐</span>
+                    <span id="avgScore">0.0</span>
+                    <span class="count">(<span id="ratingCount">0</span>)</span>
                 </div>
 
                 <!-- 로그인 사용자 전용: 별점 + 댓글 폼 -->
@@ -163,7 +213,7 @@
                         >
                             <!-- JS가 5개 별을 만들어줍니다 -->
                         </div>
-                        <span id="myScoreText">0/5</span>
+                        <span id="myScoreText">0</span>/5
                     </div>
 
                     <form id="commentForm">
@@ -186,35 +236,11 @@
                 </div>
 
                 <!-- 댓글 리스트 -->
-                <!-- 댓글 리스트 -->
-                <div id="commentList" class="comments">
-                    <!-- 예시 댓글 (JS로 동적으로 추가 예정) -->
-                    <div class="comment">
-                        <div class="meta">
-                            <span class="author">익명</span> · <span class="date">2025-09-06</span>
-                        </div>
-                        <div class="stars readonly">
-                            ⭐⭐⭐⭐☆
-                        </div>
-                        <p class="content">깔끔한 디자인이네요</p>
-                    </div>
-
-                    <div class="comment">
-                        <div class="meta">
-                            <span class="author">익명</span> · <span class="date">2025-09-12</span>
-                        </div>
-                        <div class="stars readonly">
-                            ⭐⭐⭐☆☆
-                        </div>
-                        <p class="content">아쉬운 부분이 많지만 그래도 괜찮네요</p>
-                    </div>
-
-                </div>
-
+                <div id="commentList" class="comments"></div>
             </div>
 
             
-        </div>
+
         <!-- 🔗 JavaScript -->
         <script>
             function changeMainImage(src) {

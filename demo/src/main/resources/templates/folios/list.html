@@ -1,31 +1,39 @@
+<!-- src/main/resources/templates/folios/list.html -->
 <!DOCTYPE html>
-<html
-    lang="ko"
-    th:replace="~{fragments/layout :: html(
-    title = 'Folios 목록',
-    active = 'folios',
-    css = ~{::#page-css},
-    js = ~{::#page-js},
-    content = ~{::#page-content}
-)}"
->
-    <head>
-        <th:block id="page-css">
-            <link th:href="@{/css/folios/list.css}" rel="stylesheet" />
-        </th:block>
-    </head>
-    <body>
-        <main id="page-content" class="dev-container">
-            <h1 style="margin: 2rem 0">Folio 둘러보기</h1>
-            <div id="folio-grid" class="grid">
-                <p class="loading-message muted">
-                    데이터를 불러오는 중입니다...
-                </p>
-            </div>
-        </main>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>kafolio – Folios</title>
 
-        <th:block id="page-js">
-            <script th:src="@{/js/folios/list.js}"></script>
-        </th:block>
-    </body>
+    <!-- 공통 스타일 -->
+    <link th:href="@{/css/header.css}" rel="stylesheet" />
+    <link th:href="@{/css/footer.css}" rel="stylesheet" />
+    <link th:href="@{/css/users/auth-modal.css}" rel="stylesheet" />
+
+    <!-- 페이지 전용 스타일 -->
+    <link th:href="@{/css/folios/list.css}" rel="stylesheet" />
+  </head>
+
+  <body>
+<!-- 공통 헤더(folios 전용) -->
+<div th:replace="fragments/header-folios :: headerFolios"></div>
+
+    <!-- 기존 구조/ID 유지 -->
+    <main id="page-content" class="dev-container">
+      <h1 style="margin: 2rem 0">Folio 둘러보기</h1>
+      <div id="folio-grid" class="grid">
+        <p class="loading-message muted">데이터를 불러오는 중입니다...</p>
+      </div>
+    </main>
+
+    <!-- 공통 푸터 -->
+    <div th:replace="fragments/footer :: site-footer"></div>
+
+    <!-- 전역 스크립트(테마 유지) -->
+    <script th:src="@{/js/theme.js}"></script>
+
+    <!-- 페이지 전용 스크립트 -->
+    <script th:src="@{/js/folios/list.js}"></script>
+  </body>
 </html>
