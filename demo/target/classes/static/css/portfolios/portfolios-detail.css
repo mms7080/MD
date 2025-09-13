@@ -137,15 +137,21 @@
   
   
   /* ======================
-     Meta Box
+     Meta Box (왼쪽: 내용, 오른쪽: 아이콘)
      ====================== */
   .meta-box {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: flex-start;
-    gap: 14px;
+    gap: 20px;
     margin-top: 16px;
-    position: relative; /* 아이콘 고정용 */
+  }
+  
+  .meta-left {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1; /* 왼쪽 영역 꽉 차도록 */
   }
   
   .meta-item {
@@ -171,12 +177,7 @@
     word-break: break-all;
   }
   
-  /* 태그는 그대로 칩 스타일 */
-  .meta-item .tag-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+  /* 태그 칩 스타일 */
   .tag {
     background: var(--chip);
     color: var(--chip-text);
@@ -197,62 +198,11 @@
   }
   
   
-  
   /* ======================
-     Like Button
-     ====================== */
-  .like-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 0;
-  }
-  .like-btn:hover {
-    transform: scale(1.05);
-  }
-  .heart-icon {
-    width: 22px;
-    height: 22px;
-    stroke: #f44336;
-  }
-  
-  
-  /* ======================
-     Tags
-     ====================== */
-  .tags {
-    margin-top: 10px;
-  }
-  .tag-wrap {
-    margin-top: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .tag {
-    background: var(--chip);
-    color: var(--chip-text);
-    padding: 5px 12px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    border: 1px solid var(--border);
-  }
-  .tag:hover {
-    filter: brightness(1.2);
-  }
-  
-  
-  /* ======================
-     Icon (오른쪽 상단 고정)
+     Icon (오른쪽 고정)
      ====================== */
   .summary-logo {
-    position: absolute;
-    top: 0;
-    right: 0;
+    flex-shrink: 0;
   }
   .summary-logo img {
     max-width: 160px;
@@ -262,148 +212,146 @@
   
   
   /* ======================
-   Comment Section (Redesign)
-   ====================== */
-.comment-section {
-  margin-top: 50px;
-  background: var(--card);   /* 카드 스타일 배경 */
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.comment-section h2 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 18px;
-  color: var(--text);
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 8px;
-}
-
-/* 평균 별점 */
-.rating-summary {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 16px;
-  font-size: 1rem;
-  color: var(--muted);
-}
-
-.rating-summary .star-symbol {
-  color: gold;
-  font-size: 1.2rem;
-}
-
-/* 별점 입력 */
-.rate-input {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.stars.write .star {
-  font-size: 24px;
-  cursor: pointer;
-  color: #444;
-  transition: color 0.2s;
-}
-.stars.write .star:hover,
-.stars.write .star.filled {
-  color: gold;
-}
-
-/* 댓글 입력창 */
-#commentForm textarea {
-  width: 100%;
-  resize: none;
-  padding: 12px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--bg-soft);
-  color: var(--text);
-  font-size: 0.95rem;
-  transition: border 0.2s;
-}
-#commentForm textarea:focus {
-  border-color: var(--accent);
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(91,140,255,0.3);
-}
-
-/* 등록 버튼 */
-#commentForm button {
-  margin-top: 12px;
-  padding: 10px 18px;
-  background: var(--primary);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  color: #fff;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-#commentForm button:hover {
-  background: #2563eb;
-}
-
-/* 다크 모드 (기본) */
-html[data-theme="dark"] #commentForm button {
-  background: var(--accent);
-  color: var(--bg);
-}
-
-html[data-theme="dark"] #commentForm button:hover {
-  background: #2563eb; /* hover 효과 */
-}
-
-/* 라이트 모드 */
-html[data-theme="light"] #commentForm button {
-  background: var(--primary);
-  color: white; /* 글씨 흰색 */
-}
-
-html[data-theme="light"] #commentForm button:hover {
-  background: #1d4ed8; /* hover 시 더 진한 파랑 */
-}
-
-
-/* 댓글 리스트 */
-.comments {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px; /* 카드 간격 줄임 */
-}
-
-.comment {
-  background: var(--bg-soft);
-  padding: 10px 12px;   /* 내부 여백 줄임 */
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  font-size: 0.9rem;   /* 폰트 살짝 작게 */
-}
-
-.comment .meta {
-  font-size: 0.8rem;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-
-.comment .author {
-  font-weight: 600;
-  color: var(--text);
-}
-
-.comment .content {
-  margin: 4px 0 0;
-  line-height: 1.4;
-}
-
-
+     Comment Section (Redesign)
+     ====================== */
+  .comment-section {
+    margin-top: 50px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  
+  .comment-section h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  
+  /* 평균 별점 */
+  .rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    color: var(--muted);
+  }
+  
+  .rating-summary .star-symbol {
+    color: gold;
+    font-size: 1.2rem;
+  }
+  
+  /* 별점 입력 */
+  .rate-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .stars.write .star {
+    font-size: 24px;
+    cursor: pointer;
+    color: #444;
+    transition: color 0.2s;
+  }
+  .stars.write .star:hover,
+  .stars.write .star.filled {
+    color: gold;
+  }
+  
+  /* 댓글 입력창 */
+  #commentForm textarea {
+    width: 100%;
+    resize: none;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: 0.95rem;
+    transition: border 0.2s;
+  }
+  #commentForm textarea:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(91,140,255,0.3);
+  }
+  
+  /* 등록 버튼 */
+  #commentForm button {
+    margin-top: 12px;
+    padding: 10px 18px;
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  #commentForm button:hover {
+    background: #2563eb;
+  }
+  
+  /* 다크 모드 (기본) */
+  html[data-theme="dark"] #commentForm button {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  
+  html[data-theme="dark"] #commentForm button:hover {
+    background: #2563eb;
+  }
+  
+  /* 라이트 모드 */
+  html[data-theme="light"] #commentForm button {
+    background: var(--primary);
+    color: white;
+  }
+  
+  html[data-theme="light"] #commentForm button:hover {
+    background: #1d4ed8;
+  }
+  
+  
+  /* 댓글 리스트 */
+  .comments {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .comment {
+    background: var(--bg-soft);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  
+  .comment .meta {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  
+  .comment .author {
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .comment .content {
+    margin: 4px 0 0;
+    line-height: 1.4;
+  }
   
   
   /* ======================
@@ -455,48 +403,47 @@ html[data-theme="light"] #commentForm button:hover {
   .lb-next { right: 20px; top: 50%; transform: translateY(-50%); }
   
   
-/* Like 영역 (별점 평균) */
-.like-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;   /* meta-box와 동일한 크기 */
-  margin: 6px 0;
-  color: var(--text);
-}
-
-.likes-label {
-  font-size: 0.85rem;   /* meta-box 라벨과 동일 */
-  font-weight: 500;     /* meta-box 라벨과 동일 */
-  color: var(--muted);  /* 톤도 동일 */
-}
-
-.stars.readonly {
-  display: inline-flex;
-  gap: 4px;
-}
-
-.stars.readonly .star {
-  font-size: 18px;
-  color: #ccc; /* 기본 회색 */
-}
-
-.stars.readonly .star.filled {
-  color: gold; /* 채워진 별 */
-}
-
-#avgScore {
-  font-weight: 600;   /* 수치는 강조 */
-  margin-left: 4px;
-}
-
-.count {
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-
-
-
+  /* Like 영역 (별점 평균) */
+  .like-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    margin: 6px 0;
+    color: var(--text);
+  }
+  
+  .likes-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  
+  .stars.readonly {
+    display: inline-flex;
+    gap: 4px;
+  }
+  
+  .stars.readonly .star {
+    font-size: 18px;
+    color: #ccc;
+  }
+  
+  .stars.readonly .star.filled {
+    color: gold;
+  }
+  
+  #avgScore {
+    font-weight: 600;
+    margin-left: 4px;
+  }
+  
+  .count {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  
+  
   /* === 메타 라벨 톤 === */
   .meta-box .label { color: var(--muted); }
   
