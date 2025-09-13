@@ -575,5 +575,18 @@
     white-space: nowrap;
     font-style:normal;
     font-weight: 500;
+    border: 1px solid var(--border);
+  }
+  .tag-item:hover{
+    color:#3b82f6;
   }
   
+  /* 라이트 모드 */
+html[data-theme="light"] .tag-item {
+  border: 1px solid #ccc; /* 회색 테두리 */
+}
+
+/* 다크 모드 */
+html[data-theme="dark"] .tag-item {
+  border: 1px solid #444; /* 진한 회색 테두리 */
+}
