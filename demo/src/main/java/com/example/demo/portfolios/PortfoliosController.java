@@ -25,7 +25,7 @@ public class PortfoliosController {
 
 private static final List<TeamMemberEntity> team2 = List.of(
     new TeamMemberEntity("Filmora","길광재","팀장",List.of("로그인","회원가입","홈페이지", "상세페이지,사용자 인증 시스템 구축예매의 시작점","영화 상세페이지 구현")),
-    new TeamMemberEntity("Filmora","송준회","백엔드",List.of("지역 상영관,시간,좌석 등 예매 핵심 데이터 API","예매 데이터 구조 설계 및 API 구축","실시간 좌석 정보 제공 및 중복 예매 방지")),
+    new TeamMemberEntity("Filmora","송준회","백엔드",List.of("지역 상영관,시간, 좌석 등 예매 핵심 데이터 API"," 예매 데이터 구조 설계 및 API 구축"," 실시간 좌석 정보 제공 및 중복 예매 방지")),
     new TeamMemberEntity("Filmora","박범수","백엔드",List.of("이벤트, 공지","결제,스토어,쿠폰", "예매 알림,안정적인 결제 시스템 연동","서비스 운영을 위한 관리자 페이지 및 사용자 소통 채널")),
     new TeamMemberEntity("Filmora","박채훈","프론트",List.of("영화 목록 페이지","영화관 정보 페이지","영화 목록 페이지", "영화관 정보 및 위치 안내 페이지 구현")),
     new TeamMemberEntity("Filmora","손종현","프론트",List.of("예매 페이지"," 좌석 선택 페이지","영화 결제 페이지 UI", "직관적인 단계별 예매 인터페이스 구현","시각적 좌석 선택 페이지 구현"))

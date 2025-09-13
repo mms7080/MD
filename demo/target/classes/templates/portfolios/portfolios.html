@@ -26,8 +26,12 @@
                 <h1>포트폴리오를 찾을 수 없습니다.</h1>
                 <a href="/home">← 홈으로</a>
             </div>
-            <h1 class="title" th:text="${portfolios.title}">제목</h1>
-                    <p class="desc" th:text="${portfolios.desc}">설명</p>
+            <div class="center-box">
+                <div class="title-row">
+                <h1 class="title" th:text="${portfolios.title}">제목</h1>
+            </div>
+                <p class="desc" th:text="|&quot;${portfolios.desc}&quot;|">설명</p>
+            </div>
             <!-- ✅ Portfolio Content -->
             <div th:if="${portfolios != null}" class="portfolio-detail-grid">
                 <!-- 왼쪽: 이미지 -->
@@ -52,81 +56,88 @@
                     </div>
                 </div>
 
-                <!-- 오른쪽: 정보 -->
-                <div class="info-box">
+               <!-- 오른쪽: 정보 -->
+                    <div class="info-box">
                         <!-- 👥 팀원 정보 -->
                         <div class="team-section">
-                            <h3>팀원 & 역할</h3>
-                            <div class="team-grid">
-                              <div class="team-card" th:each="member : ${portfolios.team}">
-                                <strong class="name" th:text="${member.name}"></strong>
+                        <h3>팀원 & 역할</h3>
+                        <ul class="team-list">
+                            <li class="team-item" th:each="member : ${portfolios.team}">
+                            <div class="team-name">
+                                <strong th:text="${member.name}"></strong>
                                 <span class="role" th:text="${member.role}"></span>
-                                <p class="parts" th:text="${#strings.arrayJoin(member.parts, ', ')}"></p>
-                              </div>
                             </div>
-                          </div>
-                          
+                            <p class="parts" th:text="${#strings.arrayJoin(member.parts, ', ')}"></p>
+                            </li>
+                        </ul>
                         </div>
-                          <div class="meta-box">
-                            <div class="meta-left">
-                              <!-- 🏷 태그 -->
-                              <div class="tags">
-                                <span class="label">Tags:</span>
-                                <div class="tag-wrap">
-                                  <a th:each="tag : ${portfolios.tags}"
-                                     th:href="@{/home(q=${tag})}"
-                                     th:text="${tag}"
-                                     class="tag"></a>
-                                </div>
-                              </div>
+                    </div>
+  
                           
-                              <!-- Likes -->
-                              <div class="like-wrap">
-                                <span class="label">Likes:</span>
-                                <div class="stars readonly" id="avgStars" aria-label="평균 별점"></div>
-                                <span class="star-symbol">⭐</span>
-                                <span id="avgScore">0.0</span>
-                                <span class="count">(<span id="ratingCount">0</span>)</span>
-                              </div>
-                          
-                              <!-- Links -->
-                              <p>
-                                <span class="label">Link:</span>
-                                <a th:href="${portfolios.link}"
-                                   target="_blank"
-                                   th:text="${portfolios.link}"
-                                   class="custom-link"></a>
-                              </p>
-                          
-                              <!-- Views -->
-                              <p>
-                                <span class="label">Views:</span>
-                                <span id="viewCount">0</span>
-                              </p>
-                          
-                              <!-- 다운로드 -->
-                              <p>
-                                <span class="label">Download:</span>
-                                <a th:href="${portfolios.download}"
-                                   download
-                                   th:text="${portfolios.download}"
-                                   class="download-link"></a>
-                              </p>
-                            </div>
-                          
-                            <!-- 아이콘 오른쪽 고정 -->
-                            <aside class="summary-logo" th:if="${portfolios.icon}">
-                              <figure class="logo-card" title="portfolios Logo">
-                                <img th:src="${portfolios.icon}"
-                                     th:alt="|${portfolios.title} 아이콘|"
-                                     loading="lazy"
-                                     decoding="async" />
-                              </figure>
-                            </aside>
-                          </div>
                           
                 
             </div>
+            <div class="icon-bar">
+                <div class="icon-left">
+                <!-- Views -->
+                <span class="view-box" title="조회수">
+                    <i class="fa-solid fa-eye"></i>
+                    <span class="view-label">Views :</span>
+                    <span id="viewCount">0</span>
+                  </span>
+              
+                
+        </div>
+              
+                
+        <div class="icon-right">
+            <!-- Link -->
+            <a th:href="${portfolios.link}" target="_blank" title="Link" class="icon-link">
+                <img th:src="${portfolios.icon}" alt="홈페이지 아이콘" class="link-icon" />
+            </a>
+                <!-- Download --> 
+                <a th:href="${portfolios.download}" download class="Btn" title="Download"> 
+                    <svg class="svgIcon" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg"> 
+                        <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 
+                                0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32v306.7L54.6 
+                                265.4c-12.5-12.5 -32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"> 
+                            </path> 
+                        </svg> 
+                        <span class="icon2"></span> 
+                        <span class="tooltip"></span> </a>
+              
+                            <!-- Heart (좋아요) -->
+                            <!-- From Uiverse.io by catraco --> 
+            <!-- Heart (좋아요) -->
+            
+                <!-- Uiverse.io Heart -->
+                <div class="heart-container" title="Like">
+                <input type="checkbox" class="checkbox" id="likeBtn">
+                <div class="svg-container">
+                    <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                    </svg>
+                    <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                    </svg>
+                    <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="10,10 20,20"></polygon>
+                    <polygon points="10,50 20,50"></polygon>
+                    <polygon points="20,80 30,70"></polygon>
+                    <polygon points="90,10 80,20"></polygon>
+                    <polygon points="90,50 80,50"></polygon>
+                    <polygon points="80,80 70,70"></polygon>
+                    </svg>
+                </div>
+                </div>
+            
+                <!-- 좋아요 카운트 -->
+                <span id="likeCount">0</span>
+            </div>
+        </div>
+            
+            
+              
 
             <div class="comment-section">
                 <h2>댓글</h2>
@@ -177,22 +188,23 @@
                     </p>
                 </div>
 
-                <!-- 댓글 리스트 -->
-            <div id="commentList" class="comments">
-                <!-- 예시 댓글 (JS로 동적으로 추가 예정) -->
-                <div class="comment">
-                    <div class="meta">
-                        <span class="author">익명</span> · <span class="date">2025-09-12</span>
+                <div id="commentList" class="comments">
+                    <!-- 예시 댓글 (JS로 동적으로 추가 예정) -->
+                    <div class="comment">
+                        <div class="meta">
+                            <span class="author">익명</span> · <span class="date">2025-09-12</span>
+                        </div>
+                        <div class="stars readonly">
+                            ⭐⭐⭐⭐☆
+                        </div>
+                        <p class="content">여기에 댓글 내용이 들어갑니다.</p>
                     </div>
-                    <div class="stars readonly">
-                        ⭐⭐⭐⭐☆
-                    </div>
-                    <p class="content">여기에 댓글 내용이 들어갑니다.</p>
                 </div>
-            </div>
+                </div>
 
+                <!-- 댓글 리스트 -->
 
-            
+</main>
 
         <!-- 🔗 JavaScript -->
         <script>

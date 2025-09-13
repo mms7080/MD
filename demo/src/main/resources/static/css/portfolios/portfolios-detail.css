@@ -1,18 +1,17 @@
 /* ======================
    Global (Portfolio Detail)
    ====================== */
-body.portfolio-detail {
-  background: var(--bg);   /* 테마 변수 사용 */
-  color: var(--text);
-  font-family: "Spoqa Han Sans", sans-serif;
-}
-
-body.portfolio-detail * {
-  color: inherit;          /* 본문 기본 색 = var(--text) */
-  text-decoration: none;
-  box-sizing: border-box;
-}
-
+   body.portfolio-detail {
+    background: var(--bg);   /* 테마 변수 사용 */
+    color: var(--text);
+    font-family: "Spoqa Han Sans", sans-serif;
+  }
+  
+  body.portfolio-detail * {
+    color: inherit;          /* 본문 기본 색 = var(--text) */
+    text-decoration: none;
+    box-sizing: border-box;
+  }
   
   /* ======================
      Layout
@@ -29,9 +28,40 @@ body.portfolio-detail * {
     gap: 40px;
     align-items: start;
   }
+
+  .center-box{
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 아이콘+제목을 중앙 정렬 */
+    gap: 10px; /* 아이콘과 제목 사이 간격 */
+    margin-bottom: 8px;
+  }
+  
+  .link-icon {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .icon-link:hover .link-icon {
+    transform: scale(1.1);
+  }
+  
+  .title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0; /* 불필요한 기본 여백 제거 */
+  }
+
   
   /* ======================
-     Gallery (이미지 고정 크기)
+     Gallery
      ====================== */
   .gallery {
     display: flex;
@@ -41,18 +71,19 @@ body.portfolio-detail * {
   
   .main-photo {
     width: 100%;
-    max-width: 600px;  /* 원하는 가로 크기 */
-    height: 400px;     /* 원하는 세로 크기 */
+    max-width: 600px;
+    height: 400px;
     margin-bottom: 16px;
-    overflow: hidden;  /* 넘치는 부분 잘림 */
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
   }
+  
   .main-photo img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 비율 유지하면서 채우기 */
+    object-fit: cover;
     border-radius: 8px;
   }
   
@@ -62,6 +93,7 @@ body.portfolio-detail * {
     flex-wrap: wrap;
     justify-content: center;
   }
+  
   .thumb-list img {
     width: 120px;
     height: 80px;
@@ -71,6 +103,7 @@ body.portfolio-detail * {
     border: 2px solid transparent;
     transition: border-color 0.2s ease;
   }
+  
   .thumb-list img:hover {
     border-color: #3b82f6;
   }
@@ -84,113 +117,164 @@ body.portfolio-detail * {
     gap: 18px;
   }
   
-  .title {
+  .info-box .title {
     font-size: 1.8rem;
     font-weight: 700;
+    text-align: center;
+    margin-bottom: 6px;
   }
   
-  .desc {
+  .info-box .desc {
     font-size: 1rem;
-    line-height: 1.6;
+    line-height: 1.5;
+    text-align: center;
+    margin-bottom: 8px;
+    color: var(--muted);
   }
   
-  .meta-box {
+  /* ======================
+     Team Section
+     ====================== */
+  .team-section {
+    margin-top: 20px;
+  }
+  
+  .team-section h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  
+  .team-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    font-size: 0.95rem;
-  }
-  .meta-box .label {
-    font-weight: bold;
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
   
-  /* ======================
-     Like Button (SVG 그대로)
-     ====================== */
-  .like-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
+  .team-item {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+  
+  .team-name {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 0;
-  }
-  .like-btn:hover {
-    transform: scale(1.05);
-  }
-  .heart-icon {
-    width: 22px;
-    height: 22px;
-    stroke: #f44336;
+    gap: 8px;
+    font-size: 0.95rem;
   }
   
-  /* ======================
-     Tags
-     ====================== */
-  .tags {
-    margin-top: 10px;
+  .team-name strong {
+    font-weight: 600;
+    color: var(--text);
   }
-  .tag-wrap {
-    margin-top: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .tag {
-    background: var(--chip);
-    color: var(--chip-text);
-    padding: 5px 12px;
-    border-radius: 999px;
+  
+  .team-name .role {
     font-size: 0.85rem;
-    border: 1px solid var(--border);
-  }
-  .tag:hover {
-    filter: brightness(1.2);
+    color: var(--muted);
   }
   
-  /* ======================
-     Icon
-     ====================== */
-  .summary-logo img {
-    max-width: 120px;
-    height: auto;
-    border-radius: 8px;
+  .team-item .parts {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.4;
   }
   
   /* ======================
      Comment Section
      ====================== */
   .comment-section {
-    margin-top: 60px;
-    border-top: 1px solid var(--border);
-    padding-top: 20px;
+    margin-top: 50px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
+  
   .comment-section h2 {
     font-size: 1.3rem;
-    margin-bottom: 15px;
     font-weight: 700;
+    margin-bottom: 18px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
   }
-  .comment-section textarea {
+  
+  /* 평균 별점 */
+  .rating-summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    color: var(--muted);
+  }
+  
+  .rating-summary .star-symbol {
+    color: gold;
+    font-size: 1.2rem;
+  }
+  
+  /* 별점 입력 */
+  .rate-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .stars.write .star {
+    font-size: 24px;
+    cursor: pointer;
+    color: #444;
+    transition: color 0.2s;
+  }
+  
+  .stars.write .star:hover,
+  .stars.write .star.filled {
+    color: gold;
+  }
+  
+  /* 댓글 입력창 */
+  #commentForm textarea {
     width: 100%;
     resize: none;
-    padding: 10px;
-    border-radius: 6px;
+    padding: 12px 14px;
+    border-radius: 8px;
     border: 1px solid var(--border);
-    background: var(--rail);
+    background: var(--bg-soft);
     color: var(--text);
+    font-size: 0.95rem;
+    transition: border 0.2s;
   }
-  .comment-section button {
-    margin-top: 10px;
-    padding: 8px 16px;
-    background: var(--accent);
+  
+  #commentForm textarea:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(91,140,255,0.3);
+  }
+  
+  /* 등록 버튼 */
+  #commentForm button {
+    margin-top: 12px;
+    padding: 10px 18px;
+    background: var(--primary);
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    color: var(--bg);
+    color: #fff;
+    font-weight: 600;
+    transition: background 0.2s;
   }
-  .comment-section button:hover {
+  
+  #commentForm button:hover {
     background: #2563eb;
   }
   
@@ -199,193 +283,250 @@ body.portfolio-detail * {
     margin-top: 20px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
   }
+  
   .comment {
-    background: var(--page);
-    padding: 12px;
+    background: var(--bg-soft);
+    padding: 10px 12px;
     border-radius: 8px;
     border: 1px solid var(--border);
-  }
-  .comment .meta {
-    font-size: 0.85rem;
-    color: #aaa !important;
-    margin-bottom: 6px;
+    font-size: 0.9rem;
   }
   
-  /* 별점 */
-  .stars {
+  .comment .meta {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  
+  .comment .author {
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .comment .content {
+    margin: 4px 0 0;
+    line-height: 1.4;
+  }
+
+
+  /* view-box */
+  .view-box {
     display: inline-flex;
-    gap: 6px;
-    cursor: pointer;
+    align-items: center; /* 아이콘과 텍스트를 수평 중앙 정렬 */
+    gap: 6px;           /* 아이콘과 글자 간격 */
   }
-  .stars .star {
-    font-size: 20px;
-    color: #555 !important;
-    transition: color 0.2s;
+  
+  .view-label {
+    font-style: normal; /* 기울어짐 방지 */
+    font-weight: 500;
   }
-  .stars .star.filled {
-    color: gold !important;
-  }
-  .stars.readonly { cursor: default; }
+  
+
   
   /* ======================
-     Lightbox
+     Icon Bar
      ====================== */
-  .lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: rgba(0,0,0,0.88);
+  .icon-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .icon-left,
+.icon-right {
+  display: flex;
+  align-items: center;
+  gap: 14px; /* 아이콘 사이 간격 */
+}
+  
+  .icon-btn {
+    min-width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    background: #3b82f6;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-  .lightbox[hidden] { display: none !important; }
-  .lb-content {
-    position: relative;
-    max-width: 90%;
-    max-height: 90%;
-  }
-  .lb-content img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 10px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-  }
-  /* 버튼 공통 */
-  .lb-btn {
-    position: absolute;
-    background: rgba(255,255,255,0.85);
-    border: none;
+    gap: 6px;
+    color: #fff;
+    font-size: 16px;
+    text-decoration: none;
     cursor: pointer;
-    font-size: 2rem;
-    padding: 8px 14px;
-    border-radius: 50%;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    user-select: none;
-    transition: background 0.2s ease;
+    transition: background 0.3s, transform 0.2s;
+    padding: 0 10px;
   }
-  .lb-btn:hover { background: rgba(255,255,255,1); }
-  /* 위치 */
-  .lb-close { top: 20px; right: 20px; }
-  .lb-prev { left: 20px; top: 50%; transform: translateY(-50%); }
-  .lb-next { right: 20px; top: 50%; transform: translateY(-50%); }
-
-
-
-
-  /* 로그인 필요 모달 */
-.login-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-}
-
-.login-modal[hidden] { display: none !important; }
-
-.login-modal .modal-content {
-  background: #111;
-  padding: 24px;
-  border-radius: 10px;
-  text-align: center;
-  color: #fff;
-  min-width: 280px;
-}
-
-.login-modal .modal-content p {
-  margin-bottom: 16px;
-  font-size: 1rem;
-}
-
-.login-modal .modal-content button {
-  background: #3b82f6;
-  border: none;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.login-modal .modal-content button:hover {
-  background: #2563eb;
-}
-
   
-/* === Like 영역: 테마 변수로 색/배경 통일 === */
-.like-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 4px 0 8px;
-  color: var(--text);                 /* 글자색: 테마 따라감 */
-}
-
-.like-wrap .like-btn {
-  color: var(--text);                 /* 버튼 텍스트 */
-  background: var(--chip);            /* 다른 라벨/칩과 동일 톤 */
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 10px;
-  line-height: 1;
-  text-decoration: none;              /* a.like-btn 대비 */
-}
-.like-wrap .like-btn:hover {
-  background: var(--accent-ghost);
-}
- /* === Likes 라인: Views와 톤/간격 통일 === */
-.likes-line {
-  display: flex;
-  align-items: center;
-  gap: 10px;                 /* 라벨–하트–숫자 간 간격 */
-  margin: 2px 0 0;           /* 위/아래 메타와 균형 */
-  color: var(--text);
-}
-.likes-line .label {
-  color: var(--muted);       /* Views: 와 동일한 라벨 톤 */
-  white-space: nowrap;
-}
-
-/* 하트만 클릭 가능하도록 최소 버튼 스타일 */
-.heart-btn {
-  background: var(--chip);   /* 다른 칩/라벨과 톤 맞춤 */
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 4px 10px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text);
-  text-decoration: none;     /* <a>일 때 */
-}
-.heart-btn:hover { background: var(--accent-ghost); }
-
-/* 카운트는 텍스트만 강조 */
-#likeCount { font-weight: 600; }
-
-/* (기존 정의와 충돌 방지) 이전 .like-wrap 스타일이 있다면 무시되도록 */
-.like-wrap { display: contents; }   /* 안전하게 해제 */
-
-/* 하트 아이콘은 포인트 컬러 유지 */
-.like-wrap .heart-icon { stroke: var(--danger); }
-
-/* 숫자는 살짝 강조 */
-#likeCount { font-weight: 600; }
-
-/* === 메타 라벨 톤(다른 라벨과 동일) === */
-.meta-box .label { color: var(--muted); }  /* Link:, Views:, Tags: 등 */
-
-
+  .icon-btn:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+  }
+  
+  .icon-btn i {
+    font-size: 18px;
+  }
+  
+  /* ======================
+     Uiverse.io Download Btn
+     ====================== */
+  .Btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background-color: rgb(27, 27, 27);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition-duration: .3s;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.11);
+  }
+  
+  .svgIcon {
+    fill: rgb(214, 178, 255);
+  }
+  
+  .icon2 {
+    width: 18px;
+    height: 5px;
+    border-bottom: 2px solid rgb(182, 143, 255);
+    border-left: 2px solid rgb(182, 143, 255);
+    border-right: 2px solid rgb(182, 143, 255);
+  }
+  
+  .tooltip {
+    position: absolute;
+    right: -105px;
+    opacity: 0;
+    background-color: rgb(12, 12, 12);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition-duration: .2s;
+    pointer-events: none;
+    letter-spacing: 0.5px;
+  }
+  
+  .tooltip::before {
+    position: absolute;
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-color: rgb(12, 12, 12);
+    transform: rotate(45deg);
+    left: -5%;
+    transition-duration: .3s;
+  }
+  
+  .Btn:hover .tooltip {
+    opacity: 1;
+    transition-duration: .3s;
+  }
+  
+  .Btn:hover {
+    background-color: rgb(150, 94, 255);
+    transition-duration: .3s;
+  }
+  
+  .Btn:hover .icon2 {
+    border-bottom: 2px solid rgb(235, 235, 235);
+    border-left: 2px solid rgb(235, 235, 235);
+    border-right: 2px solid rgb(235, 235, 235);
+  }
+  
+  .Btn:hover .svgIcon {
+    fill: rgb(255, 255, 255);
+    animation: slide-in-top 0.6s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+  }
+  
+  @keyframes slide-in-top {
+    0% {
+      transform: translateY(-10px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+  }
+  
+  /* ======================
+     Uiverse.io Heart Btn
+     ====================== */
+  .heart-container {
+    --heart-color: rgb(255, 91, 137);
+    position: relative;
+    width: 25px;
+    height: 25px;
+    transition: .3s;
+  }
+  
+  .heart-container .checkbox {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 20;
+    cursor: pointer;
+  }
+  
+  .heart-container .svg-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .heart-container .svg-outline,
+  .heart-container .svg-filled {
+    fill: var(--heart-color);
+    position: absolute;
+  }
+  
+  .heart-container .svg-filled {
+    animation: keyframes-svg-filled 1s;
+    display: none;
+  }
+  
+  .heart-container .svg-celebrate {
+    position: absolute;
+    animation: keyframes-svg-celebrate .5s;
+    animation-fill-mode: forwards;
+    display: none;
+    stroke: var(--heart-color);
+    fill: var(--heart-color);
+    stroke-width: 2px;
+  }
+  
+  .heart-container .checkbox:checked~.svg-container .svg-filled {
+    display: block;
+  }
+  
+  .heart-container .checkbox:checked~.svg-container .svg-celebrate {
+    display: block;
+  }
+  
+  @keyframes keyframes-svg-filled {
+    0% { transform: scale(0); }
+    25% { transform: scale(1.2); }
+    50% { transform: scale(1); filter: brightness(1.5); }
+  }
+  
+  @keyframes keyframes-svg-celebrate {
+    0% { transform: scale(0); }
+    50% { opacity: 1; filter: brightness(1.5); }
+    100% { transform: scale(1.4); opacity: 0; display: none; }
+  }
+  
   /* ======================
      Responsive
      ====================== */
@@ -393,5 +534,19 @@ body.portfolio-detail * {
     .portfolio-detail-grid { grid-template-columns: 1fr; }
     .main-photo { max-width: 100%; height: auto; }
     .thumb-list img { width: 70px; height: 70px; }
+  }
+  
+  /* icon-link */
+  .link-icon {
+    width: 25px;
+    height: 25px;
+    object-fit: contain; /* 아이콘이 찌그러지지 않도록 */
+    display: inline-block;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+  }
+  
+  .icon-link:hover .link-icon {
+    transform: scale(1.1); /* 호버 시 살짝 확대 */
   }
   
