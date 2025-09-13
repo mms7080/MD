@@ -178,10 +178,25 @@
             <div sec:authorize="isAuthenticated()">
               <form id="commentForm" class="comment-form">
                 <div class="rate-input">
-                  <label class="rate-label">별점:</label>
-                  <div id="writeStars" class="stars write"></div>
-                  <span id="myScoreText">0</span>/5
-                </div>
+                    <label class="rate-label">별점:</label>
+                    <div class="rating">
+                      <input value="5" name="rate" id="star5" type="radio">
+                      <label for="star5" title="5점"></label>
+                  
+                      <input value="4" name="rate" id="star4" type="radio">
+                      <label for="star4" title="4점"></label>
+                  
+                      <input value="3" name="rate" id="star3" type="radio">
+                      <label for="star3" title="3점"></label>
+                  
+                      <input value="2" name="rate" id="star2" type="radio">
+                      <label for="star2" title="2점"></label>
+                  
+                      <input value="1" name="rate" id="star1" type="radio">
+                      <label for="star1" title="1점"></label>
+                    </div>
+                    <span id="myScoreText">0</span>/5
+                  </div>
                 <input type="text" id="commentContent" placeholder="한 줄 평가를 남겨주세요..." required />
                 <button type="submit">등록</button>
               </form>
