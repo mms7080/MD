@@ -153,68 +153,68 @@
             
               
 
-            <div class="comment-section">
-                <h2>댓글</h2>
-
-                <!-- 평균 별점(모두에게 보임) -->
-                <div class="rating-summary">
-                    <div
-                        class="stars readonly"
-                        id="avgStars"
-                        aria-label="평균 별점"
-                    ></div>
-                    <span class="star-symbol">⭐</span>
-                    <span id="avgScore">0.0</span>
-                    <span class="count">(<span id="ratingCount">0</span>)</span>
+        <div class="comment-section">
+            <h2>댓글</h2>
+          
+            <!-- 평균 별점 -->
+            <div class="rating-summary">
+              <span class="avg-label">평균 별점</span>
+              <div class="stars readonly" id="avgStars"></div>
+              <span id="avgScore">0.0</span>
+              <span class="count">(<span id="ratingCount">0</span>)</span>
+            </div>
+          
+            <!-- 로그인 사용자 -->
+            <div sec:authorize="isAuthenticated()">
+              <form id="commentForm" class="comment-form">
+                <div class="rate-input">
+                  <label class="rate-label">내 별점:</label>
+                  <div id="writeStars" class="stars write"></div>
+                  <span id="myScoreText">0</span>/5
                 </div>
-
-                <!-- 로그인 사용자 전용: 별점 + 댓글 폼 -->
-                <div sec:authorize="isAuthenticated()">
-                    <div class="rate-input">
-                        <label class="rate-label">내 별점: </label>
-                        <div
-                            id="writeStars"
-                            class="stars write"
-                            role="radiogroup"
-                            aria-label="별점 선택(1~5)"
-                        >
-                            <!-- JS가 5개 별을 만들어줍니다 -->
-                        </div>
-                        <span id="myScoreText">0</span>/5
-                    </div>
-
-                    <form id="commentForm">
-                        <textarea
-                            id="commentContent"
-                            placeholder="댓글을 입력하세요..."
-                            rows="4"
-                            required
-                        ></textarea>
-                        <button type="submit">등록</button>
-                    </form>
-                </div>
-
-                <!-- 비회원 안내 -->
-                <div sec:authorize="isAnonymous()">
-                    <p class="muted">
-                        로그인 후 댓글/별점을 남길 수 있습니다.
-                        <a href="/signin">로그인</a>
-                    </p>
-                </div>
-
+                <input type="text" id="commentContent" placeholder="한 줄 평가를 남겨주세요..." required />
+                <button type="submit">등록</button>
+              </form>
+            </div>
+          
+            <!-- 비회원 안내 -->
+            <div sec:authorize="isAnonymous()">
+              <p class="muted">로그인 후 댓글/별점을 남길 수 있습니다. <a href="/signin">로그인</a></p>
+            </div>
+          
+            <!-- 댓글 리스트 -->
                 <div id="commentList" class="comments">
-                    <!-- 예시 댓글 (JS로 동적으로 추가 예정) -->
                     <div class="comment">
-                        <div class="meta">
-                            <span class="author">익명</span> · <span class="date">2025-09-12</span>
-                        </div>
-                        <div class="stars readonly">
-                            ⭐⭐⭐⭐☆
-                        </div>
-                        <p class="content">여기에 댓글 내용이 들어갑니다.</p>
+                    <div class="meta">
+                        <span class="author">익명</span>
+                        <span class="date">2025-08-03</span>
+                    </div>
+                    <div class="stars readonly">⭐⭐⭐⭐☆</div>
+                    <p class="content">대체적으로 깔끔한 느낌이라서 좋습니다.</p>
+                    </div>
+                
+                    <div class="comment">
+                    <div class="meta">
+                        <span class="author">익명</span>
+                        <span class="date">2025-09-02</span>
+                    </div>
+                    <div class="stars readonly">⭐⭐⭐☆☆</div>
+                    <p class="content">무난한 느낌입니다.</p>
+                    </div>
+                
+                    <div class="comment">
+                    <div class="meta">
+                        <span class="author">익명</span>
+                        <span class="date">2025-09-12</span>
+                    </div>
+                    <div class="stars readonly">⭐⭐⭐⭐⭐</div>
+                    <p class="content">잘 만들었습니다.</p>
                     </div>
                 </div>
-                </div>
+                
+
+          </div>
+          
 
                 <!-- 댓글 리스트 -->
 

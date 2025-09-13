@@ -186,129 +186,168 @@
     line-height: 1.4;
   }
   
-  /* ======================
-     Comment Section
-     ====================== */
-  .comment-section {
-    margin-top: 50px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-  
-  .comment-section h2 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 18px;
-    color: var(--text);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
-  }
-  
-  /* 평균 별점 */
-  .rating-summary {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 16px;
-    font-size: 1rem;
-    color: var(--muted);
-  }
-  
-  .rating-summary .star-symbol {
-    color: gold;
-    font-size: 1.2rem;
-  }
-  
-  /* 별점 입력 */
-  .rate-input {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  
-  .stars.write .star {
-    font-size: 24px;
-    cursor: pointer;
-    color: #444;
-    transition: color 0.2s;
-  }
-  
-  .stars.write .star:hover,
-  .stars.write .star.filled {
-    color: gold;
-  }
-  
-  /* 댓글 입력창 */
-  #commentForm textarea {
-    width: 100%;
-    resize: none;
-    padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg-soft);
-    color: var(--text);
-    font-size: 0.95rem;
-    transition: border 0.2s;
-  }
-  
-  #commentForm textarea:focus {
-    border-color: var(--accent);
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(91,140,255,0.3);
-  }
-  
-  /* 등록 버튼 */
-  #commentForm button {
-    margin-top: 12px;
-    padding: 10px 18px;
-    background: var(--primary);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #fff;
-    font-weight: 600;
-    transition: background 0.2s;
-  }
-  
-  #commentForm button:hover {
-    background: #2563eb;
-  }
-  
-  /* 댓글 리스트 */
-  .comments {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .comment {
-    background: var(--bg-soft);
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    font-size: 0.9rem;
-  }
-  
-  .comment .meta {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-  
-  .comment .author {
-    font-weight: 600;
-    color: var(--text);
-  }
-  
-  .comment .content {
-    margin: 4px 0 0;
-    line-height: 1.4;
-  }
+  /* 댓글 영역 전체 */
+.comment-section {
+  margin-top: 40px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+
+/* 제목 */
+.comment-section h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--text);
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 10px;
+}
+
+/* 별점 요약 */
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.rating-summary .star-symbol {
+  color: gold;
+  font-size: 1.3rem;
+}
+
+/* 별점 입력 */
+.rate-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.stars.write .star {
+  font-size: 26px;
+  cursor: pointer;
+  color: #ccc;
+  transition: color 0.25s, transform 0.15s;
+}
+.stars.write .star:hover,
+.stars.write .star.filled {
+  color: gold;
+  transform: scale(1.2);
+}
+
+/* 댓글 입력창 */
+.comment-section {
+  margin-top: 30px;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.comment-section h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+/* 평균 별점 */
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+.rating-summary .avg-label {
+  font-weight: 600;
+}
+.rating-summary .count {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* 댓글 작성 */
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.comment-form .rate-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.comment-form input[type="text"] {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--page);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+.comment-form input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+.comment-form button {
+  align-self: flex-end;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  cursor: pointer;
+}
+.comment-form button:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* 댓글 리스트 */
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.comment {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.comment:last-child {
+  border-bottom: none;
+}
+.comment .meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.comment .author {
+  font-weight: 600;
+  color: var(--text);
+}
+.comment .stars {
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.comment .content {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
 
 
   /* view-box */
