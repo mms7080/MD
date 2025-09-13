@@ -632,3 +632,74 @@ html[data-theme="light"] .tag-item {
 html[data-theme="dark"] .tag-item {
   border: 1px solid #444; /* 진한 회색 테두리 */
 }
+
+
+/* ===========================
+   Image Modal
+   =========================== */
+   .modal {
+    display: none; /* 기본은 숨김 */
+    position: fixed;
+    z-index: 9999;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    overflow: auto;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    display: block;
+    margin: auto;
+    max-width: 90%;
+    max-height: 85vh;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  /* 닫기 버튼 */
+  .close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .close:hover {
+    color: #f87171; /* 빨간색 느낌 */
+  }
+  
+  /* 좌우 화살표 */
+  .prev,
+  .next {
+    position: absolute;
+    top: 50%;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+    padding: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.2s;
+  }
+  .prev {
+    left: 20px;
+  }
+  .next {
+    right: 20px;
+  }
+  .prev:hover,
+  .next:hover {
+    color: #60a5fa; /* 파란색 강조 */
+  }
+  
+  /* 애니메이션 */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  

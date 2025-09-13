@@ -28,7 +28,9 @@
             </div>
             <div class="center-box">
                 <div class="title-row">
-                <h1 class="title" th:text="${portfolios.title}">제목</h1>
+                    <h1 class="title">
+                        <a th:href="${portfolios.link}" target="_blank" th:text="${portfolios.title}">제목</a>
+                      </h1>
             </div>
                 <p class="desc" th:text="|&quot;${portfolios.desc}&quot;|">설명</p>
             </div>
@@ -38,23 +40,31 @@
                 <div class="gallery">
                     <!-- 대표 이미지 -->
                     <figure class="main-photo">
-                        <img
-                            id="mainImage"
-                            th:src="${portfolios.screenshots[0]}"
-                            alt="대표 이미지"
-                        />
+                      <img
+                        id="mainImage"
+                        th:src="${portfolios.screenshots[0]}"
+                        alt="대표 이미지"
+                        onclick="openModal(currentIndex)" 
+                      />
                     </figure>
-
+                  
                     <!-- 썸네일 -->
                     <div class="thumb-list">
-                        <img
-                            th:each="img : ${portfolios.screenshots}"
-                            th:src="${img}"
-                            alt="썸네일"
-                            onmouseover="changeMainImage(this.src)"
-                        />
+                        <img th:each="img, iter : ${portfolios.screenshots}"
+                        th:src="${img}"
+                        th:attr="data-index=${iter.index}, onclick='openModal(' + ${iter.index} + ')'"
+                        alt="썸네일"
+                        class="thumb" /> <!-- ✅ 썸네일 클릭/hover 모두 대표 이미지 교체 -->
                     </div>
-                </div>
+                  </div>
+                  
+                  <!-- 📌 모달 -->
+                  <div id="imageModal" class="modal">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <img class="modal-content" id="modalImage" />
+                    <a class="prev" onclick="changeImage(-1)">&#10094;</a>
+                    <a class="next" onclick="changeImage(1)">&#10095;</a>
+                  </div>
 
                <!-- 오른쪽: 정보 -->
                     <div class="info-box">
