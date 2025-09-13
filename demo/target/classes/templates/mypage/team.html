@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>팀 참여 정보 – kafolio</title>
+
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/css/footer.css}" />
+    <!-- 페이지 전용 CSS는 마지막에 (우선순위 충돌 방지 + 캐시 버스팅) -->
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}" />
+    <link rel="stylesheet" th:href="@{/css/users/auth-modal.css}" />
+</head>
+
+<body>
+    <th:block th:replace="fragments/header :: header('mypage')"></th:block>
+
+    <!-- ⬇️ 클래스명들을 CSS와 정확히 매칭 -->
+    <div class="admin-shell">
+        <aside class="nav-rail">
+            <div class="org-name">마이페이지</div>
+            <nav class="rail-menu" id="sidebar">
+                <a href="#" class="rail-item is-active"><span class="dot"></span>홈</a>
+                <a href="/mypage/reprofile" class="rail-item"><span class="dot"></span> 프로필 수정</a>
+                <a href="/mypage/team" class="rail-item"><span class="dot"></span> 팀 참여 정보</a>
+                <a href="#" class="rail-item"><span class="dot"></span> 회원 탈퇴</a>
+            </nav>
+        </aside>
+
+        <main class="page">
+            <div class="page-header">
+                <div class="page-titles">
+                    <h1>팀 참여 정보</h1>
+                    <p class="sub">현재 참여 중인 팀 목록입니다. (하드코딩)</p>
+                </div>
+            </div>
+
+            <!-- 진행 중 -->
+            <section class="panel">
+                <div class="panel-head">
+                    <h2>진행 중</h2>
+                </div>
+                <div style="padding:16px">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:32%">프로젝트명</th>
+                                <th style="width:18%">팀명</th>
+                                <th style="width:18%">역할</th>
+                                <th style="width:12%">상태</th>
+                                <th style="width:20%">팀원</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><a href="/projects/modeme" class="link">ModeMe Admin</a></td>
+                                <td><a href="/teams/modeme" class="link">ModeMe 팀</a></td>
+                                <td>백엔드·관리자 모듈</td>
+                                <td><span class="pill on">활동중</span></td>
+                                <td><span class="member">홍길동</span>, <span class="member">김철수</span></td>
+                            </tr>
+                            <tr>
+                                <td><a href="/projects/kafolio" class="link">Kafolio</a></td>
+                                <td><a href="/teams/kafolio" class="link">Kafolio 팀</a></td>
+                                <td>프론트/UI</td>
+                                <td><span class="pill on">활동중</span></td>
+                                <td><span class="member">Alice</span>, <span class="member">Bob</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 완료 -->
+            <section class="panel">
+                <div class="panel-head">
+                    <h2>완료</h2>
+                </div>
+                <div style="padding:16px">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:32%">프로젝트명</th>
+                                <th style="width:18%">팀명</th>
+                                <th style="width:18%">역할</th>
+                                <th style="width:12%">기간</th>
+                                <th style="width:20%">팀원</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><a href="/projects/landing" class="link">Landing Page 개선</a></td>
+                                <td><a href="/teams/landing" class="link">Landing 팀</a></td>
+                                <td>프론트엔드</td>
+                                <td>2024.01~04</td>
+                                <td><span class="member">홍길동</span>, <span class="member">이영희</span></td>
+                            </tr>
+                            <tr>
+                                <td><a href="/projects/adminui" class="link">Admin UI 디자인</a></td>
+                                <td><a href="/teams/adminui" class="link">AdminUI 팀</a></td>
+                                <td>디자인</td>
+                                <td>2024.05~07</td>
+                                <td><span class="member">김철수</span>, <span class="member">박민수</span></td>
+                            </tr>
+                            <tr>
+                                <td><a href="/projects/reactapp" class="link">React 프로젝트</a></td>
+                                <td><a href="/teams/reactapp" class="link">React 팀</a></td>
+                                <td>풀스택</td>
+                                <td>2024.08~11</td>
+                                <td><span class="member">Alice</span>, <span class="member">Bob</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+</body>
+
+</html>
