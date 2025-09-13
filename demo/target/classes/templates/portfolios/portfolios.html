@@ -86,6 +86,14 @@
                     <span id="viewCount">0</span>
                   </span>
               
+                 <!-- Tags -->
+            <span class="tags-box" title="태그">
+                <i class="fa-solid fa-tags"></i>
+                <span class="tags-label">Tags :</span>
+                <span class="tags-list">
+                <span th:each="tag : ${portfolios.tags}" class="tag-item" th:text="${tag}">Tag</span>
+                </span>
+            </span>
                 
         </div>
               

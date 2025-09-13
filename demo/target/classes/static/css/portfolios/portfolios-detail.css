@@ -550,3 +550,30 @@
     transform: scale(1.1); /* 호버 시 살짝 확대 */
   }
   
+  /* tag */
+  .tags-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 15px;
+    
+  }
+  
+  .tags-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-style: normal; /* 기울어짐 방지 */
+  }
+  
+  .tag-item {
+    background: var(--chip, #3b82f6); /* 파란색 */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    font-style:normal;
+    font-weight: 500;
+  }
+  
