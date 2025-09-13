@@ -230,7 +230,8 @@
 }
 
 .stars.write .star {
-  font-size: 26px;
+  font-size: 1.2rem;
+  line-height: 1;
   cursor: pointer;
   color: #ccc;
   transition: color 0.25s, transform 0.15s;
@@ -614,10 +615,12 @@
     white-space: nowrap;
     font-style:normal;
     font-weight: 500;
+    text-decoration: none;
+    display : inline-block;
     border: 1px solid var(--border);
   }
   .tag-item:hover{
-    color:#3b82f6;
+    transform: scale(1.08);
   }
   
   /* 라이트 모드 */
