@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <th:block th:fragment="layout (pageTitle, activeMenu, content, css, js)">
+    <html lang="ko" data-theme="dark">
+      <head>
+        <meta charset="utf-8" />
+        <title th:text="|kafolio – ${pageTitle}|">kafolio</title>
+        <link th:href="@{/css/header.css}" rel="stylesheet" />
+        <link th:href="@{/css/footer.css}" rel="stylesheet" />
+        <link th:href="@{/css/users/auth-modal.css}" rel="stylesheet" />
+        <link th:href="@{/css/folios/layout.css}" rel="stylesheet" />
+        <th:block th:replace="${css} ?: ~{}"></th:block>
+      </head>
+      <body>
+        <div th:replace="~{fragments/header :: header('folio')}"></div>
+        <div class="folios-shell">
+          <main class="folios-content" th:replace="${content}"></main>
+          <aside class="folios-sidebar">
+            <nav class="folios-menu">
+              <a th:href="@{/folios}" th:classappend="${activeMenu == 'list'} ? 'is-active'">🗂️ Folios 둘러보기</a>
+              <a th:href="@{/folios/write}" th:classappend="${activeMenu == 'write'} ? 'is-active'">✨ Folio 새로 만들기</a>
+              <a th:href="@{/folios/append}" th:classappend="${activeMenu == 'append'} ? 'is-active'">🛠️ 템플릿 관리 (Admin)</a>
+            </nav>
+          </aside>
+        </div>
+        <div th:replace="~{fragments/footer :: footer}"></div>
+        <th:block th:replace="${js} ?: ~{}"></th:block>
+      </body>
+    </html>
+  </th:block>
+</body>
+</html>

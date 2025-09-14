@@ -1,0 +1,99 @@
+/* /resources/static/css/folios/detail.css */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 24px;
+    background-color: var(--panel);
+    border-radius: 16px;
+    margin-bottom: 40px;
+    border: 1px solid var(--border);
+}
+
+.profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border-strong);
+}
+
+.profile-name {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0 0 10px;
+}
+
+.profile-intro {
+    font-size: 16px;
+    color: var(--muted);
+    margin: 0 0 16px;
+    font-style: italic;
+}
+
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tags .tag {
+    background: var(--chip); color: var(--chip-text);
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 0.8rem; font-weight: 600;
+}
+
+.detail-section {
+    margin-bottom: 40px;
+}
+
+.detail-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+
+.detail-section p {
+    line-height: 1.7;
+    font-size: 16px;
+    color: var(--muted);
+}
+
+.project-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.project-card {
+    text-decoration: none;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow .2s, transform .2s;
+}
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+.project-card img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid var(--border);
+}
+.project-card .project-title {
+    padding: 14px;
+    font-weight: 600;
+}
+
+.photo-gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.photo-gallery img {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}

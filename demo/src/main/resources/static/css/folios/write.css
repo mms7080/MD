@@ -1,49 +1,18 @@
-/* Folio 작성 페이지 전용 스타일 */
+/* /resources/static/css/folios/write.css */
+.folio-create-header { text-align: center; margin-bottom: 50px; }
+.folio-create-header h1 { font-size: 26px; color: var(--text); }
+.folio-create-header p { color: var(--muted); }
 
-/* 메인 콘텐츠 영역 설정 */
-.folio-create-main {
-    padding-top: 40px;
-    padding-bottom: 80px;
-}
-
-.folio-create-container {
-    max-width: 950px; /* 콘텐츠 최대 너비 */
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* 상단 제목 및 설명 */
-.folio-create-header {
-    text-align: center;
-    margin-bottom: 60px;
-}
-
-.folio-create-header h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 16px;
-}
-
-.folio-create-header p {
-    font-size: 16px;
-    color: var(--muted);
-}
-
-/* 템플릿 카드 그리드 */
 .template-grid {
     display: flex;
     justify-content: center;
-    gap: 24px; /* 카드 사이 간격 */
-    flex-wrap: wrap; /* 화면이 작아지면 줄바꿈 */
+    gap: 30px;
+    flex-wrap: wrap;
 }
 
-/* 템플릿 카드 개별 스타일 */
+/* 모든 카드의 공통 크기 지정 */
 .template-card {
-    width: 220px; /* 카드 너비 */
+    width: 240px; /* 너비 고정 */
     border-radius: 16px;
     overflow: hidden;
     border: 1px solid var(--border);
@@ -52,39 +21,47 @@
     transition: all 0.2s ease-in-out;
     text-decoration: none;
     color: var(--text);
+    display: flex; /* 내부 요소 정렬을 위해 추가 */
+    flex-direction: column; /* 내부 요소를 세로로 쌓음 */
 }
-
 .template-card:hover {
-    transform: translateY(-8px); /* 마우스 올리면 살짝 위로 이동 */
+    transform: translateY(-8px);
     box-shadow: var(--shadow);
-    border-color: var(--border-strong);
 }
 
-/* 카드 이미지 영역 */
+/* 모든 카드의 시각적 영역 높이 고정 */
 .template-card-visual {
-    height: 300px; /* 이미지 높이 */
-    background-color: #333; /* 이미지 없을 때 배경색 */
+    height: 320px; /* 높이 고정 */
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    flex-grow: 1; /* 남는 공간을 채우도록 함 */
 }
 
-.template-card-visual img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.template-card:hover .template-card-visual img {
-    transform: scale(1.05); /* 마우스 올리면 이미지 확대 */
-}
-
-/* 카드 텍스트 영역 */
 .template-card-footer {
     padding: 20px;
     text-align: center;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
+    flex-shrink: 0; /* 푸터 높이가 줄어들지 않도록 함 */
 }
+
+/* --- 각 템플릿의 고유한 내부 디자인 --- */
+
+/* 템플릿 1: 미니멀 */
+.template-card.minimal .template-card-visual { background: #f0f2f5; padding: 20px; }
+.minimal-preview { width: 100%; }
+.minimal-preview .line { height: 10px; background: #d9dde2; border-radius: 5px; margin-bottom: 12px; }
+.minimal-preview .line.title { height: 16px; width: 60%; }
+.minimal-preview .line.short { width: 80%; }
+
+/* 템플릿 2: 크리에이티브 */
+.template-card.creative img { width: 100%; height: 100%; object-fit: cover; }
+
+/* 템플릿 3: 프로페셔널 */
+.template-card.professional .template-card-visual { background: #1a1a1a; flex-direction: column; }
+.professional-preview { color: #fff; text-align: center; }
+.professional-preview .avatar { display: block; width: 80px; height: 80px; border-radius: 50%; background: #444; margin: 0 auto 12px; }
+.professional-preview .name { display: block; font-size: 18px; font-weight: bold; }
+.professional-preview .role { display: block; font-size: 14px; color: #999; }

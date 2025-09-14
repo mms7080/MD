@@ -1,66 +1,64 @@
 <!DOCTYPE html>
-<html lang="ko" th:replace="~{fragments/layout :: html(
-    title = 'Folio 상세',
-    active = 'folios',
-    css = ~{},
-    js = ~{::#page-js},
-    content = ~{::#page-content}
+<html lang="ko" th:replace="~{fragments/folios-layout :: layout(
+    pageTitle = 'Folio 상세',
+    activeMenu = 'list',
+    css = ~{::#detail-css},
+    js = ~{},
+    content = ~{::#folio-detail-content}
 )}">
 
-<body>
-    <main id="page-content" class="dev-container">
-        <div id="folio-detail-container">
-            <p class="loading-message muted">상세 정보를 불러오는 중입니다...</p>
-        </div>
-    </main>
-    
-    <th:block id="page-js">
-        <script th:inline="javascript">
-        /*<![CDATA[*/
-            document.addEventListener('DOMContentLoaded', function() {
-                const folioId = /*[[${folioId}]]*/ 'default-id';
-                const container = document.getElementById('folio-detail-container');
-
-                fetch(`/api/folios/${folioId}`)
-                    .then(response => {
-                        if (response.status === 404) throw new Error('해당 소개서를 찾을 수 없습니다.');
-                        if (!response.ok) throw new Error('데이터를 불러오는데 실패했습니다.');
-                        return response.json();
-                    })
-                    .then(data => {
-                        const skillsHtml = data.skills.map(skill => `<span class="tag">${skill}</span>`).join('');
-                        const projectsHtml = data.projects.map(p => `<li><a href="/portfolios/${p.portfolioId}">${p.title}</a></li>`).join('');
-                        const photosHtml = data.photos.map(photoUrl => `<img src="${photoUrl}" alt="소개 이미지" style="max-width: 100%; border-radius: 8px;">`).join('');
-
-                        const detailHtml = `
-                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; margin-top: 2rem;">
-                                <div class="pane">
-                                    <img src="${data.photos[0]}" alt="대표 이미지" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem;">
-                                    <h2 style="margin: 0 0 0.5rem;">${data.user.userName}</h2>
-                                    <hr style="border-color: var(--line); margin: 1rem 0;">
-                                    <h4>기술 스택</h4>
-                                    <div class="tags" style="margin-top: 0.5rem;">${skillsHtml}</div>
-                                </div>
-                                <div class="pane">
-                                    <h3>자기소개</h3>
-                                    <p>${data.introduction}</p>
-                                    <hr style="border-color: var(--line); margin: 1.5rem 0;">
-                                    <h3>참여한 포트폴리오</h3>
-                                    <ul style="list-style: none; padding: 0;">${projectsHtml}</ul>
-                                    <hr style="border-color: var(--line); margin: 1.5rem 0;">
-                                    <h3>사진</h3>
-                                    <div style="display: flex; flex-direction: column; gap: 1rem;">${photosHtml}</div>
-                                </div>
-                            </div>
-                        `;
-                        container.innerHTML = detailHtml;
-                    })
-                    .catch(error => {
-                        container.innerHTML = `<p class="muted" style="color: red;">오류: ${error.message}</p>`;
-                    });
-            });
-        /*]]>*/
-        </script>
+<head>
+    <th:block id="detail-css">
+        <link th:href="@{/css/folios/detail.css}" rel="stylesheet" />
     </th:block>
+</head>
+
+<body>
+    <div id="folio-detail-content">
+        <div class="profile-header">
+            <img src="https://picsum.photos/seed/dev1/150" alt="프로필 사진" class="profile-image">
+            <div class="profile-info">
+                <h1 class="profile-name">송준회</h1>
+                <p class="profile-intro">"꼼꼼함과 책임감을 바탕으로 안정적인 서비스를 추구하는 백엔드 개발자입니다."</p>
+                <div class="tags">
+                    <span class="tag">#Java</span>
+                    <span class="tag">#Spring Boot</span>
+                    <span class="tag">#JPA</span>
+                    <span class="tag">#Oracle</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h2>Introduction</h2>
+            <p>
+                3년차 백엔드 개발자 송준회입니다. 저는 대용량 트래픽 처리와 안정적인 API 설계에 강점을 가지고 있습니다. 
+                특히 Spring Boot와 JPA를 활용한 MSA(Microservice Architecture) 환경에서의 개발 경험이 풍부하며, 
+                팀원들과의 원활한 소통을 통해 기술적 문제를 해결하는 것을 즐깁니다.
+            </p>
+        </div>
+
+        <div class="detail-section">
+            <h2>참여 포트폴리오</h2>
+            <div class="project-list">
+                <a href="/portfolios/1" class="project-card">
+                    <img src="https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png" alt="Pawple 썸네일">
+                    <div class="project-title">Pawple - 반려동물 건강 관리</div>
+                </a>
+                <a href="/portfolios/2" class="project-card">
+                    <img src="https://kafolio.kr/static/requests/2025/7/9/boards/ZTI0YmNkZTMxMjIzY2VkNmRlYmFkZDYyY2M4M2Q2NDJlNTE2MTdmZGUzZDE3MWVkMmE1ZTMxYTc0YjBmNWQ4Yw==.png" alt="Filmora 썸네일">
+                    <div class="project-title">Filmora - 영화 예매 사이트</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h2>Photos</h2>
+            <div class="photo-gallery">
+                <img src="https://picsum.photos/seed/photo1/800/600" alt="추가 이미지 1">
+                <img src="https://picsum.photos/seed/photo2/800/600" alt="추가 이미지 2">
+            </div>
+        </div>
+    </div>
 </body>
 </html>

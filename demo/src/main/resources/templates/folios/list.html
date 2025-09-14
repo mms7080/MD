@@ -1,79 +1,25 @@
 <!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>kafolio – Folios</title>
-
-    <!-- 공통 스타일 -->
-    <link th:href="@{/css/header.css}" rel="stylesheet" />
-    <link th:href="@{/css/footer.css}" rel="stylesheet" />
-    <link th:href="@{/css/users/auth-modal.css}" rel="stylesheet" />
-
-    <!-- 페이지 전용 스타일 -->
-    <link th:href="@{/css/folios/list.css}" rel="stylesheet" />
-  </head>
-
-  <body>
-    <!-- 공통 헤더(folios 전용) -->
-    <div th:replace="fragments/header :: header('folio')"></div>
-
-    <main id="page-content" class="dev-container">
-      <!-- 🔧 검색 제거, 정렬만 유지 -->
-      <section class="folios-toolbar" aria-label="정렬">
-        <div class="folios-right">
-          <label for="sort" class="sr-only">정렬</label>
-          <select id="sort" name="sort" th:value="${param.sort}">
-            <option value="recent"  th:selected="${param.sort}=='recent'">최신순</option>
-            <option value="popular" th:selected="${param.sort}=='popular'">인기순</option>
-            <option value="rating"  th:selected="${param.sort}=='rating'">평점순</option>
-          </select>
+<html lang="ko" th:replace="~{fragments/folios-layout :: layout(
+    pageTitle = 'Folio 목록',
+    activeMenu = 'list',
+    css = ~{::#list-css},
+    js = ~{::#list-js},
+    content = ~{::#folios-list-content}
+)}">
+<head>
+    <th:block id="list-css">
+        <link th:href="@{/css/folios/list.css}" rel="stylesheet" />
+    </th:block>
+</head>
+<body>
+    <div id="folios-list-content">
+        <h1 class="folios-title">Folio 둘러보기</h1>
+        <div id="folio-grid" class="grid">
+            <p class="loading-message muted">데이터를 불러오는 중입니다...</p>
         </div>
-      </section>
-
-      <h1 class="folios-title">Folio 둘러보기</h1>
-
-      <div id="folio-grid" class="grid">
-        <p class="loading-message muted">데이터를 불러오는 중입니다...</p>
-      </div>
-
-      <!-- 서버 페이징 사용하는 경우 -->
-      <nav class="pagination" th:if="${page != null}">
-        <a class="page-btn" th:classappend="${page.number==0} ? ' disabled'"
-           th:href="@{|/folios?page=${page.number-1}|}">이전</a>
-        <span class="page-index">
-          <b th:text="${page.number+1}">1</b> /
-          <span th:text="${page.totalPages}">1</span>
-        </span>
-        <a class="page-btn" th:classappend="${page.number+1 >= page.totalPages} ? ' disabled'"
-           th:href="@{|/folios?page=${page.number+1}|}">다음</a>
-      </nav>
-    </main>
-
-    <!-- 공통 푸터 -->
-    <div th:replace="fragments/footer :: footer"></div>
-
-    <!-- 전역 스크립트(테마 유지) -->
-     <!-- <script src="/js/theme.js"></script> -->
-    <script th:src="@{/js/theme.js}"></script>
-
-    <!-- 정렬 동작: 다른 파라미터는 유지, page는 초기화 -->
-    <script>
-      (function(){
-        var sel = document.getElementById('sort');
-        if(!sel) return;
-        sel.addEventListener('change', function(){
-          var params = new URLSearchParams(location.search);
-          params.set('sort', this.value);
-          params.delete('q');     // 검색 제거
-          params.delete('page');  // 정렬 바꾸면 페이지 1로
-          var s = params.toString();
-          location.search = s ? ('?' + s) : '';
-        });
-      })();
-    </script>
-
-    <!-- 페이지 전용 스크립트 -->
-    <script th:src="@{/js/folios/list.js}"></script>
-  </body>
+    </div>
+    <th:block id="list-js">
+        <script th:src="@{/js/folios/list.js}"></script>
+    </th:block>
+</body>
 </html>

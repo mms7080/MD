@@ -1,0 +1,166 @@
+/* /resources/static/css/folios/edit.css */
+
+/* --- 페이지 최상단 헤더 --- */
+.edit-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.edit-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+}
+.edit-header p {
+    margin-top: 8px;
+    color: var(--muted);
+}
+
+/* --- 전체 폼 컨테이너 --- */
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* 각 섹션 박스 사이의 간격 */
+}
+
+/* --- 각 섹션을 감싸는 회색 박스 --- */
+.edit-section-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+}
+
+/* --- 상단 프로필 편집 섹션 (미리보기 + 폼) --- */
+.edit-container {
+    display: grid;
+    grid-template-columns: 320px 1fr; /* 왼쪽 미리보기, 오른쪽 폼 */
+    gap: 40px;
+    align-items: flex-start;
+}
+
+/* 왼쪽: 실시간 미리보기 카드 */
+.preview-pane {
+    position: sticky;
+    top: 80px; /* 스크롤 시 상단에 고정 */
+}
+.preview-card {
+    background: #1c2026;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+}
+.preview-profile-pic {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background-color: #333;
+    border: 2px solid var(--border);
+    background-size: cover;
+    background-position: center;
+    /* 기본 아이콘 이미지 */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23666"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+}
+.preview-card h2 { margin: 0; font-size: 20px; color: #fff; }
+.preview-card p { margin: 4px 0 16px; color: var(--muted); }
+.preview-card .divider { border: 0; height: 1px; background: var(--border); margin: 16px 0; }
+.preview-info { display: flex; align-items: flex-start; text-align: left; gap: 10px; margin-bottom: 12px; color: #fff; }
+.preview-info.skills .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.preview-info .tag {
+    background: #333; color: #ddd;
+    padding: 4px 10px; border-radius: 999px; font-size: 0.8rem;
+}
+
+/* 오른쪽: 입력 폼 영역 */
+.form-pane {
+    padding: 0; /* form-pane 자체는 패딩 제거 */
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px; /* 각 폼 항목 간의 간격 */
+}
+.form-section.full-width {
+    grid-column: 1 / -1;
+}
+.form-section label {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+}
+.form-section label .req {
+    color: #3b82f6; /* 파란색 별표 */
+}
+
+.edit-form input, .edit-form textarea {
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    transition: border-color .2s;
+}
+.edit-form input:focus, .edit-form textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+/* --- 기술 스택, 이미지 업로드 등 나머지 스타일 --- */
+.tags-input-container { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background-color: var(--bg); }
+.tags-input-container:focus-within { border-color: #3b82f6; }
+.tags-input-container .tag { display: inline-flex; align-items: center; gap: 4px; background: var(--accent); color: var(--bg); padding: 5px 6px 5px 10px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+.tags-input-container .tag button { width: 16px; height: 16px; font-size: 12px; line-height: 16px; text-align: center; border-radius: 50%; background: transparent; color: inherit; opacity: 0.6; transition: background-color 0.2s, opacity 0.2s; border: none; cursor: pointer; }
+.tags-input-container .tag button:hover { background-color: rgba(0,0,0,0.2); opacity: 1; }
+#skills { border: none; background: none; padding: 6px; flex-grow: 1; min-width: 150px; }
+#skills:focus { outline: none; }
+
+.project-selector { display: flex; flex-direction: column; gap: 12px; }
+.checkbox-item { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+.checkbox-item input { width: 18px; height: 18px; }
+
+.upload-area { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.custom-file-uploader { width: 120px; height: 120px; border: 2px dashed var(--border-strong); border-radius: 16px; background-color: var(--panel); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: background-color .2s, border-color .2s; }
+.custom-file-uploader:hover { background-color: var(--chip); border-color: #3b82f6; }
+.file-icon { font-size: 36px; color: var(--muted); font-weight: 300; line-height: 1; }
+.file-text { margin-top: 12px; font-size: 14px; color: var(--muted); font-weight: 600; }
+
+#image-preview-container, #profile-preview-container, #project-main-preview-container { display: flex; flex-wrap: wrap; gap: 12px; }
+.image-preview-wrapper { position: relative; width: 120px; height: 120px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.image-preview-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.preview-delete-btn { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; background-color: rgba(0, 0, 0, 0.6); color: white; border: none; font-size: 16px; line-height: 24px; text-align: center; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+.image-preview-wrapper:hover .preview-delete-btn { opacity: 1; }
+
+/* --- 하단 버튼 --- */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+.btn-submit, .btn-cancel {
+    padding: 12px 28px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 15px;
+}
+.btn-submit {
+    background-color: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+}
+.btn-cancel {
+    background-color: transparent;
+    color: var(--text);
+}

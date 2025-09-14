@@ -23,7 +23,7 @@ public class Folio {
 
     @ElementCollection
     @CollectionTable(name = "folio_skills", joinColumns = @JoinColumn(name = "folio_id"))
-    @Column(name = "skill")
+    @Column(name = "skill", length = 255)
     private List<String> skills;
 
     @Column(columnDefinition = "CLOB")

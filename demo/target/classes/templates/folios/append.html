@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>kafolio – Folios</title>
+<html lang="ko" th:replace="~{fragments/folios-layout :: layout(
+    pageTitle = '템플릿 관리',
+    activeMenu = 'append',
+    css = ~{::#append-css},
+    js = ~{},
+    content = ~{::#folios-append-content}
+)}">
 
-    <!-- 공통 스타일 -->
-    <link th:href="@{/css/header.css}" rel="stylesheet" />
-    <link th:href="@{/css/footer.css}" rel="stylesheet" />
-    <link th:href="@{/css/users/auth-modal.css}" rel="stylesheet" />
-
-    <!-- 페이지 전용 스타일 -->
-    <link th:href="@{/css/folios/appned.css}" rel="stylesheet" />
-  </head>
+<head>
+    <th:block id="append-css">
+        <link th:href="@{/css/folios/append.css}" rel="stylesheet" />
+    </th:block>
+</head>
 
 <body>
-    <main id="page-content" class="dev-container">
-        <h1>Folio 관리자 페이지</h1>
-        <p>이곳에 관리자용 Folio 템플릿 추가 기능이 들어갈 예정입니다.</p>
-    </main>
+    <div id="folios-append-content">
+        <h1 class="folios-title">Folio 템플릿 관리</h1>
+        <p class="muted">이곳에 관리자용 Folio 템플릿 추가/편집 기능이 들어갈 예정입니다.</p>
+        </div>
 </body>
 </html>
