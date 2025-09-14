@@ -1,28 +1,89 @@
 document.addEventListener('DOMContentLoaded', function() {
     const grid = document.getElementById('folio-grid');
-    if (!grid) return;
+    const paginationContainer = document.getElementById('pagination');
+    const cardTemplate = document.getElementById('folio-card-template');
 
-    const mockData = {
-        items: [
-            { folioId: "e2f4e5a6", user: { userName: "송준회" }, skills: ["Java", "Spring Boot", "JPA"], thumbnail: "https://picsum.photos/seed/dev1/400/250" },
-            { folioId: "a1b2c3d4", user: { userName: "이홍시" }, skills: ["Python", "Django", "React"], thumbnail: "https://picsum.photos/seed/dev2/400/250" },
-            { folioId: "f0e9d8c7", user: { userName: "박개발" }, skills: ["TypeScript", "Next.js", "GraphQL"], thumbnail: "https://picsum.photos/seed/dev3/400/250" }
-        ]
-    };
+    if (!grid || !paginationContainer || !cardTemplate) {
+        console.error('필수 HTML 요소(grid, pagination, template)를 찾을 수 없습니다.');
+        return;
+    }
 
-    grid.innerHTML = '';
-    mockData.items.forEach(folio => {
-        const skillsHtml = folio.skills.map(skill => `<span class="tag">${skill}</span>`).join('');
-        grid.insertAdjacentHTML('beforeend', `
-            <div class="card">
-                <a href="/folios/detail/${folio.folioId}" class="card-link">
-                    <div class="media"><img src="${folio.thumbnail}" alt="${folio.user.userName} 프로필"></div>
-                    <div class="body">
-                        <h3 class="title">${folio.user.userName}</h3>
-                        <div class="tags">${skillsHtml}</div>
-                    </div>
-                </a>
-            </div>
-        `);
-    });
+    async function fetchAndRenderFolios(page = 1) {
+        grid.innerHTML = '<p class="loading-message muted">데이터를 불러오는 중입니다...</p>';
+        paginationContainer.innerHTML = '';
+
+        
+        try {
+            const response = await fetch(`/api/folios?page=${page - 1}&size=10`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            grid.innerHTML = '';
+
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(folio => {
+                    const cardClone = cardTemplate.content.cloneNode(true);
+                    
+                    const detailUrl = `/folios/detail/${folio.folioId}`;
+                    cardClone.querySelector('.kf-card__thumb').href = detailUrl;
+                    cardClone.querySelector('.kf-card__title a').href = detailUrl;
+
+                    const thumbnail = cardClone.querySelector('.kf-card__thumb img');
+                    thumbnail.src = folio.thumbnail || 'https://picsum.photos/seed/placeholder/400/250';
+                    thumbnail.alt = `${folio.user.userName}의 Folio 썸네일`;
+
+                    cardClone.querySelector('.kf-card__title a').textContent = folio.user.userName;
+
+                    const tagsContainer = cardClone.querySelector('.kf-card__tags');
+                    tagsContainer.innerHTML = '';
+                    folio.skills.slice(0, 4).forEach(skill => {
+                        const tagEl = document.createElement('span');
+                        tagEl.className = 'kf-tag';
+                        tagEl.textContent = `#${skill}`;
+                        tagsContainer.appendChild(tagEl);
+                    });
+                    
+                    grid.appendChild(cardClone);
+                });
+
+                renderPagination(data.page, data.totalPages);
+            } else {
+                grid.innerHTML = '<p class="muted">아직 등록된 Folio가 없습니다.</p>';
+            }
+        // 👇 이 catch 블록이 누락되면 오류가 발생합니다.
+        } catch (error) {
+            console.error('Folio 데이터를 불러오는 데 실패했습니다:', error);
+            grid.innerHTML = '<p class="muted">데이터를 불러오는 중 오류가 발생했습니다.</p>';
+        }
+    }
+
+    function renderPagination(currentPage, totalPages) {
+        paginationContainer.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.className = 'page-btn';
+            pageButton.textContent = i;
+            pageButton.dataset.page = i;
+
+            if ((i - 1) === currentPage) {
+                pageButton.classList.add('active');
+                pageButton.disabled = true;
+            }
+
+            pageButton.addEventListener('click', (e) => {
+                const targetPage = e.target.dataset.page;
+                fetchAndRenderFolios(Number(targetPage));
+            });
+            
+            paginationContainer.appendChild(pageButton);
+        }
+    }
+
+    fetchAndRenderFolios(1);
 });

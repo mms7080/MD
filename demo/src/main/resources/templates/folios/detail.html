@@ -16,49 +16,35 @@
 <body>
     <div id="folio-detail-content">
         <div class="profile-header">
-            <img src="https://picsum.photos/seed/dev1/150" alt="프로필 사진" class="profile-image">
+            <img src="" alt="프로필 사진" class="profile-image" id="profile-image">
             <div class="profile-info">
-                <h1 class="profile-name">송준회</h1>
-                <p class="profile-intro">"꼼꼼함과 책임감을 바탕으로 안정적인 서비스를 추구하는 백엔드 개발자입니다."</p>
-                <div class="tags">
-                    <span class="tag">#Java</span>
-                    <span class="tag">#Spring Boot</span>
-                    <span class="tag">#JPA</span>
-                    <span class="tag">#Oracle</span>
-                </div>
+                <h1 class="profile-name" id="profile-name"></h1>
+                <p class="profile-intro" id="profile-intro"></p>
+                <div class="tags" id="profile-skills">
+                    </div>
             </div>
         </div>
 
         <div class="detail-section">
             <h2>Introduction</h2>
-            <p>
-                3년차 백엔드 개발자 송준회입니다. 저는 대용량 트래픽 처리와 안정적인 API 설계에 강점을 가지고 있습니다. 
-                특히 Spring Boot와 JPA를 활용한 MSA(Microservice Architecture) 환경에서의 개발 경험이 풍부하며, 
-                팀원들과의 원활한 소통을 통해 기술적 문제를 해결하는 것을 즐깁니다.
-            </p>
+            <p id="introduction-text"></p>
         </div>
 
         <div class="detail-section">
             <h2>참여 포트폴리오</h2>
-            <div class="project-list">
-                <a href="/portfolios/1" class="project-card">
-                    <img src="https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png" alt="Pawple 썸네일">
-                    <div class="project-title">Pawple - 반려동물 건강 관리</div>
-                </a>
-                <a href="/portfolios/2" class="project-card">
-                    <img src="https://kafolio.kr/static/requests/2025/7/9/boards/ZTI0YmNkZTMxMjIzY2VkNmRlYmFkZDYyY2M4M2Q2NDJlNTE2MTdmZGUzZDE3MWVkMmE1ZTMxYTc0YjBmNWQ4Yw==.png" alt="Filmora 썸네일">
-                    <div class="project-title">Filmora - 영화 예매 사이트</div>
-                </a>
-            </div>
+            <div class="project-list" id="project-list">
+                </div>
         </div>
 
         <div class="detail-section">
             <h2>Photos</h2>
-            <div class="photo-gallery">
-                <img src="https://picsum.photos/seed/photo1/800/600" alt="추가 이미지 1">
-                <img src="https://picsum.photos/seed/photo2/800/600" alt="추가 이미지 2">
-            </div>
+            <div class="photo-gallery" id="photo-gallery">
+                </div>
         </div>
     </div>
+
+    <th:block id="detail-js">
+        <script th:src="@{/js/folios/detail.js}"></script>
+    </th:block>
 </body>
 </html>

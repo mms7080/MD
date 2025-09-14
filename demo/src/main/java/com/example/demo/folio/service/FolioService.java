@@ -7,6 +7,8 @@ import com.example.demo.folio.repository.FolioRepository;
 import com.example.demo.users.UsersEntity.Role;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
+import com.example.demo.folio.dto.FolioRequestDto;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,11 +56,30 @@ public class FolioService {
      */
     public FolioDetailDto getFolioDetail(String id) {
         // ID로 Folio를 찾고, 없으면 예외를 발생시킵니다.
-        Folio folio = folioRepository.findById(id)
+        Folio folio = folioRepository.findByIdWithDetails(id) 
                 .orElseThrow(() -> new IllegalArgumentException("해당 Folio를 찾을 수 없습니다. id=" + id));
 
         // Entity를 Detail DTO로 변환하여 반환합니다.
         return new FolioDetailDto(folio);
     }
 
+    @Transactional 
+    public Folio createOrUpdateFolio(FolioRequestDto requestDto, Principal principal) {
+        // 1. 현재 로그인한 사용자 정보 조회
+        Users currentUser = usersRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 2. 해당 사용자의 Folio가 이미 있는지 확인 (없으면 새로 생성)
+        Folio folio = folioRepository.findByUserId(currentUser.getId())
+                .orElse(new Folio());
+
+        // 3. DTO의 데이터로 Folio 엔티티 속성 업데이트
+        folio.setUser(currentUser);
+        folio.setIntroduction(requestDto.getIntroduction());
+        folio.setSkills(requestDto.getSkills());
+        folio.setThumbnail(requestDto.getThumbnail()); // 썸네일 정보 저장
+
+        // 4. 데이터베이스에 저장 (새로운 경우 insert, 기존 경우 update)
+        return folioRepository.save(folio);
+    }
 }

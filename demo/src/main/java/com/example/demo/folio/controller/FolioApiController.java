@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+import com.example.demo.folio.dto.FolioRequestDto;
+import com.example.demo.folio.entity.Folio;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import java.security.Principal;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +48,24 @@ public class FolioApiController {
         }
        
     }
+
+    @PostMapping
+    public ResponseEntity<FolioDetailDto> createOrUpdateFolio(
+            @RequestBody FolioRequestDto requestDto,
+            Principal principal) {
+        
+        if (principal == null) {
+            // 로그인하지 않은 사용자는 권한 없음(401) 또는 접근 거부(403) 응답
+            return ResponseEntity.status(403).build();
+        }
+        
+        Folio savedFolio = folioService.createOrUpdateFolio(requestDto, principal);
+        
+        // 저장 후 상세 DTO로 변환하여 반환
+        FolioDetailDto responseDto = new FolioDetailDto(savedFolio);
+        return ResponseEntity.ok(responseDto);
+    }
+    
     
 
 }

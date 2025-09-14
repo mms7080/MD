@@ -21,24 +21,21 @@
         <div class="edit-container">
             <aside class="preview-pane">
                 <div class="preview-card">
-                    <div class="preview-profile-pic" id="preview-pic-container">
-                        </div>
-                    <h2 id="preview-name">송준회</h2>
-                    <p id="preview-eng-name">Song Junhoe</p>
+                    <div class="preview-profile-pic" id="preview-pic-container"></div>
+                    <h2 id="preview-name">이름</h2>
+                    <p id="preview-eng-name">English Name</p>
                     <hr class="divider" />
                     <div class="preview-info">
                         <span class="icon">💼</span>
-                        <span id="preview-job">백엔드 개발자</span>
+                        <span id="preview-job">희망 직무</span>
                     </div>
                     <div class="preview-info">
                         <span class="icon">📧</span>
-                        <span id="preview-email">jott@daum.net</span>
+                        <span id="preview-email">이메일</span>
                     </div>
                     <div class="preview-info skills">
                         <span class="icon">🔧</span>
-                        <div class="tags" id="preview-skills">
-                            <span class="tag">Java</span>
-                        </div>
+                        <div class="tags" id="preview-skills"></div>
                     </div>
                 </div>
             </aside>
@@ -47,42 +44,41 @@
                 <form class="edit-form">
                     <div class="form-grid">
                         <div class="form-section">
-                            <label for="name">이름 <span class="req">*</span></label>
-                            <input type="text" id="name" value="송준회">
+                            <label for="folio-name">이름 <span class="req">*</span></label>
+                            <input type="text" id="folio-name" th:value="${currentUser.name}">
                         </div>
                         <div class="form-section">
-                            <label for="eng-name">영문 이름 <span class="req">*</span></label>
-                            <input type="text" id="eng-name" value="Song Junhoe">
+                            <label for="folio-eng-name">영문 이름 <span class="req">*</span></label>
+                            <input type="text" id="folio-eng-name" placeholder="영문 이름을 입력하세요">
                         </div>
                         <div class="form-section">
-                            <label for="job">희망 직무 <span class="req">*</span></label>
-                            <input type="text" id="job" value="백엔드 개발자">
+                            <label for="folio-job">희망 직무 <span class="req">*</span></label>
+                            <input type="text" id="folio-job" placeholder="예: 백엔드 개발자">
                         </div>
                         <div class="form-section">
-                            <label for="email">이메일 <span class="req">*</span></label>
-                            <input type="email" id="email" value="jott@daum.net">
+                            <label for="folio-email">이메일 <span class="req">*</span></label>
+                            <input type="email" id="folio-email" th:value="${currentUser.email}">
                         </div>
                         <div class="form-section">
-                            <label for="contact">연락처 <span class="req">*</span></label>
-                            <input type="tel" id="contact" value="010-5594-9271">
+                            <label for="folio-contact">연락처 <span class="req">*</span></label>
+                            <input type="tel" id="folio-contact" placeholder="010-1234-5678">
                         </div>
                         <div class="form-section">
                             <label for="skills">스킬 셋 <span class="req">*</span></label>
-                            <div id="skills-input-wrapper">
-                                </div>
+                            <div id="skills-input-wrapper"></div>
                         </div>
                     </div>
 
                     <div class="form-section">
-                        <label for="introduction">자기소개</label>
-                        <textarea id="introduction" rows="6" placeholder="자신을 자유롭게 소개해 주세요."></textarea>
+                        <label for="folio-introduction">자기소개</label>
+                        <textarea id="folio-introduction" rows="6" placeholder="자신을 자유롭게 소개해 주세요."></textarea>
                     </div>
 
                     <div class="form-section">
                         <label>참여 포트폴리오</label>
                         <div class="project-selector">
-                            <label class="checkbox-item"><input type="checkbox" checked> Pawple - 반려동물 건강 관리</label>
-                            <label class="checkbox-item"><input type="checkbox" checked> Filmora - 영화 예매 사이트</label>
+                            <label class="checkbox-item"><input type="checkbox"> Pawple - 반려동물 건강 관리</label>
+                            <label class="checkbox-item"><input type="checkbox"> Filmora - 영화 예매 사이트</label>
                             <label class="checkbox-item"><input type="checkbox"> ModeMe - 패션 커머스</label>
                         </div>
                     </div>
