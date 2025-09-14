@@ -297,6 +297,11 @@
     grid-template-columns: 1fr auto;
 }
 
+.code-block.is-open {
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+}
+
 /* ─────────────────────────────────────────
    8) 반응형
    ───────────────────────────────────────── */

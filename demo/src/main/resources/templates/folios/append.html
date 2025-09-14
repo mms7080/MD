@@ -1,11 +1,19 @@
 <!DOCTYPE html>
-<html lang="ko" th:replace="~{fragments/layout :: html(
-    title = 'Folio 관리',
-    active = 'append',
-    css = ~{},
-    content = ~{::#page-content},
-    js = ~{}
-)}">
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>kafolio – Folios</title>
+
+    <!-- 공통 스타일 -->
+    <link th:href="@{/css/header.css}" rel="stylesheet" />
+    <link th:href="@{/css/footer.css}" rel="stylesheet" />
+    <link th:href="@{/css/users/auth-modal.css}" rel="stylesheet" />
+
+    <!-- 페이지 전용 스타일 -->
+    <link th:href="@{/css/folios/appned.css}" rel="stylesheet" />
+  </head>
+
 <body>
     <main id="page-content" class="dev-container">
         <h1>Folio 관리자 페이지</h1>

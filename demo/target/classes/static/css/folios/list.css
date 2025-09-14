@@ -1,31 +1,130 @@
-/* 카드 링크 전체를 클릭 가능하게 하고 기본 스타일을 설정합니다. */
-.card-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    height: 100%;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* 컨테이너 좌우 여백을 유동으로 (화면이 넓어도 끝에 안 붙게) */
+.dev-container{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px clamp(16px, 4vw, 40px);
 }
 
-/* 카드에 마우스를 올리면 살짝 위로 뜨고 그림자가 생깁니다. */
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,.08);
+/* 제목 여백 살짝 줄이고 정렬과 균형 */
+.folios-title{
+  margin: 10px 0 14px;
+  font-size: 22px;
+  font-weight: 800;
 }
 
-/* 카드 이미지에 마우스를 올리면 이미지가 살짝 커지는 효과를 줍니다. */
-.card:hover .media img {
-    transform: scale(1.05);
+/* ===== 그리드: 가운데 정렬 + 적당한 카드 폭 비율 =====
+   - auto-fit + minmax로 열 수 자동
+   - 큰 화면에서도 카드 폭을 280~320px 사이로 유지
+   - 열이 남아도 전체 그리드를 가운데로 */
+#folio-grid.grid{
+  display: grid;
+  gap: 20px;
+  justify-content: center;        /* ← 트랙들을 가운데로 */
+  align-content: start;
+  align-items: stretch;
+  grid-auto-flow: row;
+  /* 기본: 280~320px 카드폭을 선호, 1열~N열 자동 */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
 }
 
-/* 이미지 확대 효과를 부드럽게 만듭니다. */
-.card .media img {
-    transition: transform 0.3s ease;
+/* 넓은 화면에서 살짝 더 넉넉한 카드 폭 */
+@media (min-width: 1440px){
+  #folio-grid.grid{
+    grid-template-columns: repeat(auto-fit, minmax(300px, 340px));
+  }
 }
 
-/* 카드 제목 스타일을 조정합니다. */
-.card .title {
-    font-size: 1.1rem;
-    margin: 0 0 8px;
-    font-weight: 700;
+/* 모바일 1열 */
+@media (max-width: 520px){
+  #folio-grid.grid{
+    grid-template-columns: 1fr;   /* 한 줄 꽉 채움 */
+    justify-content: stretch;
+  }
 }
+
+/* JS가 폭을 고정해도 트랙 너비에 맞춰 꽉 차도록 */
+#folio-grid.grid > *{
+  width: 100% !important;
+  min-width: 0;
+}
+
+/* 카드 기본(이미 적용돼 있으면 생략 가능) */
+.card{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 180px;
+  height: 100%;
+  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card:hover{ transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,.08); border-color: var(--accent); }
+
+.card-link{ text-decoration: none; color: inherit; display: block; height: 100%; }
+.card .media{ background: var(--rail); aspect-ratio: 16/9; overflow: hidden; }
+.card .media img{ width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.card:hover .media img{ transform: scale(1.05); }
+.card .body{ padding: 12px 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.card .title{ font-size: 1.1rem; margin: 0 0 8px; font-weight: 700; line-height: 1.35; }
+
+/* ===== 컨테이너 여백: 화면이 넓어도 좌우 gutter 유지 ===== */
+.dev-container{
+max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px 24px;
+}
+
+/* ===== 그리드: 왼쪽 정렬 + 고정폭 트랙 =====
+   - 카드 폭을 280~320px 사이로 유지
+   - 남는 공간은 오른쪽에 남기고, 왼쪽부터 채움
+   - 마지막 줄 카드가 늘어나거나 가운데로 몰리지 않음 */
+#folio-grid.grid{
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 320px));
+  justify-content: start;   /* ← 왼쪽부터 채우기 */
+  align-items: stretch;
+}
+
+/* 넓은 화면에서 약간 여유 */
+@media (min-width: 1440px){
+  #folio-grid.grid{
+    grid-template-columns: repeat(auto-fill, minmax(300px, 340px));
+  }
+}
+
+/* 모바일: 한 줄 꽉 채워서 1~2열 유동 (왼쪽부터) */
+@media (max-width: 560px){
+  #folio-grid.grid{
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    justify-content: start;
+  }
+}
+
+/* 카드가 트랙 너비에 딱 맞게 들어가도록(인라인 width 무시) */
+#folio-grid.grid > *{
+  width: 100% !important;
+  min-width: 0;
+}
+
+/* --- 카드 스타일(필요한 핵심만 재확인) --- */
+.card{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 180px;
+  height: 100%;
+  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+  transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card:hover{ transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,.08); border-color: var(--accent); }
+
+.card-link{ text-decoration: none; color: inherit; display: block; height: 100%; }
+.card .media{ background: var(--rail); aspect-ratio: 16/9; overflow: hidden; }
+.card .media img{ width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.card:hover .media img{ transform: scale(1.05); }
+.card .body{ padding: 12px 12px 14px; display:flex; flex-direction:column; gap:8px; }
+.card .title{ font-size: 1.1rem; margin: 0 0 8px; font-weight: 700; line-height: 1.35; }
+

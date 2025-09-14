@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>마이페이지 – kafolio</title>
+
+    <!-- 공통 헤더 -->
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
+    <!-- 마이페이지 전용 -->
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}" />
+    <!-- 반드시 포함 -->
+    <link rel="stylesheet" th:href="@{/css/users/auth-modal.css}" />
+  </head>
+  <body>
+    <!-- 공통 헤더 -->
+    <div th:replace="fragments/header :: header('mypage')"></div>
+
+    <!-- 본문: 좌측 레일 + 메인 -->
+    <div class="admin-shell">
+      <!-- 사이드바 -->
+      <aside class="nav-rail">
+        <div class="org-name">마이페이지</div>
+        <nav class="rail-menu" id="sidebar">
+          <a href="#" class="rail-item is-active"><span class="dot"></span>홈</a>
+          <a href="/mypage/reprofile" class="rail-item"><span class="dot"></span> 프로필 수정</a>
+          <a href="/mypage/team" class="rail-item"><span class="dot"></span> 팀 참여 정보</a>
+          <a href="#" class="rail-item"><span class="dot"></span> 회원 탈퇴</a>
+        </nav>
+      </aside>
+
+      <!-- 메인 -->
+      <main class="page">
+        <div class="page-header">
+          <div class="page-titles">
+            <h1>마이페이지</h1>
+          </div>
+        </div>
+
+        <!-- 프로필 카드 -->
+        <section class="panel profile-panel">
+          <div class="profile-card">
+            <div class="avatar">
+              <img th:src="@{/images/avatar-default.png}" alt="프로필 이미지" />
+            </div>
+            <div class="who">
+              <h2 th:text="${users.name}">홍길동</h2>
+              <div class="meta">
+                <span th:text="${users.email}">hong@example.com</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 현황 -->
+        <section class="panel">
+          <div class="panel-head">
+            <h2>나의 현황</h2>
+          </div>
+          <div class="stat-grid">
+            <!-- 포트폴리오 카드 -->
+            <article class="stat-card">
+              <div class="stat-top">
+                <div class="stat-title">포트폴리오</div>
+                <div class="stat-badge">총 개수</div>
+              </div>
+              <div class="stat-num">3</div>
+              <ul class="recent-list">
+                <li><a href="#">Landing Page 개선</a></li>
+                <li><a href="#">Admin UI 디자인</a></li>
+                <li><a href="#">React 프로젝트</a></li>
+              </ul>
+              <div class="stat-foot"><a class="link" href="#">더보기</a></div>
+            </article>
+
+            <!-- 자소서 카드 -->
+            <article class="stat-card">
+              <div class="stat-top">
+                <div class="stat-title">자소서</div>
+                <div class="stat-badge">총 개수</div>
+              </div>
+              <div class="stat-num">5</div>
+              <ul class="recent-list">
+                <li><a href="#">백엔드 개발자 지원서</a></li>
+                <li><a href="#">스타트업 자기소개</a></li>
+                <li><a href="#">인턴 지원용 자소서</a></li>
+              </ul>
+              <div class="stat-foot"><a class="link" href="#">더보기</a></div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

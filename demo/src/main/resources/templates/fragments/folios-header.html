@@ -1,0 +1,102 @@
+<!-- templates/fragments/header-folios.html -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <th:block th:fragment="headerFolios">
+    <header class="kf-header">
+      <div class="kf-header__inner">
+        <!-- 왼쪽: 로고 + 1차 메뉴 (기존과 동일) -->
+        <div class="kf-header__left">
+          <a class="kf-logo" th:href="@{/}" aria-label="kafolio 홈">
+            kafolio <span class="kf-star">✶</span>
+          </a>
+
+          <nav class="kf-nav" aria-label="주요 메뉴">
+            <ul>
+              <li>
+                <a th:href="@{/detail}"
+                   th:classappend="${#httpServletRequest.requestURI.startsWith('/detail')} ? ' is-active' : null">
+                  portfolio
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/folios}"
+                   th:classappend="${#httpServletRequest.requestURI.startsWith('/folios')} ? ' is-active' : null">
+                  folio
+                </a>
+              </li>
+              <li>
+                <a th:href="@{/notice}"
+                   th:classappend="${#httpServletRequest.requestURI.startsWith('/notice')} ? ' is-active' : null">
+                  공지사항
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        <!-- 오른쪽: 테마 토글 + Folios 전용 액션 -->
+        <div class="kf-header__right">
+          <!-- 기존 순수 CSS 토글 그대로 재사용 -->
+          <label for="themeToggle" class="themeToggle st-sunMoonThemeToggleBtn" aria-label="다크/라이트 전환">
+            <input type="checkbox" id="themeToggle" class="themeToggleInput" />
+            <!-- (svg 동일) -->
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" stroke="none" aria-hidden="true">
+              <mask id="moon-mask">
+                <rect x="0" y="0" width="20" height="20" fill="white"></rect>
+                <circle cx="11" cy="3" r="8" fill="black"></circle>
+              </mask>
+              <circle class="sunMoon" cx="10" cy="10" r="8" mask="url(#moon-mask)"></circle>
+              <g>
+                <circle class="sunRay sunRay1" cx="18" cy="10" r="1.5"></circle>
+                <circle class="sunRay sunRay2" cx="14" cy="16.928" r="1.5"></circle>
+                <circle class="sunRay sunRay3" cx="6" cy="16.928" r="1.5"></circle>
+                <circle class="sunRay sunRay4" cx="2" cy="10" r="1.5"></circle>
+                <circle class="sunRay sunRay5" cx="6" cy="3.1718" r="1.5"></circle>
+                <circle class="sunRay sunRay6" cx="14" cy="3.1718" r="1.5"></circle>
+              </g>
+            </svg>
+          </label>
+
+          <!-- ✅ Folios 전용 메뉴 (로그인/회원가입 대신) -->
+          <nav class="kf-auth" aria-label="folios 메뉴">
+            <a class="kf-link" th:href="@{/folios}"
+               th:classappend="${#httpServletRequest.requestURI=='/folios'} ? ' is-active' : null">Folios</a>
+            <a class="kf-link" th:href="@{/folios/write}"
+               th:classappend="${#httpServletRequest.requestURI.startsWith('/folios/write')} ? ' is-active' : null">Write</a>
+            <a class="kf-link" th:href="@{/folios/append}"
+               th:classappend="${#httpServletRequest.requestURI.startsWith('/folios/append')} ? ' is-active' : null">Append</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- (선택) 모달 조각 필요 없으면 생략. 필요하면 아래 줄 복구 -->
+    <!-- <th:block th:replace="fragments/modals :: authModals"></th:block> -->
+
+    <!-- (선택) 라이트/다크 상태 유지 스크립트: 체크박스 상태를 localStorage로 동기화 -->
+    <script>
+      (function () {
+        try {
+          var root = document.documentElement;
+          var key = 'theme';
+          var saved = localStorage.getItem(key);
+          if (!saved) {
+            // 시스템 선호 반영
+            saved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          root.setAttribute('data-theme', saved);
+          var cb = document.getElementById('themeToggle');
+          if (cb) cb.checked = (saved === 'dark');
+
+          if (cb) {
+            cb.addEventListener('change', function () {
+              var next = cb.checked ? 'dark' : 'light';
+              root.setAttribute('data-theme', next);
+              localStorage.setItem(key, next);
+            });
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </th:block>
+</html>

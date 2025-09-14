@@ -26,213 +26,224 @@
                 <h1>포트폴리오를 찾을 수 없습니다.</h1>
                 <a href="/home">← 홈으로</a>
             </div>
-
+            <div class="center-box">
+                <div class="title-row">
+                    <h1 class="title">
+                        <a th:href="${portfolios.link}" target="_blank" th:text="${portfolios.title}">제목</a>
+                      </h1>
+            </div>
+                <p class="desc" th:text="|&quot;${portfolios.desc}&quot;|">설명</p>
+            </div>
             <!-- ✅ Portfolio Content -->
             <div th:if="${portfolios != null}" class="portfolio-detail-grid">
                 <!-- 왼쪽: 이미지 -->
                 <div class="gallery">
                     <!-- 대표 이미지 -->
                     <figure class="main-photo">
-                        <img
-                            id="mainImage"
-                            th:src="${portfolios.screenshots[0]}"
-                            alt="대표 이미지"
-                        />
+                      <img
+                        id="mainImage"
+                        th:src="${portfolios.screenshots[0]}"
+                        alt="대표 이미지"
+                        onclick="openModal(currentIndex)" 
+                      />
                     </figure>
-
+                  
                     <!-- 썸네일 -->
                     <div class="thumb-list">
-                        <img
-                            th:each="img : ${portfolios.screenshots}"
-                            th:src="${img}"
-                            alt="썸네일"
-                            onmouseover="changeMainImage(this.src)"
-                        />
+                        <img th:each="img, iter : ${portfolios.screenshots}"
+                        th:src="${img}"
+                        th:attr="data-index=${iter.index}, onclick='openModal(' + ${iter.index} + ')'"
+                        alt="썸네일"
+                        class="thumb" /> <!-- ✅ 썸네일 클릭/hover 모두 대표 이미지 교체 -->
                     </div>
-                </div>
+                  </div>
+                  
+                  <!-- 📌 모달 -->
+                  <div id="imageModal" class="modal">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <img class="modal-content" id="modalImage" />
+                    <a class="prev" onclick="changeImage(-1)">&#10094;</a>
+                    <a class="next" onclick="changeImage(1)">&#10095;</a>
+                  </div>
 
-                <!-- 오른쪽: 정보 -->
-                <div class="info-box">
-                    <h1 class="title" th:text="${portfolios.title}">제목</h1>
-                    <p class="desc" th:text="${portfolios.desc}">설명</p>
-
-                    <div class="meta-box">
-                        <p>
-                            <span class="label">Link:</span>
-                            <a
-                                th:href="${portfolios.link}"
-                                target="_blank"
-                                th:text="${portfolios.link}"
-                                class="custom-link"
-                            ></a>
-                        </p>
-
-                        <p>
-                            <span class="label">Views:</span>
-                            <span id="viewCount">0</span>
-                        </p>
-
-                        <div class="like-wrap">
-                            <!-- 로그인 상태일 때 -->
-                            <button
-                                sec:authorize="isAuthenticated()"
-                                id="likeBtn"
-                                class="heart-btn"
-                                title="좋아요"
-                                aria-label="좋아요"
-                                th:attr="data-id=${portfolios.id}"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    class="heart-icon"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 
-                       0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 
-                       3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                                    />
-                                </svg>
-                                <span
-                                    id="likeCount"
-                                    th:text="${portfolios.likes}"
-                                    >0</span
-                                >
-                            </button>
-
-                            <!-- 비로그인 상태일 때 -->
-                            <a
-                                sec:authorize="isAnonymous()"
-                                href="/signin"
-                                id="likeSigninTrigger"
-                                class="like-btn"
-                                title="로그인 후 좋아요 가능"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    class="heart-icon"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 
-                    0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 
-                    3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                                    />
-                                </svg>
-                                <span th:text="${portfolios.likes}">0</span>
-                            </a>
-                        </div>
-
-                        <!-- 🏷 태그 -->
-                        <div class="tags">
-                            <span class="label">Tags:</span>
-                            <div class="tag-wrap">
-                                <a
-                                    th:each="tag : ${portfolios.tags}"
-                                    th:href="@{/home(q=${tag})}"
-                                    th:text="${tag}"
-                                    class="tag"
-                                ></a>
+               <!-- 오른쪽: 정보 -->
+                    <div class="info-box">
+                        <h2>팀원 & 역할</h2>
+                        <!-- 👥 팀원 정보 -->
+                        <ul class="team-list">
+                            <li class="team-item" th:each="member : ${portfolios.team}">
+                            <div class="team-name">
+                                <strong th:text="${member.name}"></strong>
+                                <span class="role" th:text="${member.role}"></span>
                             </div>
-                        </div>
-
-                        <!-- 다운로드 -->
-                        <p>
-                            <span class="label">Download:</span>
-                            <a
-                                th:href="${portfolios.download}"
-                                download
-                                th:text="${portfolios.download}"
-                                class="download-link"
-                            ></a>
-                        </p>
-
-                        <!-- 아이콘 -->
-                        <aside class="summary-logo" th:if="${portfolios.icon}">
-                            <figure class="logo-card" title="portfolios Logo">
-                                <img
-                                    th:src="${portfolios.icon}"
-                                    th:alt="|${portfolios.title} 아이콘|"
-                                    loading="lazy"
-                                    decoding="async"
-                                />
-                            </figure>
-                        </aside>
+                            <p class="parts" th:text="${#strings.arrayJoin(member.parts, ', ')}"></p>
+                            </li>
+                        </ul>
+                        
                     </div>
-                </div>
+  
+                          
+                          
+                
             </div>
+            <div class="icon-bar">
+                <div class="icon-left">
 
-            <div class="comment-section">
-                <h2>댓글</h2>
-
-                <!-- 평균 별점(모두에게 보임) -->
-                <div class="rating-summary">
-                    <div
-                        class="stars readonly"
-                        id="avgStars"
-                        aria-label="평균 별점"
-                    ></div>
-                    <span class="star-symbol">⭐</span>
-                    <span id="avgScore">0.0</span>
-                    <span class="count">(<span id="ratingCount">0</span>)</span>
-                </div>
-
-                <!-- 로그인 사용자 전용: 별점 + 댓글 폼 -->
-                <div sec:authorize="isAuthenticated()">
-                    <div class="rate-input">
-                        <label class="rate-label">내 별점: </label>
-                        <div
-                            id="writeStars"
-                            class="stars write"
-                            role="radiogroup"
-                            aria-label="별점 선택(1~5)"
-                        >
-                            <!-- JS가 5개 별을 만들어줍니다 -->
-                        </div>
-                        <span id="myScoreText">0</span>/5
+                    <!-- Views -->
+                <span class="view-box" title="조회수">
+                    <i class="fa-solid fa-eye"></i>
+                    <span class="view-label">Views :</span>
+                    <span id="viewCount">0</span>
+                  </span>
+              
+                 <!-- Tags -->
+            <!-- Tags -->
+                <span class="tags-box" title="태그">
+                    <i class="fa-solid fa-tags"></i>
+                    <span class="tags-label">Tags :</span>
+                    <span class="tags-list">
+                    <a th:each="tag : ${portfolios.tags}" 
+                        th:href="@{/portfolios(tag=${tag})}" 
+                        class="tag-item" 
+                        th:text="${tag}">Tag</a>
+                    </span>
+                </span>
+  
+                
+        </div>
+              
+                
+        <div class="icon-right">
+            <!-- Heart (좋아요) -->
+            
+                <!-- Uiverse.io Heart -->
+                <div class="heart-container" title="Like">
+                    <input type="checkbox" class="checkbox" id="likeBtn">
+                    <div class="svg-container">
+                        <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+                        </svg>
+                        <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+                        </svg>
+                        <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="10,10 20,20"></polygon>
+                        <polygon points="10,50 20,50"></polygon>
+                        <polygon points="20,80 30,70"></polygon>
+                        <polygon points="90,10 80,20"></polygon>
+                        <polygon points="90,50 80,50"></polygon>
+                        <polygon points="80,80 70,70"></polygon>
+                        </svg>
                     </div>
+                    </div>
+                
+                    <!-- 좋아요 카운트 -->
+                    <span id="likeCount">0</span>
 
-                    <form id="commentForm">
-                        <textarea
-                            id="commentContent"
-                            placeholder="댓글을 입력하세요..."
-                            rows="4"
-                            required
-                        ></textarea>
-                        <button type="submit">등록</button>
-                    </form>
-                </div>
+                    
+                <!-- Download --> 
+                <a th:href="${portfolios.download}" download class="Btn" title="Download"> 
+                    <svg class="svgIcon" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg"> 
+                        <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 
+                                0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32v306.7L54.6 
+                                265.4c-12.5-12.5 -32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"> 
+                            </path> 
+                        </svg> 
+                        <span class="icon2"></span> 
+                        <span class="tooltip"></span> </a>
+                        <!-- Link -->
+                <a th:href="${portfolios.link}" target="_blank" title="Link" class="icon-link">
+                    <img th:src="${portfolios.icon}" alt="홈페이지 아이콘" class="link-icon" />
+                </a>
 
-                <!-- 비회원 안내 -->
-                <div sec:authorize="isAnonymous()">
-                    <p class="muted">
-                        로그인 후 댓글/별점을 남길 수 있습니다.
-                        <a href="/signin">로그인</a>
-                    </p>
+                
+            </div>
+        </div>
+            
+            
+              
+
+        <div class="comment-section">
+            <h2>Comments</h2>
+          
+            <!-- 평균 별점 -->
+            <div class="rating-summary">
+              <span class="avg-label">평균 별점</span>
+              <div class="stars readonly" id="avgStars"></div>
+              <span id="avgScore">0.0</span>
+              <span class="count">(<span id="ratingCount">0</span>)</span>
+            </div>
+          
+            <!-- 로그인 사용자 -->
+            <div sec:authorize="isAuthenticated()">
+              <form id="commentForm" class="comment-form">
+                <div class="rate-input">
+                    <label class="rate-label">별점:</label>
+                    <div class="rating">
+                      <input value="5" name="rate" id="star5" type="radio">
+                      <label for="star5" title="5점"></label>
+                  
+                      <input value="4" name="rate" id="star4" type="radio">
+                      <label for="star4" title="4점"></label>
+                  
+                      <input value="3" name="rate" id="star3" type="radio">
+                      <label for="star3" title="3점"></label>
+                  
+                      <input value="2" name="rate" id="star2" type="radio">
+                      <label for="star2" title="2점"></label>
+                  
+                      <input value="1" name="rate" id="star1" type="radio">
+                      <label for="star1" title="1점"></label>
+                    </div>
+                    <span id="myScoreText">0</span>/5
+                  </div>
+                <input type="text" id="commentContent" placeholder="한 줄 평가를 남겨주세요..." required />
+                <button type="submit">등록</button>
+              </form>
+            </div>
+          
+            <!-- 비회원 안내 -->
+            <div sec:authorize="isAnonymous()">
+              <p class="muted">로그인 후 댓글/별점을 남길 수 있습니다. <a href="/signin">로그인</a></p>
+            </div>
+          
+            <!-- 댓글 리스트 -->
+                <div id="commentList" class="comments">
+                    <div class="comment">
+                    <div class="meta">
+                        <span class="author">익명</span>
+                        <span class="date">2025-08-03</span>
+                    </div>
+                    <div class="stars readonly">⭐⭐⭐⭐☆</div>
+                    <p class="content">대체적으로 깔끔한 느낌이라서 좋습니다.</p>
+                    </div>
+                
+                    <div class="comment">
+                    <div class="meta">
+                        <span class="author">익명</span>
+                        <span class="date">2025-09-02</span>
+                    </div>
+                    <div class="stars readonly">⭐⭐⭐☆☆</div>
+                    <p class="content">무난한 느낌입니다.</p>
+                    </div>
+                
+                    <div class="comment">
+                    <div class="meta">
+                        <span class="author">익명</span>
+                        <span class="date">2025-09-12</span>
+                    </div>
+                    <div class="stars readonly">⭐⭐⭐⭐⭐</div>
+                    <p class="content">잘 만들었습니다.</p>
+                    </div>
                 </div>
+                
+
+          </div>
+          
 
                 <!-- 댓글 리스트 -->
-                <div id="commentList" class="comments"></div>
-            </div>
 
-            <!-- 로그인 필요 모달 -->
-            <div id="loginModal" class="login-modal" hidden>
-                <div class="modal-content">
-                    <p>로그인이 필요한 서비스입니다.</p>
-                    <button id="goSigninBtn">확인</button>
-                </div>
-            </div>
-        </main>
+</main>
 
         <!-- 🔗 JavaScript -->
         <script>

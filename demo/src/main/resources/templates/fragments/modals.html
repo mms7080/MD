@@ -1,21 +1,19 @@
 <th:block xmlns:th="http://www.thymeleaf.org" th:fragment="authModals">
-  <!-- ✅ 래퍼를 하나 둡니다 -->
   <div class="modal-root">
     <!-- CSS-only 토글 라디오 (기본 닫힘) -->
     <input type="radio" name="modal" id="modal-none" hidden checked>
     <input type="radio" name="modal" id="modal-signin" hidden>
     <input type="radio" name="modal" id="modal-signup" hidden>
 
+    <script th:src="@{/js/users/sign.js}" defer></script>
+
     <!-- 로그인 모달 -->
     <div class="kf-auth-modal signin" role="dialog" aria-modal="true" aria-labelledby="signin-title">
-      <!-- 오버레이(클릭 시 닫힘) -->
       <label class="kf-auth__overlay" for="modal-none"></label>
-
       <div class="kf-auth__content">
         <label class="kf-auth__close" for="modal-none" aria-label="닫기">×</label>
 
         <div class="kf-auth__grid">
-          <!-- 좌측 브랜딩 -->
           <aside class="auth-left">
             <div class="auth-left__inner">
               <p class="auth-welcome">Welcome!</p>
@@ -27,7 +25,6 @@
             </div>
           </aside>
 
-          <!-- 우측 폼 -->
           <section class="auth-right">
             <h3 id="signin-title" class="auth-title">Log in</h3>
 
@@ -48,8 +45,7 @@
               </label>
 
               <!-- CSRF -->
-              <input type="hidden" th:if="${_csrf != null}"
-                     th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+              <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
               <button type="submit" class="auth-btn">Log in now</button>
 
@@ -69,7 +65,6 @@
     <!-- 회원가입 모달 -->
     <div class="kf-auth-modal signup" role="dialog" aria-modal="true" aria-labelledby="signup-title">
       <label class="kf-auth__overlay" for="modal-none"></label>
-
       <div class="kf-auth__content">
         <label class="kf-auth__close" for="modal-none" aria-label="닫기">×</label>
 
@@ -89,33 +84,36 @@
             <h3 id="signup-title" class="auth-title">Sign up</h3>
 
             <form class="auth-form" th:action="@{/signup}" method="post" aria-label="회원가입 폼" novalidate>
+              <!-- 아이디 + 중복확인 -->
               <label class="auth-field">
                 <span class="auth-label">아이디</span>
-                <input name="username" type="text" placeholder="영문/숫자 4~16자" required autocomplete="username">
+                <div class="row-2">
+                  <input id="username" name="username" type="text" placeholder="영문/숫자 4~16자" required autocomplete="username">
+                  <button type="button" class="btn" id="btnCheckId">중복 확인</button>
+                </div>
+                <small id="usernameStatus" class="note-banner" hidden></small>
               </label>
 
-            <!-- 비밀번호 / 비밀번호 확인 : 래퍼 없이 auth-field만 2개 -->
+              <!-- 비밀번호 / 비밀번호 확인 -->
               <div class="row-2">
                 <label class="auth-field">
                   <span class="auth-label">비밀번호</span>
                   <input name="password" type="password" placeholder="10자 이상" required autocomplete="new-password">
                 </label>
-
                 <label class="auth-field">
                   <span class="auth-label">비밀번호 확인</span>
                   <input name="confirmPassword" type="password" placeholder="비밀번호 재입력" required autocomplete="new-password">
                 </label>
               </div>
 
-
-
+              <!-- 이름 -->
               <label class="auth-field">
                 <span class="auth-label">이름</span>
                 <input name="name" type="text" placeholder="홍길동" required>
               </label>
 
-              <!-- 이메일 + 인증코드 발송 UI -->
-              <div class="auth-field">
+              <!-- 이메일 + 인증코드 (항상 보임) -->
+              <div class="auth-field" id="emailCombo">
                 <span class="auth-label">이메일 <span class="req" aria-hidden="true">*</span></span>
 
                 <div class="email-combo">
@@ -130,26 +128,28 @@
                       <option value="kakao.com">kakao.com</option>
                       <option value="__custom__">직접 입력</option>
                     </select>
-                    <input id="emailDomainCustom" name="emailDomainCustom" type="text" placeholder="example.com" />
+                    <input id="emailDomainCustom" name="emailDomainCustom" type="text" placeholder="example.com" class="hidden" />
                   </div>
 
-                  <!-- 인증코드 입력창 열기 토글 (라벨=버튼) -->
-                  <input id="code-open" type="checkbox" hidden />
-                  <label class="btn small" for="code-open">인증코드 발송</label>
+                  <!-- 실제 전송될 이메일 값 -->
+                  <input id="email" name="email" type="hidden" />
+
+                  <!-- 발송 버튼 -->
+                  <button type="button" class="btn small" id="btnSendCode">인증코드 발송</button>
                 </div>
 
-                <!-- 인증코드 입력칸: 버튼 클릭 전에는 숨김 -->
-                <div class="code-block">
-                  <input id="emailCode" name="emailCode" type="text"
-                         inputmode="numeric" pattern="\\d{6}" maxlength="6"
+                <!-- ✅ 인증코드 입력 블록: 항상 보이게 -->
+                <div class="code-block" id="codeBlock">
+                  <input id="emailCode" name="emailCode" type="text" inputmode="numeric" pattern="\d{6}" maxlength="6"
                          placeholder="인증코드 6자리" aria-label="이메일 인증코드" />
-                  <button type="button" class="btn">코드 확인</button>
+                  <button type="button" class="btn" id="btnVerifyCode">코드 확인</button>
                 </div>
 
-                <small class="field-error" id="err-code" aria-live="polite"></small>
+                <!-- AJAX 상태 메시지 -->
+                <small class="note-banner" id="ajaxNotice" hidden aria-live="polite"></small>
               </div>
 
-              <!-- 성별 + 생년월일 한 줄 -->
+              <!-- 성별 + 생년월일 -->
               <div class="row-2">
                 <fieldset class="auth-field">
                   <legend class="auth-label">성별</legend>
@@ -161,14 +161,13 @@
 
                 <label class="auth-field">
                   <span class="auth-label">생년월일</span>
-                  <input name="birth" type="date" placeholder="YYYY-MM-DD" required>
+                  <input id="birth" name="birth" type="date" placeholder="YYYY-MM-DD" required>
+                  <input id="ageHidden" name="age" type="hidden">
                 </label>
               </div>
 
-
               <!-- CSRF -->
-              <input type="hidden" th:if="${_csrf != null}"
-                     th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+              <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
               <button type="submit" class="auth-btn">회원가입</button>
 
