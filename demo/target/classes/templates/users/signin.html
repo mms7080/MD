@@ -76,16 +76,6 @@
 
         <!-- 본문 -->
         <main id="content" class="auth">
-            <!-- 상단 히어로 -->
-            <section class="auth-hero">
-                <div class="container">
-                    <h1>로그인</h1>
-                    <p class="muted">
-                        kafolio 계정으로 포트폴리오를 더 편하게 관리하세요.
-                    </p>
-                </div>
-            </section>
-
             <!-- 알림 배너: 회원가입 성공/로그아웃/에러 -->
             <div class="container" style="max-width: 720px">
                 <p
@@ -115,64 +105,67 @@
 
             <!-- 로그인 카드 -->
             <section class="auth-body">
-                <div class="container auth-container">
-                    <form
-                        class="auth-card"
-                        aria-label="로그인 폼"
-                        th:action="@{/signin}"
-                        method="post"
-                    >
-                        <div class="field">
-                            <input
-                                id="username"
-                                name="username"
-                                type="text"
-                                placeholder="아이디"
-                                required
-                                autocomplete="username"
-                            />
-                        </div>
+                <div class="container">
+                    <!-- 모달의 패널 박스를 페이지 전용으로 -->
+                    <div class="kf-auth__content kf-auth__content--page">
+                        <section class="auth-right">
+                            <h3 class="auth-title">로그인</h3>
 
-                        <div class="field">
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                placeholder="비밀번호"
-                                required
-                                autocomplete="current-password"
-                            />
-                        </div>
-
-                        <div class="row between">
-                            <label class="check">
-                                <input type="checkbox" name="remember-me" />
-                                <span>로그인 상태 유지</span>
-                            </label>
-                            <a
-                                class="link"
-                                th:href="@{/forgot}"
-                                aria-label="비밀번호 찾기"
-                                >비밀번호 찾기</a
+                            <form
+                                class="auth-form"
+                                th:action="@{/signin}"
+                                method="post"
+                                aria-label="로그인 폼"
                             >
-                        </div>
+                                <label class="auth-field">
+                                    <!-- <span class="auth-label">아이디</span> -->
+                                    <input
+                                        name="username"
+                                        type="text"
+                                        placeholder="아이디"
+                                        required
+                                        autocomplete="username"
+                                    />
+                                </label>
 
-                        <!-- CSRF -->
-                        <input
-                            type="hidden"
-                            th:name="${_csrf.parameterName}"
-                            th:value="${_csrf.token}"
-                        />
+                                <label class="auth-field">
+                                    <!-- <span class="auth-label">비밀번호</span> -->
+                                    <input
+                                        name="password"
+                                        type="password"
+                                        placeholder="비밀번호"
+                                        required
+                                        autocomplete="current-password"
+                                    />
+                                </label>
 
-                        <button type="submit" class="btn primary full">
-                            로그인
-                        </button>
+                                <label class="auth-keep">
+                                    <input type="checkbox" name="remember-me" />
+                                    <span>아이디 저장</span>
+                                </label>
 
-                        <div class="alt">
-                            <span class="muted">계정이 없으신가요?</span>
-                            <a class="link" th:href="@{/signup}">회원가입</a>
-                        </div>
-                    </form>
+                                <!-- CSRF -->
+                                <input
+                                    type="hidden"
+                                    th:name="${_csrf.parameterName}"
+                                    th:value="${_csrf.token}"
+                                />
+
+                                <button type="submit" class="auth-btn">
+                                    로그인
+                                </button>
+
+                                <div class="auth-row">
+                                    <a class="link small" th:href="@{/signup}"
+                                        >회원가입</a
+                                    >
+                                    <a class="link small" th:href="@{/forgot}"
+                                        >비밀번호 찾기</a
+                                    >
+                                </div>
+                            </form>
+                        </section>
+                    </div>
                 </div>
             </section>
         </main>
