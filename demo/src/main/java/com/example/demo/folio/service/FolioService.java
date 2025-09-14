@@ -12,6 +12,8 @@ import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import jakarta.annotation.PostConstruct;
 import java.util.List;
@@ -41,12 +43,11 @@ public class FolioService {
         }
     }
 
-    public List<FoliosSummaryDto> getFolioSummaries() {
-        return folioRepository.findAllWithDetails()
-                .stream()
-                .map(FoliosSummaryDto::new)
-                .collect(Collectors.toList());
+    public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
+        Page<Folio> folioPage = folioRepository.findAll(pageable);
+        return folioPage.map(FoliosSummaryDto::new);
     }
+
 
     
     /**
@@ -55,11 +56,8 @@ public class FolioService {
      * @return FolioDetailDto
      */
     public FolioDetailDto getFolioDetail(String id) {
-        // ID로 Folio를 찾고, 없으면 예외를 발생시킵니다.
-        Folio folio = folioRepository.findByIdWithDetails(id) 
+        Folio folio = folioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Folio를 찾을 수 없습니다. id=" + id));
-
-        // Entity를 Detail DTO로 변환하여 반환합니다.
         return new FolioDetailDto(folio);
     }
 

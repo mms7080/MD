@@ -9,15 +9,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 @Repository
 public interface FolioRepository extends JpaRepository<Folio, String> {
 
-    @Query("SELECT f FROM Folio f JOIN FETCH f.user JOIN FETCH f.skills")
-    List<Folio> findAllWithDetails();
+    @Override
+    @EntityGraph(attributePaths = {"user", "skills"})
+    Page<Folio> findAll(Pageable pageable);
 
-    @Query("SELECT f FROM Folio f JOIN FETCH f.user JOIN FETCH f.skills WHERE f.id = :id")
-    Optional<Folio> findByIdWithDetails(@Param("id") String id);
+    @EntityGraph(attributePaths = {"user", "skills"})
+    Optional<Folio> findById(String id);
 
     Optional<Folio> findByUserId(Long userId); 
 }

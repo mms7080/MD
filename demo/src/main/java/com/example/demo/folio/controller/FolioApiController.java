@@ -14,11 +14,16 @@ import com.example.demo.folio.entity.Folio;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.security.Principal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -29,11 +34,22 @@ public class FolioApiController {
     private final FolioService folioService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getFoliosPage() {
-        List<FoliosSummaryDto> summaries = folioService.getFolioSummaries();
+    public ResponseEntity<Map<String, Object>> getFoliosPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        // 최신순 정렬(ID 기준 내림차순)을 적용한 Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        
+        Page<FoliosSummaryDto> folioPage = folioService.getFolioSummaries(pageable);
+
+        // API 응답 형식에 맞게 Map을 구성
         Map<String, Object> response = new HashMap<>();
-        response.put("page", 1);
-        response.put("items", summaries);
+        response.put("page", folioPage.getNumber() + 1); // 프론트엔드는 1부터 시작
+        response.put("items", folioPage.getContent());
+        response.put("totalPages", folioPage.getTotalPages());
+        response.put("totalItems", folioPage.getTotalElements());
+
         return ResponseEntity.ok(response);
     }
 
