@@ -11,10 +11,6 @@ public class HomeController {
         return "home/home"; 
     }
 
-    @GetMapping("/detail")
-    public String detail() {
-        return "detail/detail"; 
-    }
     @GetMapping("/admin")
     public String admin() {
         return "admin/admin"; 

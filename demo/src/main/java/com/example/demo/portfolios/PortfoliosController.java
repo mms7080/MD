@@ -237,6 +237,13 @@ PORTFOLIOS.put("9", new PortfoliosEntity("9", "Pickup", "A. Park",
 
     }
 
+    @GetMapping("/portfolios")
+    public String list(Model model) {
+        model.addAttribute("items", PORTFOLIOS.values());
+        return "portfolios/list"; // templates/portfolios/list.html
+    }
+
+
     @GetMapping("/portfolios/{id}")
     public String getPortfolio(@PathVariable String id, Model model) {
         PortfoliosEntity portfolios = PORTFOLIOS.get(id);
@@ -245,7 +252,7 @@ PORTFOLIOS.put("9", new PortfoliosEntity("9", "Pickup", "A. Park",
         } else {
             model.addAttribute("portfolios", portfolios);
         }
-        return "portfolios/portfolios"; // templates/detail/portfolio-detail.html
+        return "portfolios/detail"; // templates/detail/portfolio-detail.html
     }
 
 
