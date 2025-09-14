@@ -481,18 +481,233 @@
 }
 
 /* === 브랜딩 패널 제거 + 오른쪽 폼만 중앙 배치 === */
-.kf-auth-modal .auth-left {
+/* .kf-auth-modal .auth-left {
     display: none !important;
 }
 .kf-auth-modal .kf-auth__grid {
-    grid-template-columns: 1fr !important; /* 단일 컬럼 */
+    grid-template-columns: 1fr !important; 
 }
 
-/* 모달 너비를 폼에 맞게 슬림화 + 가운데 정렬 유지 */
+/* 모달 너비를 폼에 맞게 슬림화 + 가운데 정렬 유지 
 .kf-auth-modal .kf-auth__content {
     width: min(
         560px,
         calc(100% - 24px)
-    ) !important; /* 원하면 520~600px로 조절 */
-    margin: 56px auto 24px !important; /* 수평 중앙 */
+    ) !important; 
+    margin: 56px auto 24px !important; 
+} */
+
+/* ---------- Left Branding Panel (감각적/미니멀) ---------- */
+.auth-left {
+    position: relative;
+    background: radial-gradient(
+            800px 260px at 10% 0%,
+            color-mix(in oklab, var(--primary, #7aa8ff) 20%, transparent),
+            transparent 60%
+        ),
+        radial-gradient(
+            900px 260px at 95% 0%,
+            color-mix(in oklab, var(--accent, #ff9ecf) 22%, transparent),
+            transparent 60%
+        ),
+        linear-gradient(180deg, #15181d, #0f1216);
+    color: #fff;
+    padding: 28px 26px;
+    overflow: hidden;
+}
+
+/* 부드러운 그리드 무늬 */
+.auth-left::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background: repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.04) 0 1px,
+            transparent 1px 16px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.04) 0 1px,
+            transparent 1px 16px
+        );
+    opacity: 0.18;
+    pointer-events: none;
+    mask-image: radial-gradient(
+        120% 100% at 50% 0%,
+        #000 40%,
+        transparent 100%
+    );
+}
+
+/* 표면 */
+.kf-brand {
+    position: relative;
+    max-width: 460px;
+    width: 100%;
+    margin-inline: auto;
+}
+
+/* 상단: 워드마크/뱃지 */
+.kf-brand__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.kf-wordmark {
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    opacity: 0.95;
+}
+.kf-wordmark .star {
+    margin-left: 6px;
+    opacity: 0.9;
+}
+.kf-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* 헤드라인/서브 */
+.kf-headline {
+    margin: 10px 0 6px;
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.25;
+}
+.kf-headline em {
+    color: color-mix(in oklab, var(--primary, #7aa8ff) 70%, #fff);
+    font-style: normal;
+}
+.kf-sub {
+    margin: 0 0 14px;
+    color: #d2d7de;
+    opacity: 0.9;
+}
+
+/* 시각 카드(겹친 스크린샷) */
+.kf-shots {
+    position: relative;
+    height: 220px; /* 패널 안에서 과하지 않게 */
+    margin: 12px 0 14px;
+}
+.kf-shots .shot {
+    --r: 12px;
+    position: absolute;
+    inset: auto;
+    width: 56%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--r);
+    background: linear-gradient(180deg, #2b2f36, #1c2026);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.42), 0 6px 16px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+.kf-shots .shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* 좌/우 카드 배치 + 가벼운 부유 애니메이션 */
+.kf-shots .s1 {
+    left: 6%;
+    top: 12%;
+    transform: rotate(-6deg);
+    animation: float1 7s ease-in-out infinite;
+}
+.kf-shots .s2 {
+    right: 6%;
+    bottom: 4%;
+    transform: rotate(7deg);
+    animation: float2 7.5s ease-in-out infinite;
+}
+
+@keyframes float1 {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-6deg);
+    }
+    50% {
+        transform: translateY(-6px) rotate(-6deg);
+    }
+}
+@keyframes float2 {
+    0%,
+    100% {
+        transform: translateY(0) rotate(7deg);
+    }
+    50% {
+        transform: translateY(8px) rotate(7deg);
+    }
+}
+
+/* 기능 칩 */
+.kf-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 14px;
+}
+.kf-chips .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+}
+
+/* 소셜 프루프 */
+.kf-proof {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #d7dce2;
+    font-weight: 800;
+}
+.kf-proof .dots {
+    display: inline-flex;
+    gap: 4px;
+}
+.kf-proof .dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--primary, #7aa8ff) 60%, #fff);
+    box-shadow: 0 0 0 3px rgba(122, 168, 255, 0.18);
+}
+.kf-proof .dots span:nth-child(2) {
+    background: color-mix(in oklab, var(--accent, #ff9ecf) 70%, #fff);
+    box-shadow: 0 0 0 3px rgba(255, 158, 207, 0.18);
+}
+.kf-proof .dots span:nth-child(3) {
+    background: #8de0c6;
+    box-shadow: 0 0 0 3px rgba(141, 224, 198, 0.18);
+}
+
+/* 접근성: 모션 최소화 설정 존중 */
+@media (prefers-reduced-motion: reduce) {
+    .kf-shots .shot {
+        animation: none;
+    }
+}
+
+/* 모바일에서는 원래처럼 좌측 숨김 */
+@media (max-width: 760px) {
+    .auth-left {
+        display: none;
+    }
 }

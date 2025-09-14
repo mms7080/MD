@@ -79,35 +79,18 @@ body {
 /* 사진칸 */
 .topic2-visual {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* ← 핵심 */
     gap: 14px;
     padding: 18px;
     background: linear-gradient(180deg, #2b2f36, #1c2026);
 }
 .pv {
-    height: 200px;
+    display: block;
+    width: 100%; /* 가로 꽉 채움 */
+    height: var(--topic-pv-h); /* 세로 고정 */
+    object-fit: cover; /* 넘치는 부분은 크롭 */
     border-radius: 14px;
-    background: #fff;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.16);
-}
-/* 더미 톤 */
-.pv-a {
-    background: #e9f8d0;
-}
-.pv-b {
-    background: #cfe9ff;
-}
-.pv-c {
-    background: #ffe2e2;
-}
-.pv-d {
-    background: #f1eaff;
-}
-.pv-e {
-    background: #dff7ff;
-}
-.pv-f {
-    background: #f9f0d6;
+    background: #222; /* 로딩 중 배경 */
 }
 
 /* 설명칸 */
@@ -168,7 +151,7 @@ body {
 .trend-list a {
     display: block;
     height: 100%;
-    padding: 12px 14px;
+    padding: 16px 14px;
     border-radius: 12px;
     text-decoration: none;
     color: var(--text);
@@ -317,4 +300,38 @@ body {
     .shots-row {
         grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* 인기 급상승 카드 이미지: 칼럼 안전 + 크기 고정 */
+.topic2-visual {
+    display: grid;
+    grid-template-columns: repeat(
+        2,
+        minmax(0, 1fr)
+    ); /* 칼럼이 이미지에 안 밀리게 */
+    gap: 14px;
+    padding: 18px;
+    background: linear-gradient(180deg, #2b2f36, #1c2026);
+}
+
+/* 고정 높이(가장 단순) */
+:root {
+    --topic-pv-h: 200px;
+} /* 필요시 180~220px로 조절 */
+.topic2-visual .pv {
+    display: block;
+    width: 100%;
+    height: var(--topic-pv-h);
+    object-fit: cover;
+    border-radius: 14px;
+    background: #222; /* 로딩 중 바탕 */
+}
+
+/* 하단 포트폴리오 썸네일도 안전하게 */
+.shot-img {
+    width: 100%;
+    aspect-ratio: 9 / 19; /* 사용 중 비율 유지 */
+    object-fit: cover;
+    display: block;
+    border-radius: 18px;
 }
