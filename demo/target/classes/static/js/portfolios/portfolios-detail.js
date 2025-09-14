@@ -42,3 +42,11 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft") changeImage(-1);
   if (e.key === "ArrowRight") changeImage(1);
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const viewCountEl = document.getElementById("viewCount");
+  let count = parseInt(localStorage.getItem("viewCount") || "0"); // ✅ 브라우저에 저장된 값 불러오기
+  count++;
+  viewCountEl.textContent = count;
+  localStorage.setItem("viewCount", count); // ✅ 새 값 저장
+});
