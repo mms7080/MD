@@ -16,7 +16,7 @@
         <div class="kf-auth__grid">
           <aside class="auth-left">
             <div class="auth-left__inner">
-              <p class="auth-welcome">Welcome!</p>
+              <p class="auth-welcome">Welc☺me!</p>
               <div class="brand-title">kafolio</div>
               <p class="brand-sub">portfolio gallery</p>
               <p class="auth-cta">Not a member yet?
@@ -26,36 +26,35 @@
           </aside>
 
           <section class="auth-right">
-            <h3 id="signin-title" class="auth-title">Log in</h3>
+            <h3 id="signin-title" class="auth-title">로그인</h3>
 
             <form class="auth-form" th:action="@{/signin}" method="post" aria-label="로그인 폼">
               <label class="auth-field">
-                <span class="auth-label">EMAIL OR USERNAME</span>
-                <input name="username" type="text" placeholder="아이디 또는 이메일" required autocomplete="username">
+                <!-- <span class="auth-label">아이디</span> -->
+                <input name="username" type="text" placeholder="아이디" required autocomplete="username">
               </label>
 
               <label class="auth-field">
-                <span class="auth-label">PASSWORD</span>
+                <!-- <span class="auth-label">비밀번호</span> -->
                 <input name="password" type="password" placeholder="비밀번호" required autocomplete="current-password">
               </label>
 
               <label class="auth-keep">
                 <input type="checkbox" name="remember-me">
-                <span>로그인 상태 유지</span>
+                <span>아이디 저장</span>
               </label>
 
               <!-- CSRF -->
               <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-              <button type="submit" class="auth-btn">Log in now</button>
+              <button type="submit" class="auth-btn">로그인</button>
 
               <div class="auth-row">
-                <a class="link small" th:href="@{/forgot}">Forgot your password?</a>
+                <label for="modal-signup" class="link small" style="cursor:pointer">회원가입</label>
+                <a class="link small" th:href="@{/forgot}">비밀번호 찾기</a>
               </div>
 
-              <p class="kf-switch">계정이 없나요?
-                <label for="modal-signup" class="link">회원가입</label>
-              </p>
+              
             </form>
           </section>
         </div>
@@ -81,13 +80,13 @@
           </aside>
 
           <section class="auth-right">
-            <h3 id="signup-title" class="auth-title">Sign up</h3>
+            <h3 id="signup-title" class="auth-title">회원가입</h3>
 
             <form class="auth-form" th:action="@{/signup}" method="post" aria-label="회원가입 폼" novalidate>
               <!-- 아이디 + 중복확인 -->
               <label class="auth-field">
                 <span class="auth-label">아이디</span>
-                <div class="row-2">
+                <div class="row-2 row-id">
                   <input id="username" name="username" type="text" placeholder="영문/숫자 4~16자" required autocomplete="username">
                   <button type="button" class="btn" id="btnCheckId">중복 확인</button>
                 </div>
@@ -116,7 +115,7 @@
               <div class="auth-field" id="emailCombo">
                 <span class="auth-label">이메일 <span class="req" aria-hidden="true">*</span></span>
 
-                <div class="email-combo">
+                <div class="email-combo email-combo--widebtn">
                   <input id="emailLocal" name="emailLocal" type="text" placeholder="아이디" autocomplete="off" />
                   <span class="at">@</span>
 
@@ -135,7 +134,7 @@
                   <input id="email" name="email" type="hidden" />
 
                   <!-- 발송 버튼 -->
-                  <button type="button" class="btn small" id="btnSendCode">인증코드 발송</button>
+                  <button type="button" class="btn small" id="btnSendCode">인증하기</button>
                 </div>
 
                 <!-- ✅ 인증코드 입력 블록: 항상 보이게 -->
@@ -171,9 +170,9 @@
 
               <button type="submit" class="auth-btn">회원가입</button>
 
-              <p class="kf-switch">이미 계정이 있나요?
-                <label for="modal-signin" class="link">로그인</label>
-              </p>
+              <div class="auth-row">
+                <!-- <label class="link small" for="modal-signin" >로그인</label> -->
+              </div>
             </form>
           </section>
         </div>
