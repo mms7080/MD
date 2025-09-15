@@ -1,157 +1,171 @@
+/* /resources/static/js/folios/edit.js (최종 수정 완료) */
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 미리보기 UI 요소 ---
-    const preview = {
-        name: document.getElementById('preview-name'),
-        engName: document.getElementById('preview-eng-name'),
-        job: document.getElementById('preview-job'),
-        email: document.getElementById('preview-email'),
-        skills: document.getElementById('preview-skills'),
-        picContainer: document.getElementById('preview-pic-container')
+    const folioState = {
+        skills: ["Java", "Spring Boot"],
+        photos: [], // { fileId: '...', url: '...' }
     };
 
-    // --- 폼 입력 요소 ---
-    const form = {
-        name: document.getElementById('folio-name'),
-        engName: document.getElementById('folio-eng-name'),
-        job: document.getElementById('folio-job'),
-        email: document.getElementById('folio-email'),
-        introduction: document.getElementById('folio-introduction'),
-        photosInput: document.getElementById('photos'), 
-        submitButton: document.querySelector('.btn-submit')
+    const elements = {
+        preview: {
+            pic: document.getElementById('preview-profile-pic'),
+            job: document.getElementById('preview-job'),
+            skills: document.getElementById('preview-skills'),
+        },
+        form: {
+            job: document.getElementById('folio-job'),
+            introduction: document.getElementById('folio-introduction'),
+            skillsWrapper: document.getElementById('skills-input-wrapper'),
+            photosInput: document.getElementById('photos-input'),
+            imagePreviewContainer: document.getElementById('image-preview-container'),
+            formElement: document.getElementById('folio-edit-form'),
+        },
     };
 
-    // --- 실시간 미리보기 이벤트 연결 ---
-    function syncPreview() {
-        preview.name.textContent = form.name.value || '이름';
-        preview.engName.textContent = form.engName.value || 'English Name';
-        preview.job.textContent = form.job.value || '희망 직무';
-        preview.email.textContent = form.email.value || '이메일';
-    }
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
 
-    form.name.addEventListener('input', syncPreview);
-    form.engName.addEventListener('input', syncPreview);
-    form.job.addEventListener('input', syncPreview);
-    form.email.addEventListener('input', syncPreview);
-    
-    syncPreview(); // 초기 로드 시 미리보기 동기화
+    const syncPreview = () => {
+        elements.preview.job.textContent = elements.form.job.value || '희망 직무';
+        const firstPhotoUrl = folioState.photos[0]?.url;
+        elements.preview.pic.style.backgroundImage = firstPhotoUrl ? `url('${firstPhotoUrl}')` : 'none';
+    };
 
-    // --- 기술 스택 태그 관리 ---
-    const skillsInputWrapper = document.getElementById('skills-input-wrapper');
-    let tags = ["Java", "Spring Boot"]; // 태그 데이터를 저장할 배열
-    
-    if (skillsInputWrapper) {
-        // ... (이전 단계의 기술 스택 코드는 여기에 그대로 유지됩니다) ...
-        const tagsContainer = document.createElement('div');
-        tagsContainer.className = 'tags-input-container';
-        const skillsInput = document.createElement('input');
-        skillsInput.type = 'text';
-        skillsInput.id = 'skills';
-        skillsInput.placeholder = '스킬 입력 후 Enter...';
+    function setupSkillsInput() {
+        const wrapper = elements.form.skillsWrapper;
+        if (!wrapper) return;
+        wrapper.innerHTML = `<div class="tags-input-container"><input type="text" id="skills-input" placeholder="스킬 입력 후 Enter..."></div>`;
+        const container = wrapper.querySelector('.tags-input-container');
+        const input = wrapper.querySelector('#skills-input');
 
-        skillsInputWrapper.appendChild(tagsContainer);
-        tagsContainer.appendChild(skillsInput);
-
-        const renderPreviewSkills = () => {
-            preview.skills.innerHTML = '';
-            tags.forEach(tagText => {
+        const renderSkills = () => {
+            container.querySelectorAll('.tag').forEach(t => t.remove());
+            folioState.skills.forEach(skill => {
                 const tagEl = document.createElement('span');
                 tagEl.className = 'tag';
-                tagEl.textContent = tagText;
-                preview.skills.appendChild(tagEl);
-            });
-        };
-
-        const renderFormSkills = () => {
-            tagsContainer.querySelectorAll('.tag').forEach(t => t.remove());
-            tags.forEach(tagText => {
-                const tagElement = document.createElement('span');
-                tagElement.className = 'tag';
-                tagElement.textContent = tagText;
+                tagEl.textContent = skill;
                 const removeBtn = document.createElement('button');
                 removeBtn.textContent = '×';
                 removeBtn.type = 'button';
                 removeBtn.onclick = () => {
-                    tags = tags.filter(t => t !== tagText);
-                    renderFormSkills();
-                    renderPreviewSkills();
+                    folioState.skills = folioState.skills.filter(s => s !== skill);
+                    renderSkills();
                 };
-                tagElement.appendChild(removeBtn);
-                tagsContainer.insertBefore(tagElement, skillsInput);
+                tagEl.appendChild(removeBtn);
+                container.insertBefore(tagEl, input);
+            });
+            elements.preview.skills.innerHTML = folioState.skills.map(s => `<span class="tag">${s}</span>`).join('');
+        };
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const newSkill = input.value.trim();
+                if (newSkill && !folioState.skills.includes(newSkill)) {
+                    folioState.skills.push(newSkill);
+                    renderSkills();
+                }
+                input.value = '';
+            }
+        });
+        renderSkills();
+    }
+
+    function setupImageUpload() {
+        const input = elements.form.photosInput;
+        const container = elements.form.imagePreviewContainer;
+        if (!input || !container) return;
+
+        const renderImagePreviews = () => {
+            container.innerHTML = '';
+            folioState.photos.forEach((photo, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'image-preview-wrapper';
+                wrapper.innerHTML = `<img src="${photo.url}" alt="미리보기 ${index + 1}">`;
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'preview-delete-btn';
+                deleteBtn.textContent = '×';
+                deleteBtn.type = 'button';
+                deleteBtn.onclick = () => {
+                    folioState.photos.splice(index, 1);
+                    renderImagePreviews();
+                    syncPreview();
+                };
+                wrapper.appendChild(deleteBtn);
+                container.appendChild(wrapper);
             });
         };
 
-        skillsInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const newTag = skillsInput.value.trim();
-                if (newTag && !tags.includes(newTag)) {
-                    tags.push(newTag);
-                    renderFormSkills();
-                    renderPreviewSkills();
-                }
-                skillsInput.value = '';
-            }
-        });
-
-        renderFormSkills();
-        renderPreviewSkills();
-    }
-    
-    // --- 이미지 업로드 미리보기 (기존 코드 유지) ---
-    if (form.photosInput) {
-        // ... (이전 단계의 이미지 업로드 코드는 여기에 그대로 유지됩니다) ...
-        form.photosInput.addEventListener('change', (event) => {
+        input.addEventListener('change', async (event) => {
             const files = Array.from(event.target.files);
-            if (files.length > 0) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    preview.picContainer.style.backgroundImage = `url('${e.target.result}')`;
-                };
-                reader.readAsDataURL(files[0]);
+            if (files.length === 0) return;
+
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+                try {
+                    const response = await fetch('/api/uploads/images', {
+                        method: 'POST',
+                        headers: { ...(csrfHeader && csrfToken && { [csrfHeader]: csrfToken }) },
+                        body: formData,
+                    });
+                    if (!response.ok) throw new Error(`이미지 업로드 실패 (${response.status})`);
+                    const result = await response.json();
+                    folioState.photos.push(result);
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert(`이미지 업로드 중 오류가 발생했습니다: ${error.message}`);
+                }
             }
+            renderImagePreviews();
+            syncPreview();
+            input.value = '';
         });
     }
 
-    // --- ⬇️ [매우 중요] 저장(Submit) 기능 구현 ⬇️ ---
-    form.submitButton.addEventListener('click', async (e) => {
-        e.preventDefault(); // 기본 폼 제출 동작 방지
+    elements.form.formElement?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const selectedProjectIds = Array.from(document.querySelectorAll('input[name="projectIds"]:checked'))
+                                    .map(input => input.value);
 
-        // 1. DTO 형태로 보낼 데이터 객체 생성
         const folioData = {
-            introduction: form.introduction.value,
-            skills: tags,
-            thumbnail: "https://picsum.photos/seed/newfolio/300" // 썸네일은 우선 임시값으로
-            // 여기에 나중에 사진 업로드 후 대표 이미지 URL을 넣으면 됩니다.
+            introduction: elements.form.introduction.value,
+            skills: folioState.skills,
+            photos: folioState.photos.map(p => p.url),
+            projectIds: selectedProjectIds
         };
-
-        // 2. CSRF 토큰 가져오기 (Thymeleaf를 통해 meta 태그에 저장된 값 사용)
-        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
+        
         try {
-            // 3. fetch를 사용하여 서버에 POST 요청 보내기
             const response = await fetch('/api/folios', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken // CSRF 토큰을 헤더에 추가
+                    ...(csrfHeader && csrfToken && { [csrfHeader]: csrfToken }),
                 },
-                body: JSON.stringify(folioData) // JavaScript 객체를 JSON 문자열로 변환
+                body: JSON.stringify(folioData)
             });
 
             if (response.ok) {
                 const result = await response.json();
                 alert('Folio가 성공적으로 저장되었습니다!');
-                // 4. 저장 성공 시, 새로 만들어진 상세 페이지로 이동
                 window.location.href = `/folios/detail/${result.folioId}`;
             } else {
-                // 서버에서 보낸 에러 메시지 표시
-                const errorData = await response.json();
-                alert(`저장 실패: ${errorData.message || '서버 오류가 발생했습니다.'}`);
+                // 서버가 403 같은 오류를 보내면 JSON이 없을 수 있음
+                if (response.status === 403) {
+                     alert(`저장 실패: 권한이 없습니다. 다시 로그인해주세요.`);
+                } else {
+                    const errorData = await response.json();
+                    alert(`저장 실패: ${errorData.message || '서버 오류'}`);
+                }
             }
         } catch (error) {
-            console.error('저장 중 오류 발생:', error);
-            alert('저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            console.error('Submit error:', error);
+            alert('저장 중 네트워크 오류가 발생했습니다.');
         }
     });
+
+    elements.form.job.addEventListener('input', syncPreview);
+    setupSkillsInput();
+    setupImageUpload();
+    syncPreview();
 });

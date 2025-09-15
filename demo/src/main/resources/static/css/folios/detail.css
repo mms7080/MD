@@ -1,5 +1,6 @@
 /* /resources/static/css/folios/detail.css */
 
+/* --- 프로필 헤더 --- */
 .profile-header {
     display: flex;
     align-items: center;
@@ -39,6 +40,7 @@
     font-size: 0.8rem; font-weight: 600;
 }
 
+/* --- 공통 섹션 스타일 --- */
 .detail-section {
     margin-bottom: 40px;
 }
@@ -54,9 +56,10 @@
 .detail-section p {
     line-height: 1.7;
     font-size: 16px;
-    color: var(--muted);
+    color: var(--text);
 }
 
+/* --- 참여 포트폴리오 리스트 --- */
 .project-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -70,11 +73,14 @@
     border-radius: 12px;
     overflow: hidden;
     transition: box-shadow .2s, transform .2s;
+    background: var(--panel);
 }
+
 .project-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    box-shadow: var(--shadow);
 }
+
 .project-card img {
     width: 100%;
     aspect-ratio: 16/9;
@@ -82,18 +88,23 @@
     display: block;
     border-bottom: 1px solid var(--border);
 }
+
 .project-card .project-title {
     padding: 14px;
     font-weight: 600;
 }
 
+/* --- 사진 갤러리 --- */
 .photo-gallery {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
 }
+
 .photo-gallery img {
     width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
     border-radius: 12px;
     border: 1px solid var(--border);
 }

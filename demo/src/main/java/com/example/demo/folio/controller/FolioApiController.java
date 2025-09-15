@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.HashMap;
 import java.util.List;
@@ -71,14 +72,15 @@ public class FolioApiController {
             Principal principal) {
         
         if (principal == null) {
-            // 로그인하지 않은 사용자는 권한 없음(401) 또는 접근 거부(403) 응답
             return ResponseEntity.status(403).build();
         }
         
         Folio savedFolio = folioService.createOrUpdateFolio(requestDto, principal);
         
-        // 저장 후 상세 DTO로 변환하여 반환
+        // --- 수정된 부분: Folio 객체 하나만 받는 생성자를 사용 ---
         FolioDetailDto responseDto = new FolioDetailDto(savedFolio);
+        
+
         return ResponseEntity.ok(responseDto);
     }
     

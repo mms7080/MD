@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersService.UsersService;
 import java.security.Principal;
+import com.example.demo.folio.dto.PortfolioInFolioDto;
+import com.example.demo.folio.service.FolioService; // FolioService 주입
+import java.util.List;
 
 
 
@@ -22,6 +25,7 @@ import java.security.Principal;
 public class FolioController {
 
     private final UsersService usersService;
+    private final FolioService folioService; 
 
     // 1. 목록 페이지 뷰
     @GetMapping

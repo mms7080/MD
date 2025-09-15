@@ -1,3 +1,4 @@
+/* /resources/static/js/folios/list.js */
 document.addEventListener('DOMContentLoaded', function() {
     const grid = document.getElementById('folio-grid');
     const paginationContainer = document.getElementById('pagination');
@@ -12,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
         grid.innerHTML = '<p class="loading-message muted">데이터를 불러오는 중입니다...</p>';
         paginationContainer.innerHTML = '';
 
-        
         try {
             const response = await fetch(`/api/folios?page=${page - 1}&size=10`);
             
@@ -34,13 +34,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     const thumbnail = cardClone.querySelector('.kf-card__thumb img');
                     thumbnail.src = folio.thumbnail || 'https://picsum.photos/seed/placeholder/400/250';
-                    thumbnail.alt = `${folio.user.userName}의 Folio 썸네일`;
-
-                    cardClone.querySelector('.kf-card__title a').textContent = folio.user.userName;
+                    
+                    // --- 수정된 부분 ---
+                    thumbnail.alt = `${folio.userName}의 Folio 썸네일`;
+                    cardClone.querySelector('.kf-card__title a').textContent = folio.userName;
+                    // --------------------
 
                     const tagsContainer = cardClone.querySelector('.kf-card__tags');
                     tagsContainer.innerHTML = '';
-                    folio.skills.slice(0, 4).forEach(skill => {
+                    (folio.skills || []).slice(0, 4).forEach(skill => {
                         const tagEl = document.createElement('span');
                         tagEl.className = 'kf-tag';
                         tagEl.textContent = `#${skill}`;
@@ -50,14 +52,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     grid.appendChild(cardClone);
                 });
 
-                renderPagination(data.page, data.totalPages);
+                // API 응답의 page는 0부터 시작하므로 currentPage는 data.page + 1
+                renderPagination(data.page + 1, data.totalPages);
             } else {
-                grid.innerHTML = '<p class="muted">아직 등록된 Folio가 없습니다.</p>';
+                grid.innerHTML = '<p class="muted empty-message">아직 등록된 Folio가 없습니다.</p>';
             }
-        // 👇 이 catch 블록이 누락되면 오류가 발생합니다.
         } catch (error) {
             console.error('Folio 데이터를 불러오는 데 실패했습니다:', error);
-            grid.innerHTML = '<p class="muted">데이터를 불러오는 중 오류가 발생했습니다.</p>';
+            grid.innerHTML = '<p class="muted empty-message">데이터를 불러오는 중 오류가 발생했습니다.</p>';
         }
     }
 
@@ -71,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
             pageButton.textContent = i;
             pageButton.dataset.page = i;
 
-            if ((i - 1) === currentPage) {
+            if (i === currentPage) {
                 pageButton.classList.add('active');
                 pageButton.disabled = true;
             }

@@ -8,38 +8,39 @@
 )}">
 <head>
     <th:block id="list-css">
+        <link th:href="@{/css/portfolios/list.css}" rel="stylesheet" />
         <link th:href="@{/css/folios/list.css}" rel="stylesheet" />
-        <link th:href="@{/css/portfolios/list.css}" rel="stylesheet" /> 
     </th:block>
 </head>
 <body>
     <div id="folios-list-content">
-    <h1 class="folios-title">Folio 둘러보기</h1>
+        <h1 class="folios-title">Folio 둘러보기</h1>
     
-    <div id="folio-grid" class="grid">
-        </div>
-
-    <nav id="pagination" class="pagination" aria-label="Folio list navigation"></nav>
-
-    <template id="folio-card-template">
-    <article class="kf-card">
-        <a class="kf-card__thumb" href="#">
-            <img src="https://picsum.photos/seed/placeholder/400/250" alt="Folio 썸네일" />
-        </a>
-        <div class="kf-card__body">
-            <div class="kf-card__head">
-                <div class="kf-card__left">
-                    <h3 class="kf-card__title">
-                        <a href="#">사용자 이름</a>
-                    </h3>
-                </div>
+        <div id="folio-grid" class="kf-grid">
             </div>
-            <div class="kf-card__tags">
+
+        <nav id="pagination" class="pagination" aria-label="Folio list navigation"></nav>
+
+        <template id="folio-card-template">
+            <article class="kf-card">
+                <a class="kf-card__thumb" href="#">
+                    <img src="https://picsum.photos/seed/placeholder/400/250" alt="Folio 썸네일" />
+                </a>
+                <div class="kf-card__body">
+                    <div class="kf-card__head">
+                        <div class="kf-card__left">
+                            <h3 class="kf-card__title">
+                                <a href="#">사용자 이름</a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="kf-card__tags">
+                        </div>
                 </div>
-        </div>
-    </article>
-</template>
-</div>
+            </article>
+        </template>
+    </div>
+
     <th:block id="list-js">
         <script th:src="@{/js/folios/list.js}"></script>
     </th:block>

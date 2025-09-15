@@ -1,5 +1,6 @@
 package com.example.demo.portfolios;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -255,6 +256,19 @@ PORTFOLIOS.put("9", new PortfoliosEntity("9", "Pickup", "A. Park",
         return "portfolios/detail"; // templates/detail/portfolio-detail.html
     }
 
+    /**
+     * ID로 포트폴리오 엔티티를 반환하는 public 메서드 (임시)(준회)
+     */
+    public PortfoliosEntity getPortfolioById(String id) {
+        return PORTFOLIOS.get(id);
+    }
+
+    /**
+     * 모든 포트폴리오 엔티티 목록을 반환하는 public 메서드 (임시)(준회)
+     */
+    public Collection<PortfoliosEntity> getAllPortfolios() {
+        return PORTFOLIOS.values();
+    }
 
 
 }

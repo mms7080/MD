@@ -14,24 +14,20 @@
 <body>
     <div id="folios-edit-content">
         <div class="edit-header">
-            <h1>기본 프로필을 완성해볼까요?</h1>
-            <p>이름, 연락처, 이메일 등 기본 정보를 입력해 주세요.</p>
+            <h1>나의 Folio 만들기</h1>
+            <p>자신을 멋지게 표현하고, 참여했던 프로젝트를 연결해보세요.</p>
         </div>
 
         <div class="edit-container">
             <aside class="preview-pane">
                 <div class="preview-card">
-                    <div class="preview-profile-pic" id="preview-pic-container"></div>
-                    <h2 id="preview-name">이름</h2>
-                    <p id="preview-eng-name">English Name</p>
+                    <div class="preview-profile-pic" id="preview-profile-pic"></div>
+                    <h2 id="preview-name" th:text="${currentUser.name}">이름</h2>
+                    <p id="preview-job">희망 직무</p>
                     <hr class="divider" />
-                    <div class="preview-info">
-                        <span class="icon">💼</span>
-                        <span id="preview-job">희망 직무</span>
-                    </div>
-                    <div class="preview-info">
+                     <div class="preview-info">
                         <span class="icon">📧</span>
-                        <span id="preview-email">이메일</span>
+                        <span id="preview-email" th:text="${currentUser.email}">이메일</span>
                     </div>
                     <div class="preview-info skills">
                         <span class="icon">🔧</span>
@@ -41,63 +37,53 @@
             </aside>
 
             <main class="form-pane">
-                <form class="edit-form">
-                    <div class="form-grid">
-                        <div class="form-section">
-                            <label for="folio-name">이름 <span class="req">*</span></label>
-                            <input type="text" id="folio-name" th:value="${currentUser.name}">
-                        </div>
-                        <div class="form-section">
-                            <label for="folio-eng-name">영문 이름 <span class="req">*</span></label>
-                            <input type="text" id="folio-eng-name" placeholder="영문 이름을 입력하세요">
-                        </div>
-                        <div class="form-section">
-                            <label for="folio-job">희망 직무 <span class="req">*</span></label>
-                            <input type="text" id="folio-job" placeholder="예: 백엔드 개발자">
-                        </div>
-                        <div class="form-section">
-                            <label for="folio-email">이메일 <span class="req">*</span></label>
-                            <input type="email" id="folio-email" th:value="${currentUser.email}">
-                        </div>
-                        <div class="form-section">
-                            <label for="folio-contact">연락처 <span class="req">*</span></label>
-                            <input type="tel" id="folio-contact" placeholder="010-1234-5678">
-                        </div>
-                        <div class="form-section">
-                            <label for="skills">스킬 셋 <span class="req">*</span></label>
-                            <div id="skills-input-wrapper"></div>
-                        </div>
+                <form id="folio-edit-form" class="edit-form">
+                    <div class="form-section">
+                        <label>이름</label>
+                        <input type="text" th:value="${currentUser.name}" readonly disabled>
+                    </div>
+                    <div class="form-section">
+                        <label>이메일</label>
+                        <input type="email" th:value="${currentUser.email}" readonly disabled>
                     </div>
 
+                    <div class="form-section">
+                        <label for="folio-job">희망 직무 <span class="req">*</span></label>
+                        <input type="text" id="folio-job" placeholder="예: 백엔드 개발자" required>
+                    </div>
+                    <div class="form-section">
+                        <label for="skills-input">기술 스택 <span class="req">*</span></label>
+                        <div id="skills-input-wrapper"></div>
+                    </div>
                     <div class="form-section">
                         <label for="folio-introduction">자기소개</label>
                         <textarea id="folio-introduction" rows="6" placeholder="자신을 자유롭게 소개해 주세요."></textarea>
                     </div>
-
                     <div class="form-section">
-                        <label>참여 포트폴리오</label>
-                        <div class="project-selector">
-                            <label class="checkbox-item"><input type="checkbox"> Pawple - 반려동물 건강 관리</label>
-                            <label class="checkbox-item"><input type="checkbox"> Filmora - 영화 예매 사이트</label>
-                            <label class="checkbox-item"><input type="checkbox"> ModeMe - 패션 커머스</label>
+                        <label>대표 이미지 및 사진</label>
+                        <div class="upload-area">
+                            <label for="photos-input" class="custom-file-uploader">
+                                <span class="file-icon">+</span>
+                                <span class="file-text">사진 추가</span>
+                            </label>
+                            <input type="file" id="photos-input" multiple accept="image/*" style="display: none;">
+                            <div id="image-preview-container"></div>
                         </div>
                     </div>
-
+                    
                     <div class="form-section">
-                        <label>대표 이미지 및 사진 (최대 20개)</label>
-                        <input type="file" id="photos" multiple accept="image/*" style="display: none;">
-                        <div class="upload-area">
-                            <label for="photos" class="custom-file-uploader">
-                                <span class="file-icon">+</span>
-                                <span class="file-text">새 포트폴리오 만들기</span>
+                        <label>참여 포트폴리오 연결</label>
+                        <div class="project-selector">
+                            <label class="checkbox-item" th:each="p : ${allPortfolios}">
+                                <input type="checkbox" name="projectIds" th:value="${p.portfolioId}">
+                                <span th:text="${p.title}">포트폴리오 제목</span>
                             </label>
-                            <div id="image-preview-container"></div>
                         </div>
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" class="btn-cancel">이전</button>
-                        <button type="submit" class="btn-submit">다음</button>
+                        <a th:href="@{/folios}" class="btn-cancel">취소</a>
+                        <button type="submit" class="btn-submit">저장하기</button>
                     </div>
                 </form>
             </main>
