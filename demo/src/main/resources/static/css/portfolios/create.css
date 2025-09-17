@@ -1,0 +1,225 @@
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Spoqa Han Sans Neo", "Noto Sans KR", sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* =====================
+     Container
+  ===================== */
+  .container {
+    max-width: 700px;
+    margin: 60px auto;
+    padding: 32px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  
+  h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  
+  /* =====================
+     Form Elements
+  ===================== */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  
+  label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: var(--muted);
+    display: block;
+  }
+  
+  input[type="text"],
+  input[type="url"],
+  input[type="file"],
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s ease, background 0.2s ease;
+  }
+  
+  input[type="text"]:focus,
+  input[type="url"]:focus,
+  input[type="file"]:focus,
+  textarea:focus {
+    border-color: var(--primary);
+    background: #1c1e28;
+  }
+  
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  /* 팀원 아이템 */
+  .team-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .team-item input,
+  .team-item select {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: 14px;
+  }
+  
+  .team-item select {
+    max-width: 120px; /* 역할은 짧으니까 */
+  }
+  
+  /* =====================
+     Buttons
+  ===================== */
+  button {
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s ease;
+  }
+  
+  button[type="button"] {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  
+  button[type="button"]:hover {
+    background: #1e2029;
+    color: var(--text);
+  }
+  
+  button[type="submit"] {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 3px 10px rgba(0,0,0,.25);
+  }
+  
+  button[type="submit"]:hover {
+    background: #466ddb;
+  }
+
+  /* 태그 */
+  .tag-input-box {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .tag-input-box input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-soft);
+    color: var(--text);
+  }
+  
+  .tag-input-box button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--primary);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: 13px;
+  }
+  
+  .remove-tag {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--muted);
+  }
+  .remove-tag:hover {
+    color: var(--danger, red);
+  }
+
+  /* 이미지 */
+  .image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .thumb-wrapper {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .thumb-wrapper img.thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .thumb-wrapper .remove-thumb {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px 5px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .thumb-wrapper .remove-thumb:hover {
+    background: rgba(255,0,0,0.7);
+  }
+  

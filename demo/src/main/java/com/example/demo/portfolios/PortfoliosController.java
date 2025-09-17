@@ -8,7 +8,11 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class PortfoliosController {
@@ -86,7 +90,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
     private static final Map<String,PortfoliosEntity> PORTFOLIOS = new LinkedHashMap<>();
 
         static{
-            PORTFOLIOS.put("1",new PortfoliosEntity("1","Pawple","H.kim",
+            PORTFOLIOS.put("1",new PortfoliosEntity("Pawple","H.kim",
                                 List.of("React","Next.js","SpringBoot","JPA","LomBok"),10,"2025-08-15",
                                 "https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1....png","반려동물 건강 관리 웹사이트 프로젝트",
                                 List.of("https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png",
@@ -100,7 +104,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
             "https://pawple.kafolio.kr/","pawpleRe.zip"
         ));
             
-        PORTFOLIOS.put("2", new PortfoliosEntity("2", "Filmora", "S.Han",
+        PORTFOLIOS.put("2", new PortfoliosEntity( "Filmora", "S.Han",
             List.of("Next.js","SpringBoot","React","JPA","VSCode"),
             2, "2025-08-22",
             "https://kafolio.kr/static/requests/2025/7/9/boards/NmI2....png",
@@ -118,7 +122,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
             ));
     
     
-        PORTFOLIOS.put("3", new PortfoliosEntity("3", "ModeMe", "A. Park",
+        PORTFOLIOS.put("3", new PortfoliosEntity( "ModeMe", "A. Park",
             List.of("Java","Thymeleaf","HTML","CSS","SpringBoot"),
             2, "2025-07-10",
             "https://kafolio.kr/static/requests/2025/7/9/boards/YWFm....png",
@@ -135,7 +139,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
     ));
 
 
-    PORTFOLIOS.put("4", new PortfoliosEntity("4", "OSPE", "A. Park",
+    PORTFOLIOS.put("4", new PortfoliosEntity( "OSPE", "A. Park",
     List.of("Java","Thymeleaf","HTML","JavaScript","SQL"),
     2, "2025-07-10",
     "https://kafolio.kr/static/requests/2025/7/9/boards/YWFm....png",
@@ -152,7 +156,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
 ));
 
     
-    PORTFOLIOS.put("5", new PortfoliosEntity("5", "NotePad", "A. Park",
+    PORTFOLIOS.put("5", new PortfoliosEntity("NotePad", "A. Park",
     List.of("JavaScript","Tailwind","HTML","CSS","NodeJS"),
     2, "2025-07-10",
     "https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg",
@@ -169,7 +173,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
     ));
 
 
-    PORTFOLIOS.put("6",new PortfoliosEntity("6","Planner for U","H.kim",
+    PORTFOLIOS.put("6",new PortfoliosEntity("Planner for U","H.kim",
                                 List.of("Java","SCSS","JavaScript","TS","HTML","CSS","Thymeleaf"),
                                 10,"2025-08-15",
                                 "https://kafolio.kr/static/requests/2024/9/4/boards/NjRlNGMwMzJkZDc0OTJlYzZjYTdiYTk3ZTE5YjEyOTEyZmYwODhhZDE4NmM5MjExZDNkYzgzZmE4ZThmZjhkOA==.png",
@@ -186,7 +190,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
         ));
 
 
-        PORTFOLIOS.put("7", new PortfoliosEntity("7", "취미존중", "A. Park",
+        PORTFOLIOS.put("7", new PortfoliosEntity( "취미존중", "A. Park",
     List.of("Java","Thymeleaf","HTML","JavaScript","CSS","SCSS","TypeScript"),
     2, "2025-07-10",
     "https://kafolio.kr/static/requests/2024/9/5/boards/NmQ4OTU1OGMwZTQ4ODcyZTFmMTExY2M3ZTEwOTA4ZjBlNzAxMDBlMTJkZGEyZDg5MDBmMjM3NzA4ZmY2ZDYxMw==.png",
@@ -203,7 +207,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
 ));
 
 
-PORTFOLIOS.put("8", new PortfoliosEntity("8", "O_O 커뮤니티", "A. Park",
+PORTFOLIOS.put("8", new PortfoliosEntity( "O_O 커뮤니티", "A. Park",
     List.of("JavaScript","HTML","CSS","React"),
     2, "2025-07-10",
     "https://kafolio.kr/static/requests/2024/5/3/boards/MjFhOWE5YzMxZmYxMjFmN2E0MzBlZDk1NmRmMDU2MGE5Y2ZkYzZkMmI1ZDIyMzBlNzRhYWE5Nzc5NzE0ODY1Yw==.png",
@@ -219,7 +223,7 @@ PORTFOLIOS.put("8", new PortfoliosEntity("8", "O_O 커뮤니티", "A. Park",
     "https://o-o.kafolio.kr/app","O-O.kafolio.kr.zip"
 ));
 
-PORTFOLIOS.put("9", new PortfoliosEntity("9", "Pickup", "A. Park",
+PORTFOLIOS.put("9", new PortfoliosEntity( "Pickup", "A. Park",
     List.of("JavaScript","Express","React"),
     2, "2025-07-10",
     "https://kafolio.kr/static/requests/2024/4/26/boards/MTkyMzEwZTdiOTM2Mjk0NjQ3NDdhMjBiNGQ4OGEwNjdmYWI3YzlkMDk1MGQ5ODg5ZmIyMTBiNzg4NTBjOGIxZA==.jpg",
@@ -269,6 +273,21 @@ PORTFOLIOS.put("9", new PortfoliosEntity("9", "Pickup", "A. Park",
     public Collection<PortfoliosEntity> getAllPortfolios() {
         return PORTFOLIOS.values();
     }
+
+
+    @GetMapping("/portfolios/create")
+    public String createForm(Model model){
+        model.addAttribute("portfolioFormDto", new PortfolioFormDto());
+        return "portfolios/create";
+    }
+
+    // @PostMapping("portfolios/create")
+    // public String createSubmit(@ModelAttribute PortfolioFormDto form,
+    //                             @RequestParam("images") List<MultipartFile> images,
+    //                             @RequestParam("download") MultipartFile downloadZip){
+    //     portfolioService.savePortfolio(form, images, downloadZip);
+    //     return "redirect:/portfolios";
+    //                             }
 
 
 }

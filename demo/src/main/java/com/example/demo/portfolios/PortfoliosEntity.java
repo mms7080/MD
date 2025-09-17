@@ -3,14 +3,38 @@ package com.example.demo.portfolios;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 // 임시 entity
+@Entity
+@Table(name="portfolio")
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PortfoliosEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private String id;
+    
     private String title;
     private String creator;
+
+    @ElementCollection
     private List<String> tags;
     private int likes;
     private String createdAt;
@@ -18,7 +42,10 @@ public class PortfoliosEntity {
     private String desc;
 
     // 추가
+    @ElementCollection
     private List<String> screenshots; 
+
+    @OneToMany(cascade = CascadeType.ALL)
     private List<TeamMemberEntity> team;
 
     private String icon; // 팀 아이콘
@@ -27,10 +54,9 @@ public class PortfoliosEntity {
     
 
     // 생성자
-    public PortfoliosEntity(String id, String title, String creator, List<String> tags, int likes,
+    public PortfoliosEntity(String title, String creator, List<String> tags, int likes,
                    String createdAt, String cover, String desc, List<String> screenshots,List<TeamMemberEntity> team
                    ,String icon, String link, String download) {
-        this.id = id;
         this.title = title;
         this.creator = creator;
         this.tags = tags;

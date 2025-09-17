@@ -57,6 +57,31 @@ body {
     color: var(--muted);
 }
 
+/* Create-box */
+.kf-create-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--chip);
+    color: var(--chip-text);
+    font-weight: 200;
+    font-size: 13px;
+    cursor: pointer;
+    margin-left: auto;  /* 오른쪽 끝으로 이동 */
+    text-decoration: none;
+   
+}
+.kf-create-btn:hover {
+    filter: brightness(1.05);
+    text-decoration: none;
+}
+
+
+
+
 /* 바 & 폼 */
 .kf-filterbar {
     display: flex;
@@ -310,6 +335,11 @@ body {
     background: var(--chip);
     outline: none;
 }
+
+
+/* Create Box */
+
+
 
 /* Grid of cards */
 
