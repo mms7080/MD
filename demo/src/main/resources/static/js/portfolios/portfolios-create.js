@@ -56,9 +56,25 @@ function renderTags() {
   document.getElementById("tags-hidden").value = tags.join(",");
 }
 
+function validateFile(file) {
+  const validTypes = ["image/jpeg", "image/png", "image/webp"];
+  const maxSize = 10 * 1024 * 1024; // 10MB
 
-// 이미지 추가
-document.getElementById("image-input").addEventListener("change", function(event) {
+  if (!validTypes.includes(file.type)) {
+    alert("JPEG, PNG, WebP 형식만 업로드 가능합니다.");
+    return false;
+  }
+  if (file.size > maxSize) {
+    alert("파일 크기는 최대 10MB까지 가능합니다.");
+    return false;
+  }
+  return true;
+}
+
+// ===========================
+// 이미지 추가 + 미리보기 + 삭제
+// ===========================
+document.getElementById("image-input")?.addEventListener("change", function(event) {
   const files = event.target.files;
   const preview = document.getElementById("image-preview");
 
@@ -73,7 +89,7 @@ document.getElementById("image-input").addEventListener("change", function(event
         img.src = e.target.result;
         img.className = "thumb";
 
-        // 삭제 버튼 (×)
+        // 삭제 버튼
         const removeBtn = document.createElement("span");
         removeBtn.className = "remove-thumb";
         removeBtn.innerHTML = "&times;";
@@ -87,4 +103,49 @@ document.getElementById("image-input").addEventListener("change", function(event
     }
   });
 });
+// ===========================
+// 아이콘 업로드 (1장만 미리보기)
+// ===========================
+document.getElementById("icon-input")?.addEventListener("change", function(event) {
+  const file = event.target.files[0]; // 첫 번째 파일만
+  const preview = document.getElementById("icon-preview");
+  preview.innerHTML = ""; // 기존 미리보기 초기화
+
+  if (file && file.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const imgWrapper = document.createElement("div");
+      imgWrapper.className = "icon-wrapper";
+
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.className = "icon-thumb";
+
+      // 삭제 버튼
+      const removeBtn = document.createElement("span");
+      removeBtn.className = "remove-thumb";
+      removeBtn.innerHTML = "&times;";
+      removeBtn.onclick = () => {
+        preview.innerHTML = "";
+        document.getElementById("icon-input").value = ""; // 파일 선택 초기화
+      };
+
+      imgWrapper.appendChild(img);
+      imgWrapper.appendChild(removeBtn);
+      preview.appendChild(imgWrapper);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+
+// ===========================
+// 취소 버튼 → 리스트로 이동
+// ===========================
+function goToList() {
+  window.location.href = "/portfolios";
+}
+
+
+
 
