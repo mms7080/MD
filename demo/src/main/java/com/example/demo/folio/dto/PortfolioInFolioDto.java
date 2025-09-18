@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class PortfolioInFolioDto {
-    private String portfolioId;
+    private Long portfolioId;
     private String title;
 }

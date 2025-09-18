@@ -1,4 +1,6 @@
-package com.example.demo.portfolios;
+package com.example.demo.portfolios.dto;
+
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class TeamMemberDto {
     
     private String teamName;
-    private String name;
-    private String role;
+    private String memberName;
+    private String memberRole;
+    private List<String> parts;
 }

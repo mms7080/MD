@@ -118,13 +118,15 @@ body {
   }
   
   button[type="submit"] {
-    background: var(--primary);
-    color: white;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--muted);
     box-shadow: 0 3px 10px rgba(0,0,0,.25);
   }
   
   button[type="submit"]:hover {
-    background: #466ddb;
+    color: var(--text);
+    background: #1e2029;
   }
 
   /* 태그 */

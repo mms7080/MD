@@ -1,5 +1,7 @@
-package com.example.demo.portfolios;
+package com.example.demo.portfolios.controller;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,8 +16,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.portfolios.dto.PortfolioFormDto;
+import com.example.demo.portfolios.entity.PortfoliosEntity;
+import com.example.demo.portfolios.entity.TeamMemberEntity;
+import com.example.demo.portfolios.service.PortfolioService;
+
 @Controller
 public class PortfoliosController {
+
+    private final PortfolioService portfolioService;
     
     private static final List<TeamMemberEntity> team1 = List.of(
     new TeamMemberEntity("PAWPLE","김민정", "팀장) 프론트+백엔드", List.of("회원", "스토어", "지도", "유기동물")),
@@ -91,7 +100,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
 
         static{
             PORTFOLIOS.put("1",new PortfoliosEntity("Pawple","H.kim",
-                                List.of("React","Next.js","SpringBoot","JPA","LomBok"),10,"2025-08-15",
+                                List.of("React","Next.js","SpringBoot","JPA","LomBok"),10,LocalDateTime.of(2025,7,10,21,50),
                                 "https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1....png","반려동물 건강 관리 웹사이트 프로젝트",
                                 List.of("https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png",
                                         "https://kafolio.kr/static/requests/2025/7/9/boards/NmI2MTk3MzEwZTFkODBmMTRhMTI1NWRlMmE1ODI2NWZkZTg0OWJkNzJlOTM5ZDg3MGFlMjc5Yzc4NzViOThhMw==.png",
@@ -106,7 +115,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
             
         PORTFOLIOS.put("2", new PortfoliosEntity( "Filmora", "S.Han",
             List.of("Next.js","SpringBoot","React","JPA","VSCode"),
-            2, "2025-08-22",
+            2, LocalDateTime.of(2025,7,10,21,50),
             "https://kafolio.kr/static/requests/2025/7/9/boards/NmI2....png",
             "영화 예매 사이트",
             List.of(
@@ -124,7 +133,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
     
         PORTFOLIOS.put("3", new PortfoliosEntity( "ModeMe", "A. Park",
             List.of("Java","Thymeleaf","HTML","CSS","SpringBoot"),
-            2, "2025-07-10",
+            2, LocalDateTime.of(2025,7,10,21,50),
             "https://kafolio.kr/static/requests/2025/7/9/boards/YWFm....png",
             "20대 남성 전문 의류 쇼핑몰",
             List.of(
@@ -141,7 +150,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
 
     PORTFOLIOS.put("4", new PortfoliosEntity( "OSPE", "A. Park",
     List.of("Java","Thymeleaf","HTML","JavaScript","SQL"),
-    2, "2025-07-10",
+    2, LocalDateTime.of(2025,7,10,21,50),
     "https://kafolio.kr/static/requests/2025/7/9/boards/YWFm....png",
     "진료 예약 및 처방전 출력",
     List.of(
@@ -158,7 +167,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
     
     PORTFOLIOS.put("5", new PortfoliosEntity("NotePad", "A. Park",
     List.of("JavaScript","Tailwind","HTML","CSS","NodeJS"),
-    2, "2025-07-10",
+    2, LocalDateTime.of(2025,7,10,21,50),
     "https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg",
     "진료 예약 및 처방전 출력",
     List.of(
@@ -175,7 +184,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
 
     PORTFOLIOS.put("6",new PortfoliosEntity("Planner for U","H.kim",
                                 List.of("Java","SCSS","JavaScript","TS","HTML","CSS","Thymeleaf"),
-                                10,"2025-08-15",
+                                10,LocalDateTime.of(2025,7,10,21,50),
                                 "https://kafolio.kr/static/requests/2024/9/4/boards/NjRlNGMwMzJkZDc0OTJlYzZjYTdiYTk3ZTE5YjEyOTEyZmYwODhhZDE4NmM5MjExZDNkYzgzZmE4ZThmZjhkOA==.png",
                                 "공유 캘린더 및 팀채팅",
                                 List.of("https://kafolio.kr/static/requests/2024/9/4/boards/NjRlNGMwMzJkZDc0OTJlYzZjYTdiYTk3ZTE5YjEyOTEyZmYwODhhZDE4NmM5MjExZDNkYzgzZmE4ZThmZjhkOA==.png",
@@ -192,7 +201,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
 
         PORTFOLIOS.put("7", new PortfoliosEntity( "취미존중", "A. Park",
     List.of("Java","Thymeleaf","HTML","JavaScript","CSS","SCSS","TypeScript"),
-    2, "2025-07-10",
+    2, LocalDateTime.of(2025,7,10,21,50),
     "https://kafolio.kr/static/requests/2024/9/5/boards/NmQ4OTU1OGMwZTQ4ODcyZTFmMTExY2M3ZTEwOTA4ZjBlNzAxMDBlMTJkZGEyZDg5MDBmMjM3NzA4ZmY2ZDYxMw==.png",
     "원데이 클래스 예약 사이트",
     List.of(
@@ -209,7 +218,7 @@ private static final List<TeamMemberEntity> team9 = List.of(
 
 PORTFOLIOS.put("8", new PortfoliosEntity( "O_O 커뮤니티", "A. Park",
     List.of("JavaScript","HTML","CSS","React"),
-    2, "2025-07-10",
+    2,LocalDateTime.of(2025,7,10,21,50),
     "https://kafolio.kr/static/requests/2024/5/3/boards/MjFhOWE5YzMxZmYxMjFmN2E0MzBlZDk1NmRmMDU2MGE5Y2ZkYzZkMmI1ZDIyMzBlNzRhYWE5Nzc5NzE0ODY1Yw==.png",
     "커뮤니티 사이트",
     List.of(
@@ -225,7 +234,7 @@ PORTFOLIOS.put("8", new PortfoliosEntity( "O_O 커뮤니티", "A. Park",
 
 PORTFOLIOS.put("9", new PortfoliosEntity( "Pickup", "A. Park",
     List.of("JavaScript","Express","React"),
-    2, "2025-07-10",
+    2, LocalDateTime.of(2025,7,10,21,50),
     "https://kafolio.kr/static/requests/2024/4/26/boards/MTkyMzEwZTdiOTM2Mjk0NjQ3NDdhMjBiNGQ4OGEwNjdmYWI3YzlkMDk1MGQ5ODg5ZmIyMTBiNzg4NTBjOGIxZA==.jpg",
     "리그오브레전드 아이템 계산기",
     List.of(
@@ -240,6 +249,10 @@ PORTFOLIOS.put("9", new PortfoliosEntity( "Pickup", "A. Park",
 ));
 
 
+    }
+
+    PortfoliosController(PortfolioService portfolioService) {
+        this.portfolioService = portfolioService;
     }
 
     @GetMapping("/portfolios")
@@ -281,13 +294,42 @@ PORTFOLIOS.put("9", new PortfoliosEntity( "Pickup", "A. Park",
         return "portfolios/create";
     }
 
-    // @PostMapping("portfolios/create")
-    // public String createSubmit(@ModelAttribute PortfolioFormDto form,
-    //                             @RequestParam("images") List<MultipartFile> images,
-    //                             @RequestParam("download") MultipartFile downloadZip){
-    //     portfolioService.savePortfolio(form, images, downloadZip);
-    //     return "redirect:/portfolios";
-    //                             }
+   // 생성 처리
+    @PostMapping("/create")
+    public String create(@ModelAttribute PortfolioFormDto dto,
+                         @RequestParam("images") List<MultipartFile> images,
+                         @RequestParam("icon") MultipartFile icon,
+                         @RequestParam(value = "download", required = false) MultipartFile download) throws IOException {
 
+        // 👉 여기서 파일 저장 로직을 구현해야 합니다 (경로 or S3 등)
+        // 예시: 파일명을 DB에만 저장한다고 가정
+        List<String> imagePaths = images.stream()
+                .filter(f -> !f.isEmpty())
+                .map(MultipartFile::getOriginalFilename)
+                .toList();
+
+        String iconPath = (icon != null && !icon.isEmpty()) ? icon.getOriginalFilename() : null;
+        String downloadPath = (download != null && !download.isEmpty()) ? download.getOriginalFilename() : null;
+
+        // DTO → Entity 변환
+        PortfoliosEntity entity = PortfoliosEntity.builder()
+                .title(dto.getTitle())
+                .creator("현재 로그인한 사용자") // SecurityContextHolder에서 꺼내는 게 정석
+                .tags(dto.getTags())
+                .cover(imagePaths.isEmpty() ? null : imagePaths.get(0))
+                .desc(dto.getDesc())
+                .screenshots(imagePaths)
+                .team(dto.getTeam().stream()
+                        .map(t -> new TeamMemberEntity(t.getTeamName(), t.getMemberName(), t.getMemberRole(), t.getParts()))
+                        .toList())
+                .icon(iconPath)
+                .link(dto.getLink())
+                .download(downloadPath)
+                .build();
+
+                portfolioService.save(entity);
+
+        return "redirect:/portfolios"; // 저장 후 목록 페이지로 이동
+    }
 
 }

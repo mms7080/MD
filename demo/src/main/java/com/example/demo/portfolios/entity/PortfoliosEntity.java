@@ -1,6 +1,7 @@
 
-package com.example.demo.portfolios;
+package com.example.demo.portfolios.entity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -28,16 +29,15 @@ import lombok.Setter;
 public class PortfoliosEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private String id;
-    
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)    
+    private Long id;
     private String title;
     private String creator;
 
     @ElementCollection
     private List<String> tags;
     private int likes;
-    private String createdAt;
+    private LocalDateTime createdAt;
     private String cover;
     private String desc;
 
@@ -55,7 +55,7 @@ public class PortfoliosEntity {
 
     // 생성자
     public PortfoliosEntity(String title, String creator, List<String> tags, int likes,
-                   String createdAt, String cover, String desc, List<String> screenshots,List<TeamMemberEntity> team
+                   LocalDateTime createdAt, String cover, String desc, List<String> screenshots,List<TeamMemberEntity> team
                    ,String icon, String link, String download) {
         this.title = title;
         this.creator = creator;

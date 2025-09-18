@@ -5,8 +5,8 @@ import com.example.demo.folio.dto.FoliosSummaryDto;
 import com.example.demo.folio.dto.PortfolioInFolioDto;
 import com.example.demo.folio.entity.Folio;
 import com.example.demo.folio.repository.FolioRepository;
-import com.example.demo.portfolios.PortfoliosController; // 임시 데이터용
-import com.example.demo.portfolios.PortfoliosEntity; // 임시 데이터용
+import com.example.demo.portfolios.controller.PortfoliosController;
+import com.example.demo.portfolios.entity.PortfoliosEntity;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 import com.example.demo.folio.dto.FolioRequestDto;

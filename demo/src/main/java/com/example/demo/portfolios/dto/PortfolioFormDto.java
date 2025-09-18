@@ -1,6 +1,8 @@
-package com.example.demo.portfolios;
+package com.example.demo.portfolios.dto;
 
 import java.util.List;
+
+import com.example.demo.portfolios.entity.PortfoliosEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PortfolioFormDto {
     
-    private String id;
+    private Long id;
     private String title;
     private String creator;
     private List<String> tags;
@@ -36,7 +38,7 @@ public class PortfolioFormDto {
             .desc(entity.getDesc())
             .screenshot(entity.getScreenshots())
             .team(entity.getTeam().stream()
-                .map(t-> new TeamMemberDto(t.getTeamName(), t.getName(),t.getRole()))
+                .map(t-> new TeamMemberDto(t.getTeamName(), t.getMemberName(),t.getMemberRole(), t.getParts()))
                 .toList())
             .icon(entity.getIcon())
             .link(entity.getLink())
