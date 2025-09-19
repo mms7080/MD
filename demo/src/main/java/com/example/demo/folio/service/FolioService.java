@@ -7,6 +7,7 @@ import com.example.demo.folio.entity.Folio;
 import com.example.demo.folio.repository.FolioRepository;
 import com.example.demo.portfolios.PortfoliosController; // 임시 데이터용
 import com.example.demo.portfolios.PortfoliosEntity; // 임시 데이터용
+import com.example.demo.users.UsersEntity.DeleteStatus;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 import com.example.demo.folio.dto.FolioRequestDto;
@@ -53,27 +54,29 @@ public class FolioService {
         return new FolioDetailDto(folio, projects);
     }
 
-    // @Transactional 
-    // public Folio createOrUpdateFolio(FolioRequestDto requestDto, Principal principal) {
-    //     Users currentUser = usersRepository.findByUsername(principal.getName())
-    //             .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-    //     // --- 수정된 부분: 덮어쓰지 않고 항상 새로 생성하도록 변경 ---
-    //     Folio folio = new Folio(); 
-    //     // ---------------------------------------------------
-
-    //     folio.setUser(currentUser);
-    //     folio.setIntroduction(requestDto.getIntroduction());
-    //     folio.setSkills(requestDto.getSkills());
-    //     folio.setPhotos(requestDto.getPhotos());
-    //     folio.setProjectIds(requestDto.getProjectIds());
+    @Transactional 
+    public Folio createOrUpdateFolio(FolioRequestDto requestDto, Principal principal) {
         
-    //     if (requestDto.getPhotos() != null && !requestDto.getPhotos().isEmpty()) {
-    //         folio.setThumbnail(requestDto.getPhotos().get(0));
-    //     } else {
-    //         folio.setThumbnail("https://picsum.photos/seed/default/300");
-    //     }
+        // UsersRepository 수정해서 현재 로그인했으면서 탈퇴를 하지 않은 사람 찾아오게 수정해놨습니다.
+        Users currentUser = usersRepository.findByUsernameAndDeleteStatus(principal.getName(), DeleteStatus.N)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-    //     return folioRepository.save(folio);
-    // }
+        // --- 수정된 부분: 덮어쓰지 않고 항상 새로 생성하도록 변경 ---
+        Folio folio = new Folio(); 
+        // ---------------------------------------------------
+
+        folio.setUser(currentUser);
+        folio.setIntroduction(requestDto.getIntroduction());
+        folio.setSkills(requestDto.getSkills());
+        folio.setPhotos(requestDto.getPhotos());
+        folio.setProjectIds(requestDto.getProjectIds());
+        
+        if (requestDto.getPhotos() != null && !requestDto.getPhotos().isEmpty()) {
+            folio.setThumbnail(requestDto.getPhotos().get(0));
+        } else {
+            folio.setThumbnail("https://picsum.photos/seed/default/300");
+        }
+
+        return folioRepository.save(folio);
+    }
 }

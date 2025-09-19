@@ -66,23 +66,23 @@ public class FolioApiController {
        
     }
 
-    // @PostMapping
-    // public ResponseEntity<FolioDetailDto> createOrUpdateFolio(
-    //         @RequestBody FolioRequestDto requestDto,
-    //         Principal principal) {
+    @PostMapping
+    public ResponseEntity<FolioDetailDto> createOrUpdateFolio(
+            @RequestBody FolioRequestDto requestDto,
+            Principal principal) {
         
-    //     if (principal == null) {
-    //         return ResponseEntity.status(403).build();
-    //     }
+        if (principal == null) {
+            return ResponseEntity.status(403).build();
+        }
         
-    //     Folio savedFolio = folioService.createOrUpdateFolio(requestDto, principal);
+        Folio savedFolio = folioService.createOrUpdateFolio(requestDto, principal);
         
-    //     // --- 수정된 부분: Folio 객체 하나만 받는 생성자를 사용 ---
-    //     FolioDetailDto responseDto = new FolioDetailDto(savedFolio);
+        // --- 수정된 부분: Folio 객체 하나만 받는 생성자를 사용 ---
+        FolioDetailDto responseDto = new FolioDetailDto(savedFolio);
         
 
-    //     return ResponseEntity.ok(responseDto);
-    // }
+        return ResponseEntity.ok(responseDto);
+    }
     
     
 
