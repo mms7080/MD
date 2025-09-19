@@ -32,7 +32,7 @@ public class Users {
     @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -47,7 +47,7 @@ public class Users {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "delete_status", nullable = false, length = 1)
-    private DeleteStatus deleteStatus = DeleteStatus.N; // 탈퇴 상태
+    private DeleteStatus deleteStatus = DeleteStatus.N; // 탈퇴 여부 
 
     @Column
     private LocalDateTime deletedAt; // 삭제일자

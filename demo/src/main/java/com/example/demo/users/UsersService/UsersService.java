@@ -1,5 +1,6 @@
 package com.example.demo.users.UsersService;
 
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ public class UsersService {
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationService emailVerificationService;
 
+    // 이메일 없이 회원가입
     public void registerUserWithoutEmailCode(UsersDTO usersDTO, HttpSession session) {
         if (usersDTO == null)
             throw new IllegalArgumentException("가입 정보가 없습니다.");
@@ -111,14 +113,29 @@ public class UsersService {
 
     // usersRepository.save(users);
     // }
-
+ 
+    // 아이디 중복 체크 (활동 중)
     public boolean isUsernameTaken(String username) {
         return usersRepository.existsByUsernameAndDeleteStatus(username, DeleteStatus.N);
     }
 
+    // 사용자 조회 (활동 중)
     public Users getUserByUsername(String username) {
         return usersRepository.findByUsernameAndDeleteStatus(username, DeleteStatus.N)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + username));
+    }
+
+    // 탈퇴 기능 (개인)    
+    public void withdrawSelf(String username, String currentRawPassword) {
+        Users u = usersRepository.findByUsernameAndDeleteStatus(username, DeleteStatus.N)
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (!passwordEncoder.matches(currentRawPassword, u.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+        }
+
+        u.setDeleteStatus(DeleteStatus.Y);
+        u.setDeletedAt(LocalDateTime.now());
     }
 
 }

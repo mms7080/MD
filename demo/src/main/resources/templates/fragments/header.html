@@ -79,7 +79,7 @@
 
       <!-- 로그인(일반) -->
       <div sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
-                        <a class="kf-link" th:href="@{/mypage}">마이페이지</a>
+                        <a class="kf-link" th:href="@{/mypage/home}">마이페이지</a>
                         <form th:action="@{/logout}" method="post" style="display:inline">
                           <button type="submit" class="kf-link" style="background:none;border:0;padding:0;cursor:pointer">로그아웃</button>
                         </form>

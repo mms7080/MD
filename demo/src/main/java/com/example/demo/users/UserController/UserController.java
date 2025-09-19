@@ -6,8 +6,9 @@
     import org.springframework.ui.Model;
     import org.springframework.web.bind.annotation.GetMapping;
     import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-    import com.example.demo.users.UsersDTO.HeaderLogin;
+import com.example.demo.users.UsersDTO.HeaderLogin;
     import com.example.demo.users.UsersEntity.Users;
     import com.example.demo.users.UsersRepository.UsersRepository;
     import com.example.demo.users.UsersService.UsersService;
@@ -16,6 +17,7 @@
 
     @Controller
     @RequiredArgsConstructor
+    @RequestMapping("/mypage")
     public class UserController {
 
         private final HeaderLogin keep;
@@ -28,7 +30,7 @@
         }
 
         
-    @GetMapping("/mypage")
+    @GetMapping("/home")
     public String mypage(Model model, Principal principal) {
         // 1) 비로그인 접근 가드
         if (principal == null) {
@@ -39,7 +41,7 @@
         return "mypage/mypage";
     }
 
-    @GetMapping("/mypage/team")
+    @GetMapping("/team")
     public String mypageTeam() {
         return "mypage/team";
     }
