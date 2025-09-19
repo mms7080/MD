@@ -1,11 +1,17 @@
 package com.example.demo.portfolios.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -294,42 +300,41 @@ PORTFOLIOS.put("9", new PortfoliosEntity( "Pickup", "A. Park",
         return "portfolios/create";
     }
 
-   // 생성 처리
-    @PostMapping("/create")
-    public String create(@ModelAttribute PortfolioFormDto dto,
-                         @RequestParam("images") List<MultipartFile> images,
-                         @RequestParam("icon") MultipartFile icon,
-                         @RequestParam(value = "download", required = false) MultipartFile download) throws IOException {
+            // 생성 처리
+            @PostMapping("/portfolios/create")
+            public String create(@ModelAttribute PortfolioFormDto dto,
+                                 @RequestParam("images") List<MultipartFile> images,
+                                 @RequestParam("icon") MultipartFile icon,
+                                 @RequestParam(value = "download", required = false) MultipartFile download
+            ) throws IOException {
+            
+                // 📂 업로드 폴더 생성
+                String uploadDir = System.getProperty("user.dir") + "/uploads";
+                File dir = new File(uploadDir);
+                if (!dir.exists()) dir.mkdirs();
+            
+                // 📌 저장 코드 (transferTo)
+                if (icon != null && !icon.isEmpty()) {
+                    String filename = UUID.randomUUID() + "_" + icon.getOriginalFilename();
+                    Path filePath = Paths.get(uploadDir, filename);
+                    icon.transferTo(filePath.toFile());
+                    dto.setIconPath("/uploads/" + filename);   // DB에 저장할 경로
+                }
+            
+                if (download != null && !download.isEmpty()) {
+                    String filename = UUID.randomUUID() + "_" + download.getOriginalFilename();
+                    Path filePath = Paths.get(uploadDir, filename);
+                    download.transferTo(filePath.toFile());
+                    dto.setDownloadPath("/uploads/" + filename);
+                }
+            
+                // 👉 DB 저장 로직 호출
+                portfolioService.saveFromDto(dto);
+            
+                return "redirect:/portfolios";
+            }
+            
+            
 
-        // 👉 여기서 파일 저장 로직을 구현해야 합니다 (경로 or S3 등)
-        // 예시: 파일명을 DB에만 저장한다고 가정
-        List<String> imagePaths = images.stream()
-                .filter(f -> !f.isEmpty())
-                .map(MultipartFile::getOriginalFilename)
-                .toList();
-
-        String iconPath = (icon != null && !icon.isEmpty()) ? icon.getOriginalFilename() : null;
-        String downloadPath = (download != null && !download.isEmpty()) ? download.getOriginalFilename() : null;
-
-        // DTO → Entity 변환
-        PortfoliosEntity entity = PortfoliosEntity.builder()
-                .title(dto.getTitle())
-                .creator("현재 로그인한 사용자") // SecurityContextHolder에서 꺼내는 게 정석
-                .tags(dto.getTags())
-                .cover(imagePaths.isEmpty() ? null : imagePaths.get(0))
-                .desc(dto.getDesc())
-                .screenshots(imagePaths)
-                .team(dto.getTeam().stream()
-                        .map(t -> new TeamMemberEntity(t.getTeamName(), t.getMemberName(), t.getMemberRole(), t.getParts()))
-                        .toList())
-                .icon(iconPath)
-                .link(dto.getLink())
-                .download(downloadPath)
-                .build();
-
-                portfolioService.save(entity);
-
-        return "redirect:/portfolios"; // 저장 후 목록 페이지로 이동
-    }
 
 }
