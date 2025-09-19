@@ -53,27 +53,27 @@ public class FolioService {
         return new FolioDetailDto(folio, projects);
     }
 
-    @Transactional 
-    public Folio createOrUpdateFolio(FolioRequestDto requestDto, Principal principal) {
-        Users currentUser = usersRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    // @Transactional 
+    // public Folio createOrUpdateFolio(FolioRequestDto requestDto, Principal principal) {
+    //     Users currentUser = usersRepository.findByUsername(principal.getName())
+    //             .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // --- 수정된 부분: 덮어쓰지 않고 항상 새로 생성하도록 변경 ---
-        Folio folio = new Folio(); 
-        // ---------------------------------------------------
+    //     // --- 수정된 부분: 덮어쓰지 않고 항상 새로 생성하도록 변경 ---
+    //     Folio folio = new Folio(); 
+    //     // ---------------------------------------------------
 
-        folio.setUser(currentUser);
-        folio.setIntroduction(requestDto.getIntroduction());
-        folio.setSkills(requestDto.getSkills());
-        folio.setPhotos(requestDto.getPhotos());
-        folio.setProjectIds(requestDto.getProjectIds());
+    //     folio.setUser(currentUser);
+    //     folio.setIntroduction(requestDto.getIntroduction());
+    //     folio.setSkills(requestDto.getSkills());
+    //     folio.setPhotos(requestDto.getPhotos());
+    //     folio.setProjectIds(requestDto.getProjectIds());
         
-        if (requestDto.getPhotos() != null && !requestDto.getPhotos().isEmpty()) {
-            folio.setThumbnail(requestDto.getPhotos().get(0));
-        } else {
-            folio.setThumbnail("https://picsum.photos/seed/default/300");
-        }
+    //     if (requestDto.getPhotos() != null && !requestDto.getPhotos().isEmpty()) {
+    //         folio.setThumbnail(requestDto.getPhotos().get(0));
+    //     } else {
+    //         folio.setThumbnail("https://picsum.photos/seed/default/300");
+    //     }
 
-        return folioRepository.save(folio);
-    }
+    //     return folioRepository.save(folio);
+    // }
 }

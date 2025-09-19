@@ -1,5 +1,7 @@
 package com.example.demo.users.UsersEntity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,10 +38,18 @@ public class Users {
     @Column(nullable = false)
     private Integer age;
 
-    @Enumerated(EnumType.STRING)     // ✅ enum을 문자열로 저장
+    @Enumerated(EnumType.STRING) // ✅ enum을 문자열로 저장
     @Column(nullable = false, length = 10)
-    private Role role = Role.USER;   // ✅ 기본값 USER
+    private Role role = Role.USER; // ✅ 기본값 USER
 
     @Column(nullable = false, length = 10)
     private String gender;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delete_status", nullable = false, length = 1)
+    private DeleteStatus deleteStatus = DeleteStatus.N; // 탈퇴 상태
+
+    @Column
+    private LocalDateTime deletedAt; // 삭제일자
+
 }

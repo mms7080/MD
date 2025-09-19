@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.users.UsersDTO.UsersDTO;
+import com.example.demo.users.UsersEntity.DeleteStatus;
 import com.example.demo.users.UsersEntity.Role;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
@@ -38,10 +39,10 @@ public class UsersService {
         final String normalizedEmail = usersDTO.getEmail().trim().toLowerCase(Locale.ROOT);
 
         // 중복 검사 (아이디/이메일)
-        if (usersRepository.findByUsername(usersDTO.getUsername()).isPresent()) {
+        if (usersRepository.findByUsernameAndDeleteStatus(usersDTO.getUsername(), DeleteStatus.N).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 아이디입니다.");
         }
-        if (usersRepository.existsByEmail(normalizedEmail)) {
+        if (usersRepository.existsByEmailAndDeleteStatus(normalizedEmail, DeleteStatus.N)) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
@@ -112,11 +113,11 @@ public class UsersService {
     // }
 
     public boolean isUsernameTaken(String username) {
-        return usersRepository.existsByUsername(username);
+        return usersRepository.existsByUsernameAndDeleteStatus(username, DeleteStatus.N);
     }
 
     public Users getUserByUsername(String username) {
-        return usersRepository.findByUsername(username)
+        return usersRepository.findByUsernameAndDeleteStatus(username, DeleteStatus.N)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + username));
     }
 
