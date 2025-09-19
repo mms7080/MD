@@ -32,6 +32,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/", "/main",
                     "/signin",
+                    "/notice/{id}",
+                    "/notice",
                     "/signup",
                     "/error",   
                     "/api/**",
@@ -40,7 +42,10 @@ public class SecurityConfig {
                     "/folios/**", // 추가 페이지 접근은 허용(준회)
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/home/**"
-                    //  ,"/**" 
+                   
+                   
+                   
+                    ,"/**" 
                     //일단 테스트로 전체허용해놨다
                 ).permitAll()
 
