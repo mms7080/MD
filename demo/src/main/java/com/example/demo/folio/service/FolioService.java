@@ -7,6 +7,7 @@ import com.example.demo.folio.entity.Folio;
 import com.example.demo.folio.repository.FolioRepository;
 import com.example.demo.portfolios.controller.PortfoliosController;
 import com.example.demo.portfolios.entity.PortfoliosEntity;
+import com.example.demo.portfolios.service.PortfolioService;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 import com.example.demo.folio.dto.FolioRequestDto;
@@ -32,6 +33,7 @@ public class FolioService {
     private final UsersRepository usersRepository;
     // 임시로 PortfoliosController의 데이터를 사용
     private final PortfoliosController portfoliosController;
+    private final PortfolioService portfolioService;
 
     public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
         Page<Folio> folioPage = folioRepository.findAll(pageable);
@@ -44,7 +46,7 @@ public class FolioService {
         
         List<PortfolioInFolioDto> projects = folio.getProjectIds().stream()
             .map(projectId -> {
-                PortfoliosEntity entity = portfoliosController.getPortfolioById(projectId);
+                PortfoliosEntity entity = portfolioService.getPortfolioById(Long.valueOf(projectId));
                 return (entity != null) ? new PortfolioInFolioDto(entity.getId(), entity.getTitle()) : null;
             })
             .filter(p -> p != null)

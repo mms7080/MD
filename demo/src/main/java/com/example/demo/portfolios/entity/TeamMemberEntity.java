@@ -22,8 +22,11 @@ public class TeamMemberEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name="teamName")
     private String teamName;
-    private String memberName;      // 이름
+    @Column(name="memberName")
+    private String memberName;
+    @Column(name="memberRole")      // 이름
     private String memberRole;      // 역할 (ex: 팀장, 팀원 등)
     
     @ElementCollection

@@ -44,26 +44,27 @@
                 <!-- 왼쪽: 이미지 -->
                 <div class="gallery">
                     <!-- 대표 이미지 -->
+                    <!-- 대표 이미지 -->
                     <figure class="main-photo">
-                        <img
-                            id="mainImage"
-                            th:src="${portfolios.screenshots[0]}"
-                            alt="대표 이미지"
-                            onclick="openModal(currentIndex)"
-                        />
+                        <img id="mainImage"
+                             th:src="${(portfolios.screenshots != null and portfolios.screenshots.size() > 0) 
+                                        ? portfolios.screenshots[0] 
+                                        : portfolios.cover}"
+                             alt="대표 이미지"
+                             onclick="openModal(0)" />
                     </figure>
+                    
+
 
                     <!-- 썸네일 -->
-                    <div class="thumb-list">
-                        <img
-                            th:each="img, iter : ${portfolios.screenshots}"
+                    <div class="thumb-list" th:if="${portfolios.screenshots != null}">
+                        <img th:each="img, iter : ${portfolios.screenshots}"
                             th:src="${img}"
                             th:attr="data-index=${iter.index}, onclick='openModal(' + ${iter.index} + ')'"
                             alt="썸네일"
-                            class="thumb"
-                        />
-                        <!-- ✅ 썸네일 클릭/hover 모두 대표 이미지 교체 -->
+                            class="thumb"/>
                     </div>
+
                 </div>
 
                 <!-- 📌 모달 -->
@@ -78,24 +79,19 @@
                 <div class="info-box">
                     <h2>팀원 & 역할</h2>
                     <!-- 👥 팀원 정보 -->
+                    <!-- 팀원 & 역할 -->
                     <ul class="team-list">
-                        <li
-                            class="team-item"
-                            th:each="member : ${portfolios.team}"
-                        >
+                        <li class="team-item" th:each="member : ${portfolios.team}">
                             <div class="team-name">
-                                <strong th:text="${member.name}"></strong>
-                                <span
-                                    class="role"
-                                    th:text="${member.role}"
-                                ></span>
+                                <!-- ✅ 필드명 교정 -->
+                                <strong th:text="${member.memberName}">팀원 이름</strong>
+                                <span class="role" th:text="${member.memberRole}">역할</span>
                             </div>
-                            <p
-                                class="parts"
-                                th:text="${#strings.arrayJoin(member.parts, ', ')}"
-                            ></p>
+                            <p class="parts"
+                            th:text="${#strings.arrayJoin(member.parts, ', ')}">담당 기능</p>
                         </li>
                     </ul>
+
                 </div>
             </div>
             <div class="icon-bar">
@@ -109,19 +105,18 @@
 
                     <!-- Tags -->
                     <!-- Tags -->
-                    <span class="tags-box" title="태그">
-                        <i class="fa-solid fa-tags"></i>
-                        <span class="tags-label">Tags :</span>
-                        <span class="tags-list">
-                            <a
-                                th:each="tag : ${portfolios.tags}"
-                                th:href="@{/portfolios(tag=${tag})}"
+                    <!-- Tags -->
+                        <span class="tags-box" title="태그">
+                            <i class="fa-solid fa-tags"></i>
+                            <span class="tags-label">Tags :</span>
+                            <span class="tags-list">
+                                <a th:each="tag : ${portfolios.tags}"
+                                th:href="@{|/portfolios?tag=${tag}|}"  <!-- ✅ 파라미터 방식 교정 -->
                                 class="tag-item"
-                                th:text="${tag}"
-                                >Tag</a
-                            >
+                                th:text="${tag}">Tag</a>
+                            </span>
                         </span>
-                    </span>
+
                 </div>
 
                 <div class="icon-right">
