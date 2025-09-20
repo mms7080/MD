@@ -9,11 +9,17 @@
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.users.UsersDTO.HeaderLogin;
-    import com.example.demo.users.UsersEntity.Users;
+import com.example.demo.users.UsersDTO.ProfileDTO;
+import com.example.demo.users.UsersEntity.Users;
     import com.example.demo.users.UsersRepository.UsersRepository;
     import com.example.demo.users.UsersService.UsersService;
 
     import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
 
     @Controller
     @RequiredArgsConstructor
@@ -37,7 +43,8 @@ import com.example.demo.users.UsersDTO.HeaderLogin;
             return "redirect:/home?modal=signin";
         }
         Users users = usersService.getUserByUsername(principal.getName());
-        model.addAttribute("users", users);
+        ProfileDTO profile = usersService.loadProfileForm(users.getId());
+        model.addAttribute("form", profile);
         return "mypage/mypage";
     }
 
@@ -46,4 +53,22 @@ import com.example.demo.users.UsersDTO.HeaderLogin;
         return "mypage/team";
     }
 
+    @GetMapping("/withdraw")
+    public String withdrawForm(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/home?modal=signin";
+        }
+        Users users = usersService.getUserByUsername(principal.getName());
+        model.addAttribute("users", users);
+        return "mypage/withdraw";
     }
+
+    @PostMapping("path")
+    public String postMethodName(@RequestBody String entity) {
+        //TODO: process POST request
+        
+        return entity;
+    }
+    
+    
+}

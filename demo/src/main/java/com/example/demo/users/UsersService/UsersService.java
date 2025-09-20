@@ -1,8 +1,8 @@
 package com.example.demo.users.UsersService;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Locale;
-import java.util.Optional;
 
 import jakarta.servlet.http.HttpSession; // ⬅️ 추가
 
@@ -10,10 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.users.UsersDTO.ProfileDTO;
 import com.example.demo.users.UsersDTO.UsersDTO;
 import com.example.demo.users.UsersEntity.DeleteStatus;
+import com.example.demo.users.UsersEntity.Profile;
 import com.example.demo.users.UsersEntity.Role;
 import com.example.demo.users.UsersEntity.Users;
+import com.example.demo.users.UsersRepository.ProfileRepository;
 import com.example.demo.users.UsersRepository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +28,8 @@ public class UsersService {
 
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailVerificationService emailVerificationService;
+    private final ProfileRepository profileRepository;
+    // private final EmailVerificationService emailVerificationService;
 
     // 이메일 없이 회원가입
     public void registerUserWithoutEmailCode(UsersDTO usersDTO, HttpSession session) {
@@ -113,7 +117,7 @@ public class UsersService {
 
     // usersRepository.save(users);
     // }
- 
+
     // 아이디 중복 체크 (활동 중)
     public boolean isUsernameTaken(String username) {
         return usersRepository.existsByUsernameAndDeleteStatus(username, DeleteStatus.N);
@@ -125,10 +129,10 @@ public class UsersService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + username));
     }
 
-    // 탈퇴 기능 (개인)    
+    // 탈퇴 기능 (개인)
     public void withdrawSelf(String username, String currentRawPassword) {
         Users u = usersRepository.findByUsernameAndDeleteStatus(username, DeleteStatus.N)
-            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         if (!passwordEncoder.matches(currentRawPassword, u.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
@@ -136,6 +140,26 @@ public class UsersService {
 
         u.setDeleteStatus(DeleteStatus.Y);
         u.setDeletedAt(LocalDateTime.now());
+    }
+
+    @Transactional(readOnly = true)
+    public ProfileDTO loadProfileForm(Long userId) {
+        Users users = usersRepository.findById(userId).orElseThrow();
+        Profile profile = profileRepository.findById(userId).orElse(null);
+        if (profile == null) {
+            profile = new Profile();
+            profile.setId(userId);
+            profile.setPositions(new HashSet<>());
+        }
+        ProfileDTO profiledto = new ProfileDTO();
+        profiledto.setName(users.getName());
+        profiledto.setEmail(users.getEmail());
+        profiledto.setAge(users.getAge());
+        profiledto.setGender(users.getGender());
+        profiledto.setProfileImgUrl(profile != null ? profile.getProfileImgUrl() : null);
+        profiledto.setGithubUrl(profile != null && profile.getGithubUrl() != null ? profile.getGithubUrl() : "");
+        profiledto.setPositions(profile != null && profile.getPositions() != null ? profile.getPositions() : new HashSet<>());
+        return profiledto; // ✅ 반환
     }
 
 }
