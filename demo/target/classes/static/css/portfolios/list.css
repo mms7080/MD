@@ -346,7 +346,7 @@ body {
 .kf-grid {
     margin-top: 18px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 3열 */
+    grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); /* 3열 */
     gap: 20px;
 }
 

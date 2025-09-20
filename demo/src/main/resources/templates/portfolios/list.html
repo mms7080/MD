@@ -222,8 +222,14 @@
 <section class="kf-grid">
     <article class="kf-card" th:each="portfolio : ${portfolios}">
         <a class="kf-card__thumb" th:href="@{|/portfolios/${portfolio.id}|}">
-            <img th:src="${portfolio.cover}" th:alt="${portfolio.title + ' 썸네일'}"/>
+            <img th:if="${portfolio.cover != null}" 
+                 th:src="${portfolio.cover}" 
+                 th:alt="${portfolio.title + ' 썸네일'}"/>
+            <img th:if="${portfolio.cover == null}" 
+                 src="/images/default-thumbnail.png" 
+                 alt="기본 썸네일"/>
         </a>
+        
 
         <div class="kf-card__body">
             <div class="kf-card__head">
@@ -259,33 +265,41 @@
 </section>
 
     <!-- 포트폴리오 마퀴 -->
-    <section class="kf-mq-portfolios" aria-label="포트폴리오">
-        <div class="mq-mask">
-            <div class="mq-track">
-                <div class="mq-seq">
-                    <a class="mq-item" th:each="portfolio : ${portfolios}"
-                       th:href="@{|/portfolios/${portfolio.id}|}">
+    <!-- 포트폴리오 마퀴 -->
+<section class="kf-mq-portfolios" aria-label="포트폴리오">
+    <div class="mq-mask">
+        <div class="mq-track">
+            
+            <!-- 시퀀스 A -->
+            <div class="mq-seq">
+                <div class="mq-item" th:each="portfolio : ${portfolios}">
+                    <a th:href="@{|/portfolios/${portfolio.id}|}">
                         <figure>
                             <img th:src="${portfolio.cover}"
-                                 th:alt="${portfolio.title + ' 썸네일'}"/>
-                            <figcaption th:text="${portfolio.title}">제목</figcaption>
-                        </figure>
-                    </a>
-                </div>
-                <!-- 시퀀스 B: 끊김 없는 루프용 복제 -->
-                <div class="mq-seq" aria-hidden="true">
-                    <a class="mq-item" th:each="portfolio : ${portfolios}"
-                       th:href="@{|/portfolios/${portfolio.id}|}">
-                        <figure>
-                            <img th:src="${portfolio.cover}"
-                                 th:alt="${portfolio.title + ' 썸네일'}"/>
+                                 th:alt="${portfolio.title + ' 썸네일'}" />
                             <figcaption th:text="${portfolio.title}">제목</figcaption>
                         </figure>
                     </a>
                 </div>
             </div>
+
+            <!-- 시퀀스 B (무한루프용 복제) -->
+            <div class="mq-seq" aria-hidden="true">
+                <div class="mq-item" th:each="portfolio : ${portfolios}">
+                    <a th:href="@{|/portfolios/${portfolio.id}|}">
+                        <figure>
+                            <img th:src="${portfolio.cover}"
+                                 th:alt="${portfolio.title + ' 썸네일'}" />
+                            <figcaption th:text="${portfolio.title}">제목</figcaption>
+                        </figure>
+                    </a>
+                </div>
+            </div>
+
         </div>
-    </section>
+    </div>
+</section>
+
 </main>
 
 <div th:replace="fragments/footer :: footer"></div>
