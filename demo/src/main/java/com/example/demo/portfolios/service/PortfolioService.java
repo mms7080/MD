@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PortfolioService {
-    
+
     private final PortfoliosRepository repository;
 
     /**
@@ -33,13 +34,11 @@ public class PortfolioService {
     public String saveFile(MultipartFile file, String type) throws IOException {
         if (file == null || file.isEmpty()) return null;
 
-        // 용량 제한
         long maxSize = type.equals("zip") ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
         if (file.getSize() > maxSize) {
             throw new IOException("파일 용량 초과: " + file.getOriginalFilename());
         }
 
-        // 확장자 체크
         String originalName = file.getOriginalFilename();
         String extension = originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
 
@@ -54,13 +53,11 @@ public class PortfolioService {
             }
         }
 
-        // 저장 경로 생성
         Path uploadPath = Paths.get(System.getProperty("user.dir"), "uploads");
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        // UUID 붙여 저장
         String filename = UUID.randomUUID() + "_" + originalName;
         Path filePath = uploadPath.resolve(filename);
 
@@ -68,7 +65,7 @@ public class PortfolioService {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        return "/uploads/" + filename; // DB에 저장되는 상대경로
+        return "/uploads/" + filename; // DB에 상대경로 저장
     }
 
     /**
@@ -77,35 +74,62 @@ public class PortfolioService {
     @Transactional
     public void saveFromDto(PortfolioFormDto dto, String coverPath, String iconPath, String downloadPath) {
         String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
-
+    
+        // ✅ 스크린샷 파일 저장 (MultipartFile → String 경로 리스트)
+        List<String> screenshotPaths = dto.getScreenshots() != null
+            ? dto.getScreenshots().stream()
+                .filter(file -> file != null && !file.isEmpty())
+                .map(file -> {
+                    try {
+                        return saveFile(file, "image"); // 파일 저장 후 경로 반환
+                    } catch (IOException e) {
+                        throw new RuntimeException("스크린샷 저장 실패", e);
+                    }
+                })
+                .toList()
+            : java.util.Collections.emptyList();
+    
+        // ✅ 부모 엔티티 생성
         PortfoliosEntity entity = PortfoliosEntity.builder()
                 .title(dto.getTitle())
                 .creator(currentUser)
                 .tags(dto.getTags())
                 .cover(coverPath)
                 .desc(dto.getDesc())
-                .screenshots(dto.getScreenshot())
-                .team(dto.getTeam().stream()
-                        .map(t -> new TeamMemberEntity(
-                                t.getTeamName(),
-                                t.getMemberName(),
-                                t.getMemberRole(),
-                                t.getParts()))
-                        .toList())
+                .screenshots(screenshotPaths)   // ← 여기 적용
                 .icon(iconPath)
                 .link(dto.getLink())
                 .download(downloadPath)
                 .likes(0)
                 .createdAt(LocalDateTime.now())
                 .build();
-
+    
+        // ✅ 자식 엔티티 생성 + 부모 연결
+        var team = dto.getTeam().stream()
+                .map(t -> {
+                    TeamMemberEntity member = new TeamMemberEntity(
+                            t.getTeamName(),
+                            t.getMemberName(),
+                            t.getMemberRole(),
+                            t.getParts()
+                    );
+                    member.setPortfolio(entity); // FK 연결
+                    return member;
+                })
+                .toList();
+    
+        entity.setTeam(team);
+    
+        // ✅ 저장 (CascadeType.ALL 로 team 자동 저장됨)
         repository.save(entity);
     }
     
+    
+
+
     public PortfoliosEntity getPortfolioById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
     }
-    
 }
 

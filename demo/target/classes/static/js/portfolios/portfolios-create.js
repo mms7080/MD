@@ -4,13 +4,16 @@ function addTeam() {
   const div = document.createElement("div");
   div.className = "team-item";
   div.innerHTML = `
-    <input type="text" name="team[${teamIndex}].member" placeholder="팀원 이름">
-    <select name="team[${teamIndex}].role">
-      <option value="팀장">팀장</option>
-      <option value="팀원">팀원</option>
-    </select>
-    <input type="text" name="team[${teamIndex}].task" placeholder="담당 기능/페이지">
-  `;
+  <input type="text" name="team[${teamIndex}].teamName" placeholder="팀명">
+  <input type="text" name="team[${teamIndex}].memberName" placeholder="팀원 이름">
+
+  <select name="team[${teamIndex}].memberRole">
+    <option value="팀장">팀장</option>
+    <option value="팀원">팀원</option>
+  </select>
+
+  <input type="text" name="team[${teamIndex}].parts" placeholder="담당 기능/페이지">
+`;
   list.appendChild(div);
   teamIndex++;
 }
@@ -146,6 +149,23 @@ function goToList() {
   window.location.href = "/portfolios";
 }
 
+// Cover 이미지 미리보기
+document.getElementById("cover-input").addEventListener("change", function(event) {
+  const file = event.target.files[0]; // 1장만
+  const preview = document.getElementById("cover-preview");
+  preview.innerHTML = ""; // 기존 내용 초기화
+
+  if (file && file.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.className = "cover-thumb"; // CSS로 크기 조정 가능
+      preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+});
 
 
 

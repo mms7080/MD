@@ -16,5 +16,5 @@ public class TeamMemberDto {
     private String teamName;
     private String memberName;
     private String memberRole;
-    private List<String> parts;
+    private String parts;
 }

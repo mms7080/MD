@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,15 +43,16 @@ public class TeamMemberEntity {
     private String memberName;
 
     @Column(name = "member_role")
-    private String memberRole; // (팀장, 팀원 등)
+    private String memberRole;
 
-    @ElementCollection
+    // ✅ 담당 파트 (순서 유지)
     @CollectionTable(name = "team_member_parts", joinColumns = @JoinColumn(name = "team_member_id"))
     @Column(name = "part")
-    private List<String> parts; // 담당 기능들 (회원, 지도 등)
+    
+    private String parts;
 
     // 생성자 (portfolio 없이)
-    public TeamMemberEntity(String teamName, String memberName, String memberRole, List<String> parts) {
+    public TeamMemberEntity(String teamName, String memberName, String memberRole, String parts) {
         this.teamName = teamName;
         this.memberName = memberName;
         this.memberRole = memberRole;

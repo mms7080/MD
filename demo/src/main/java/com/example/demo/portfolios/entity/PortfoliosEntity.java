@@ -1,19 +1,27 @@
-
 package com.example.demo.portfolios.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,29 +30,34 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-// 임시 entity
-@Entity
-@Table(name="portfolio")
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name="portfolio")
+@SequenceGenerator(name="portfolio_seq_gen", sequenceName="portfolio_seq", allocationSize=1)
 public class PortfoliosEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)    
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "portfolio_seq_gen")
     private Long id;
 
-    @Column(name="p_title")
+    @Column(name="p_title", nullable = false)
     private String title;
 
-    @Column(name="p_creator")
+    @Column(name="p_creator" ,nullable = false)
     private String creator;
 
-    @ElementCollection
-    @CollectionTable(name="portfolio_tags", joinColumns = @JoinColumn(name="portfolio_id"))
-    @Column(name="tag")
-    private List<String> tags;
+    // ✅ 태그 (Set)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "portfolio_tags",
+        joinColumns = @JoinColumn(name = "portfolio_id")
+    )
+    @Column(name = "tag", nullable = false)
+    @Fetch(FetchMode.SUBSELECT)
+    private Set<String> tags = new LinkedHashSet<>();
 
     @Column(name="p_likes")
     private int likes;
@@ -55,50 +68,30 @@ public class PortfoliosEntity {
     @Column(name="p_cover")
     private String cover;
 
-    @Column(name="p_desc")
+    @Column(name="p_desc", length=2000)
     private String desc;
 
-    // 추가
-    @ElementCollection
-    @CollectionTable(name="portfolio_screenshots", joinColumns = @JoinColumn(name="portfolio_id"))
-    @Column(name="screenshot")
-    private List<String> screenshots;
+    // ✅ 스크린샷 (입력 순서 유지 → List + OrderColumn)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "portfolio_screenshots",
+        joinColumns = @JoinColumn(name = "portfolio_id")
+    )
+    @Column(name = "screenshot")
+    private List<String> screenshots = new ArrayList<>();
 
+    // ✅ 팀원 (입력 순서 유지 → List + OrderColumn)
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeamMemberEntity> team;
+    @OrderColumn(name="team_order")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<TeamMemberEntity> team = new ArrayList<>();
 
     @Column(name="p_icon")
-    private String icon; // 팀 아이콘
+    private String icon;
 
     @Column(name="p_link")
-    private String link; // 실제 접속 경로
+    private String link;
 
     @Column(name="p_download")
-    private String download; // 코드 다운로드 폴더 
-    
-
-    // 생성자
-    public PortfoliosEntity(String title, String creator, List<String> tags, int likes,
-                   LocalDateTime createdAt, String cover, String desc, List<String> screenshots,List<TeamMemberEntity> team
-                   ,String icon, String link, String download) {
-        this.title = title;
-        this.creator = creator;
-        this.tags = tags;
-        this.likes = likes;
-        this.createdAt = createdAt;
-        this.cover = cover;
-        this.desc = desc;
-        this.screenshots = screenshots;
-        this.team = team;
-        this.icon = icon;
-        this.link = link;
-        this.download = download;
-    }
-
-    
-
-    public static void put(String string, PortfoliosEntity portfoliosEntity) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'put'");
-    }
+    private String download;
 }

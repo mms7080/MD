@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,7 @@ import com.example.demo.portfolios.repository.PortfoliosRepository;
 import com.example.demo.portfolios.service.PortfolioService;
 
 @Controller
+@RequestMapping("portfolios")
 public class PortfoliosController {
 
     private final PortfolioService portfolioService;
@@ -42,7 +44,7 @@ public class PortfoliosController {
         
     }
 
-    @GetMapping("/portfolios")
+    @GetMapping
     public String list(Model model) {
     List<PortfoliosEntity> portfolios = portfoliosRepository.findAll();
     model.addAttribute("portfolios", portfolios);
@@ -52,29 +54,23 @@ public class PortfoliosController {
 
 
 
-@GetMapping("/portfolios/{id}")
+@GetMapping("/{id}")
 public String getPortfolio(@PathVariable Long id, Model model) {
-    // DB에서 ID로 조회
-    PortfoliosEntity portfolio = portfoliosRepository.findById(id).orElse(null);
-
-    if (portfolio == null) {
-        model.addAttribute("notFound", true);
-    } else {
-        model.addAttribute("portfolios", portfolio);
-    }
-
-    return "portfolios/detail"; // templates/portfolios/detail.html
+    PortfoliosEntity portfolio = portfoliosRepository.findDetailById(id)
+        .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
+    model.addAttribute("portfolio", portfolio);
+    return "portfolios/detail";
 }
 
 
 
-    @GetMapping("/portfolios/create")
+    @GetMapping("/create")
     public String createForm(Model model){
         model.addAttribute("portfolioFormDto", new PortfolioFormDto());
         return "portfolios/create";
     }
 
-    @PostMapping("/portfolios")
+    @PostMapping
     public String create(@ModelAttribute PortfolioFormDto dto) throws IOException {
         // 1️⃣ 파일 저장 (Service 호출)
         String coverPath = portfolioService.saveFile(dto.getCover(), "image");

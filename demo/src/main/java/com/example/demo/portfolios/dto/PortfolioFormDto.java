@@ -1,6 +1,7 @@
 package com.example.demo.portfolios.dto;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,17 +21,24 @@ public class PortfolioFormDto {
     
     private Long id;
     private String title;
-    private List<String> tags;
+    private Set<String> tags;
+
+    // 파일 업로드
     private MultipartFile cover;
-    private String desc;
-    private List<String> screenshot;
-    private List<TeamMemberDto> team;
+    private List<MultipartFile> screenshots; // ✅ 이름 통일 (복수형)
+
+    // DB에 저장된 경로들
     private String coverPath;
+    private List<String> screenshotPaths; // ✅ 출력용 (entity.getScreenshots())
+
+    private String desc;
+    private List<TeamMemberDto> team;
+
     private String iconPath;
-    private String downloadPath;
     private MultipartFile icon;
-    private String link;
+    private String downloadPath;
     private MultipartFile download;
+    private String link;
 
     public static PortfolioFormDto formEntityDto(PortfoliosEntity entity){
         return PortfolioFormDto.builder()
@@ -39,7 +47,7 @@ public class PortfolioFormDto {
             .tags(entity.getTags())
             .coverPath(entity.getCover())
             .desc(entity.getDesc())
-            .screenshot(entity.getScreenshots())
+            .screenshotPaths(entity.getScreenshots()) // ✅ 여기로 매핑
             .team(entity.getTeam().stream()
                 .map(t -> new TeamMemberDto(
                         t.getTeamName(),
@@ -47,11 +55,10 @@ public class PortfolioFormDto {
                         t.getMemberRole(),
                         t.getParts()))
                 .toList())
-            .iconPath(entity.getIcon())          // 경로 저장
-            .downloadPath(entity.getDownload())  // 경로 저장
+            .iconPath(entity.getIcon())
+            .downloadPath(entity.getDownload())
             .link(entity.getLink())
             .build();
     }
-    
-
 }
+

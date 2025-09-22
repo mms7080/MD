@@ -239,3 +239,14 @@ body {
     border: 1px solid var(--border);
   }
   
+  .cover-preview {
+    margin-top: 10px;
+  }
+  
+  .cover-preview img.cover-thumb {
+    max-width: 300px;
+    border-radius: 8px;
+    display: block;
+    margin-top: 5px;
+  }
+  
