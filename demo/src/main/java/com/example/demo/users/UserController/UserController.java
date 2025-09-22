@@ -2,7 +2,8 @@
 
     import java.security.Principal;
 
-    import org.springframework.stereotype.Controller;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.stereotype.Controller;
     import org.springframework.ui.Model;
     import org.springframework.web.bind.annotation.GetMapping;
     import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,10 +15,12 @@ import com.example.demo.users.UsersEntity.Users;
     import com.example.demo.users.UsersRepository.UsersRepository;
     import com.example.demo.users.UsersService.UsersService;
 
-    import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -63,11 +66,14 @@ import org.springframework.web.bind.annotation.RequestBody;
         return "mypage/withdraw";
     }
 
-    @PostMapping("path")
-    public String postMethodName(@RequestBody String entity) {
-        //TODO: process POST request
-        
-        return entity;
+    @PostMapping("/withdraw")
+    public String withdraw(@RequestParam("password") String password,
+                        Principal principal,
+                        HttpServletRequest req,
+                        HttpServletResponse res) {
+        usersService.withdrawSelf(principal.getName(), password);
+        new SecurityContextLogoutHandler().logout(req, res, null);
+        return "redirect:/home";
     }
     
     
