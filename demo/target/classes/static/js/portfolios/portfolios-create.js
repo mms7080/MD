@@ -4,28 +4,28 @@ function addTeam() {
   const div = document.createElement("div");
   div.className = "team-item";
   div.innerHTML = `
-  <input type="text" name="team[${teamIndex}].teamName" placeholder="팀명">
-  <input type="text" name="team[${teamIndex}].memberName" placeholder="팀원 이름">
+    <input type="text" name="team[${teamIndex}].teamName" placeholder="팀명">
+    <input type="text" name="team[${teamIndex}].memberName" placeholder="팀원 이름">
 
-  <select name="team[${teamIndex}].memberRole">
-    <option value="팀장">팀장</option>
-    <option value="팀원">팀원</option>
-  </select>
+    <select name="team[${teamIndex}].memberRole">
+      <option value="팀장">팀장</option>
+      <option value="팀원">팀원</option>
+    </select>
 
-  <input type="text" name="team[${teamIndex}].parts" placeholder="담당 기능/페이지">
-`;
+    <input type="text" name="team[${teamIndex}].parts" placeholder="담당 기능/페이지">
+  `;
   list.appendChild(div);
   teamIndex++;
 }
 
 // 취소 버튼 → 리스트 페이지로 이동
 function goToList() {
-  window.location.href = "/portfolios";  // list.html을 보여주는 경로
+  window.location.href = "/portfolios";  
 }
-
 
 let tags = [];
 
+// ✅ 태그 추가
 function addTag() {
   const input = document.getElementById("tag-input");
   const value = input.value.trim();
@@ -37,45 +37,39 @@ function addTag() {
   }
 }
 
+// ✅ 태그 제거
 function removeTag(tag) {
   tags = tags.filter(t => t !== tag);
   renderTags();
 }
 
+// ✅ 태그 렌더링 & hidden input 생성
 function renderTags() {
   const list = document.getElementById("tag-list");
+  const hiddenBox = document.getElementById("tags-hidden-box");
   list.innerHTML = "";
+  hiddenBox.innerHTML = "";
 
-  tags.forEach(tag => {
+  tags.forEach((tag, idx) => {
+    // 보여주는 UI
     const div = document.createElement("div");
     div.className = "tag-chip";
     div.innerHTML = `
       ${tag} <span class="remove-tag" onclick="removeTag('${tag}')">&times;</span>
     `;
     list.appendChild(div);
+
+    // ✅ DTO: Set<String> tags 로 넘어가도록 hidden input 생성
+    const hidden = document.createElement("input");
+    hidden.type = "hidden";
+    hidden.name = "tags";
+    hidden.value = tag;
+    hiddenBox.appendChild(hidden);
   });
-
-  // hidden input에 콤마로 join해서 값 넣기
-  document.getElementById("tags-hidden").value = tags.join(",");
-}
-
-function validateFile(file) {
-  const validTypes = ["image/jpeg", "image/png", "image/webp"];
-  const maxSize = 10 * 1024 * 1024; // 10MB
-
-  if (!validTypes.includes(file.type)) {
-    alert("JPEG, PNG, WebP 형식만 업로드 가능합니다.");
-    return false;
-  }
-  if (file.size > maxSize) {
-    alert("파일 크기는 최대 10MB까지 가능합니다.");
-    return false;
-  }
-  return true;
 }
 
 // ===========================
-// 이미지 추가 + 미리보기 + 삭제
+// 이미지 업로드 (여러 장) + 미리보기
 // ===========================
 document.getElementById("image-input")?.addEventListener("change", function(event) {
   const files = event.target.files;
@@ -106,13 +100,14 @@ document.getElementById("image-input")?.addEventListener("change", function(even
     }
   });
 });
+
 // ===========================
 // 아이콘 업로드 (1장만 미리보기)
 // ===========================
 document.getElementById("icon-input")?.addEventListener("change", function(event) {
-  const file = event.target.files[0]; // 첫 번째 파일만
+  const file = event.target.files[0]; 
   const preview = document.getElementById("icon-preview");
-  preview.innerHTML = ""; // 기존 미리보기 초기화
+  preview.innerHTML = ""; 
 
   if (file && file.type.startsWith("image/")) {
     const reader = new FileReader();
@@ -124,13 +119,12 @@ document.getElementById("icon-input")?.addEventListener("change", function(event
       img.src = e.target.result;
       img.className = "icon-thumb";
 
-      // 삭제 버튼
       const removeBtn = document.createElement("span");
       removeBtn.className = "remove-thumb";
       removeBtn.innerHTML = "&times;";
       removeBtn.onclick = () => {
         preview.innerHTML = "";
-        document.getElementById("icon-input").value = ""; // 파일 선택 초기화
+        document.getElementById("icon-input").value = ""; 
       };
 
       imgWrapper.appendChild(img);
@@ -141,31 +135,22 @@ document.getElementById("icon-input")?.addEventListener("change", function(event
   }
 });
 
-
 // ===========================
-// 취소 버튼 → 리스트로 이동
-// ===========================
-function goToList() {
-  window.location.href = "/portfolios";
-}
-
 // Cover 이미지 미리보기
-document.getElementById("cover-input").addEventListener("change", function(event) {
-  const file = event.target.files[0]; // 1장만
+// ===========================
+document.getElementById("cover-input")?.addEventListener("change", function(event) {
+  const file = event.target.files[0];
   const preview = document.getElementById("cover-preview");
-  preview.innerHTML = ""; // 기존 내용 초기화
+  preview.innerHTML = "";
 
   if (file && file.type.startsWith("image/")) {
     const reader = new FileReader();
     reader.onload = e => {
       const img = document.createElement("img");
       img.src = e.target.result;
-      img.className = "cover-thumb"; // CSS로 크기 조정 가능
+      img.className = "cover-thumb"; 
       preview.appendChild(img);
     };
     reader.readAsDataURL(file);
   }
 });
-
-
-

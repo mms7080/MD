@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,10 +49,15 @@ public class PortfoliosController {
     }
 
     @GetMapping
-    public String list(Model model) {
-    List<PortfoliosEntity> portfolios = portfoliosRepository.findAll();
-    model.addAttribute("portfolios", portfolios);
-    return "portfolios/list"; 
+    public String list(Model model,
+                   @RequestParam(defaultValue = "0") int page,
+                   @RequestParam(defaultValue = "12") int size) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    Page<PortfoliosEntity> portfoliosPage = portfoliosRepository.findAll(pageable);
+
+    model.addAttribute("portfoliosPage", portfoliosPage);
+    model.addAttribute("portfolios", portfoliosPage.getContent()); // 실제 데이터
+    return "portfolios/list";
 }
 
 
@@ -82,6 +91,14 @@ public String getPortfolio(@PathVariable Long id, Model model) {
 
         return "redirect:/portfolios";
     }
+
+    // delete
+    @PostMapping("/delete/{id}")
+    public String deletePortfolio(@PathVariable Long id) {
+        portfolioService.deletePortfolio(id);
+        return "redirect:/portfolios"; // 삭제 후 포트폴리오 리스트 페이지로 이동
+    }
+
 
             
 

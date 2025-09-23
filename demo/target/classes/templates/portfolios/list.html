@@ -9,13 +9,15 @@
     <link rel="stylesheet" href="/css/footer.css" />
     <link rel="stylesheet" href="/css/portfolios/list.css" />
     <link rel="stylesheet" href="/css/users/auth-modal.css" />
+
 </head>
 <body>
 <div th:replace="fragments/modals :: authModals"></div>
 <div th:replace="fragments/header :: header('portfolio')"></div>
 
 <main class="kf-main">
-    <!-- 검색 & 필터 영역 (변경 없음) -->
+
+    <!-- 검색 & 필터 영역 -->
     <section class="kf-hero">
         <div class="kf-search">
             <svg class="kf-search__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -27,176 +29,79 @@
 
         <!-- 필터 바 -->
         <div class="kf-filterbar">
-            <!-- 전부 같은 form 안에 넣기 (reset도 가능) -->
             <form id="filters" class="kf-filterform">
-                <!-- 🔒 드롭다운 '열림' 토글 (칩을 라벨로 사용) -->
+                <!-- 언어/툴 체크박스 (숨김) -->
                 <input id="open-lang" type="checkbox" hidden />
                 <input id="open-tools" type="checkbox" hidden />
-
-                <!-- ✅ 전역 선택 체크박스 (LANGUAGE) -->
                 <input id="lang-js" type="checkbox" hidden />
                 <input id="lang-ts" type="checkbox" hidden />
                 <input id="lang-java" type="checkbox" hidden />
                 <input id="lang-python" type="checkbox" hidden />
-
-                <!-- ✅ 전역 선택 체크박스 (TOOLS) -->
                 <input id="tool-react" type="checkbox" hidden />
                 <input id="tool-next" type="checkbox" hidden />
                 <input id="tool-spring" type="checkbox" hidden />
                 <input id="tool-tailwind" type="checkbox" hidden />
                 <input id="tool-express" type="checkbox" hidden />
                 <input id="tool-thymeleaf" type="checkbox" hidden />
-                
-                
-                
-                    <!-- LANGUAGE: 칩 버튼(라벨) + 패널 -->
+
+                <!-- LANGUAGE -->
                 <div class="kf-dd kf-dd--lang">
-                    <label class="kf-chip" for="open-lang"
-                        >LANGUAGE</label
-                    >
-
+                    <label class="kf-chip" for="open-lang">LANGUAGE</label>
                     <div class="kf-dd__panel">
-                        <input
-                            class="opt-search"
-                            type="search"
-                            placeholder="언어 검색 (예: Java)"
-                        />
+                        <input class="opt-search" type="search" placeholder="언어 검색 (예: Java)" />
                         <ul class="opt-list">
-                            <li>
-                                <label class="opt" for="lang-js"
-                                    >JavaScript</label
-                                >
-                            </li>
-                            <li>
-                                <label class="opt" for="lang-ts"
-                                    >TypeScript</label
-                                >
-                            </li>
-                            <li>
-                                <label class="opt" for="lang-java"
-                                    >Java</label
-                                >
-                            </li>
-                            <li>
-                                <label class="opt" for="lang-python"
-                                    >Python</label
-                                >
-                            </li>
+                            <li><label class="opt" for="lang-js">JavaScript</label></li>
+                            <li><label class="opt" for="lang-ts">TypeScript</label></li>
+                            <li><label class="opt" for="lang-java">Java</label></li>
+                            <li><label class="opt" for="lang-python">Python</label></li>
                         </ul>
-
                         <div class="dd-actions">
-                            <button class="btn ghost" type="reset">
-                                초기화
-                            </button>
-                            <!-- 적용 = 열림 토글 끄기 -->
-                            <label class="btn primary" for="open-lang"
-                                >적용</label
-                            >
+                            <button class="btn ghost" type="reset">초기화</button>
+                            <label class="btn primary" for="open-lang">적용</label>
                         </div>
                     </div>
                 </div>
 
-                <!-- TOOLS: 칩 버튼(라벨) + 패널 -->
+                <!-- TOOLS -->
                 <div class="kf-dd kf-dd--tools">
-                    <label class="kf-chip" for="open-tools"
-                        >TOOLS</label
-                    >
-
+                    <label class="kf-chip" for="open-tools">TOOLS</label>
                     <div class="kf-dd__panel">
-                        <input
-                            class="opt-search"
-                            type="search"
-                            placeholder="툴 검색 (예: React)"
-                        />
+                        <input class="opt-search" type="search" placeholder="툴 검색 (예: React)" />
                         <ul class="opt-list">
-                            <li>
-                                <label class="opt" for="tool-react"
-                                    >React</label
-                                >
-                            </li>
-                            <li>
-                                <label class="opt" for="tool-next"
-                                    >Next.js</label
-                                >
-                            </li>
-                            <li>
-                                <label class="opt" for="tool-spring"
-                                    >Spring Boot</label
-                                >
-                            </li>
-                            <li>
-                                <label class="opt" for="tool-tailwind"
-                                    >Tailwind</label
-                                >
-                            </li>
-                            <li>
-                                <label class="opt" for="tool-express"
-                                    >Express</label
-                                >
-                            </li>
-                            <li>
-                                <label class="opt" for="tool-thymeleaf"
-                                    >Thymeleaf</label
-                                >
-                            </li>
+                            <li><label class="opt" for="tool-react">React</label></li>
+                            <li><label class="opt" for="tool-next">Next.js</label></li>
+                            <li><label class="opt" for="tool-spring">Spring Boot</label></li>
+                            <li><label class="opt" for="tool-tailwind">Tailwind</label></li>
+                            <li><label class="opt" for="tool-express">Express</label></li>
+                            <li><label class="opt" for="tool-thymeleaf">Thymeleaf</label></li>
                         </ul>
-
                         <div class="dd-actions">
-                            <button class="btn ghost" type="reset">
-                                초기화
-                            </button>
-                            <!-- 적용 = 열림 토글 끄기 -->
-                            <label class="btn primary" for="open-tools"
-                                >적용</label
-                            >
+                            <button class="btn ghost" type="reset">초기화</button>
+                            <label class="btn primary" for="open-tools">적용</label>
                         </div>
                     </div>
                 </div>
-                
 
-                <!-- 선택된 항목 ‘구름’ (라벨 = 클릭 시 해제) -->
+                <!-- 선택된 항목 -->
                 <div class="kf-selected">
                     <div class="kf-selected__cloud">
-                        <label class="chip" for="lang-js"
-                            >JavaScript
-                            <span class="x" aria-hidden="true"
-                                >×</span
-                            ></label
-                        >
-                        <label class="chip" for="lang-ts"
-                            >TypeScript <span class="x">×</span></label
-                        >
-                        <label class="chip" for="lang-java"
-                            >Java <span class="x">×</span></label
-                        >
-                        <label class="chip" for="lang-python"
-                            >Python <span class="x">×</span></label
-                        >
-
-                        <label class="chip" for="tool-react"
-                            >React <span class="x">×</span></label
-                        >
-                        <label class="chip" for="tool-next"
-                            >Next.js <span class="x">×</span></label
-                        >
-                        <label class="chip" for="tool-spring"
-                            >Spring Boot <span class="x">×</span></label
-                        >
-                        <label class="chip" for="tool-tailwind"
-                            >Tailwind <span class="x">×</span></label
-                        >
-                        <label class="chip" for="tool-express"
-                            >Express <span class="x">×</span></label
-                        >
-                        <label class="chip" for="tool-thymeleaf"
-                            >Thymeleaf <span class="x">×</span></label
-                        >
+                        <label class="chip" for="lang-js">JavaScript<span class="x">×</span></label>
+                        <label class="chip" for="lang-ts">TypeScript<span class="x">×</span></label>
+                        <label class="chip" for="lang-java">Java<span class="x">×</span></label>
+                        <label class="chip" for="lang-python">Python<span class="x">×</span></label>
+                        <label class="chip" for="tool-react">React<span class="x">×</span></label>
+                        <label class="chip" for="tool-next">Next.js<span class="x">×</span></label>
+                        <label class="chip" for="tool-spring">Spring Boot<span class="x">×</span></label>
+                        <label class="chip" for="tool-tailwind">Tailwind<span class="x">×</span></label>
+                        <label class="chip" for="tool-express">Express<span class="x">×</span></label>
+                        <label class="chip" for="tool-thymeleaf">Thymeleaf<span class="x">×</span></label>
                     </div>
                 </div>
-                
             </form>
-            <a href="/portfolios/create" class="btn primary kf-create-btn" sec:authorize="isAuthenticated()">CREATE</a>
 
+            <a href="/portfolios/create" class="btn primary kf-create-btn" sec:authorize="hasRole('ADMIN')">
+                CREATE
+            </a>
         </div>
     </section>
 
@@ -219,86 +124,67 @@
     </section>
 
     <!-- 포트폴리오 카드 리스트 -->
-<section class="kf-grid">
-    <article class="kf-card" th:each="portfolio : ${portfolios}">
-        <a class="kf-card__thumb" th:href="@{|/portfolios/${portfolio.id}|}">
-            <img th:if="${portfolio.cover != null}" 
-                 th:src="${portfolio.cover}" 
-                 th:alt="${portfolio.title + ' 썸네일'}"/>
-            <img th:if="${portfolio.cover == null}" 
-                 src="/images/default-thumbnail.png" 
-                 alt="기본 썸네일"/>
-        </a>
-        
+    <section class="kf-grid">
+        <article class="kf-card" th:each="portfolio : ${portfolios}">
+            <a class="kf-card__thumb" th:href="@{|/portfolios/${portfolio.id}|}">
+                <img th:if="${portfolio.cover != null}" th:src="${portfolio.cover}" loading="lazy"
+                     th:alt="${portfolio.title + ' 썸네일'}"/>
+                <img th:if="${portfolio.cover == null}" src="/images/default-thumbnail.png" loading="lazy"
+                     alt="기본 썸네일"/>
+            </a>
+            <div class="kf-card__body">
+                <div class="kf-card__head">
+                    <div class="kf-card__left">
+                        <h3 class="kf-card__title">
+                            <a th:href="@{|/portfolios/${portfolio.id}|}" th:text="${portfolio.title}">제목</a>
+                        </h3>
+                        <div class="kf-card__inline">
+                            <span class="kf-card__author" th:text="${portfolio.creator}">작성자</span>
+                            <span class="kf-dot">·</span>
+                            <time class="kf-card__date" th:text="${#temporals.format(portfolio.createdAt,'yyyy.MM.dd')}">
+                                2025.08.15
+                            </time>
+                        </div>
+                    </div>
+                    <span class="kf-like-right" aria-label="좋아요" th:text="'♥ ' + ${portfolio.likes}">♥ 0</span>
+                </div>
+                <p class="kf-card__desc" th:text="${portfolio.desc}">설명 텍스트</p>
+                <div class="kf-card__tags">
+                    <span class="kf-tag" th:each="tag : ${portfolio.tags}" th:text="'#' + ${tag}">#태그</span>
+                </div>
+            </div>
+        </article>
+    </section>
 
-        <div class="kf-card__body">
-            <div class="kf-card__head">
-                <div class="kf-card__left">
-                    <h3 class="kf-card__title">
-                        <a th:href="@{|/portfolios/${portfolio.id}|}"
-                           th:text="${portfolio.title}">제목</a>
-                    </h3>
-                    <div class="kf-card__inline">
-                        <span class="kf-card__author"
-                              th:text="${portfolio.creator}">작성자</span>
-                        <span class="kf-dot">·</span>
-                        <time class="kf-card__date"
-                              th:text="${#temporals.format(portfolio.createdAt,'yyyy.MM.dd')}">
-                            2025.08.15
-                        </time>
+    <!-- 포트폴리오 마퀴 -->
+    <section class="kf-mq-portfolios" aria-label="포트폴리오">
+        <div class="mq-mask">
+            <div class="mq-track">
+                <!-- 시퀀스 A -->
+                <div class="mq-seq">
+                    <div class="mq-item" th:each="portfolio : ${#lists.take(portfolios, 10)}">
+                        <a th:href="@{|/portfolios/${portfolio.id}|}">
+                            <figure>
+                                <img th:src="${portfolio.cover}" loading="lazy" th:alt="${portfolio.title + ' 썸네일'}"/>
+                                <figcaption th:text="${portfolio.title}">제목</figcaption>
+                            </figure>
+                        </a>
                     </div>
                 </div>
-                <span class="kf-like-right" aria-label="좋아요"
-                      th:text="'♥ ' + ${portfolio.likes}">♥ 0</span>
-            </div>
-
-            <p class="kf-card__desc" th:text="${portfolio.desc}">
-                설명 텍스트
-            </p>
-
-            <div class="kf-card__tags">
-                <span class="kf-tag" th:each="tag : ${portfolio.tags}"
-                      th:text="'#' + ${tag}">#태그</span>
-            </div>
-        </div>
-    </article>
-</section>
-
-    <!-- 포트폴리오 마퀴 -->
-    <!-- 포트폴리오 마퀴 -->
-<section class="kf-mq-portfolios" aria-label="포트폴리오">
-    <div class="mq-mask">
-        <div class="mq-track">
-            
-            <!-- 시퀀스 A -->
-            <div class="mq-seq">
-                <div class="mq-item" th:each="portfolio : ${portfolios}">
-                    <a th:href="@{|/portfolios/${portfolio.id}|}">
-                        <figure>
-                            <img th:src="${portfolio.cover}"
-                                 th:alt="${portfolio.title + ' 썸네일'}" />
-                            <figcaption th:text="${portfolio.title}">제목</figcaption>
-                        </figure>
-                    </a>
+                <!-- 시퀀스 B -->
+                <div class="mq-seq" aria-hidden="true">
+                    <div class="mq-item" th:each="portfolio : ${#lists.take(portfolios, 10)}">
+                        <a th:href="@{|/portfolios/${portfolio.id}|}">
+                            <figure>
+                                <img th:src="${portfolio.cover}" loading="lazy" th:alt="${portfolio.title + ' 썸네일'}"/>
+                                <figcaption th:text="${portfolio.title}">제목</figcaption>
+                            </figure>
+                        </a>
+                    </div>
                 </div>
             </div>
-
-            <!-- 시퀀스 B (무한루프용 복제) -->
-            <div class="mq-seq" aria-hidden="true">
-                <div class="mq-item" th:each="portfolio : ${portfolios}">
-                    <a th:href="@{|/portfolios/${portfolio.id}|}">
-                        <figure>
-                            <img th:src="${portfolio.cover}"
-                                 th:alt="${portfolio.title + ' 썸네일'}" />
-                            <figcaption th:text="${portfolio.title}">제목</figcaption>
-                        </figure>
-                    </a>
-                </div>
-            </div>
-
         </div>
-    </div>
-</section>
+    </section>
 
 </main>
 

@@ -131,5 +131,14 @@ public class PortfolioService {
         return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
     }
+
+    // 삭제
+    @Transactional
+    public void deletePortfolio(Long id) {
+        PortfoliosEntity portfolio = repository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 존재하지 않습니다. id=" + id));
+
+        repository.delete(portfolio);  // ✅ Cascade 때문에 팀원/태그/스크린샷도 자동 삭제
+    }
 }
 

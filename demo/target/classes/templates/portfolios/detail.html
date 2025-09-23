@@ -18,12 +18,50 @@
         <div th:replace="fragments/modals :: authModals"></div>
         <div th:replace="fragments/header :: header('portfolio')"></div>
 
+        <!-- ✅ 수정/삭제 버튼 (ADMIN 전용, 헤더 아래 우측) -->
+            <div class="detail-admin-actions" sec:authorize="hasRole('ADMIN')">
+                
+                <!-- 수정 버튼 (Uiverse.io 스타일) -->
+                <a th:href="@{|/portfolios/edit/${portfolio.id}|}">
+                    <button class="edit-btn">edit
+                        
+                    </button>
+                </a>
+                <button type=button class="edit-btn" onclick="openDeleteModal()">delete
+                    
+                </button>
+        
+            <!-- 삭제 버튼 (모달 열기용) -->
+        
+            <!-- 삭제 모달 -->
+            <div id="deleteModal" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <p>정말 삭제하시겠습니까?</p>
+                    <div class="modal-actions">
+                        <!-- ✅ 확인 버튼: 실제 삭제 폼 제출 -->
+                        <form id="deleteForm" th:action="@{|/portfolios/delete/${portfolio.id}|}" method="post">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                            <button type="submit" class="btn-confirm">확인</button>
+                            <!-- 취소 버튼 -->
+                        <button type="button" class="btn-confirm" onclick="closeDeleteModal()">취소</button>
+                        </form>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+
         <main class="container">
             <!-- ❌ Not Found -->
             <div th:if="${notFound}" class="error-box">
                 <h1>포트폴리오를 찾을 수 없습니다.</h1>
                 <a href="/home">← 홈으로</a>
             </div>
+            
             <div class="center-box">
                 <div class="title-row">
                     <h1 class="title">
@@ -34,34 +72,36 @@
                             >제목</a
                         >
                     </h1>
+                   
                 </div>
                 <p class="desc" th:text='|"${portfolio.desc}"|'>설명</p>
             </div>
+            
             <!-- ✅ Portfolio Content -->
             <div th:if="${portfolio != null}" class="portfolio-detail-grid">
                 <!-- 왼쪽: 이미지 -->
                 <div class="gallery">
-                    <!-- 대표 이미지 -->
-                    <!-- 대표 이미지 -->
-                    <figure class="main-photo">
-                        <img id="mainImage"
-                             th:src="${(portfolio.screenshots != null and portfolio.screenshots.size() > 0) 
-                                        ? portfolio.screenshots[0] 
-                                        : portfolio.cover}"
-                             alt="대표 이미지"
-                             onclick="openModal(0)" />
-                    </figure>
-                    
+                 <!-- 대표 이미지 -->
+                <figure class="main-photo"
+                th:if="${portfolio.screenshots != null and !portfolio.screenshots.isEmpty()}">
+                <img id="mainImage"
+                th:src="${portfolio.screenshots[0]}"
+                alt="대표 이미지"
+                onclick="openModal(0)" />
+                </figure>
 
-
-                   <!-- 썸네일 목록 -->
-                <div class="thumb-list" th:if="${portfolio.screenshots != null}">
-                    <img th:each="img, iter : ${portfolio.screenshots}"
-                        th:src="${img}"
-                        th:attr="data-index=${iter.index}, onclick='openModal(' + ${iter.index} + ')' "
-                        alt="썸네일"
-                        class="thumb"/>
+                <!-- 썸네일 목록 -->
+                <div class="thumb-list"
+                th:if="${portfolio.screenshots != null and portfolio.screenshots.size() > 1}">
+                <img th:each="img, iter : ${portfolio.screenshots}"
+                th:if="${iter.index > 0}"
+                th:src="${img}"
+                th:attr="data-index=${iter.index}, onclick='openModal(' + ${iter.index} + ')'"
+                alt="썸네일"
+                class="thumb"/>
                 </div>
+
+
 
                 </div>
 
@@ -101,18 +141,20 @@
                     </span>
 
                     <!-- Tags -->
-                    <!-- Tags -->
-                    <!-- Tags -->
-                        <span class="tags-box" title="태그">
-                            <i class="fa-solid fa-tags"></i>
-                            <span class="tags-label">Tags :</span>
-                            <span class="tags-list">
-                                <a th:each="tag : ${portfolio.tags}"
-                                    th:href="@{|/portfolios?tag=${tag}|}" 
-                                    class="tag-item"
-                                    th:text="${tag}">Tag</a>
-                            </span>
+                    <span class="tags-box" title="태그">
+                        <i class="fa-solid fa-tags"></i>
+                        <span class="tags-label">Tags :</span>
+                        <span class="tags-list">
+                          <a th:each="tag : ${portfolio.tags}"
+                             th:href="@{|/portfolios?tag=${tag}|}" 
+                             class="tag-item"
+                             th:text="${tag}">Tag</a>
                         </span>
+                        <!-- ✅ 더보기 버튼 추가 -->
+                        <button type="button" class="tag-more-btn" onclick="toggleTags(this)" data-expanded="false">+ 더보기</button>
+                      </span>
+                      
+                      
 
                 </div>
 

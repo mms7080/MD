@@ -46,7 +46,6 @@ public class TeamMemberEntity {
     private String memberRole;
 
     // ✅ 담당 파트 (순서 유지)
-    @CollectionTable(name = "team_member_parts", joinColumns = @JoinColumn(name = "team_member_id"))
     @Column(name = "part")
     
     private String parts;

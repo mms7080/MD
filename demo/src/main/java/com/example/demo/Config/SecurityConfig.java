@@ -39,6 +39,7 @@ public class SecurityConfig {
                     "/portfolios/**",
                     "/folios/**", // 추가 페이지 접근은 허용(준회)
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
+                    "/uploads/**", // 이미지(훈희)
                     "/home/**"
                     //  ,"/**" 
                     //일단 테스트로 전체허용해놨다
