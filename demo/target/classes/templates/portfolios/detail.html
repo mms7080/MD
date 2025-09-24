@@ -82,24 +82,26 @@
                 <!-- 왼쪽: 이미지 -->
                 <div class="gallery">
                  <!-- 대표 이미지 -->
-                <figure class="main-photo"
-                th:if="${portfolio.screenshots != null and !portfolio.screenshots.isEmpty()}">
-                <img id="mainImage"
-                th:src="${portfolio.screenshots[0]}"
-                alt="대표 이미지"
-                onclick="openModal(0)" />
+                 <figure class="main-photo" 
+                        th:if="${portfolio.screenshots != null and !portfolio.screenshots.isEmpty()}">
+                        <img id="mainImage"
+                        th:src="@{${portfolio.screenshots[0]}}"
+                        alt="대표 이미지"
+                        onclick="openModal(0)" />
                 </figure>
+                
 
                 <!-- 썸네일 목록 -->
-                <div class="thumb-list"
-                th:if="${portfolio.screenshots != null and portfolio.screenshots.size() > 1}">
-                <img th:each="img, iter : ${portfolio.screenshots}"
-                th:if="${iter.index > 0}"
-                th:src="${img}"
-                th:attr="data-index=${iter.index}, onclick='openModal(' + ${iter.index} + ')'"
-                alt="썸네일"
-                class="thumb"/>
-                </div>
+                <!-- 썸네일 목록 (첫 번째 제외) -->
+            <div class="thumb-list"
+                    th:if="${portfolio.screenshots != null and portfolio.screenshots.size() > 1}">
+                    <img th:each="img, iter : ${portfolio.screenshots}"
+                    th:if="${iter.index > 0}"
+                    th:src="@{${img}}"
+                    th:attr="data-index=${iter.index}, onclick='openModal(' + ${iter.index} + ')'"
+                    alt="썸네일"
+                    class="thumb"/>
+            </div>
 
 
 
@@ -204,7 +206,7 @@
 
                     <!-- Download -->
                     <a th:if="${portfolio.download != null}" 
-                        th:href="${portfolio.download}" 
+                        th:href="@{${portfolio.download}}"
                         download class="Btn" title="Download">
 
                         <svg
@@ -229,8 +231,7 @@
                         title="Link"
                         class="icon-link"
                     >
-                    <img th:if="${portfolio.icon != null}" 
-                        th:src="${portfolio.icon}" 
+                    <img th:if="${portfolio.icon != null}" th:src="@{${portfolio.icon}}" 
                         alt="홈페이지 아이콘" 
                         class="link-icon"/>
                     </a>

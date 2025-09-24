@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PortfolioFormDto {
     
-    private Long id;
     private String title;
     private Set<String> tags;
 
@@ -32,6 +31,7 @@ public class PortfolioFormDto {
     private List<String> screenshotPaths; // ✅ 출력용 (entity.getScreenshots())
 
     private String desc;
+    private String teamName;
     private List<TeamMemberDto> team;
 
     private String iconPath;
@@ -42,7 +42,6 @@ public class PortfolioFormDto {
 
     public static PortfolioFormDto formEntityDto(PortfoliosEntity entity){
         return PortfolioFormDto.builder()
-            .id(entity.getId())
             .title(entity.getTitle())
             .tags(entity.getTags())
             .coverPath(entity.getCover())
@@ -50,7 +49,6 @@ public class PortfolioFormDto {
             .screenshotPaths(entity.getScreenshots()) // ✅ 여기로 매핑
             .team(entity.getTeam().stream()
                 .map(t -> new TeamMemberDto(
-                        t.getTeamName(),
                         t.getMemberName(),
                         t.getMemberRole(),
                         t.getParts()))

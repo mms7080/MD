@@ -36,8 +36,6 @@ public class TeamMemberEntity {
     @JoinColumn(name="portfolio_id")
     private PortfoliosEntity portfolio;
 
-    @Column(name = "team_name")
-    private String teamName;
 
     @Column(name = "member_name")
     private String memberName;
@@ -51,8 +49,8 @@ public class TeamMemberEntity {
     private String parts;
 
     // 생성자 (portfolio 없이)
-    public TeamMemberEntity(String teamName, String memberName, String memberRole, String parts) {
-        this.teamName = teamName;
+    public TeamMemberEntity( String memberName, String memberRole, String parts) {
+        
         this.memberName = memberName;
         this.memberRole = memberRole;
         this.parts = parts;

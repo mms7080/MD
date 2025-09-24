@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -49,14 +50,20 @@ public class PortfoliosController {
     }
 
     @GetMapping
-    public String list(Model model,
-                   @RequestParam(defaultValue = "0") int page,
-                   @RequestParam(defaultValue = "12") int size) {
+public String list(Model model,
+   @RequestParam(defaultValue = "0") int page,
+   @RequestParam(defaultValue = "12") int size) {
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-    Page<PortfoliosEntity> portfoliosPage = portfoliosRepository.findAll(pageable);
+    Page<PortfoliosEntity> portfoliosPage = portfoliosRepository.findAllWithTags(pageable);
+
+    // ✅ 디버그용 로그
+    System.out.println("포트폴리오 개수: " + portfoliosPage.getContent().size());
+    portfoliosPage.getContent().forEach(p -> 
+        System.out.println("제목: " + p.getTitle())
+    );
 
     model.addAttribute("portfoliosPage", portfoliosPage);
-    model.addAttribute("portfolios", portfoliosPage.getContent()); // 실제 데이터
+    model.addAttribute("portfolios", portfoliosPage.getContent());
     return "portfolios/list";
 }
 
@@ -67,9 +74,15 @@ public class PortfoliosController {
 public String getPortfolio(@PathVariable Long id, Model model) {
     PortfoliosEntity portfolio = portfoliosRepository.findDetailById(id)
         .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
+
+    // ✅ 중복 제거
+    portfolio.setScreenshots(new ArrayList<>(new LinkedHashSet<>(portfolio.getScreenshots())));
+    portfolio.setTeam(new ArrayList<>(new LinkedHashSet<>(portfolio.getTeam())));
+
     model.addAttribute("portfolio", portfolio);
     return "portfolios/detail";
 }
+
 
 
 

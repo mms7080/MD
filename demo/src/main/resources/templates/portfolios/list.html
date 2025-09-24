@@ -165,7 +165,7 @@
                     <div class="mq-item" th:each="portfolio : ${#lists.take(portfolios, 10)}">
                         <a th:href="@{|/portfolios/${portfolio.id}|}">
                             <figure>
-                                <img th:src="${portfolio.cover}" loading="lazy" th:alt="${portfolio.title + ' 썸네일'}"/>
+                                <img th:src="${portfolio.cover}" loading="lazy" th:alt="@{/${portfolio.title + ' 썸네일'}}"/>
                                 <figcaption th:text="${portfolio.title}">제목</figcaption>
                             </figure>
                         </a>

@@ -78,7 +78,11 @@ public class PortfoliosEntity {
         joinColumns = @JoinColumn(name = "portfolio_id")
     )
     @Column(name = "screenshot")
+    @Fetch(FetchMode.SUBSELECT) // ← ✅ 추가!
     private List<String> screenshots = new ArrayList<>();
+
+    @Column(name="p_teamName")
+    private String teamName;
 
     // ✅ 팀원 (입력 순서 유지 → List + OrderColumn)
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)

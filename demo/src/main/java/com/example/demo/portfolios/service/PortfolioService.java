@@ -33,15 +33,15 @@ public class PortfolioService {
      */
     public String saveFile(MultipartFile file, String type) throws IOException {
         if (file == null || file.isEmpty()) return null;
-
+    
         long maxSize = type.equals("zip") ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
         if (file.getSize() > maxSize) {
             throw new IOException("파일 용량 초과: " + file.getOriginalFilename());
         }
-
+    
         String originalName = file.getOriginalFilename();
         String extension = originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
-
+    
         if (type.equals("image")) {
             if (!(extension.equals("jpg") || extension.equals("jpeg")
                     || extension.equals("png") || extension.equals("webp"))) {
@@ -52,20 +52,21 @@ public class PortfolioService {
                 throw new IOException("ZIP 파일만 업로드 가능: " + originalName);
             }
         }
-
+    
         Path uploadPath = Paths.get(System.getProperty("user.dir"), "uploads");
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-
+    
         String filename = UUID.randomUUID() + "_" + originalName;
         Path filePath = uploadPath.resolve(filename);
-
+    
         try (InputStream inputStream = file.getInputStream()) {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
-
-        return "/uploads/" + filename; // DB에 상대경로 저장
+    
+        // ✅ 앞에 "/" 추가 (절대 경로로 저장)
+        return "/uploads/" + filename;
     }
 
     /**
@@ -91,36 +92,35 @@ public class PortfolioService {
     
         // ✅ 부모 엔티티 생성
         PortfoliosEntity entity = PortfoliosEntity.builder()
-                .title(dto.getTitle())
-                .creator(currentUser)
-                .tags(dto.getTags())
-                .cover(coverPath)
-                .desc(dto.getDesc())
-                .screenshots(screenshotPaths)   // ← 여기 적용
-                .icon(iconPath)
-                .link(dto.getLink())
-                .download(downloadPath)
-                .likes(0)
-                .createdAt(LocalDateTime.now())
-                .build();
+        .title(dto.getTitle())
+        .creator(currentUser)
+        .tags(dto.getTags())
+        .cover(coverPath)
+        .desc(dto.getDesc())
+        .screenshots(screenshotPaths)
+        .icon(iconPath)
+        .link(dto.getLink())
+        .download(downloadPath)
+        .likes(0)
+        .createdAt(LocalDateTime.now())
+        .teamName(dto.getTeamName()) // ✅ 팀명은 부모에 한 번만 저장
+        .build();
     
-        // ✅ 자식 엔티티 생성 + 부모 연결
+                // ✅ 팀원 리스트 (teamName 제거됨)
         var team = dto.getTeam().stream()
-                .map(t -> {
-                    TeamMemberEntity member = new TeamMemberEntity(
-                            t.getTeamName(),
-                            t.getMemberName(),
-                            t.getMemberRole(),
-                            t.getParts()
-                    );
-                    member.setPortfolio(entity); // FK 연결
-                    return member;
-                })
-                .toList();
-    
+        .map(t -> {
+            TeamMemberEntity member = new TeamMemberEntity(
+                    t.getMemberName(),
+                    t.getMemberRole(),
+                    t.getParts()
+            );
+            member.setPortfolio(entity);
+            return member;
+        })
+        .toList();
+
         entity.setTeam(team);
-    
-        // ✅ 저장 (CascadeType.ALL 로 team 자동 저장됨)
+
         repository.save(entity);
     }
     
