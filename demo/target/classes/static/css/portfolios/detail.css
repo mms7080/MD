@@ -619,48 +619,71 @@ html[data-theme="light"] .icon2 {
   .icon-link:hover .link-icon {
     transform: scale(1.1); /* 호버 시 살짝 확대 */
   }
+
+
   
-  /* tag */
-  .tags-box {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-left: 15px;
-    
-  }
-  
-  .tags-list {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    font-style: normal; /* 기울어짐 방지 */
-  }
-  
-  .tag-item {
-    background: var(--chip, #3b82f6); /* 파란색 */
-    color: white;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    font-style:normal;
-    font-weight: 500;
-    text-decoration: none;
-    display : inline-block;
-    border: 1px solid var(--border);
-  }
-  .tag-item:hover{
-    transform: scale(1.08);
-  }
-  
-  /* 라이트 모드 */
+/* tag */
+.tags-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-left: 15px;
+  flex-wrap: wrap; /* 태그 여러 줄 허용 */
+  max-width: 800px;   /* ✅ 최대 가로 길이 고정 */
+  flex-wrap: wrap; 
+}
+
+.tags-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-style: normal;
+  max-width: 100%;
+  flex:1;
+}
+
+.tag-item {
+  background: var(--chip, #3b82f6);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  font-style: normal;
+  font-weight: 500;
+  text-decoration: none;
+  display: none; /* 처음엔 숨김 (JS 제어) */
+  border: 1px solid var(--border);
+}
+
+.tag-item:hover {
+  transform: scale(1.08);
+}
+
+/* 라이트 모드 */
 html[data-theme="light"] .tag-item {
-  border: 1px solid #ccc; /* 회색 테두리 */
+  border: 1px solid #ccc;
 }
 
 /* 다크 모드 */
 html[data-theme="dark"] .tag-item {
-  border: 1px solid #444; /* 진한 회색 테두리 */
+  border: 1px solid #444;
+}
+
+/* 더보기 버튼 */
+.tag-more-btn {
+  background: none;
+  border: none;
+  color: var(--chip, #3b82f6);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  margin-left: 6px;
+}
+
+.tag-more-btn:hover {
+  text-decoration: underline;
 }
 
 
@@ -733,3 +756,149 @@ html[data-theme="dark"] .tag-item {
     to { opacity: 1; transform: scale(1); }
   }
   
+
+/*  수정 삭제 버튼 */
+  .detail-admin-actions {
+    position: absolute;
+    top: 90px;   /* 헤더 높이에 맞춰 조절 */
+    right: 30px; /* 화면 우측 여백 */
+    display: flex;
+    gap: 10px;
+    z-index: 1000; /* 다른 요소보다 위 */
+  }
+  
+  .btn-edit, .btn-delete {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .btn-edit {
+    background-color: #3498db;
+    color: #fff;
+  }
+  
+  .btn-delete {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+  }
+  
+  .btn-delete:hover {
+    background-color: #c0392b;
+  }
+  
+  /* ===========================
+   Delete Modal
+   =========================== */
+/* Delete Modal */
+/* Delete Modal */
+.delete-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  inset: 0;
+  background-color: rgba(0,0,0,0.6); /* 화면 전체 배경은 반투명 */
+  justify-content: center;
+  align-items: center;
+}
+
+/* 모달 박스 */
+.delete-modal-content {
+  background: #000;   /* 검은색 불투명 */
+  padding: 24px 30px;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 300px;
+  position: relative; /* X 버튼 위치 조정용 */
+  color: #fff;        /* 글씨 흰색 */
+}
+
+/* 텍스트 */
+.delete-modal-content p {
+  margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* X 버튼 */
+.delete-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+}
+.delete-close:hover {
+  color: #e74c3c; /* hover 시 빨간색 */
+}
+
+/* 버튼 영역 */
+.delete-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* 확인 버튼 */
+.btn-confirm {
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-confirm:hover {
+  background: #fff;
+  color: #000;
+}
+
+
+/* Edit 버튼 전용 스타일 (기본: 다크 모드 기준) */
+.edit-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 8px;
+  gap: 8px;
+  height: 28px;
+  width: auto;
+  border: none;
+  background: #00000034;  /* 다크 모드: 검은 배경 */
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #fff;            /* 다크 모드: 흰 글씨 */
+}
+
+/* hover 효과 (다크 모드) */
+.edit-btn:hover {
+  background: #fff;
+  color: #000;
+}
+
+/* ✅ 라이트 모드일 때 */
+html[data-theme="light"] .edit-btn {
+  background: #fff;   /* 박스 흰색 */
+  color: #000;        /* 글씨 검은색 */
+  border: 1px solid #ddd; /* 구분감 */
+}
+
+/* 라이트 모드 hover 효과 */
+html[data-theme="light"] .edit-btn:hover {
+  background: #f0f0f0; /* 살짝 회색 */
+  color: #000;
+}
+
+
+

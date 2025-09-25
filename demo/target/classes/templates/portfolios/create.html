@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>포트폴리오 생성</title>
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/portfolios/create.css">
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/users/auth-modal.css" />
+</head>
+<body>
+<div th:replace="fragments/modals :: authModals"></div>
+<div th:replace="fragments/header :: header('portfolio')"></div>
+
+<main class="container">
+  <h1>포트폴리오 생성</h1>
+  <form th:action="@{/portfolios}" method="post" enctype="multipart/form-data">
+
+    <!-- 제목 -->
+    <label>제목</label>
+    <input type="text" name="title" required>
+
+    <!-- 설명 -->
+    <label>설명</label>
+    <textarea name="desc" rows="4" required></textarea>
+
+    <!-- Cover 이미지 -->
+    <label>대표 이미지</label>
+    <input type="file" name="cover" id=cover-input accept=".jpg,.jpeg,.png,.webp">
+    <div id="cover-preview" class="cover-preview"></div>
+
+    <!-- ✅ 팀명 (한 번만) -->
+    <label>팀명</label>
+    <input type="text" name="teamName" placeholder="팀명" required>
+
+    <!-- 팀원 & 역할 -->
+    <label>팀원 & 역할</label>
+    <div id="team-list">
+      <div class="team-item">
+        <input type="text" name="team[0].memberName" placeholder="팀원 이름" required>
+        <select name="team[0].memberRole">
+          <option value="팀장">팀장</option>
+          <option value="팀원">팀원</option>
+        </select>
+        <input type="text" name="team[0].parts" placeholder="담당 기능/페이지">
+      </div>
+    </div>
+    <button type="button" onclick="addTeam()">+ 팀원 추가</button>
+
+    <!-- 프로젝트 이미지 -->
+    <label>프로젝트 이미지</label>
+    <input type="file" name="screenshots" id="image-input" multiple accept=".jpg,.jpeg,.png,.webp">
+    <div id="image-preview" class="image-preview"></div>
+
+    <!-- 아이콘 -->
+    <label>프로젝트 아이콘</label>
+    <input type="file" name="icon" id="icon-input" accept=".jpg,.jpeg,.png,.webp">
+    <div id="icon-preview" class="icon-preview"></div>
+
+    <!-- 태그 -->
+    <label>태그</label>
+    <div class="tag-input-box">
+      <input type="text" id="tag-input" placeholder="예: React">
+      <button type="button" onclick="addTag()">+ 추가</button>
+    </div>
+    <div id="tag-list"></div>
+    <div id="tags-hidden-box"></div>
+
+    <!-- ZIP -->
+    <label>다운로드 ZIP 파일</label>
+    <input type="file" name="download" accept=".zip">
+
+    <!-- 링크 -->
+    <label>홈페이지 주소</label>
+    <input type="url" name="link" placeholder="https://...">
+
+    <!-- 저장/취소 -->
+    <div class="form-actions">
+      <button type="submit" class="btn-save">저장</button>
+      <button type="button" class="btn-cancel" onclick="goToList()">취소</button>
+    </div>
+  </form>
+</main>
+
+<script src="/js/portfolios/portfolios-create.js"></script>
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>
