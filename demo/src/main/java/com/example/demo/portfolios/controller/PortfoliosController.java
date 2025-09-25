@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import com.example.demo.portfolios.dto.PortfolioFormDto;
 import com.example.demo.portfolios.entity.PortfoliosEntity;
 import com.example.demo.portfolios.entity.TeamMemberEntity;
 import com.example.demo.portfolios.repository.PortfoliosRepository;
+// import com.example.demo.portfolios.service.PortfolioLikeService;
 import com.example.demo.portfolios.service.PortfolioService;
 
 @Controller
@@ -40,6 +42,7 @@ public class PortfoliosController {
 
     private final PortfolioService portfolioService;
     private final PortfoliosRepository portfoliosRepository;
+    
     
     
 
@@ -112,6 +115,17 @@ public String getPortfolio(@PathVariable Long id, Model model) {
         return "redirect:/portfolios"; // 삭제 후 포트폴리오 리스트 페이지로 이동
     }
 
+//     @PostMapping("/{id}/like")
+// public String likePortfolio(@PathVariable Long id, Principal principal) {
+//     portfolioService.likePortfolio(id, principal.getName());
+//     return "redirect:/portfolios/" + id;  // 다시 상세 페이지로 이동
+// }
+
+// @PostMapping("/{id}/unlike")
+// public String unlikePortfolio(@PathVariable Long id, Principal principal) {
+//     portfolioService.unlikePortfolio(id, principal.getName());
+//     return "redirect:/portfolios/" + id;
+// }
 
             
 

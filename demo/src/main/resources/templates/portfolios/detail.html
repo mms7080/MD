@@ -74,7 +74,7 @@
                     </h1>
                    
                 </div>
-                <p class="desc" th:text='|"${portfolio.desc}"|'>설명</p>
+                <p class="desc" th:if="${portfolio.desc != null}" th:text="${portfolio.desc}"></p>
             </div>
             
             <!-- ✅ Portfolio Content -->
@@ -116,20 +116,19 @@
                 </div>
 
                 <!-- 오른쪽: 정보 -->
-                <div class="info-box">
+                <div class="info-box" th:if="${portfolio.team != null and !portfolio.team.isEmpty()}">
                     <h2>팀원 & 역할</h2>
-                    <!-- 👥 팀원 정보 -->
-                    <!-- 팀원 & 역할 -->
-                   <!-- 팀원 출력 -->
-                <ul class="team-list">
-                    <li class="team-item" th:each="member : ${portfolio.team}">
-                        <div class="team-name">
-                            <strong th:text="${member.memberName}">팀원 이름</strong>
-                            <span class="role" th:text="${member.memberRole}">역할</span>
-                        </div>
-                        <p class="parts" th:text="${member.parts}">담당 기능</p>
-                    </li>
-                </ul>
+                    <ul class="team-list">
+                        <li class="team-item" th:each="member : ${portfolio.team}">
+                            <div class="team-name">
+                                <strong th:text="${member.memberName}">팀원 이름</strong>
+                                <span class="role" th:text="${member.memberRole}">역할</span>
+                            </div>
+                            <p class="parts" th:text="${member.parts}">담당 기능</p>
+                        </li>
+                    </ul>
+                </div>
+                
 
                 </div>
             </div>

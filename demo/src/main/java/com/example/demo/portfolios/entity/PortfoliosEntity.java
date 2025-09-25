@@ -59,8 +59,7 @@ public class PortfoliosEntity {
     @Fetch(FetchMode.SUBSELECT)
     private Set<String> tags = new LinkedHashSet<>();
 
-    @Column(name="p_likes")
-    private int likes;
+
 
     @Column(name="p_createdAt")
     private LocalDateTime createdAt;

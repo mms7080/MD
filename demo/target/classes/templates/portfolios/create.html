@@ -22,7 +22,7 @@
 
     <!-- 설명 -->
     <label>설명</label>
-    <textarea name="desc" rows="4" required></textarea>
+    <textarea name="desc" rows="4" ></textarea>
 
     <!-- Cover 이미지 -->
     <label>대표 이미지</label>
@@ -31,14 +31,15 @@
 
     <!-- ✅ 팀명 (한 번만) -->
     <label>팀명</label>
-    <input type="text" name="teamName" placeholder="팀명" required>
+    <input type="text" name="teamName" placeholder="팀명">
 
     <!-- 팀원 & 역할 -->
     <label>팀원 & 역할</label>
     <div id="team-list">
       <div class="team-item">
-        <input type="text" name="team[0].memberName" placeholder="팀원 이름" required>
+        <input type="text" name="team[0].memberName" placeholder="팀원 이름" >
         <select name="team[0].memberRole">
+          <option value="">-- 선택 --</option>   <!-- 기본값: 빈 문자열 -->
           <option value="팀장">팀장</option>
           <option value="팀원">팀원</option>
         </select>

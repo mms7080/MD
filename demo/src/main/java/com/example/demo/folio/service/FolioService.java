@@ -33,7 +33,6 @@ public class FolioService {
     private final FolioRepository folioRepository;
     private final UsersRepository usersRepository;
     // 임시로 PortfoliosController의 데이터를 사용
-    private final PortfoliosController portfoliosController;
     private final PortfolioService portfolioService;
 
     public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {

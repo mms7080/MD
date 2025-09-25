@@ -16,9 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.portfolios.dto.PortfolioFormDto;
+// import com.example.demo.portfolios.entity.PortfolioLikesEntity;
 import com.example.demo.portfolios.entity.PortfoliosEntity;
 import com.example.demo.portfolios.entity.TeamMemberEntity;
+// import com.example.demo.portfolios.repository.PortfolioLikeRepository;
 import com.example.demo.portfolios.repository.PortfoliosRepository;
+import com.example.demo.users.UsersEntity.Users;
+import com.example.demo.users.UsersRepository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +31,8 @@ import lombok.RequiredArgsConstructor;
 public class PortfolioService {
 
     private final PortfoliosRepository repository;
+    private final UsersRepository userRepository;
+    // private final PortfolioLikeRepository likeRepository;
 
     /**
      * 파일 저장 (이미지/ZIP 구분)
@@ -101,23 +107,25 @@ public class PortfolioService {
         .icon(iconPath)
         .link(dto.getLink())
         .download(downloadPath)
-        .likes(0)
         .createdAt(LocalDateTime.now())
         .teamName(dto.getTeamName()) // ✅ 팀명은 부모에 한 번만 저장
         .build();
     
                 // ✅ 팀원 리스트 (teamName 제거됨)
-        var team = dto.getTeam().stream()
-        .map(t -> {
-            TeamMemberEntity member = new TeamMemberEntity(
-                    t.getMemberName(),
-                    t.getMemberRole(),
-                    t.getParts()
-            );
-            member.setPortfolio(entity);
-            return member;
-        })
-        .toList();
+                var team = dto.getTeam().stream()
+                .map(t -> {
+                    String role = t.getMemberRole(); // DTO에서 가져옴
+            
+                    TeamMemberEntity member = new TeamMemberEntity(
+                        t.getMemberName(),
+                        (role == null || role.trim().isEmpty()) ? null : role, // ✅ null 처리
+                        t.getParts()
+                    );
+            
+                    member.setPortfolio(entity);
+                    return member;
+                })
+                .toList();
 
         entity.setTeam(team);
 
@@ -140,5 +148,43 @@ public class PortfolioService {
 
         repository.delete(portfolio);  // ✅ Cascade 때문에 팀원/태그/스크린샷도 자동 삭제
     }
+
+
+
+
+//     @Transactional
+// public void likePortfolio(Long portfolioId, String username) {
+//     PortfoliosEntity portfolio = repository.findById(portfolioId)
+//         .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음"));
+
+//     Users user = userRepository.findByUsername(username)
+//         .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+
+//     // 이미 좋아요 눌렀는지 확인
+//     boolean exists = likeRepository.existsByPortfolioAndUser(portfolio, user);
+//     if (exists) {
+//         throw new IllegalStateException("이미 좋아요를 눌렀습니다.");
+//     }
+
+//     PortfolioLikesEntity like = new PortfolioLikesEntity();
+//     like.setPortfolio(portfolio);
+//     like.setUser(user);
+
+//     likeRepository.save(like);
+// }
+
+// @Transactional
+// public void unlikePortfolio(Long portfolioId, String username) {
+//     PortfoliosEntity portfolio = repository.findById(portfolioId)
+//         .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음"));
+
+//     Users user = userRepository.findByUsername(username)
+//         .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+
+//     likeRepository.deleteByPortfolioAndUser(portfolio, user);
+// }
+
+
+
 }
 
