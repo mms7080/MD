@@ -6,11 +6,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    
+
     @Override
-public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    String projectPath = System.getProperty("user.dir") + "/uploads/";
-    registry.addResourceHandler("/uploads/**")
-            .addResourceLocations("file:" + projectPath);
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 프로젝트 루트 경로/uploads
+        String uploadPath = System.getProperty("user.dir") + "/uploads/";
+
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + uploadPath);
+    }
 }
-}
+

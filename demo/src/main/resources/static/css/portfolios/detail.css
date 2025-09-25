@@ -759,12 +759,10 @@ html[data-theme="dark"] .tag-item {
 
 /*  수정 삭제 버튼 */
   .detail-admin-actions {
-    position: absolute;
-    top: 90px;   /* 헤더 높이에 맞춰 조절 */
-    right: 30px; /* 화면 우측 여백 */
+    position: static;
     display: flex;
     gap: 10px;
-    z-index: 1000; /* 다른 요소보다 위 */
+  
   }
   
   .btn-edit, .btn-delete {

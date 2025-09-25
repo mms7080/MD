@@ -60,7 +60,7 @@ public class PortfoliosEntity {
     private Set<String> tags = new LinkedHashSet<>();
 
     @Column(name="p_likes")
-    private int likes;
+    private Integer likes = 0;
 
     @Column(name="p_createdAt")
     private LocalDateTime createdAt;

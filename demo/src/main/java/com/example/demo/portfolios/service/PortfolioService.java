@@ -33,15 +33,15 @@ public class PortfolioService {
      */
     public String saveFile(MultipartFile file, String type) throws IOException {
         if (file == null || file.isEmpty()) return null;
-    
+
         long maxSize = type.equals("zip") ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
         if (file.getSize() > maxSize) {
             throw new IOException("파일 용량 초과: " + file.getOriginalFilename());
         }
-    
+
         String originalName = file.getOriginalFilename();
         String extension = originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
-    
+
         if (type.equals("image")) {
             if (!(extension.equals("jpg") || extension.equals("jpeg")
                     || extension.equals("png") || extension.equals("webp"))) {
@@ -52,20 +52,22 @@ public class PortfolioService {
                 throw new IOException("ZIP 파일만 업로드 가능: " + originalName);
             }
         }
-    
+
+        // ✅ 프로젝트 내부 static/uploads/ 경로
         Path uploadPath = Paths.get(System.getProperty("user.dir"), "uploads");
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-    
+
+        // 파일명에 UUID 붙이기
         String filename = UUID.randomUUID() + "_" + originalName;
         Path filePath = uploadPath.resolve(filename);
-    
+
         try (InputStream inputStream = file.getInputStream()) {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
-    
-        // ✅ 앞에 "/" 추가 (절대 경로로 저장)
+
+        // ✅ DB에는 /uploads/filename 으로 저장
         return "/uploads/" + filename;
     }
 
@@ -75,7 +77,7 @@ public class PortfolioService {
     @Transactional
     public void saveFromDto(PortfolioFormDto dto, String coverPath, String iconPath, String downloadPath) {
         String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
-    
+
         // ✅ 스크린샷 파일 저장 (MultipartFile → String 경로 리스트)
         List<String> screenshotPaths = dto.getScreenshots() != null
             ? dto.getScreenshots().stream()
@@ -89,43 +91,40 @@ public class PortfolioService {
                 })
                 .toList()
             : java.util.Collections.emptyList();
-    
+
         // ✅ 부모 엔티티 생성
         PortfoliosEntity entity = PortfoliosEntity.builder()
-        .title(dto.getTitle())
-        .creator(currentUser)
-        .tags(dto.getTags())
-        .cover(coverPath)
-        .desc(dto.getDesc())
-        .screenshots(screenshotPaths)
-        .icon(iconPath)
-        .link(dto.getLink())
-        .download(downloadPath)
-        .likes(0)
-        .createdAt(LocalDateTime.now())
-        .teamName(dto.getTeamName()) // ✅ 팀명은 부모에 한 번만 저장
-        .build();
-    
-                // ✅ 팀원 리스트 (teamName 제거됨)
+            .title(dto.getTitle())
+            .creator(currentUser)
+            .tags(dto.getTags())
+            .cover(coverPath)
+            .desc(dto.getDesc())
+            .screenshots(screenshotPaths)
+            .icon(iconPath)
+            .link(dto.getLink())
+            .download(downloadPath)
+            .likes(0)
+            .createdAt(LocalDateTime.now())
+            .teamName(dto.getTeamName()) // ✅ 팀명은 부모에 한 번만 저장
+            .build();
+
+        // ✅ 팀원 리스트 (teamName 제거됨)
         var team = dto.getTeam().stream()
-        .map(t -> {
-            TeamMemberEntity member = new TeamMemberEntity(
-                    t.getMemberName(),
-                    t.getMemberRole(),
-                    t.getParts()
-            );
-            member.setPortfolio(entity);
-            return member;
-        })
-        .toList();
+            .map(t -> {
+                TeamMemberEntity member = new TeamMemberEntity(
+                        t.getMemberName(),
+                        t.getMemberRole(),
+                        t.getParts()
+                );
+                member.setPortfolio(entity);
+                return member;
+            })
+            .toList();
 
         entity.setTeam(team);
 
         repository.save(entity);
     }
-    
-    
-
 
     public PortfoliosEntity getPortfolioById(Long id) {
         return repository.findById(id)
@@ -141,4 +140,3 @@ public class PortfolioService {
         repository.delete(portfolio);  // ✅ Cascade 때문에 팀원/태그/스크린샷도 자동 삭제
     }
 }
-
