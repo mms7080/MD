@@ -98,4 +98,7 @@ public class PortfoliosEntity {
 
     @Column(name="p_download")
     private String download;
+
+    @Column(name="p_views")
+    private  Integer viewCount = 0;
 }

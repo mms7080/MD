@@ -139,4 +139,19 @@ public class PortfolioService {
 
         repository.delete(portfolio);  // ✅ Cascade 때문에 팀원/태그/스크린샷도 자동 삭제
     }
+
+
+    @Transactional
+public PortfoliosEntity increaseViewCount(Long id) {
+    PortfoliosEntity portfolio = repository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
+
+    // ✅ null 방어
+    if (portfolio.getViewCount() == null) {
+        portfolio.setViewCount(0);
+    }
+
+    portfolio.setViewCount(portfolio.getViewCount() + 1);
+    return repository.save(portfolio);
+}
 }

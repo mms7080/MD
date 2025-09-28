@@ -10,18 +10,20 @@ function loadImages() {
 
   images = [];
   if (mainImage) {
-    images.push(mainImage.getAttribute("src")); // 대표 이미지 1장
+    images.push(mainImage.getAttribute("src")); // 대표 이미지
   }
   if (thumbs.length > 0) {
-    images.push(...thumbs.map(img => img.getAttribute("src"))); // 나머지 썸네일
+    images.push(...thumbs.map(img => img.getAttribute("src"))); // 썸네일
   }
 }
 
 // 썸네일 클릭 → 대표 이미지 변경
 function changeMainImage(element, index) {
   const mainImage = document.getElementById("mainImage");
-  mainImage.src = element.src;
-  currentIndex = index;
+  if (mainImage) {
+    mainImage.src = element.src;
+    currentIndex = index;
+  }
 }
 
 // 대표/썸네일 클릭 → 모달 열기
@@ -61,22 +63,32 @@ document.addEventListener("keydown", (e) => {
 document.addEventListener("DOMContentLoaded", () => {
   const viewCountEl = document.getElementById("viewCount");
   if (viewCountEl) {
-    let count = parseInt(localStorage.getItem("viewCount") || "0");
-    count++;
-    viewCountEl.textContent = count;
-    localStorage.setItem("viewCount", count);
+    const portfolioId = viewCountEl.getAttribute("data-id"); // HTML에 data-id 추가 필요
+
+    fetch(`/api/portfolios/${portfolioId}/views`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(res => res.json())
+    .then(count => {
+      viewCountEl.textContent = count;
+    })
+    .catch(err => console.error("조회수 증가 실패:", err));
   }
 });
 
 /* -----------------------------
    삭제 모달
 ----------------------------- */
-function openDeleteModal() {
+window.openDeleteModal = function() {
   document.getElementById("deleteModal").style.display = "flex";
-}
-function closeDeleteModal() {
+};
+
+window.closeDeleteModal = function() {
   document.getElementById("deleteModal").style.display = "none";
-}
+};
 
 /* -----------------------------
    태그 더보기 / 접기
@@ -87,19 +99,19 @@ function toggleTags(button) {
   const visibleCount = tagsList.querySelectorAll(".tag-item:not([style*='display: none'])").length;
 
   if (button.dataset.expanded === "true") {
-    // 접기 → 처음 8개만 보이게
+    // 접기 → 처음 6개만
     allTags.forEach((tag, i) => {
       tag.style.display = i < 6 ? "inline-block" : "none";
     });
     button.textContent = "+ 더보기";
     button.dataset.expanded = "false";
   } else {
-    // 더보기 → 현재 보이는 개수 + 8개 더
+    // 더보기 → 현재 보이는 개수 + 6개 더
     for (let i = visibleCount; i < visibleCount + 6 && i < allTags.length; i++) {
       allTags[i].style.display = "inline-block";
     }
 
-    // 다 보이면 접기로 변경
+    // 다 보이면 접기 버튼
     if (visibleCount + 6 >= allTags.length) {
       button.textContent = "접기";
       button.dataset.expanded = "true";
@@ -107,12 +119,14 @@ function toggleTags(button) {
   }
 }
 
-// 초기화 (처음에 8개만 보이게)
+// 초기화 (처음에 6개만 보이게)
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".tags-list").forEach(tagsList => {
     const allTags = tagsList.querySelectorAll(".tag-item");
-    allTags.forEach((tag, i) => {
-      tag.style.display = i < 6 ? "inline-block" : "none";
-    });
+    if (allTags.length > 0) {
+      allTags.forEach((tag, i) => {
+        tag.style.display = i < 6 ? "inline-block" : "none";
+      });
+    }
   });
 });
