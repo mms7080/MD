@@ -158,8 +158,46 @@ public class UsersService {
         profiledto.setGender(users.getGender());
         profiledto.setProfileImgUrl(profile != null ? profile.getProfileImgUrl() : null);
         profiledto.setGithubUrl(profile != null && profile.getGithubUrl() != null ? profile.getGithubUrl() : "");
-        profiledto.setPositions(profile != null && profile.getPositions() != null ? profile.getPositions() : new HashSet<>());
+        profiledto.setPositions(
+                profile != null && profile.getPositions() != null ? profile.getPositions() : new HashSet<>());
         return profiledto; // ✅ 반환
+    }
+
+    @Transactional
+    public void updateProfileBasic(Long userId,
+            String name,
+            String githubUrl,
+            java.util.Set<String> positions,
+            String existingProfileImgUrl // hidden값 그대로 보존
+    ) {
+        Users user = usersRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 1) 사용자 이름 갱신
+        if (name != null && !name.isBlank()) {
+            user.setName(name.trim());
+        }
+
+        // 2) 프로필 로드/생성
+        Profile profile = profileRepository.findById(userId).orElse(null);
+        if (profile == null) {
+            profile = new Profile();
+            profile.setId(userId); // @MapsId 구조 가정
+            profile.setPositions(new java.util.HashSet<>());
+        }
+
+        // 3) GitHub URL
+        profile.setGithubUrl((githubUrl == null || githubUrl.isBlank()) ? null : githubUrl.trim());
+
+        // 4) 포지션
+        profile.setPositions(positions != null ? positions : new java.util.HashSet<>());
+
+        // 5) 이미지 경로는 수정하지 않음(폼 hidden 값 유지)
+        profile.setProfileImgUrl(existingProfileImgUrl);
+
+        // 저장
+        profileRepository.save(profile);
+        // Users는 @Transactional로 dirty checking 반영
     }
 
 }

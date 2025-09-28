@@ -219,6 +219,7 @@ body {
     gap: 8px;
     min-width: 140px;       /* 카드 폭 */
     padding: 12px 14px;
+    justify-content: center;
     border: 1px solid var(--border, #e5e7eb);
     border-radius: 12px;
     background: var(--panel, #ffffff);

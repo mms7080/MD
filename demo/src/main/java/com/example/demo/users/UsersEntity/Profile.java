@@ -19,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="user_profile")
+@Table(name = "user_profile")
 public class Profile {
     @Id
     private Long id;
@@ -30,9 +30,9 @@ public class Profile {
     @Column
     private String githubUrl;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_profile_position", joinColumns = @JoinColumn(name = "id"))
     @Column(name = "position")
-    private Set<String> positions  = new HashSet<>();
-    
+    private Set<String> positions = new HashSet<>();
+
 }
