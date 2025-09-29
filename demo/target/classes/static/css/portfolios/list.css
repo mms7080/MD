@@ -470,22 +470,18 @@ body {
     font-weight: 700;
     font-size: 12px;
 }
-
 /* 포트폴리오 마키 */
 .kf-mq-portfolios {
     --speed: 40s; /* 숫자 작게 = 더 빠름 */
     --gap: 20px;
     --item-w: 220px; /* 카드 너비 */
     --img-h: 140px; /* 이미지 높이 */
-    /* border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border); */
-    /* background: var(--panel); */
     margin-top: 50px;
 }
 
 .kf-mq-portfolios .mq-mask {
     position: relative;
-    /* overflow: hidden; */
+    overflow: hidden; /* ✅ 숨김 */
     padding: 14px 0;
 }
 
@@ -493,10 +489,10 @@ body {
     display: flex;
     width: max-content;
     gap: var(--gap);
-    animation: mq-scroll var(--speed) linear infinite;
+    animation: marquee var(--speed) linear infinite; /* ✅ keyframes 적용 */
 }
 .kf-mq-portfolios:hover .mq-track {
-    animation-play-state: paused;
+    animation-play-state: paused; /* 마우스 올리면 정지 */
 }
 
 .kf-mq-portfolios .mq-seq {
@@ -505,10 +501,11 @@ body {
 }
 
 .kf-mq-portfolios .mq-item {
-    display: block;
-    position: relative;
+    flex: 0 0 auto;
     width: var(--item-w);
+    margin-right: var(--gap);
     text-decoration: none;
+    position: relative;
 }
 .kf-mq-portfolios .mq-item:hover {
     z-index: 2;
@@ -516,11 +513,9 @@ body {
 
 .kf-mq-portfolios .mq-item figure {
     transition: transform 0.22s ease, box-shadow 0.22s ease;
-    transform-origin: 60% 100%; /* 오른쪽으로 살짝 기운 느낌 */
+    transform-origin: 60% 100%;
     will-change: transform;
 }
-
-/* 호버 시: 오른쪽으로 살짝 기울이기 + 살짝 띄우기 + 그림자 */
 .kf-mq-portfolios .mq-item:hover figure {
     transform: rotate(2deg) translateY(-2px);
 }
@@ -538,7 +533,6 @@ body {
     background: #000;
 }
 
-/* 제목(작게) */
 .kf-mq-portfolios figcaption {
     margin-top: 6px;
     font-size: 12px;
@@ -550,13 +544,9 @@ body {
 }
 
 /* 무한 루프 */
-@keyframes mq-scroll {
-    from {
-        transform: translateX(0);
-    }
-    to {
-        transform: translateX(-50%);
-    } /* 시퀀스 2개이므로 -50% 이동 */
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); } /* 시퀀스 2개라 절반만 이동 */
 }
 
 /* 모션 최소화 존중 */
@@ -565,34 +555,3 @@ body {
         animation: none;
     }
 }
-
-.pagination {
-    margin: 24px auto;
-    text-align: center;
-  }
-  .pagination ul {
-    list-style: none;
-    display: inline-flex;
-    gap: 6px;
-    padding: 0;
-  }
-  .pagination li {
-    display: inline-block;
-  }
-  .pagination a {
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    text-decoration: none;
-    font-size: 0.9rem;
-  }
-  .pagination li.active a {
-    background: var(--primary);
-    color: #fff;
-    font-weight: bold;
-  }
-  .pagination a:hover {
-    background: var(--primary-ink);
-  }
-  
