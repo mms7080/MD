@@ -20,6 +20,7 @@ public interface PortfoliosRepository extends JpaRepository<PortfoliosEntity, Lo
        "LEFT JOIN FETCH p.screenshots " +
        "LEFT JOIN FETCH p.team " +
        "WHERE p.id = :id")
+   
     Optional<PortfoliosEntity> findDetailById(@Param("id") Long id);
     Optional<PortfoliosEntity> findById(Long id);
 
