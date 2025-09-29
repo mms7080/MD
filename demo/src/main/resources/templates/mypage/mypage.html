@@ -78,8 +78,6 @@
                     <span th:case="'BACKEND'">백엔드</span>
                     <span th:case="'FULLSTACK'">풀스택</span>
                     <span th:case="'MOBILE'">모바일</span>
-                    <span th:case="'DATA'">데이터/ML</span>
-                    <span th:case="'DEVOPS'">데브옵스</span>
                     <span th:case="*" th:text="${pos}">기타</span>
                   </span>
                 </div>
@@ -191,11 +189,6 @@
                         th:checked="${form != null and form.positions != null and form.positions.contains('FULLSTACK')}"> 풀스택</label>
                 <label><input type="checkbox" name="positions" value="MOBILE"
                         th:checked="${form != null and form.positions != null and form.positions.contains('MOBILE')}"> 모바일</label>
-                <label><input type="checkbox" name="positions" value="DATA"
-                        th:checked="${form != null and form.positions != null and form.positions.contains('DATA')}"> 데이터/ML</label>
-                <label><input type="checkbox" name="positions" value="DEVOPS"
-                        th:checked="${form != null and form.positions != null and form.positions.contains('DEVOPS')}"> 데브옵스</label>
-                <small class="hint">최대 3개 정도를 권장합니다.</small>
               </td>
             </tr>
           </tbody>
