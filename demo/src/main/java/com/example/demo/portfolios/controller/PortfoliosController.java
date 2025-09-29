@@ -98,8 +98,8 @@ public String getPortfolio(@PathVariable Long id, Model model) {
     portfolio.setScreenshots(new ArrayList<>(new LinkedHashSet<>(portfolio.getScreenshots())));
     portfolio.setTeam(new ArrayList<>(new LinkedHashSet<>(portfolio.getTeam())));
     
-         // 댓글 가져오기
-         List<PortfolioComment> comments = commentService.getComments(portfolio);
+         // ✅ id 기반으로 댓글 조회
+    List<PortfolioComment> comments = commentService.getComments(id);
 
     model.addAttribute("portfolio", portfolio);
     model.addAttribute("comments", comments);

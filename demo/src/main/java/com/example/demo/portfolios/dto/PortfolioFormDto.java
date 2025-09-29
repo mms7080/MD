@@ -39,6 +39,7 @@ public class PortfolioFormDto {
     private String downloadPath;
     private MultipartFile download;
     private String link;
+    private Integer viewCount;
 
     public static PortfolioFormDto formEntityDto(PortfoliosEntity entity){
         return PortfolioFormDto.builder()
@@ -56,6 +57,7 @@ public class PortfolioFormDto {
             .iconPath(entity.getIcon())
             .downloadPath(entity.getDownload())
             .link(entity.getLink())
+            .viewCount(entity.getViewCount())
             .build();
     }
 }

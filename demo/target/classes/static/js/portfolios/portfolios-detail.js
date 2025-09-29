@@ -63,21 +63,31 @@ document.addEventListener("keydown", (e) => {
 document.addEventListener("DOMContentLoaded", () => {
   const viewCountEl = document.getElementById("viewCount");
   if (viewCountEl) {
-    const portfolioId = viewCountEl.getAttribute("data-id"); // HTML에 data-id 추가 필요
+    const portfolioId = viewCountEl.getAttribute("data-id");
 
-    fetch(`/api/portfolios/${portfolioId}/views`, {
+    // ✅ CSRF 토큰 읽기
+    const token = document.querySelector("meta[name='_csrf']")?.content;
+    const header = document.querySelector("meta[name='_csrf_header']")?.content;
+
+    fetch(`/portfolios/${portfolioId}/views`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        [header]: token // ✅ CSRF 토큰 추가
       }
     })
-    .then(res => res.json())
-    .then(count => {
-      viewCountEl.textContent = count;
-    })
-    .catch(err => console.error("조회수 증가 실패:", err));
+      .then(res => {
+        if (!res.ok) throw new Error(`조회수 요청 실패: ${res.status}`);
+        return res.json();
+      })
+      .then(count => {
+        viewCountEl.textContent = count;
+      })
+      .catch(err => console.error("조회수 증가 실패:", err));
   }
 });
+
+
 
 /* -----------------------------
    삭제 모달

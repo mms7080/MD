@@ -17,11 +17,6 @@
         <div th:replace="fragments/modals :: authModals"></div>
         <div th:replace="fragments/header :: header('portfolio')"></div>
 
-       
-
-
-        
-
         <main class="container">
             <!-- ❌ Not Found -->
             <div th:if="${notFound}" class="error-box">
@@ -266,11 +261,11 @@
                     </p>
                 </div>
             
-                <div id="commentList" class="comments">
+                <div id="commentList" class="comments" sec:authorize="isAuthenticated()">
                     <div class="comment" th:each="comment : ${comments}">
-                      <div class="meta" sec:authorize="isAuthenticated()">
-                        <!-- 작성자 -->
-                        <span class="author" th:text="${comment.user.username ?: '익명'}">익명</span>
+                      <div class="meta">
+                        <!-- 작성자는 무조건 "익명" -->
+                        <span class="author">익명</span>
                   
                         <!-- 날짜 + 수정/삭제 -->
                         <div class="right-box">
@@ -288,16 +283,13 @@
                         </div>
                       </div>
                   
-                      <!-- ⭐ 별점 (로그인 사용자만) -->
-                      <div class="stars readonly" 
-                           th:attr="data-rating=${comment.rating}" 
-                           sec:authorize="isAuthenticated()">
-                      </div>
+                      <!-- ⭐ 별점 -->
+                      <div class="stars readonly" th:attr="data-rating=${comment.rating}"></div>
                   
-                      <!-- 💬 댓글 본문 (로그인 사용자만) -->
-                      <p class="content" th:text="${comment.content}" sec:authorize="isAuthenticated()"></p>
+                      <!-- 💬 댓글 본문 -->
+                      <p class="content" th:text="${comment.content}"></p>
                   
-                      <!-- ✍️ 인라인 수정 폼 -->
+                      <!-- ✍️ 인라인 수정 폼 (본인 or ADMIN만) -->
                       <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/edit|}" 
                             method="post" class="edit-form" style="display:none;"
                             sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
@@ -316,7 +308,6 @@
                     </div>
                   </div>
                   
-                </div>
                 
             </div>
             
