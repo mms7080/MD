@@ -4,6 +4,10 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.portfolios.entity.PortfolioComment;
@@ -99,6 +103,20 @@ public void updateComment(Long portfolioId, Long commentId, String content, int 
 
     comment.setContent(content);
     comment.setRating(rating);
+}
+
+
+public Page<PortfolioComment> getComments(Long portfolioId, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    return commentRepository.findByPortfolioIdWithUser(portfolioId, pageable);
+}
+
+public double getAverageRating(Long portfolioId) {
+    return commentRepository.findAverageRatingByPortfolioId(portfolioId);
+}
+
+public long getCommentCount(Long portfolioId) {
+    return commentRepository.countByPortfolioId(portfolioId);
 }
 
 

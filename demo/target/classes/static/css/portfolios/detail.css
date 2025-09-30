@@ -191,25 +191,163 @@
     line-height: 1.4;
   }
   
-  /* ======================
-     Comment Section
-     ====================== */
-  .comment-section {
-    margin-top: 40px;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 0;
+/* ======================
+   Comment Section (카드형)
+   ====================== */
+.comment-section {
+  margin-top: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+/* 제목 */
+.comment-section h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--text);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* 댓글 리스트 */
+.comments {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 개별 댓글 카드 */
+.comment {
+  background: var(--page, #1e1e1e);
+  border: 1px solid var(--border, #333);
+  border-radius: 10px;
+  padding: 16px 20px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.comment:hover {
+  background: rgba(255,255,255,0.05);
+  transform: translateY(-2px);
+}
+
+/* 메타 정보 */
+.comment .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.comment .author {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.comment .date {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* ======================
+   Comment Actions (수정/삭제 버튼)
+   ====================== */
+   .comment-actions {
+    display: flex;
+    gap: 6px;
   }
   
-  /* 제목 */
-  .comment-section h2 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 18px;
+  .comment-actions .btn-mini {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid var(--border, #555);
+    background: transparent;
     color: var(--text);
-    padding-bottom: 10px;
+    transition: all 0.2s ease;
   }
+  
+  /* hover 시 색상은 그대로 두고 느낌만 */
+  .comment-actions .btn-mini:hover {
+    transform: scale(1.05);      /* 살짝 확대 */
+    opacity: 0.85;               /* 약간 진해진 듯 */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25); /* 그림자 */
+  }
+  
+  /* 클릭 시 눌린 느낌 */
+  .comment-actions .btn-mini:active {
+    transform: scale(0.95);
+    box-shadow: none;
+  }
+  
+  /* 삭제 버튼 */
+  .comment-actions .btn-mini.danger {
+    border-color: #e74c3c;
+    color: #e74c3c;
+  }
+  
+  /* 삭제 버튼 hover 시에도 색상 변화 없음 */
+  .comment-actions .btn-mini.danger:hover {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: transparent;
+    transform: scale(1.05);
+    opacity: 0.85;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+
+/* 댓글 카드 안의 별점 표시 */
+.comment .stars.readonly {
+  margin: 4px 0;
+  margin-left: 0;
+  font-size: 1rem;
+  display: block;
+  gap: 2px;
+}
+
+/* 공통 별 모양 */
+.comment .stars.readonly .star {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* 꽉 찬 별 */
+.comment .stars.readonly .star.filled {
+  color: #FFD700; /* 노란색 */
+}
+
+/* 빈 별 */
+.comment .stars.readonly .star.empty {
+  color: #555; /* 회색 */
+}
+
+/* 평균 별점에도 적용 */
+.rating-summary .stars.readonly {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 6px;
+}
+.rating-summary .stars.readonly .star.filled {
+  color: #FFD700;
+}
+.rating-summary .stars.readonly .star.empty {
+  color: #555;
+}
+
+
+/* 댓글 본문 */
+.comment .content {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+  margin-top: 6px;
+  white-space: pre-line; /* 줄바꿈 반영 */
+}
+
   
   /* ===== 별점 공통 스타일 ===== */
   .rating {
@@ -258,12 +396,13 @@
     align-items: center;
     gap: 6px;
   }
-  .comment-form input[type="text"] {
+  .comment-form input[type="text"],
+  .comment-form textarea {
     padding: 10px 14px;
     border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--page);
-    color: var(--text);
+    border: 1px solid #444;
+    background: #222;
+    color: #fff;
     font-size: 0.95rem;
   }
   .comment-form input:focus {
@@ -807,7 +946,7 @@
     color: #fff;
   }
   .edit-btn:hover {
-    background: #fff;
+    background: #ffffff;
     color: #000;
   }
   html[data-theme="light"] .edit-btn {
@@ -819,6 +958,8 @@
     background: #f0f0f0;
     color: #000;
   }
+  
+
   
   /* ======================
      Responsive Meta
@@ -863,4 +1004,51 @@
   .login-btn:hover {
     text-decoration: underline;
   }
+ /* ======================
+   Pagination
+   ====================== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.pagination ul {
+  list-style: none;
+  display: flex;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+}
+
+.pagination li {
+  display: inline-block;
+}
+
+.pagination a {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid #444;   /* 테두리 */
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  color: #fff;              /* 글자 흰색 */
+  background: #222;         /* 버튼 어두운 회색 */
+  transition: all 0.2s ease;
+}
+
+.pagination a:hover {
+  background: #333;         /* hover 시 살짝 밝아짐 */
+  border-color: #666;
+}
+
+.pagination li.active a {
+  background: #fff;         /* 현재 페이지는 흰색 배경 */
+  color: #000;              /* 글자 검은색 */
+  font-weight: 600;
+  border-color: #fff;
+}
+
+  
+
   

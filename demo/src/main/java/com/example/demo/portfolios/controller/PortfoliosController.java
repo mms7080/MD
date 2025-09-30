@@ -88,23 +88,36 @@ public String list(Model model,
 
 
 @GetMapping("/{id}")
-public String getPortfolio(@PathVariable Long id, Model model) {
+public String getPortfolio(@PathVariable Long id,
+                           @RequestParam(defaultValue = "0") int page,
+                           Model model) {
+    // 포트폴리오 + 연관 데이터 가져오기
     PortfoliosEntity portfolio = portfoliosRepository.findDetailById(id)
         .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
 
-        
-
-    // ✅ 중복 제거
+    // 중복 제거
     portfolio.setScreenshots(new ArrayList<>(new LinkedHashSet<>(portfolio.getScreenshots())));
     portfolio.setTeam(new ArrayList<>(new LinkedHashSet<>(portfolio.getTeam())));
-    
-         // ✅ id 기반으로 댓글 조회
-    List<PortfolioComment> comments = commentService.getComments(id);
 
+    // 댓글 (페이지네이션 적용)
+    int size = 5;
+    Page<PortfolioComment> commentPage = commentService.getComments(id, page, size);
+
+    // 전체 평균 & 총 댓글 수
+    double avgRating = commentService.getAverageRating(id);
+    long ratingCount = commentService.getCommentCount(id);
+
+    // 모델에 담기
     model.addAttribute("portfolio", portfolio);
-    model.addAttribute("comments", comments);
+    model.addAttribute("comments", commentPage.getContent());  // ✅ 페이징된 댓글만
+    model.addAttribute("avgRating", avgRating);                // ✅ 전체 평균
+    model.addAttribute("ratingCount", ratingCount);            // ✅ 전체 댓글 수
+    model.addAttribute("currentPage", commentPage.getNumber());
+    model.addAttribute("totalPages", commentPage.getTotalPages());
+
     return "portfolios/detail";
 }
+
 
 
 

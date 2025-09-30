@@ -220,11 +220,17 @@
             
                 <!-- 평균 별점 -->
                 <div class="rating-summary">
-                    <span class="avg-label">평균 별점</span>
-                    <div class="stars readonly" id="avgStars"></div>
-                    <span id="avgScore">0.0</span>
-                    <span class="count">(<span id="ratingCount">0</span>)</span>
-                </div>
+                    <span class="avg-label">평균 별점:</span>
+                    <span th:text="${#numbers.formatDecimal(avgRating, 1, 1)}">0.0</span> 점
+                    <span class="count">(<span th:text="${ratingCount}">0</span>개)</span>
+                  
+                    <!-- 별 아이콘 -->
+                    <div class="stars readonly">
+                      <span th:each="i : ${#numbers.sequence(1,5)}"
+                            th:class="${i <= avgRating} ? 'star filled' : 'star empty'">★</span>
+                    </div>
+                  </div>
+</div>
             
                 <!-- 로그인 사용자 -->
                 <div sec:authorize="isAuthenticated()">
@@ -262,51 +268,78 @@
                 </div>
             
                 <div id="commentList" class="comments" sec:authorize="isAuthenticated()">
-                    <div class="comment" th:each="comment : ${comments}">
-                      <div class="meta">
-                        <!-- 작성자는 무조건 "익명" -->
-                        <span class="author">익명</span>
-                  
-                        <!-- 날짜 + 수정/삭제 -->
-                        <div class="right-box">
-                          <span class="date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd')}"></span>
-                          <div class="comment-actions"
-                               sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
-                            <button type="button" class="btn-mini" onclick="enableEdit(this)">수정</button>
-                            <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/delete|}" 
-                                  method="post" class="delete-form"
-                                  onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                              <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-                              <button type="submit" class="btn-mini danger">삭제</button>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                  
-                      <!-- ⭐ 별점 -->
-                      <div class="stars readonly" th:attr="data-rating=${comment.rating}"></div>
-                  
-                      <!-- 💬 댓글 본문 -->
-                      <p class="content" th:text="${comment.content}"></p>
-                  
-                      <!-- ✍️ 인라인 수정 폼 (본인 or ADMIN만) -->
-                      <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/edit|}" 
-                            method="post" class="edit-form" style="display:none;"
-                            sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
-                        <div class="rating">
-                          <label><input type="radio" name="rating" value="5"> ★★★★★</label>
-                          <label><input type="radio" name="rating" value="4"> ★★★★☆</label>
-                          <label><input type="radio" name="rating" value="3"> ★★★☆☆</label>
-                          <label><input type="radio" name="rating" value="2"> ★★☆☆☆</label>
-                          <label><input type="radio" name="rating" value="1"> ★☆☆☆☆</label>
-                        </div>
-                        <textarea name="content" rows="2"></textarea>
-                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-                        <button type="submit" class="btn-save">저장</button>
-                        <button type="button" class="btn-cancel" onclick="cancelEdit(this)">취소</button>
-                      </form>
+                    <div class="comment" 
+                        th:each="comment : ${comments}" 
+                        th:classappend="${#authentication.name == comment.user.username} ? ' mine'">
+  
+                <!-- 메타 (작성자, 날짜, 수정/삭제) -->
+                <div class="meta">
+                    <div class="left-box">
+                    <span class="author">익명</span>
+                    <!-- ⭐ 별점: 익명 밑에 한 줄 -->
+                    <!-- 별점 블록 (익명 아래) -->
+                <!-- 댓글 별점 -->
+                <div class="stars readonly" th:attr="data-rating=${comment.rating}"></div>
                     </div>
+                
+                    <div class="right-box">
+                    <span class="date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd')}"></span>
+                    <div class="comment-actions"
+                        sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
+                        <button type="button" class="btn-mini" onclick="enableEdit(this)">수정</button>
+                        <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/delete|}" 
+                            method="post" class="delete-form"
+                            onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                        <button type="submit" class="btn-mini danger">삭제</button>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+                
+                <!-- 💬 댓글 본문 -->
+                <p class="content" th:text="${comment.content}"></p>
+                
+
+                <!-- ✍️ 인라인 수정 폼 -->
+                <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/edit|}" 
+                        method="post" class="edit-form" style="display:none;"
+                        sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
+                        <!-- 댓글 수정폼 별점 -->
+<div class="rating edit-rating">
+    <input type="radio" name="rating" value="5" id="edit-star5-[[${comment.id}]]">
+    <label for="edit-star5-[[${comment.id}]]">★</label>
+  
+    <input type="radio" name="rating" value="4" id="edit-star4-[[${comment.id}]]">
+    <label for="edit-star4-[[${comment.id}]]">★</label>
+  
+    <input type="radio" name="rating" value="3" id="edit-star3-[[${comment.id}]]">
+    <label for="edit-star3-[[${comment.id}]]">★</label>
+  
+    <input type="radio" name="rating" value="2" id="edit-star2-[[${comment.id}]]">
+    <label for="edit-star2-[[${comment.id}]]">★</label>
+  
+    <input type="radio" name="rating" value="1" id="edit-star1-[[${comment.id}]]">
+    <label for="edit-star1-[[${comment.id}]]">★</label>
+  </div>
+  
+                    <textarea name="content" rows="2"></textarea>
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                    <button type="submit" class="btn-save">저장</button>
+                    <button type="button" class="btn-cancel" onclick="cancelEdit(this)">취소</button>
+                </form>
+                </div>
+
                   </div>
+                  <!-- 페이지네이션 -->
+                  <div class="pagination" th:if="${totalPages > 1}">
+                    <ul>
+                        <li th:each="i : ${#numbers.sequence(0, totalPages-1)}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a th:href="@{|/portfolios/${portfolio.id}?page=${i}|}" th:text="${i + 1}"></a>
+                        </li>
+                    </ul>
+                </div>
                   
                 
             </div>
