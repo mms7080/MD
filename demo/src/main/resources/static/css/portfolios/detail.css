@@ -2,13 +2,13 @@
    Global (Portfolio Detail)
    ====================== */
    body.portfolio-detail {
-    background: var(--bg);   /* 테마 변수 사용 */
+    background: var(--bg); /* 테마 변수 사용 */
     color: var(--text);
     font-family: "Spoqa Han Sans", sans-serif;
   }
   
   body.portfolio-detail * {
-    color: inherit;          /* 본문 기본 색 = var(--text) */
+    color: inherit; /* 본문 기본 색 = var(--text) */
     text-decoration: none;
     box-sizing: border-box;
   }
@@ -28,11 +28,13 @@
     gap: 40px;
     align-items: start;
   }
-
-  .center-box{
+  
+  .center-box {
+    position: relative;
     text-align: center;
     margin-bottom: 30px;
   }
+  
   .title-row {
     display: flex;
     align-items: center;
@@ -41,6 +43,13 @@
     margin-bottom: 8px;
   }
   
+  .title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0; /* 불필요한 기본 여백 제거 */
+  }
+  
+  /* 아이콘 */
   .link-icon {
     width: 25px;
     height: 25px;
@@ -48,17 +57,9 @@
     cursor: pointer;
     transition: transform 0.2s ease;
   }
-  
   .icon-link:hover .link-icon {
     transform: scale(1.1);
   }
-  
-  .title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin: 0; /* 불필요한 기본 여백 제거 */
-  }
-
   
   /* ======================
      Gallery
@@ -79,7 +80,6 @@
     justify-content: center;
     align-items: center;
   }
-  
   .main-photo img {
     width: 100%;
     height: 100%;
@@ -93,7 +93,6 @@
     flex-wrap: wrap;
     justify-content: center;
   }
-  
   .thumb-list img {
     width: 120px;
     height: 80px;
@@ -103,7 +102,6 @@
     border: 2px solid transparent;
     transition: border-color 0.2s ease;
   }
-  
   .thumb-list img:hover {
     border-color: #3b82f6;
   }
@@ -116,14 +114,12 @@
     flex-direction: column;
     gap: 18px;
   }
-  
   .info-box .title {
     font-size: 1.8rem;
     font-weight: 700;
     text-align: center;
     margin-bottom: 6px;
   }
-  
   .info-box .desc {
     font-size: 1rem;
     line-height: 1.5;
@@ -132,13 +128,25 @@
     color: var(--muted);
   }
   
+  /* 따옴표 감싸기 */
+  .portfolio-detail .desc {
+    display: inline;
+  }
+  .portfolio-detail .desc::before {
+    content: '"';
+    margin-right: 2px;
+  }
+  .portfolio-detail .desc::after {
+    content: '"';
+    margin-left: 2px;
+  }
+  
   /* ======================
      Team Section
      ====================== */
   .team-section {
     margin-top: 20px;
   }
-  
   .team-section h3 {
     font-size: 1.1rem;
     font-weight: 700;
@@ -168,17 +176,14 @@
     gap: 8px;
     font-size: 0.95rem;
   }
-  
   .team-name strong {
     font-weight: 600;
     color: var(--text);
   }
-  
   .team-name .role {
     font-size: 0.85rem;
     color: var(--muted);
   }
-  
   .team-item .parts {
     margin-top: 4px;
     font-size: 0.85rem;
@@ -186,13 +191,15 @@
     line-height: 1.4;
   }
   
-  .comment-section {
-    margin-top: 40px;
-    background: transparent;  /* 배경 제거 */
-    border: none;             /* 테두리 제거 */
-    box-shadow: none;         /* 그림자 제거 */
-    padding: 0;               /* 기본 패딩도 제거 */
-  }
+/* ======================
+   Comment Section (카드형)
+   ====================== */
+.comment-section {
+  margin-top: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
 
 /* 제목 */
 .comment-section h2 {
@@ -201,121 +208,7 @@
   margin-bottom: 18px;
   color: var(--text);
   padding-bottom: 10px;
-}
-
-/* ===== 별점 공통 스타일 ===== */
-.rating {
-  display: inline-flex;
-  flex-direction: row-reverse; /* 별점 오른쪽부터 */
-  gap: 4px;
-}
-
-.rating input {
-  display: none; /* 라디오 버튼 숨김 */
-}
-
-.rating label {
-  font-size: 20px;  /* 별 크기 */
-  color: var(--star-default, #666); /* 기본 색 (다크/라이트 모드에 따라 조정 가능) */
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.rating label::before {
-  content: "★";
-}
-
-/* ===== hover ===== */
-.rating label:hover,
-.rating label:hover ~ label {
-  color: var(--star-hover, #ffb84d);
-}
-
-/* ===== 선택된 별 ===== */
-.rating input:checked ~ label {
-  color: var(--star-checked, #ffa500);
-}
-
-/* ===== hover + checked 조합 ===== */
-.rating input:checked + label:hover,
-.rating input:checked + label:hover ~ label,
-.rating input:checked ~ label:hover,
-.rating input:checked ~ label:hover ~ label {
-  color: var(--star-hover-checked, #ff9900);
-}
-
-/* 댓글 입력창 */
-.comment-section {
-  margin-top: 30px;
-  padding: 20px;
-  border-radius: 0;          /* 둥근 모서리 제거 */
-  background: transparent;   /* 배경 제거 (본문과 자연스럽게) */
-  color: var(--text);
-  border: none;              /* 테두리 제거 */
-}
-
-/* 제목 */
-.comment-section h2 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  border-bottom: none;       /* 제목 밑줄 제거 */
-  padding-bottom: 0;
-}
-
-/* 평균 별점 */
-.rating-summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-size: 0.95rem;
-}
-.rating-summary .avg-label {
-  font-weight: 600;
-}
-.rating-summary .count {
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-
-/* 댓글 작성 */
-.comment-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.comment-form .rate-input {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.comment-form input[type="text"] {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--page);
-  color: var(--text);
-  font-size: 0.95rem;
-}
-.comment-form input:focus {
-  border-color: var(--accent);
-  outline: none;
-}
-.comment-form button {
-  align-self: flex-end;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  background: var(--accent);
-  color: var(--bg);
-  font-weight: 600;
-  cursor: pointer;
-}
-.comment-form button:hover {
-  background: #2563eb;
-  color: #fff;
+  border-bottom: 1px solid var(--border);
 }
 
 /* 댓글 리스트 */
@@ -324,50 +217,265 @@
   flex-direction: column;
   gap: 16px;
 }
+
+/* 개별 댓글 카드 */
 .comment {
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
+  background: var(--page, #1e1e1e);
+  border: 1px solid var(--border, #333);
+  border-radius: 10px;
+  padding: 16px 20px;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
-.comment:last-child {
-  border-bottom: none;
+
+.comment:hover {
+  background: rgba(255,255,255,0.05);
+  transform: translateY(-2px);
 }
+
+/* 메타 정보 */
 .comment .meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
   font-size: 0.85rem;
   color: var(--muted);
-  margin-bottom: 4px;
 }
+
 .comment .author {
   font-weight: 600;
   color: var(--text);
 }
-.comment .stars {
-  font-size: 1rem;
-  margin-bottom: 4px;
+
+.comment .date {
+  font-size: 0.8rem;
+  color: var(--muted);
 }
+
+/* ======================
+   Comment Actions (수정/삭제 버튼)
+   ====================== */
+   .comment-actions {
+    display: flex;
+    gap: 6px;
+  }
+  
+  .comment-actions .btn-mini {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid var(--border, #555);
+    background: transparent;
+    color: var(--text);
+    transition: all 0.2s ease;
+  }
+  
+  /* hover 시 색상은 그대로 두고 느낌만 */
+  .comment-actions .btn-mini:hover {
+    transform: scale(1.05);      /* 살짝 확대 */
+    opacity: 0.85;               /* 약간 진해진 듯 */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25); /* 그림자 */
+  }
+  
+  /* 클릭 시 눌린 느낌 */
+  .comment-actions .btn-mini:active {
+    transform: scale(0.95);
+    box-shadow: none;
+  }
+  
+  /* 삭제 버튼 */
+  .comment-actions .btn-mini.danger {
+    border-color: #e74c3c;
+    color: #e74c3c;
+  }
+  
+  /* 삭제 버튼 hover 시에도 색상 변화 없음 */
+  .comment-actions .btn-mini.danger:hover {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background: transparent;
+    transform: scale(1.05);
+    opacity: 0.85;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+
+/* 댓글 카드 안의 별점 표시 */
+.comment .stars.readonly {
+  margin: 4px 0;
+  margin-left: 0;
+  font-size: 1rem;
+  display: block;
+  gap: 2px;
+}
+
+/* 공통 별 모양 */
+.comment .stars.readonly .star {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* 꽉 찬 별 */
+.comment .stars.readonly .star.filled {
+  color: #FFD700; /* 노란색 */
+}
+
+/* 빈 별 */
+.comment .stars.readonly .star.empty {
+  color: #555; /* 회색 */
+}
+
+/* 평균 별점에도 적용 */
+.rating-summary .stars.readonly {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 6px;
+}
+.rating-summary .stars.readonly .star.filled {
+  color: #FFD700;
+}
+.rating-summary .stars.readonly .star.empty {
+  color: #555;
+}
+
+
+/* 댓글 본문 */
 .comment .content {
   font-size: 0.95rem;
-  line-height: 1.4;
+  line-height: 1.5;
   color: var(--text);
+  margin-top: 6px;
+  white-space: pre-line; /* 줄바꿈 반영 */
 }
 
-
-
-
+  
+  /* ===== 별점 공통 스타일 ===== */
+  .rating {
+    display: inline-flex;
+    flex-direction: row-reverse; /* 별점 오른쪽부터 */
+    gap: 4px;
+  }
+  .rating input {
+    display: none; /* 라디오 버튼 숨김 */
+  }
+  .rating label {
+    font-size: 20px;
+    color: var(--star-default, #666);
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .rating label::before {
+    content: "★";
+  }
+  /* hover */
+  .rating label:hover,
+  .rating label:hover ~ label {
+    color: var(--star-hover, #ffb84d);
+  }
+  /* 선택된 별 */
+  .rating input:checked ~ label {
+    color: var(--star-checked, #ffa500);
+  }
+  /* hover + checked */
+  .rating input:checked + label:hover,
+  .rating input:checked + label:hover ~ label,
+  .rating input:checked ~ label:hover,
+  .rating input:checked ~ label:hover ~ label {
+    color: var(--star-hover-checked, #ff9900);
+  }
+  
+  /* 댓글 입력창 */
+  .comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .comment-form .rate-input {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .comment-form input[type="text"],
+  .comment-form textarea {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #222;
+    color: #fff;
+    font-size: 0.95rem;
+  }
+  .comment-form input:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+  .comment-form button {
+    align-self: flex-end;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .comment-form button:hover {
+    background: #2563eb;
+    color: #fff;
+  }
+  
+  .comment .meta {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .comment .meta .right-box {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .comment .meta .comment-actions {
+    display: flex;
+    gap: 6px;
+  }
+  
+  /* 버튼 */
+  .btn-mini {
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid var(--border, #555);
+    background: transparent;
+    color: var(--text);
+    transition: all 0.2s ease;
+  }
+  .btn-mini:hover {
+    background: #fff;
+    color: #000;
+  }
+  .btn-mini.danger {
+    border-color: #e74c3c;
+    color: #e74c3c;
+  }
+  .btn-mini.danger:hover {
+    background: #e74c3c;
+    color: #fff;
+  }
+  
   /* view-box */
   .view-box {
     display: inline-flex;
-    align-items: center; /* 아이콘과 텍스트를 수평 중앙 정렬 */
-    gap: 6px;           /* 아이콘과 글자 간격 */
+    align-items: center;
+    gap: 6px;
   }
-  
   .view-label {
-    font-style: normal; /* 기울어짐 방지 */
+    font-style: normal;
     font-weight: 500;
   }
-  
-
   
   /* ======================
      Icon Bar
@@ -380,12 +488,11 @@
     margin: 16px 0;
   }
   .icon-left,
-.icon-right {
-  display: flex;
-  align-items: center;
-  gap: 14px; /* 아이콘 사이 간격 */
-}
-  
+  .icon-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
   .icon-btn {
     min-width: 45px;
     height: 45px;
@@ -402,12 +509,10 @@
     transition: background 0.3s, transform 0.2s;
     padding: 0 10px;
   }
-  
   .icon-btn:hover {
     background: #2563eb;
     transform: translateY(-2px);
   }
-  
   .icon-btn i {
     font-size: 18px;
   }
@@ -418,7 +523,7 @@
   .Btn {
     width: 36px;
     height: 36px;
-    padding : 4px;
+    padding: 4px;
     border: none;
     border-radius: 50%;
     display: flex;
@@ -427,22 +532,19 @@
     justify-content: center;
     cursor: pointer;
     position: relative;
-    transition-duration: .3s;
+    transition-duration: 0.3s;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.11);
   }
-  
   .svgIcon {
     fill: rgb(149, 88, 219);
   }
-  
   .icon2 {
     width: 18px;
     height: 5px;
     border-bottom: 2px solid rgb(149, 88, 219);
     border-left: 2px solid rgb(149, 88, 219);
-    border-right: 2px solidrgb(149, 88, 219);
+    border-right: 2px solid rgb(149, 88, 219);
   }
-  
   .tooltip {
     position: absolute;
     right: -105px;
@@ -454,11 +556,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition-duration: .2s;
+    transition-duration: 0.2s;
     pointer-events: none;
     letter-spacing: 0.5px;
   }
-  
   .tooltip::before {
     position: absolute;
     content: "";
@@ -467,55 +568,45 @@
     background-color: rgb(12, 12, 12);
     transform: rotate(45deg);
     left: -5%;
-    transition-duration: .3s;
+    transition-duration: 0.3s;
   }
-  
   .Btn:hover .tooltip {
     opacity: 1;
-    transition-duration: .3s;
+    transition-duration: 0.3s;
   }
-  
   .Btn:hover {
     background-color: rgb(150, 94, 255);
-    transition-duration: .3s;
+    transition-duration: 0.3s;
   }
-  
   .Btn:hover .icon2 {
     border-bottom: 2px solid rgb(235, 235, 235);
     border-left: 2px solid rgb(235, 235, 235);
     border-right: 2px solid rgb(235, 235, 235);
   }
-  
   .Btn:hover .svgIcon {
     fill: rgb(255, 255, 255);
-    animation: slide-in-top 0.6s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+    animation: slide-in-top 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
   }
-
-  /* 다크 모드 아이콘 */
-html[data-theme="dark"] .svgIcon {
-  fill: rgb(214, 178, 255);
-}
-html[data-theme="dark"] .icon2 {
-  border-bottom: 2px solid rgb(182, 143, 255);
-  border-left: 2px solid rgb(182, 143, 255);
-  border-right: 2px solid rgb(182, 143, 255);
-}
-
-/* 라이트 모드 아이콘 */
-html[data-theme="light"] .svgIcon {
-  fill: rgb(120, 70, 200); /* 살짝 진한 퍼플 */
-}
-html[data-theme="light"] .icon2 {
-  border-bottom: 2px solid rgb(120, 70, 200);
-  border-left: 2px solid rgb(120, 70, 200);
-  border-right: 2px solid rgb(120, 70, 200);
-}
-
-
-
-
-
   
+  /* 다크 모드 */
+  html[data-theme="dark"] .svgIcon {
+    fill: rgb(214, 178, 255);
+  }
+  html[data-theme="dark"] .icon2 {
+    border-bottom: 2px solid rgb(182, 143, 255);
+    border-left: 2px solid rgb(182, 143, 255);
+    border-right: 2px solid rgb(182, 143, 255);
+  }
+  
+  /* 라이트 모드 */
+  html[data-theme="light"] .svgIcon {
+    fill: rgb(120, 70, 200);
+  }
+  html[data-theme="light"] .icon2 {
+    border-bottom: 2px solid rgb(120, 70, 200);
+    border-left: 2px solid rgb(120, 70, 200);
+    border-right: 2px solid rgb(120, 70, 200);
+  }
   
   @keyframes slide-in-top {
     0% {
@@ -536,9 +627,8 @@ html[data-theme="light"] .icon2 {
     position: relative;
     width: 25px;
     height: 25px;
-    transition: .3s;
+    transition: 0.3s;
   }
-  
   .heart-container .checkbox {
     position: absolute;
     width: 100%;
@@ -547,7 +637,6 @@ html[data-theme="light"] .icon2 {
     z-index: 20;
     cursor: pointer;
   }
-  
   .heart-container .svg-container {
     width: 100%;
     height: 100%;
@@ -555,120 +644,136 @@ html[data-theme="light"] .icon2 {
     justify-content: center;
     align-items: center;
   }
-  
   .heart-container .svg-outline,
   .heart-container .svg-filled {
     fill: var(--heart-color);
     position: absolute;
   }
-  
   .heart-container .svg-filled {
     animation: keyframes-svg-filled 1s;
     display: none;
   }
-  
   .heart-container .svg-celebrate {
     position: absolute;
-    animation: keyframes-svg-celebrate .5s;
+    animation: keyframes-svg-celebrate 0.5s;
     animation-fill-mode: forwards;
     display: none;
     stroke: var(--heart-color);
     fill: var(--heart-color);
     stroke-width: 2px;
   }
-  
-  .heart-container .checkbox:checked~.svg-container .svg-filled {
+  .heart-container .checkbox:checked ~ .svg-container .svg-filled {
     display: block;
   }
-  
-  .heart-container .checkbox:checked~.svg-container .svg-celebrate {
+  .heart-container .checkbox:checked ~ .svg-container .svg-celebrate {
     display: block;
   }
   
   @keyframes keyframes-svg-filled {
-    0% { transform: scale(0); }
-    25% { transform: scale(1.2); }
-    50% { transform: scale(1); filter: brightness(1.5); }
+    0% {
+      transform: scale(0);
+    }
+    25% {
+      transform: scale(1.2);
+    }
+    50% {
+      transform: scale(1);
+      filter: brightness(1.5);
+    }
   }
   
   @keyframes keyframes-svg-celebrate {
-    0% { transform: scale(0); }
-    50% { opacity: 1; filter: brightness(1.5); }
-    100% { transform: scale(1.4); opacity: 0; display: none; }
+    0% {
+      transform: scale(0);
+    }
+    50% {
+      opacity: 1;
+      filter: brightness(1.5);
+    }
+    100% {
+      transform: scale(1.4);
+      opacity: 0;
+      display: none;
+    }
   }
   
   /* ======================
      Responsive
      ====================== */
   @media (max-width: 900px) {
-    .portfolio-detail-grid { grid-template-columns: 1fr; }
-    .main-photo { max-width: 100%; height: auto; }
-    .thumb-list img { width: 70px; height: 70px; }
+    .portfolio-detail-grid {
+      grid-template-columns: 1fr;
+    }
+    .main-photo {
+      max-width: 100%;
+      height: auto;
+    }
+    .thumb-list img {
+      width: 70px;
+      height: 70px;
+    }
   }
   
-  /* icon-link */
-  .link-icon {
-    width: 25px;
-    height: 25px;
-    object-fit: contain; /* 아이콘이 찌그러지지 않도록 */
-    display: inline-block;
-    vertical-align: middle;
-    transition: transform 0.2s ease;
-  }
-  
-  .icon-link:hover .link-icon {
-    transform: scale(1.1); /* 호버 시 살짝 확대 */
-  }
-  
-  /* tag */
+  /* ======================
+     Tags
+     ====================== */
   .tags-box {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
     margin-left: 15px;
-    
+    flex-wrap: wrap;
+    max-width: 800px;
   }
-  
   .tags-list {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
-    font-style: normal; /* 기울어짐 방지 */
+    font-style: normal;
+    max-width: 100%;
+    flex: 1;
   }
-  
   .tag-item {
-    background: var(--chip, #3b82f6); /* 파란색 */
+    background: var(--chip, #3b82f6);
     color: white;
     padding: 2px 8px;
     border-radius: 999px;
     font-size: 0.8rem;
     white-space: nowrap;
-    font-style:normal;
+    font-style: normal;
     font-weight: 500;
     text-decoration: none;
-    display : inline-block;
+    display: none;
     border: 1px solid var(--border);
   }
-  .tag-item:hover{
+  .tag-item:hover {
     transform: scale(1.08);
   }
+  html[data-theme="light"] .tag-item {
+    border: 1px solid #ccc;
+  }
+  html[data-theme="dark"] .tag-item {
+    border: 1px solid #444;
+  }
+  .tag-more-btn {
+    background: none;
+    border: none;
+    color: var(--chip, #3b82f6);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    margin-left: 6px;
+  }
+  .tag-more-btn:hover {
+    text-decoration: underline;
+  }
   
-  /* 라이트 모드 */
-html[data-theme="light"] .tag-item {
-  border: 1px solid #ccc; /* 회색 테두리 */
-}
-
-/* 다크 모드 */
-html[data-theme="dark"] .tag-item {
-  border: 1px solid #444; /* 진한 회색 테두리 */
-}
-
-
-/* ===========================
-   Image Modal
-   =========================== */
-   .modal {
-    display: none; /* 기본은 숨김 */
+  /* ======================
+     Image Modal
+     ====================== */
+  .modal {
+    display: none;
     position: fixed;
     z-index: 9999;
     inset: 0;
@@ -677,7 +782,6 @@ html[data-theme="dark"] .tag-item {
     justify-content: center;
     align-items: center;
   }
-  
   .modal-content {
     display: block;
     margin: auto;
@@ -687,7 +791,6 @@ html[data-theme="dark"] .tag-item {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
     animation: fadeIn 0.3s ease-in-out;
   }
-  
   /* 닫기 버튼 */
   .close {
     position: absolute;
@@ -700,9 +803,8 @@ html[data-theme="dark"] .tag-item {
     transition: 0.2s;
   }
   .close:hover {
-    color: #f87171; /* 빨간색 느낌 */
+    color: #f87171;
   }
-  
   /* 좌우 화살표 */
   .prev,
   .next {
@@ -724,12 +826,229 @@ html[data-theme="dark"] .tag-item {
   }
   .prev:hover,
   .next:hover {
-    color: #60a5fa; /* 파란색 강조 */
+    color: #60a5fa;
   }
-  
   /* 애니메이션 */
   @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
+  
+  /* ======================
+     Delete Modal
+     ====================== */
+  .delete-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+  }
+  .delete-modal-content {
+    background: #000;
+    padding: 24px 30px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 300px;
+    position: relative;
+    color: #fff;
+  }
+  .delete-modal-content p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+  }
+  .delete-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+  }
+  .delete-close:hover {
+    color: #e74c3c;
+  }
+  .delete-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  .btn-confirm {
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+  }
+  .btn-confirm:hover {
+    background: #fff;
+    color: #000;
+  }
+  
+  /* ======================
+     Edit/Delete Buttons
+     ====================== */
+  .detail-admin-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .btn-edit,
+  .btn-delete {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .btn-edit {
+    background-color: #3498db;
+    color: #fff;
+  }
+  .btn-delete {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+  }
+  .btn-delete:hover {
+    background-color: #c0392b;
+  }
+  
+  /* Edit 버튼 (테마별) */
+  .edit-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 8px;
+    gap: 8px;
+    height: 28px;
+    width: auto;
+    border: none;
+    background: #00000034;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fff;
+  }
+  .edit-btn:hover {
+    background: #ffffff;
+    color: #000;
+  }
+  html[data-theme="light"] .edit-btn {
+    background: #fff;
+    color: #000;
+    border: 1px solid #ddd;
+  }
+  html[data-theme="light"] .edit-btn:hover {
+    background: #f0f0f0;
+    color: #000;
+  }
+  
+
+  
+  /* ======================
+     Responsive Meta
+     ====================== */
+  .comment .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+  }
+  .comment .author {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .right-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .comment .date {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .comment-actions {
+    display: flex;
+    gap: 4px;
+  }
+  
+  /* ======================
+     Login Button
+     ====================== */
+  .login-btn {
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 600;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .login-btn:hover {
+    text-decoration: underline;
+  }
+ /* ======================
+   Pagination
+   ====================== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.pagination ul {
+  list-style: none;
+  display: flex;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+}
+
+.pagination li {
+  display: inline-block;
+}
+
+.pagination a {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid #444;   /* 테두리 */
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  color: #fff;              /* 글자 흰색 */
+  background: #222;         /* 버튼 어두운 회색 */
+  transition: all 0.2s ease;
+}
+
+.pagination a:hover {
+  background: #333;         /* hover 시 살짝 밝아짐 */
+  border-color: #666;
+}
+
+.pagination li.active a {
+  background: #fff;         /* 현재 페이지는 흰색 배경 */
+  color: #000;              /* 글자 검은색 */
+  font-weight: 600;
+  border-color: #fff;
+}
+
+  
+
   
