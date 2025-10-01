@@ -210,6 +210,24 @@ public String editComment(@PathVariable Long portfolioId,
    
 
 
+//     @GetMapping("/edit/{id}")
+//     public String editPortfolioForm(@PathVariable Long id, Model model) {
+//         PortfoliosEntity portfolio = portfolioService.getPortfolioById(id);
+//         model.addAttribute("portfolio", portfolio);
+//         return "portfolios/edit"; // edit.html
+//     }
+    
+//     @PostMapping("/{id}/edit")
+// public String updatePortfolio(@PathVariable Long id,
+//                               @ModelAttribute PortfolioFormDto dto) {
+//     // dto.getCover() → 대표 이미지
+//     // dto.getScreenshots() → 스크린샷들
+//     // dto.getIcon() → 아이콘 파일
+//     // dto.getDownload() → 다운로드 파일
+//     portfolioService.updatePortfolio(id, dto);
+//     return "redirect:/portfolios/" + id;
+// }
+
 
 
             

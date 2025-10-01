@@ -154,4 +154,20 @@ public PortfoliosEntity increaseViewCount(Long id) {
     portfolio.setViewCount(portfolio.getViewCount() + 1);
     return repository.save(portfolio);
 }
+
+
+// 수정
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
