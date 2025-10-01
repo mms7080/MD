@@ -7,6 +7,7 @@ body {
     margin: 0;
     padding: 0;
     background: var(--bg);
+    
 }
 
 .kf-main {
@@ -470,6 +471,9 @@ body {
     font-weight: 700;
     font-size: 12px;
 }
+
+
+
 /* 포트폴리오 마키 */
 .kf-mq-portfolios {
     --speed: 40s; /* 숫자 작게 = 더 빠름 */
@@ -555,3 +559,12 @@ body {
         animation: none;
     }
 }
+
+@media (max-width: 600px) {
+    .kf-mq-portfolios {
+        --item-w: 160px;
+        --img-h: 100px;
+        --speed: 30s; /* 좁을수록 빨리 돌아가도록 */
+    }
+}
+

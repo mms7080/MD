@@ -157,7 +157,8 @@
     </section>
 
     <!-- 포트폴리오 마퀴 -->
-    <section class="kf-mq-portfolios" aria-label="포트폴리오">
+    <section class="kf-mq-portfolios" aria-label="포트폴리오"
+         th:if="${portfolios != null and !portfolios.isEmpty()}">
         <div class="mq-mask">
             <div class="mq-track">
                 <!-- 시퀀스 A -->
@@ -172,15 +173,14 @@
                     </div>
                 </div>
                 <!-- 시퀀스 B -->
-                <div class="mq-seq" aria-hidden="true">
-                    <div class="mq-item" th:each="portfolio : ${#lists.take(portfolios, 10)}">
-                        <a th:href="@{|/portfolios/${portfolio.id}|}">
-                            <figure>
-                                <img th:src="${portfolio.cover}" loading="lazy" th:alt="${portfolio.title + ' 썸네일'}"/>
-                                <figcaption th:text="${portfolio.title}">제목</figcaption>
-                            </figure>
-                        </a>
-                    </div>
+                <div class="mq-seq">
+                    <a class="mq-item" th:each="portfolio : ${#lists.take(portfolios, 10)}"
+                       th:href="@{|/portfolios/${portfolio.id}|}">
+                        <figure>
+                            <img th:src="${portfolio.cover}" loading="lazy" th:alt="${portfolio.title + ' 썸네일'}"/>
+                            <figcaption th:text="${portfolio.title}">제목</figcaption>
+                        </figure>
+                    </a>
                 </div>
             </div>
         </div>
