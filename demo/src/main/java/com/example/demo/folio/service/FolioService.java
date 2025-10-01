@@ -8,7 +8,7 @@ import com.example.demo.folio.repository.FolioRepository;
 import com.example.demo.portfolios.controller.PortfoliosController; // 임시 데이터용
 import com.example.demo.portfolios.entity.PortfoliosEntity; // 임시 데이터용
 import com.example.demo.portfolios.service.PortfolioService;
-
+import com.example.demo.users.UsersEntity.DeleteStatus;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 import com.example.demo.folio.dto.FolioRequestDto;
