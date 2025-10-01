@@ -197,7 +197,35 @@ public class UsersService {
 
         // 저장
         profileRepository.save(profile);
-        // Users는 @Transactional로 dirty checking 반영
     }
 
+    @Transactional
+    public void changeMypassword(Long userId, 
+                                 String currnetPassword, 
+                                 String newPassword,
+                                 String confirmNewPassword){
+        if(!newPassword.equals(confirmNewPassword)){
+            throw new IllegalArgumentException("새 비밀번호와 확인 값이 일치하지 않습니다.");
+        }
+        
+        Users user = usersRepository.findById(userId)
+                   .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        
+        if(!passwordEncoder.matches(currnetPassword, user.getPassword())){
+            throw new IllegalArgumentException("현재 비밀번호가 올바르지 않습니다.");
+        }
+        
+        user.setPassword(passwordEncoder.encode(confirmNewPassword));
+    }
+    
+    @Transactional(readOnly = true)
+    public boolean verifyCurrentPassword(String username, String rawPassword) {
+        if (username == null || username.isBlank() || rawPassword == null) return false;
+
+        Users u = usersRepository.findByUsernameAndDeleteStatus(username, DeleteStatus.N)
+                .orElse(null);
+        if (u == null) return false;
+
+        return passwordEncoder.matches(rawPassword, u.getPassword());
+    }
 }

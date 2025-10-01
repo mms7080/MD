@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.users.UsersDTO.HeaderLogin;
 import com.example.demo.users.UsersDTO.ProfileDTO;
+import com.example.demo.users.UsersEntity.DeleteStatus;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 import com.example.demo.users.UsersService.UsersService;
@@ -19,6 +20,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -81,14 +84,46 @@ public class UserController {
         if (principal == null)
             return "redirect:/home?modal=signin";
 
-        Users me = usersService.getUserByUsername(principal.getName());
+        Users user = usersService.getUserByUsername(principal.getName());
         usersService.updateProfileBasic(
-                me.getId(),
+                user.getId(),
                 name,
                 githubUrl,
                 positions,
-                profileImgUrlHidden // 그대로 유지
-        );
+                profileImgUrlHidden);
         return "redirect:/mypage/home";
     }
+
+    @PostMapping("/newpassword")
+    public String changePassword(@RequestParam String currentPassword,
+            @RequestParam String newPassword,
+            @RequestParam String confirmNewPassword,
+            Principal principal,
+            RedirectAttributes ra,
+            HttpServletRequest req, // ⬅️ 추가
+            HttpServletResponse res) { // ⬅️ 추가
+        if (principal == null)
+            return "redirect:/home?modal=signin";
+
+        Users user = usersRepository
+                .findByUsernameAndDeleteStatus(principal.getName(), DeleteStatus.N)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        usersService.changeMypassword(user.getId(), currentPassword, newPassword, confirmNewPassword);
+
+        // ✅ 세션/인증정보 무효화 (POST /logout 없이 바로 처리)
+        new SecurityContextLogoutHandler().logout(req, res, null);
+
+        ra.addFlashAttribute("passwordMessage", "비밀번호가 변경되었습니다. 다시 로그인 해주세요.");
+        return "redirect:/home?modal=signin"; // 또는 로그인 페이지 경로
+    }
+
+    @PostMapping("/api/check-password")
+    @ResponseBody
+    public boolean checkPassword(@RequestParam("currentPassword") String currentPassword,
+                                 Principal principal) {
+        if (principal == null) return false;
+        return usersService.verifyCurrentPassword(principal.getName(), currentPassword);
+    }
+
 }

@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>마이페이지 – kafolio</title>
 
+  <!-- ✅ CSRF 메타 추가: fetch POST용 -->
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
   <!-- 공통 CSS -->
   <link rel="stylesheet" th:href="@{/css/header.css}" />
   <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}" />
@@ -210,7 +214,7 @@
         <button type="button" class="kf-editmodal__close" id="btnClosePassword" aria-label="닫기">×</button>
       </div>
 
-      <form th:action="@{/mypage/password}" method="post">
+      <form th:action="@{/mypage/newpassword}" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <table class="kf-formtable">
           <tbody>
@@ -224,7 +228,7 @@
             </tr>
             <tr>
               <th scope="row">새 비밀번호 확인</th>
-              <td><input type="password" name="confirmPassword" placeholder="새 비밀번호 확인" required /></td>
+              <td><input type="password" name="confirmNewPassword" placeholder="새 비밀번호 확인" required /></td>
             </tr>
           </tbody>
         </table>
