@@ -47,7 +47,7 @@ public class FolioService {
         
         List<PortfolioInFolioDto> projects = folio.getProjectIds().stream()
             .map(projectId -> {
-                PortfoliosEntity entity = portfolioService.getPortfolioById(Long.valueOf(projectId));
+                PortfoliosEntity entity = portfolioService.getPortfolioWithTeam(Long.valueOf(projectId));
                 return (entity != null) ? new PortfolioInFolioDto(entity.getId(), entity.getTitle()) : null;
             })
             .filter(p -> p != null)

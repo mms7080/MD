@@ -210,23 +210,26 @@ public String editComment(@PathVariable Long portfolioId,
    
 
 
-//     @GetMapping("/edit/{id}")
-//     public String editPortfolioForm(@PathVariable Long id, Model model) {
-//         PortfoliosEntity portfolio = portfolioService.getPortfolioById(id);
-//         model.addAttribute("portfolio", portfolio);
-//         return "portfolios/edit"; // edit.html
-//     }
+    @GetMapping("/edit/{id}")
+    public String editPortfolioForm(@PathVariable Long id, Model model) {
+        PortfoliosEntity portfolio = portfolioService.getPortfolioWithTeam(id);
     
-//     @PostMapping("/{id}/edit")
-// public String updatePortfolio(@PathVariable Long id,
-//                               @ModelAttribute PortfolioFormDto dto) {
-//     // dto.getCover() → 대표 이미지
-//     // dto.getScreenshots() → 스크린샷들
-//     // dto.getIcon() → 아이콘 파일
-//     // dto.getDownload() → 다운로드 파일
-//     portfolioService.updatePortfolio(id, dto);
-//     return "redirect:/portfolios/" + id;
-// }
+        // 기존 데이터 → Form DTO 변환
+        PortfolioFormDto dto = PortfolioFormDto.formEntityDto(portfolio);
+        model.addAttribute("portfolioFormDto", dto);
+        model.addAttribute("portfolioId", id);
+    
+        return "portfolios/edit"; // edit.html
+    }
+
+// ✅ 수정 저장
+@PostMapping("/{id}/edit")
+public String updatePortfolio(@PathVariable Long id,
+                              @ModelAttribute PortfolioFormDto dto) throws IOException {
+    portfolioService.updatePortfolio(id, dto);
+    return "redirect:/portfolios/" + id; // 수정 후 detail 페이지로
+}
+
 
 
 

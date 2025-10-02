@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamMemberDto {
-    
+    private Long id;
     private String memberName;
     private String memberRole;
     private String parts;

@@ -159,3 +159,32 @@ document.getElementById("cover-input")?.addEventListener("change", function(even
     reader.readAsDataURL(file);
   }
 });
+
+// ===========================
+// 수정
+// ===========================
+
+  // ✅ 팀원 동적 추가
+  function addTeam() {
+    const list = document.getElementById("team-list");
+    const index = list.children.length;
+    const div = document.createElement("div");
+    div.className = "team-item";
+
+    div.innerHTML = `
+      <input type="hidden" name="team[${index}].id" value="">
+      <input type="text" name="team[${index}].memberName" placeholder="팀원 이름" required>
+      <select name="team[${index}].memberRole">
+        <option value="팀장">팀장</option>
+        <option value="팀원">팀원</option>
+      </select>
+      <input type="text" name="team[${index}].parts" placeholder="담당 기능/페이지">
+      <button type="button" class="btn-mini danger" onclick="removeTeam(this)">삭제</button>
+    `;
+    list.appendChild(div);
+  }
+
+  // ✅ 팀원 삭제
+  function removeTeam(btn) {
+    btn.parentElement.remove();
+  }

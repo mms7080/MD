@@ -50,6 +50,7 @@ public class PortfolioFormDto {
             .screenshotPaths(entity.getScreenshots()) // ✅ 여기로 매핑
             .team(entity.getTeam().stream()
                 .map(t -> new TeamMemberDto(
+                        t.getId(),
                         t.getMemberName(),
                         t.getMemberRole(),
                         t.getParts()))

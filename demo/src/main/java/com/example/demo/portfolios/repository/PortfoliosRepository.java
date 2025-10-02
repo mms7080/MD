@@ -26,4 +26,13 @@ public interface PortfoliosRepository extends JpaRepository<PortfoliosEntity, Lo
 
     @Query("SELECT DISTINCT p FROM PortfoliosEntity p LEFT JOIN FETCH p.tags")
     Page<PortfoliosEntity> findAllWithTags(Pageable pageable);
+
+
+    @Query("SELECT DISTINCT p FROM PortfoliosEntity p " +
+    "LEFT JOIN FETCH p.team " +
+    "WHERE p.id = :id")
+Optional<PortfoliosEntity> findDetailByIdWithTeam(@Param("id") Long id);
+
+
+
     }

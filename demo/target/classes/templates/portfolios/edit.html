@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>포트폴리오 생성</title>
+  <title>포트폴리오 수정</title>
   <link rel="stylesheet" href="/css/header.css">
-  <link rel="stylesheet" href="/css/portfolios/create.css">
+  <link rel="stylesheet" href="/css/portfolios/edit.css">
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/users/auth-modal.css" />
 </head>
@@ -13,47 +13,70 @@
 <div th:replace="fragments/header :: header('portfolio')"></div>
 
 <main class="container">
-  <h1>포트폴리오 생성</h1>
-  <form th:action="@{|/portfolios/${portfolio.id}/edit|}" method="post" enctype="multipart/form-data">
+  <h1>포트폴리오 수정</h1>
+
+  <!-- action: /portfolios/{id}/edit -->
+  <form th:action="@{|/portfolios/${portfolioId}/edit|}"
+        th:object="${portfolioFormDto}"
+        method="post" enctype="multipart/form-data">
 
     <!-- 제목 -->
     <label>제목</label>
-    <input type="text" name="title" required>
+    <input type="text" name="title" th:value="*{title}" required>
 
     <!-- 설명 -->
     <label>설명</label>
-    <textarea name="desc" rows="4" required></textarea>
+    <textarea name="desc" rows="4" th:text="*{desc}" required></textarea>
 
-    <!-- Cover 이미지 -->
+    <!-- 대표 이미지 -->
     <label>대표 이미지</label>
-    <input type="file" name="cover" id=cover-input accept=".jpg,.jpeg,.png,.webp">
+    <div class="cover-preview" th:if="*{coverPath} != null">
+      <img th:src="${coverPath}" alt="기존 대표 이미지" class="preview-img">
+    </div>
+    <input type="file" name="cover" id="cover-input" accept=".jpg,.jpeg,.png,.webp">
     <div id="cover-preview" class="cover-preview"></div>
 
-    <!-- ✅ 팀명 (한 번만) -->
+    <!-- 팀명 -->
     <label>팀명</label>
-    <input type="text" name="teamName" placeholder="팀명" required>
+    <input type="text" name="teamName" th:value="*{teamName}" placeholder="팀명" required>
 
     <!-- 팀원 & 역할 -->
     <label>팀원 & 역할</label>
     <div id="team-list">
-      <div class="team-item">
-        <input type="text" name="team[0].memberName" placeholder="팀원 이름" required>
-        <select name="team[0].memberRole">
-          <option value="팀장">팀장</option>
-          <option value="팀원">팀원</option>
+      <div class="team-item" th:each="member, iter : *{team}">
+        <input type="hidden" th:name="|team[${iter.index}].id|" th:value="${member.id}">
+
+        <input type="text" th:name="|team[${iter.index}].memberName|"
+               th:value="${member.memberName}" placeholder="팀원 이름" required>
+        <select th:name="|team[${iter.index}].memberRole|">
+          <option value="팀장" th:selected="${member.memberRole == '팀장'}">팀장</option>
+          <option value="팀원" th:selected="${member.memberRole == '팀원'}">팀원</option>
         </select>
-        <input type="text" name="team[0].parts" placeholder="담당 기능/페이지">
+        <input type="text" th:name="|team[${iter.index}].parts|"
+               th:value="${member.parts}" placeholder="담당 기능/페이지">
+
+        <button type="button" class="btn-mini danger" onclick="removeTeam(this)">삭제</button>
       </div>
     </div>
     <button type="button" onclick="addTeam()">+ 팀원 추가</button>
 
     <!-- 프로젝트 이미지 -->
     <label>프로젝트 이미지</label>
+    <div th:if="*{screenshotPaths} != null">
+      <div class="image-preview">
+        <img th:each="img : *{screenshotPaths}"
+             th:src="${img}"
+             alt="기존 스크린샷" class="preview-img">
+      </div>
+    </div>
     <input type="file" name="screenshots" id="image-input" multiple accept=".jpg,.jpeg,.png,.webp">
     <div id="image-preview" class="image-preview"></div>
 
     <!-- 아이콘 -->
     <label>프로젝트 아이콘</label>
+    <div th:if="*{iconPath} != null">
+      <img th:src="${iconPath}" alt="기존 아이콘" class="preview-img">
+    </div>
     <input type="file" name="icon" id="icon-input" accept=".jpg,.jpeg,.png,.webp">
     <div id="icon-preview" class="icon-preview"></div>
 
@@ -63,16 +86,21 @@
       <input type="text" id="tag-input" placeholder="예: React">
       <button type="button" onclick="addTag()">+ 추가</button>
     </div>
-    <div id="tag-list"></div>
+    <div id="tag-list">
+      <span th:each="tag : *{tags}" class="tag-item" th:text="${tag}"></span>
+    </div>
     <div id="tags-hidden-box"></div>
 
     <!-- ZIP -->
     <label>다운로드 ZIP 파일</label>
+    <div th:if="*{downloadPath} != null">
+      <a th:href="${downloadPath}" download>기존 ZIP 다운로드</a>
+    </div>
     <input type="file" name="download" accept=".zip">
 
     <!-- 링크 -->
     <label>홈페이지 주소</label>
-    <input type="url" name="link" placeholder="https://...">
+    <input type="url" name="link" th:value="*{link}" placeholder="https://...">
 
     <!-- 저장/취소 -->
     <div class="form-actions">

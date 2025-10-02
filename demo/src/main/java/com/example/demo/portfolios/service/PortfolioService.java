@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.portfolios.dto.PortfolioFormDto;
+import com.example.demo.portfolios.dto.TeamMemberDto;
 import com.example.demo.portfolios.entity.PortfoliosEntity;
 import com.example.demo.portfolios.entity.TeamMemberEntity;
 import com.example.demo.portfolios.repository.PortfoliosRepository;
@@ -126,9 +128,10 @@ public class PortfolioService {
         repository.save(entity);
     }
 
-    public PortfoliosEntity getPortfolioById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
+    @Transactional(readOnly = true)
+    public PortfoliosEntity getPortfolioWithTeam(Long id) {
+        return repository.findDetailByIdWithTeam(id)
+            .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
     }
 
     // 삭제
@@ -157,17 +160,92 @@ public PortfoliosEntity increaseViewCount(Long id) {
 
 
 // 수정
+// 수정 처리
+    @Transactional
+public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
+    PortfoliosEntity portfolio = getPortfolioWithTeam(id);
 
+    // 일반 필드 수정
+    portfolio.setTitle(dto.getTitle());
+    portfolio.setDesc(dto.getDesc());
+    portfolio.setLink(dto.getLink());
 
+    // 파일 업데이트 (있을 때만)
+    if (dto.getCover() != null && !dto.getCover().isEmpty()) {
+        String coverPath = saveFile(dto.getCover(), "image");
+        portfolio.setCover(coverPath);
+    }
+    if (dto.getIcon() != null && !dto.getIcon().isEmpty()) {
+        String iconPath = saveFile(dto.getIcon(), "image");
+        portfolio.setIcon(iconPath);
+    }
+    if (dto.getDownload() != null && !dto.getDownload().isEmpty()) {
+        String downloadPath = saveFile(dto.getDownload(), "zip");
+        portfolio.setDownload(downloadPath);
+    }
 
+    // 태그
+    if (dto.getTags() != null) {
+        portfolio.setTags(dto.getTags());
+    }
 
+    // ✅ 팀원 수정 로직
+    List<TeamMemberEntity> existing = portfolio.getTeam(); // 현재 DB 팀원들
 
+    // 1) 수정 + 신규
+    List<TeamMemberEntity> updatedList = new ArrayList<>();
+    for (TeamMemberDto t : dto.getTeam()) {
+        if (t.getId() != null) {
+            // 기존 팀원 찾기
+            TeamMemberEntity member = existing.stream()
+                .filter(m -> m.getId().equals(t.getId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("팀원 없음 id=" + t.getId()));
 
+            // 필드 업데이트
+            member.setMemberName(t.getMemberName());
+            member.setMemberRole(t.getMemberRole());
+            member.setParts(t.getParts());
+            updatedList.add(member);
+        } else {
+            // 신규 추가
+            TeamMemberEntity newMember = new TeamMemberEntity(
+                t.getMemberName(),
+                t.getMemberRole(),
+                t.getParts()
+            );
+            newMember.setPortfolio(portfolio);
+            updatedList.add(newMember);
+        }
+    }
 
+    // 2) 삭제 처리 (DTO에 없는 기존 팀원 제거)
+    List<Long> incomingIds = dto.getTeam().stream()
+            .map(TeamMemberDto::getId)
+            .filter(idVal -> idVal != null)
+            .toList();
 
+    existing.removeIf(m -> !incomingIds.contains(m.getId())); // DB에서 orphanRemoval=true 라서 자동 삭제됨
 
+    // 3) 최종 세팅
+    portfolio.setTeam(updatedList);
 
-
-
-
+    repository.save(portfolio);
 }
+
+
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
