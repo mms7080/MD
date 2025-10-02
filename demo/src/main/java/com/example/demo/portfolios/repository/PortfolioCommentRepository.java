@@ -1,6 +1,7 @@
 package com.example.demo.portfolios.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,9 @@ Page<PortfolioComment> findByPortfolioIdWithUser(@Param("portfolioId") Long port
 
  // 전체 댓글 개수 (Page.getTotalElements() 대신 써도 됨)
  long countByPortfolioId(Long portfolioId);
+
+ // 특정 포트폴리오 ID로 댓글 삭제
+ void deleteByPortfolioId(Long portfolioId);
 
 }
 

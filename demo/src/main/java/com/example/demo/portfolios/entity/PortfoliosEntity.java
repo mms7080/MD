@@ -101,4 +101,7 @@ public class PortfoliosEntity {
 
     @Column(name="p_views")
     private  Integer viewCount = 0;
+
+    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PortfolioComment> comments = new ArrayList<>();
 }

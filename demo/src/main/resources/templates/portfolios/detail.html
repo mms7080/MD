@@ -223,12 +223,6 @@
                     <span class="avg-label">평균 별점:</span>
                     <span th:text="${#numbers.formatDecimal(avgRating, 1, 1)}">0.0</span> 점
                     <span class="count">(<span th:text="${ratingCount}">0</span>개)</span>
-                  
-                    <!-- 별 아이콘 -->
-                    <div class="stars readonly">
-                      <span th:each="i : ${#numbers.sequence(1,5)}"
-                            th:class="${i <= avgRating} ? 'star filled' : 'star empty'">★</span>
-                    </div>
                   </div>
 </div>
             

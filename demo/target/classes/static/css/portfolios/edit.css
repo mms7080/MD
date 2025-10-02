@@ -2,29 +2,33 @@
    Global
 ===================== */
 html, body {
-    min-height: 100%;     /* 자동 확장 허용 */
+    min-height: 100%;
     height: auto;
     margin: 0;
     padding: 0;
     background: var(--bg);
     color: var(--text);
     font-family: "Spoqa Han Sans Neo", "Noto Sans KR", sans-serif;
-    overflow-x: hidden;   /* 가로 스크롤 방지 */
-    overflow-y: auto;     /* 세로 스크롤 정상 동작 */
-  }
-  
-  /* =====================
-     Container
-  ===================== */
-  .container {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* =====================
+   Container
+===================== */
+.container {
     max-width: 700px;
-    margin: 80px auto 120px; /* header와 footer와 간격 확보 */
+    margin: 80px auto;        /* footer와 겹치지 않게 auto */
     padding: 32px;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-  }
+
+    /* 추가 */
+    min-height: calc(100vh - 200px); /* 화면 높이에서 header+footer 뺀 만큼 */
+    box-sizing: border-box;
+}
   
   h1 {
     font-size: 1.6rem;

@@ -20,6 +20,7 @@ import com.example.demo.portfolios.dto.PortfolioFormDto;
 import com.example.demo.portfolios.dto.TeamMemberDto;
 import com.example.demo.portfolios.entity.PortfoliosEntity;
 import com.example.demo.portfolios.entity.TeamMemberEntity;
+import com.example.demo.portfolios.repository.PortfolioCommentRepository;
 import com.example.demo.portfolios.repository.PortfoliosRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class PortfolioService {
 
     private final PortfoliosRepository repository;
-
+    private final PortfolioCommentRepository commentRepository;
     /**
      * 파일 저장 (이미지/ZIP 구분)
      */
@@ -139,6 +140,8 @@ public class PortfolioService {
     public void deletePortfolio(Long id) {
         PortfoliosEntity portfolio = repository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 존재하지 않습니다. id=" + id));
+
+            commentRepository.deleteByPortfolioId(id);
 
         repository.delete(portfolio);  // ✅ Cascade 때문에 팀원/태그/스크린샷도 자동 삭제
     }

@@ -29,10 +29,11 @@
     <textarea name="desc" rows="4" th:text="*{desc}" required></textarea>
 
     <!-- 대표 이미지 -->
-    <label>대표 이미지</label>
-    <div class="cover-preview" th:if="*{coverPath} != null">
-      <img th:src="${coverPath}" alt="기존 대표 이미지" class="preview-img">
-    </div>
+    <!-- 대표 이미지 -->
+  <label>대표 이미지</label>
+  <div class="cover-preview" th:if="*{coverPath} != null">
+    <img th:src="*{coverPath}" alt="기존 대표 이미지" class="preview-img">
+  </div>
     <input type="file" name="cover" id="cover-input" accept=".jpg,.jpeg,.png,.webp">
     <div id="cover-preview" class="cover-preview"></div>
 
@@ -65,17 +66,18 @@
     <div th:if="*{screenshotPaths} != null">
       <div class="image-preview">
         <img th:each="img : *{screenshotPaths}"
-             th:src="${img}"
-             alt="기존 스크린샷" class="preview-img">
+            th:src="${img}"
+            alt="기존 스크린샷" class="preview-img">
       </div>
     </div>
     <input type="file" name="screenshots" id="image-input" multiple accept=".jpg,.jpeg,.png,.webp">
     <div id="image-preview" class="image-preview"></div>
 
     <!-- 아이콘 -->
+    <!-- 아이콘 -->
     <label>프로젝트 아이콘</label>
     <div th:if="*{iconPath} != null">
-      <img th:src="${iconPath}" alt="기존 아이콘" class="preview-img">
+      <img th:src="*{iconPath}" alt="기존 아이콘" class="preview-img">
     </div>
     <input type="file" name="icon" id="icon-input" accept=".jpg,.jpeg,.png,.webp">
     <div id="icon-preview" class="icon-preview"></div>
