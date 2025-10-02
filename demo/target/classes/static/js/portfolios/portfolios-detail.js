@@ -207,3 +207,21 @@ window.cancelEdit = function (button) {
   editForm.style.display = "none";
   contentEl.style.display = "block";
 };
+
+
+const likeBtn = document.getElementById("likeBtn");
+const portfolioId = likeBtn.dataset.id;   // ✅ HTML에서 주입됨
+const csrfToken = likeBtn.dataset.csrf;   // ✅ CSRF도 주입
+
+likeBtn.addEventListener("change", function () {
+    const checked = this.checked;
+
+    fetch(`/portfolios/${portfolioId}/${checked ? 'like' : 'unlike'}`, {
+        method: "POST",
+        headers: { "X-CSRF-TOKEN": csrfToken }
+    })
+    .then(res => res.text())
+    .then(count => {
+        document.getElementById("likeCount").innerText = count;
+    });
+});

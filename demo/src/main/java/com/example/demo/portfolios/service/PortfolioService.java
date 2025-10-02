@@ -236,6 +236,23 @@ public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
     repository.save(portfolio);
 }
 
+// //  좋아요
+// @Transactional
+// public int likePortfolio(Long id) {
+//     PortfoliosEntity portfolio = repository.findById(id)
+//         .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음"));
+//     portfolio.setLikes(portfolio.getLikes() + 1); // 👍 JPA가 dirty checking으로 update
+//     return portfolio.getLikes();
+// }
+
+// @Transactional
+// public int unlikePortfolio(Long id) {
+//     PortfoliosEntity portfolio = repository.findById(id)
+//         .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음"));
+//     portfolio.setLikes(Math.max(0, portfolio.getLikes() - 1));
+//     return portfolio.getLikes();
+// }
+
 
     
 }
