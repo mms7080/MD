@@ -186,6 +186,17 @@ public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
         String downloadPath = saveFile(dto.getDownload(), "zip");
         portfolio.setDownload(downloadPath);
     }
+    // 스크린샷 업데이트
+    if (dto.getScreenshots() != null && !dto.getScreenshots().isEmpty()) {
+        List<String> screenshotPaths = new ArrayList<>();
+        for (MultipartFile file : dto.getScreenshots()) {
+            if (!file.isEmpty()) {
+                String path = saveFile(file, "image");
+                screenshotPaths.add(path);
+            }
+        }
+        portfolio.setScreenshots(screenshotPaths);
+    }
 
     // ===== 태그 수정 =====
     if (dto.getTags() != null) {

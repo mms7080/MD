@@ -29,7 +29,7 @@
     <!-- 대표 이미지 -->
     <label>대표 이미지</label>
     <div class="cover-preview" th:if="${portfolioFormDto.coverPath} != null">
-      <img th:src="${portfolioFormDto.coverPath}" alt="기존 대표 이미지" class="preview-img" />
+      <img th:src="${portfolioFormDto.coverPath}" alt="기존 대표 이미지" class="cover-thumb" />
     </div>
     <input type="file" name="cover" id="cover-input" accept=".jpg,.jpeg,.png,.webp" />
     <div id="cover-preview" class="cover-preview"></div>
@@ -66,7 +66,7 @@
              th:if="${img != null}"
              th:src="@{${img}}"
              th:alt="${img != null ? '스크린샷: ' + img : '이미지 없음'}"
-             class="preview-img"/>
+             class="screenshot-thumb"/>
       </div>
     </div>
 
@@ -74,10 +74,10 @@
     <div id="image-preview" class="image-preview"></div>
 
     <!-- 아이콘 -->
-<label>프로젝트 아이콘</label>
-<div class="icon-preview" th:if="${portfolioFormDto.iconPath} != null">
-  <img th:src="${portfolioFormDto.iconPath}" alt="기존 아이콘" />
-</div>
+    <label>프로젝트 아이콘</label>
+    <div class="icon-preview" th:if="${portfolioFormDto.iconPath} != null">
+      <img th:src="${portfolioFormDto.iconPath}" alt="기존 아이콘" class="icon-thumb"/>
+    </div>
 
     <input type="file" name="icon" id="icon-input" accept=".jpg,.jpeg,.png,.webp" />
     <div id="icon-preview" class="icon-preview"></div>

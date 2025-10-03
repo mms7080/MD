@@ -78,7 +78,7 @@ function renderTags() {
 document.getElementById("image-input")?.addEventListener("change", function(event) {
   const files = event.target.files;
   const preview = document.getElementById("image-preview");
-  preview.innerHTML = ""; // 선택할 때마다 초기화
+  preview.innerHTML = ""; // 초기화
 
   Array.from(files).forEach(file => {
     if (file.type.startsWith("image/")) {
@@ -89,7 +89,7 @@ document.getElementById("image-input")?.addEventListener("change", function(even
 
         const img = document.createElement("img");
         img.src = e.target.result;
-        img.className = "thumb";
+        img.className = "screenshot-thumb";  // ✅ 변경
 
         // 삭제 버튼
         const removeBtn = document.createElement("span");
@@ -141,7 +141,7 @@ document.getElementById("icon-input")?.addEventListener("change", function(event
 });
 
 // ===========================
-// Cover 이미지 업로드 (1장만) + 미리보기
+// Cover 이미지 (1장만) + 미리보기
 // ===========================
 document.getElementById("cover-input")?.addEventListener("change", function(event) {
   const file = event.target.files[0];
@@ -153,7 +153,7 @@ document.getElementById("cover-input")?.addEventListener("change", function(even
     reader.onload = e => {
       const img = document.createElement("img");
       img.src = e.target.result;
-      img.className = "cover-thumb"; 
+      img.className = "cover-thumb";  // ✅ 변경
       preview.appendChild(img);
     };
     reader.readAsDataURL(file);
