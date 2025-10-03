@@ -213,14 +213,10 @@ public String editComment(@PathVariable Long portfolioId,
 
     @GetMapping("/edit/{id}")
     public String editPortfolioForm(@PathVariable Long id, Model model) {
-        PortfoliosEntity portfolio = portfolioService.getPortfolioWithTeam(id);
-    
-        // 기존 데이터 → Form DTO 변환
-        PortfolioFormDto dto = PortfolioFormDto.formEntityDto(portfolio);
+        PortfolioFormDto dto = portfolioService.getPortfolioForm(id);
         model.addAttribute("portfolioFormDto", dto);
         model.addAttribute("portfolioId", id);
-    
-        return "portfolios/edit"; // edit.html
+        return "portfolios/edit";
     }
 
 // ✅ 수정 저장

@@ -164,16 +164,16 @@ public PortfoliosEntity increaseViewCount(Long id) {
 
 // 수정
 // 수정 처리
-    @Transactional
+@Transactional
 public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
     PortfoliosEntity portfolio = getPortfolioWithTeam(id);
 
-    // 일반 필드 수정
+    // ===== 일반 필드 수정 =====
     portfolio.setTitle(dto.getTitle());
     portfolio.setDesc(dto.getDesc());
     portfolio.setLink(dto.getLink());
 
-    // 파일 업데이트 (있을 때만)
+    // ===== 파일 수정 =====
     if (dto.getCover() != null && !dto.getCover().isEmpty()) {
         String coverPath = saveFile(dto.getCover(), "image");
         portfolio.setCover(coverPath);
@@ -187,54 +187,48 @@ public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
         portfolio.setDownload(downloadPath);
     }
 
-    // 태그
+    // ===== 태그 수정 =====
     if (dto.getTags() != null) {
         portfolio.setTags(dto.getTags());
     }
 
-    // ✅ 팀원 수정 로직
-    List<TeamMemberEntity> existing = portfolio.getTeam(); // 현재 DB 팀원들
+    // ===== 팀원 수정 =====
+    List<TeamMemberEntity> existing = portfolio.getTeam();
 
-    // 1) 수정 + 신규
-    List<TeamMemberEntity> updatedList = new ArrayList<>();
+    // 1) 기존 컬렉션 비우기
+    existing.clear();
+
+    // 2) DTO 기반으로 다시 채우기
     for (TeamMemberDto t : dto.getTeam()) {
-        if (t.getId() != null) {
-            // 기존 팀원 찾기
-            TeamMemberEntity member = existing.stream()
-                .filter(m -> m.getId().equals(t.getId()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("팀원 없음 id=" + t.getId()));
+        TeamMemberEntity member;
 
-            // 필드 업데이트
-            member.setMemberName(t.getMemberName());
-            member.setMemberRole(t.getMemberRole());
-            member.setParts(t.getParts());
-            updatedList.add(member);
+        if (t.getId() != null) {
+            // 기존 멤버를 찾을 필요가 없음 → 어차피 clear() 했으니까 새로 채워야 함
+            member = new TeamMemberEntity();
+            member.setId(t.getId()); // 필요하다면 유지
         } else {
-            // 신규 추가
-            TeamMemberEntity newMember = new TeamMemberEntity(
-                t.getMemberName(),
-                t.getMemberRole(),
-                t.getParts()
-            );
-            newMember.setPortfolio(portfolio);
-            updatedList.add(newMember);
+            member = new TeamMemberEntity();
         }
+
+        member.setMemberName(t.getMemberName());
+        member.setMemberRole(t.getMemberRole());
+        member.setParts(t.getParts());
+        member.setPortfolio(portfolio); // FK 연결
+        existing.add(member);
     }
 
-    // 2) 삭제 처리 (DTO에 없는 기존 팀원 제거)
-    List<Long> incomingIds = dto.getTeam().stream()
-            .map(TeamMemberDto::getId)
-            .filter(idVal -> idVal != null)
-            .toList();
-
-    existing.removeIf(m -> !incomingIds.contains(m.getId())); // DB에서 orphanRemoval=true 라서 자동 삭제됨
-
-    // 3) 최종 세팅
-    portfolio.setTeam(updatedList);
-
+    // repository.save(portfolio) 는 @Transactional 이라면 없어도 flush 됨
     repository.save(portfolio);
 }
+
+
+@Transactional(readOnly = true)
+public PortfolioFormDto getPortfolioForm(Long id) {
+    PortfoliosEntity portfolio = repository.findDetailById(id)
+        .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음: " + id));
+    return PortfolioFormDto.formEntityDto(portfolio); // 세션이 살아있으니 LAZY 초기화됨
+}
+
 
 // //  좋아요
 // @Transactional

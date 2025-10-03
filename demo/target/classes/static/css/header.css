@@ -39,8 +39,9 @@ body:has(#themeToggle:checked) {
 /* Global reset */
 html,
 body {
-    height: 100%;
-    overflow: auto; /* 스크롤 동작 유지 */
+    min-height: 100%;
+    overflow-x: hidden; /* 스크롤 동작 유지 */
+    overflow-y: auto;
     -ms-overflow-style: none; /* IE/Edge */
     scrollbar-width: none; /* Firefox */
 }

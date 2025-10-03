@@ -1,17 +1,3 @@
-/* =====================
-   Global
-===================== */
-html, body {
-    min-height: 100%;
-    height: auto;
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: "Spoqa Han Sans Neo", "Noto Sans KR", sans-serif;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
 
 /* =====================
    Container
@@ -200,45 +186,56 @@ html, body {
     cursor: default;
   }
   
-  /* =====================
-     Image Previews
-  ===================== */
-  .image-preview {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
-  
-  .image-preview .preview-img,
-  .cover-preview .preview-img,
-  .icon-preview .preview-img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    display: inline-block;
-  }
-  
-  .cover-preview {
-    margin-top: 10px;
-  }
-  .cover-preview .preview-img {
-    width: 120px;   /* 대표 이미지는 살짝 더 크게 */
-    height: auto;
-    max-height: 150px;
-    border-radius: 8px;
-    display: block;
-  }
-  
-  .icon-preview {
-    margin-top: 10px;
-  }
-  .icon-preview .preview-img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 1px solid var(--border);
-  }
-  
+/* =====================
+   Image Previews
+===================== */
+.image-preview {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* 공통 스타일 (크기는 제외) */
+.image-preview .preview-img,
+.cover-preview .preview-img,
+.icon-preview .preview-img {
+  border: 1px solid var(--border);
+  display: inline-block;
+  object-fit: cover;
+}
+
+/* 스크린샷 (작게) */
+.image-preview .preview-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+}
+
+/* 대표 이미지 */
+.cover-preview {
+  margin-top: 10px;
+}
+.cover-preview .preview-img {
+  width: 120px;
+  height: auto;
+  max-height: 150px;
+  border-radius: 8px;
+  display: block;
+}
+
+/* =====================
+   아이콘 (cover랑 같은 크기, 둥글게)
+===================== */
+.icon-preview {
+  margin-top: 10px;
+}
+
+.icon-preview img {
+  width: 120px !important;   /* 강제 적용 */
+  height: 120px !important;  /* 강제 적용 */
+  border-radius: 50%;        /* 원형 */
+  border: 1px solid var(--border);
+  object-fit: cover;         /* 잘라서 맞춤 */
+  display: block;
+}

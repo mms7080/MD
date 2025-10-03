@@ -1,6 +1,9 @@
 package com.example.demo.portfolios.dto;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +31,7 @@ public class PortfolioFormDto {
 
     // DB에 저장된 경로들
     private String coverPath;
-    private List<String> screenshotPaths; // ✅ 출력용 (entity.getScreenshots())
+    private List<String> screenshotPaths = new ArrayList<>(); // ✅ 출력용 (entity.getScreenshots())
 
     private String desc;
     private String teamName;
@@ -44,22 +47,34 @@ public class PortfolioFormDto {
     public static PortfolioFormDto formEntityDto(PortfoliosEntity entity){
         return PortfolioFormDto.builder()
             .title(entity.getTitle())
-            .tags(entity.getTags())
+            .tags(entity.getTags() != null ? entity.getTags() : Set.of()) // ✅ null 방지
             .coverPath(entity.getCover())
             .desc(entity.getDesc())
-            .screenshotPaths(entity.getScreenshots()) // ✅ 여기로 매핑
-            .team(entity.getTeam().stream()
+            .screenshotPaths(
+                entity.getScreenshots() != null
+                    ? new ArrayList<>(
+                        new LinkedHashSet<>(
+                            entity.getScreenshots().stream()
+                                .filter(Objects::nonNull)   // null 제거
+                                .map(String::valueOf)       // String 보장
+                                .toList()
+                        )
+                    )
+                    : new ArrayList<>()
+            )
+            .team(entity.getTeam() != null ? entity.getTeam().stream()
                 .map(t -> new TeamMemberDto(
                         t.getId(),
                         t.getMemberName(),
                         t.getMemberRole(),
                         t.getParts()))
-                .toList())
+                .toList() : new ArrayList<>()) // ✅ null-safe
             .iconPath(entity.getIcon())
             .downloadPath(entity.getDownload())
             .link(entity.getLink())
-            .viewCount(entity.getViewCount())
+            .viewCount(entity.getViewCount() != null ? entity.getViewCount() : 0) // ✅ null-safe
             .build();
     }
+    
 }
 
