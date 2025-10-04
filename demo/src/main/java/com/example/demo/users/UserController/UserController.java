@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -79,6 +80,7 @@ public class UserController {
     public String saveSettings(@RequestParam("name") String name,
             @RequestParam(value = "githubUrl", required = false) String githubUrl,
             @RequestParam(value = "positions", required = false) java.util.Set<String> positions,
+            @RequestParam(value = "profileImageFile", required = false) MultipartFile profileImageFile,
             @RequestParam(value = "profileImgUrl", required = false) String profileImgUrlHidden,
             Principal principal) {
         if (principal == null)
@@ -90,6 +92,7 @@ public class UserController {
                 name,
                 githubUrl,
                 positions,
+                profileImageFile,  
                 profileImgUrlHidden);
         return "redirect:/mypage/home";
     }

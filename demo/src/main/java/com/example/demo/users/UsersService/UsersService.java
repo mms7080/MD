@@ -1,14 +1,22 @@
 package com.example.demo.users.UsersService;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.UUID;
 
 import jakarta.servlet.http.HttpSession; // ⬅️ 추가
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.users.UsersDTO.ProfileDTO;
 import com.example.demo.users.UsersDTO.UsersDTO;
@@ -142,6 +150,36 @@ public class UsersService {
         u.setDeletedAt(LocalDateTime.now());
     }
 
+    // 사진 업로드
+    public String saveProfileImage(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty())
+            return null;
+
+        // 확장자 확인
+        String originalName = file.getOriginalFilename();
+        String ext = originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
+        if (!(ext.equals("jpg") || ext.equals("jpeg") || ext.equals("png") || ext.equals("webp"))) {
+            throw new IOException("이미지 파일만 업로드 가능합니다: " + originalName);
+        }
+
+        // 업로드 경로: /uploads/users/
+        Path uploadPath = Paths.get(System.getProperty("user.dir"), "uploads", "users");
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        // 파일명에 UUID 붙이기
+        String filename = UUID.randomUUID() + "_" + originalName;
+        Path filePath = uploadPath.resolve(filename);
+
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // DB에는 /uploads/users/filename 저장
+        return "/uploads/users/" + filename;
+    }
+
     @Transactional(readOnly = true)
     public ProfileDTO loadProfileForm(Long userId) {
         Users users = usersRepository.findById(userId).orElseThrow();
@@ -168,63 +206,71 @@ public class UsersService {
             String name,
             String githubUrl,
             java.util.Set<String> positions,
-            String existingProfileImgUrl // hidden값 그대로 보존
-    ) {
+            MultipartFile profileImageFile,
+            String existingProfileImgUrl) {
         Users user = usersRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // 1) 사용자 이름 갱신
         if (name != null && !name.isBlank()) {
             user.setName(name.trim());
         }
 
-        // 2) 프로필 로드/생성
         Profile profile = profileRepository.findById(userId).orElse(null);
         if (profile == null) {
             profile = new Profile();
-            profile.setId(userId); // @MapsId 구조 가정
-            profile.setPositions(new java.util.HashSet<>());
+            profile.setId(userId);
+            profile.setPositions(new HashSet<>());
         }
 
-        // 3) GitHub URL
         profile.setGithubUrl((githubUrl == null || githubUrl.isBlank()) ? null : githubUrl.trim());
+        profile.setPositions(positions != null ? positions : new HashSet<>());
+        if (profileImageFile != null && !profileImageFile.isEmpty()) {
+            try {
+                String uploadedUrl = saveProfileImage(profileImageFile);
+                // (선택) 이전 파일 삭제 로직
+                profile.setProfileImgUrl(uploadedUrl);
+            } catch (IOException e) {
+                throw new IllegalStateException("프로필 이미지 저장 실패", e);
+            }
+        } else {
+            // ✅ hidden이 비어있으면 기존 값 유지 (덮어쓰지 않음)
+            if (existingProfileImgUrl != null && !existingProfileImgUrl.isBlank()) {
+                profile.setProfileImgUrl(existingProfileImgUrl);
+            }
+            // else: 아무 것도 하지 않음 → 현재 DB 값 유지
+        }
 
-        // 4) 포지션
-        profile.setPositions(positions != null ? positions : new java.util.HashSet<>());
-
-        // 5) 이미지 경로는 수정하지 않음(폼 hidden 값 유지)
-        profile.setProfileImgUrl(existingProfileImgUrl);
-
-        // 저장
         profileRepository.save(profile);
     }
 
     @Transactional
-    public void changeMypassword(Long userId, 
-                                 String currnetPassword, 
-                                 String newPassword,
-                                 String confirmNewPassword){
-        if(!newPassword.equals(confirmNewPassword)){
+    public void changeMypassword(Long userId,
+            String currnetPassword,
+            String newPassword,
+            String confirmNewPassword) {
+        if (!newPassword.equals(confirmNewPassword)) {
             throw new IllegalArgumentException("새 비밀번호와 확인 값이 일치하지 않습니다.");
         }
-        
+
         Users user = usersRepository.findById(userId)
-                   .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        
-        if(!passwordEncoder.matches(currnetPassword, user.getPassword())){
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (!passwordEncoder.matches(currnetPassword, user.getPassword())) {
             throw new IllegalArgumentException("현재 비밀번호가 올바르지 않습니다.");
         }
-        
+
         user.setPassword(passwordEncoder.encode(confirmNewPassword));
     }
-    
+
     @Transactional(readOnly = true)
     public boolean verifyCurrentPassword(String username, String rawPassword) {
-        if (username == null || username.isBlank() || rawPassword == null) return false;
+        if (username == null || username.isBlank() || rawPassword == null)
+            return false;
 
         Users u = usersRepository.findByUsernameAndDeleteStatus(username, DeleteStatus.N)
                 .orElse(null);
-        if (u == null) return false;
+        if (u == null)
+            return false;
 
         return passwordEncoder.matches(rawPassword, u.getPassword());
     }
