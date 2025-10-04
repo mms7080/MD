@@ -261,7 +261,7 @@
                     </p>
                 </div>
             
-                <div id="commentList" class="comments" sec:authorize="isAuthenticated()">
+                <div id="commentList" class="comments">
                     <div class="comment" 
                         th:each="comment : ${comments}" 
                         th:classappend="${#authentication.name == comment.user.username} ? ' mine'">
