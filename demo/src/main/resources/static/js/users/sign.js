@@ -38,6 +38,50 @@
     });
 })();
 
+document.addEventListener("DOMContentLoaded", () => {
+  const pw = document.getElementById("password");
+  const pwCheck = document.getElementById("confirmPassword");
+  const pwStatus = document.getElementById("password-status");
+
+  if (!pw || !pwCheck || !pwStatus) return;
+
+  function showMessage(msg, isError = false) {
+  pwStatus.textContent = msg;
+  pwStatus.classList.toggle("error", isError);
+  pwStatus.style.display = "inline-block"; // 표시
+  requestAnimationFrame(() => {
+    pwStatus.style.opacity = "1";
+  });
+}
+
+function hideMessage() {
+  pwStatus.style.opacity = "0";
+  setTimeout(() => {
+    pwStatus.style.display = "none"; // 완전 숨김
+    pwStatus.textContent = "";
+    pwStatus.classList.remove("error");
+  }, 200);
+}
+
+  // 일치 검사
+  function checkPasswordMatch() {
+    const a = pw.value.trim();
+    const b = pwCheck.value.trim();
+
+    if (!a && !b) return hideMessage();
+    if (!a || !b) return showMessage("비밀번호가 일치하지 않습니다.", true);
+    if (a === b) showMessage("비밀번호가 일치합니다.");
+    else showMessage("비밀번호가 일치하지 않습니다.", true);
+  }
+
+  ["input", "change", "keyup", "paste"].forEach(evt => {
+    pw.addEventListener(evt, checkPasswordMatch);
+    pwCheck.addEventListener(evt, checkPasswordMatch);
+  });
+});
+
+
+
 /* ========== 생년월일 → 만 나이 자동 계산 ========== */
 (function () {
     const birth = document.getElementById("birth");
