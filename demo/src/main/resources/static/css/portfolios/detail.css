@@ -1052,3 +1052,92 @@
   
 
   
+/* ======================
+   Comment Edit Form 수정 전용
+   ====================== */
+
+/* 인라인 수정 폼 전체 */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* 수정용 별점 */
+.edit-form .edit-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  gap: 4px;
+}
+
+.edit-form .edit-rating input {
+  display: none;
+}
+
+.edit-form .edit-rating label {
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+/* hover 시 */
+.edit-form .edit-rating label:hover,
+.edit-form .edit-rating label:hover ~ label {
+  color: #ffb84d;
+}
+
+/* 선택된 별 */
+.edit-form .edit-rating input:checked ~ label {
+  color: #ffa500;
+}
+
+/* 수정용 textarea */
+.edit-form textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #222;
+  color: #fff;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.edit-form textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+/* 버튼 */
+.edit-form .btn-save,
+.edit-form .btn-cancel {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-form .btn-save {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.edit-form .btn-save:hover {
+  background: #2563eb;
+}
+
+.edit-form .btn-cancel {
+  background: #555;
+  color: #fff;
+}
+
+.edit-form .btn-cancel:hover {
+  background: #666;
+}

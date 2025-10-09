@@ -160,20 +160,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-/* ✅ 각 댓글의 "읽기 전용" 별점만 처리 */
-document.querySelectorAll(".stars.readonly").forEach(starBox => {
-  const rating = parseInt(starBox.getAttribute("data-rating")) || 0;
-  starBox.innerHTML = ""; 
-  for (let i = 1; i <= 5; i++) {
-    const span = document.createElement("span");
-    span.textContent = i <= rating ? "★" : "☆";
-    span.style.color = i <= rating ? "gold" : "#555";
-    starBox.appendChild(span);
-  }
-});
-
-
-
+  /* ✅ 각 댓글의 "읽기 전용" 별점만 처리 */
+  document.querySelectorAll(".stars.readonly").forEach(starBox => {
+    const rating = parseInt(starBox.getAttribute("data-rating")) || 0;
+    starBox.innerHTML = "";
+    for (let i = 1; i <= 5; i++) {
+      const span = document.createElement("span");
+      span.textContent = i <= rating ? "★" : "☆";
+      span.style.color = i <= rating ? "gold" : "#555";
+      starBox.appendChild(span);
+    }
+  });
 });
 
 /* -----------------------------
@@ -183,45 +180,56 @@ window.enableEdit = function (button) {
   const commentCard = button.closest(".comment");
   const contentEl = commentCard.querySelector(".content");
   const editForm = commentCard.querySelector(".edit-form");
+  const readonlyStars = commentCard.querySelector(".stars.readonly");
 
-  // 본문 숨기고 수정폼 보이기
-  contentEl.style.display = "none";
-  editForm.style.display = "block";
+  // 본문 및 별점 숨기기
+  if (contentEl) contentEl.style.display = "none";
+  if (readonlyStars) readonlyStars.style.display = "none";
+
+  // 수정폼 표시
+  editForm.style.display = "flex";
 
   // textarea에 기존 본문 채우기
   editForm.querySelector("textarea").value = contentEl.innerText.trim();
 
- // 기존 댓글 별점 값에 맞게 라디오 선택
-const rating = parseInt(commentCard.querySelector(".stars.readonly")?.dataset.rating) || 0;
-if (rating > 0) {
-  const radio = editForm.querySelector(`input[name="rating"][value="${rating}"]`);
-  if (radio) radio.checked = true;
-}
+  // 기존 댓글 별점 값 반영
+  const rating = parseInt(readonlyStars?.dataset.rating) || 0;
+  if (rating > 0) {
+    const radio = editForm.querySelector(`input[name="rating"][value="${rating}"]`);
+    if (radio) radio.checked = true;
+  }
 };
 
 window.cancelEdit = function (button) {
   const editForm = button.closest(".edit-form");
   const commentCard = editForm.closest(".comment");
   const contentEl = commentCard.querySelector(".content");
+  const readonlyStars = commentCard.querySelector(".stars.readonly");
 
   editForm.style.display = "none";
-  contentEl.style.display = "block";
+  if (contentEl) contentEl.style.display = "block";
+  if (readonlyStars) readonlyStars.style.display = "block";
 };
 
-
+/* -----------------------------
+   좋아요 버튼 기능
+----------------------------- */
 const likeBtn = document.getElementById("likeBtn");
-const portfolioId = likeBtn.dataset.id;   // ✅ HTML에서 주입됨
-const csrfToken = likeBtn.dataset.csrf;   // ✅ CSRF도 주입
+if (likeBtn) {
+  const portfolioId = likeBtn.dataset.id;
+  const csrfToken = likeBtn.dataset.csrf;
 
-likeBtn.addEventListener("change", function () {
+  likeBtn.addEventListener("change", function () {
     const checked = this.checked;
 
-    fetch(`/portfolios/${portfolioId}/${checked ? 'like' : 'unlike'}`, {
-        method: "POST",
-        headers: { "X-CSRF-TOKEN": csrfToken }
+    fetch(`/portfolios/${portfolioId}/${checked ? "like" : "unlike"}`, {
+      method: "POST",
+      headers: { "X-CSRF-TOKEN": csrfToken }
     })
-    .then(res => res.text())
-    .then(count => {
+      .then(res => res.text())
+      .then(count => {
         document.getElementById("likeCount").innerText = count;
-    });
-});
+      })
+      .catch(err => console.error("좋아요 처리 실패:", err));
+  });
+}
