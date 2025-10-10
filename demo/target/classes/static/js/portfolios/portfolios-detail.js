@@ -135,12 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  /* ✅ 평균 별점 표시 */
+  /* ✅ 평균 별점 표시 (중복 방지 포함) */
   const avgScoreEl = document.getElementById("avgScore");
   const ratingCountEl = document.getElementById("ratingCount");
   const avgStars = document.getElementById("avgStars");
 
-  if (avgScoreEl && ratingCountEl && avgStars) {
+  if (avgScoreEl && ratingCountEl && avgStars && !avgStars.dataset.rendered) {
     const comments = document.querySelectorAll(".stars.readonly[data-rating]");
     let sum = 0;
 
@@ -158,18 +158,28 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 1; i <= 5; i++) {
       avgStars.innerHTML += i <= Math.round(avg) ? "★" : "☆";
     }
+
+    // ✅ 렌더링 완료 플래그
+    avgStars.dataset.rendered = "true";
   }
 
-  /* ✅ 각 댓글의 "읽기 전용" 별점만 처리 */
+  /* ✅ 각 댓글의 "읽기 전용" 별점만 처리 (중복 완전 차단 버전) */
   document.querySelectorAll(".stars.readonly").forEach(starBox => {
+    // 이미 렌더링된 별이면 skip
+    if (starBox.dataset.starsRendered === "true") return;
+
     const rating = parseInt(starBox.getAttribute("data-rating")) || 0;
     starBox.innerHTML = "";
+
     for (let i = 1; i <= 5; i++) {
       const span = document.createElement("span");
       span.textContent = i <= rating ? "★" : "☆";
       span.style.color = i <= rating ? "gold" : "#555";
       starBox.appendChild(span);
     }
+
+    // ✅ 중복 생성 방지 플래그 추가
+    starBox.dataset.starsRendered = "true";
   });
 });
 

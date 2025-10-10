@@ -300,22 +300,27 @@
                         method="post" class="edit-form" style="display:none;"
                         sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
                         <!-- 댓글 수정폼 별점 -->
-<div class="rating edit-rating">
-    <input type="radio" name="rating" value="5" id="edit-star5-[[${comment.id}]]">
-    <label for="edit-star5-[[${comment.id}]]">★</label>
-  
-    <input type="radio" name="rating" value="4" id="edit-star4-[[${comment.id}]]">
-    <label for="edit-star4-[[${comment.id}]]">★</label>
-  
-    <input type="radio" name="rating" value="3" id="edit-star3-[[${comment.id}]]">
-    <label for="edit-star3-[[${comment.id}]]">★</label>
-  
-    <input type="radio" name="rating" value="2" id="edit-star2-[[${comment.id}]]">
-    <label for="edit-star2-[[${comment.id}]]">★</label>
-  
-    <input type="radio" name="rating" value="1" id="edit-star1-[[${comment.id}]]">
-    <label for="edit-star1-[[${comment.id}]]">★</label>
-  </div>
+                        <div class="edit-rating">
+                            <input type="radio" name="rating" value="5"
+                                   th:id="'edit-star5-' + ${comment.id}" />
+                            <label th:for="'edit-star5-' + ${comment.id}">★</label>
+                          
+                            <input type="radio" name="rating" value="4"
+                                   th:id="'edit-star4-' + ${comment.id}" />
+                            <label th:for="'edit-star4-' + ${comment.id}">★</label>
+                          
+                            <input type="radio" name="rating" value="3"
+                                   th:id="'edit-star3-' + ${comment.id}" />
+                            <label th:for="'edit-star3-' + ${comment.id}">★</label>
+                          
+                            <input type="radio" name="rating" value="2"
+                                   th:id="'edit-star2-' + ${comment.id}" />
+                            <label th:for="'edit-star2-' + ${comment.id}">★</label>
+                          
+                            <input type="radio" name="rating" value="1"
+                                   th:id="'edit-star1-' + ${comment.id}" />
+                            <label th:for="'edit-star1-' + ${comment.id}">★</label>
+                          </div>
   
                     <textarea name="content" rows="2"></textarea>
                     <input type="hidden" name="_csrf" th:value="${_csrf.token}">
