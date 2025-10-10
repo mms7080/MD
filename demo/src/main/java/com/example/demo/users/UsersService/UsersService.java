@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.servlet.http.HttpSession; // ⬅️ 추가
@@ -274,4 +275,36 @@ public class UsersService {
 
         return passwordEncoder.matches(rawPassword, u.getPassword());
     }
+
+    // 아이디 찾기(이메일 + 이름)
+    @Transactional(readOnly = true)
+    public Optional<String> findUsernameBy(String name, String email) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("이름을 입력하세요.");
+        }
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("이메일을 입력하세요.");
+        }
+
+        final String normalizedEmail = email.trim();
+
+        return usersRepository
+                .findByEmailAndNameAndDeleteStatus(normalizedEmail, name.trim(), DeleteStatus.N)
+                .map(Users::getUsername)
+                .map(this::maskUsername);
+    }
+
+    // 아이디 마스킹
+    private String maskUsername(String username) {
+    if (username == null) return null;
+
+    int len = username.length();
+    if (len <= 3) {
+        return username; // 너무 짧으면 그대로
+    } else if (len <= 6) {
+        return username.substring(0, len - 2) + "xx";
+    } else {
+        return username.substring(0, len - 3) + "xxx";
+    }
+}
 }
