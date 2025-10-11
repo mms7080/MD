@@ -23,6 +23,13 @@ public interface UsersRepository extends JpaRepository<Users, Long>{
     // 이메일로 유저 찾기
     Optional<Users> findByEmailAndDeleteStatus(String email, DeleteStatus deleteStatus);
 
+    // 아이디 찾기 (이메일 + 이름)
+    Optional<Users> findByEmailAndNameAndDeleteStatus(String email, String name, DeleteStatus deleteStatus);
+
+
+    // 비밀번호 찾기 -> 재설정 (이메일 + 아이디 + 이름)
+    Optional<Users> findByEmailAndUsernameAndNameAndDeleteStatus(String email, String username, String name, DeleteStatus deleteStatus);
+
     // 권한별 유저 조회
     List<Users> findByRole(Role role);
 

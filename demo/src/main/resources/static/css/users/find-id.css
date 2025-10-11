@@ -1,0 +1,112 @@
+/* 카드 컨테이너 */
+.kf-find__container {
+  display: flex;
+  justify-content: center;
+}
+
+/* 결과 카드 */
+.kf-find-result {
+  width: min(560px, 92vw);
+  background: var(--page, #fff);
+  border: 1px solid var(--line, #eaeaea);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg, 0 10px 30px rgba(0, 0, 0, 0.08));
+  padding: 28px 24px;
+  margin: 24px 0 48px;
+}
+
+/* 헤더 */
+.kf-find-result__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* 아이콘 */
+.kf-find-result__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #111, #2b2f36);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* 제목, 설명 */
+.kf-find-result__title {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.kf-find-result__desc {
+  margin: 2px 0 18px;
+  color: var(--muted, #666);
+  font-size: 14px;
+}
+
+/* 아이디 결과 박스 */
+.kf-find-result__box {
+  border: 1px dashed var(--line, #eaeaea);
+  border-radius: 12px;
+  padding: 16px 14px;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.kf-find-result__label {
+  font-size: 13px;
+  color: var(--muted, #666);
+  margin-bottom: 6px;
+}
+
+.kf-find-result__id {
+  font-size: 22px;
+  font-weight: 800;
+  word-break: break-all;
+  letter-spacing: 0.2px;
+}
+
+/* 에러 메시지 */
+.kf-find-result__error {
+  border: 1px solid #b00020;
+  color: #b00020;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 14px;
+  background: color-mix(in oklab, #b00020 8%, transparent);
+}
+
+/* 버튼 영역 */
+.kf-find-result__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 18px;
+}
+
+/* 버튼 공통 */
+.kf-btn {
+  appearance: none;
+  border: 1px solid var(--line, #eaeaea);
+  background: transparent;
+  color: inherit;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: transform 0.06s ease, opacity 0.15s ease;
+}
+
+/* 버튼 호버/클릭 효과 */
+.kf-btn:hover {
+  opacity: 0.9;
+}
+
+.kf-btn:active {
+  transform: scale(0.98);
+}

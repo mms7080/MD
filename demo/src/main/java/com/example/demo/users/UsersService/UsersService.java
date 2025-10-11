@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.servlet.http.HttpSession; // ⬅️ 추가
@@ -273,5 +274,76 @@ public class UsersService {
             return false;
 
         return passwordEncoder.matches(rawPassword, u.getPassword());
+    }
+
+    // 아이디 찾기(이메일 + 이름)
+    @Transactional(readOnly = true)
+    public Optional<String> findUsernameBy(String name, String email) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("이름을 입력하세요.");
+        }
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("이메일을 입력하세요.");
+        }
+
+        final String normalizedEmail = email.trim();
+
+        return usersRepository
+                .findByEmailAndNameAndDeleteStatus(normalizedEmail, name.trim(), DeleteStatus.N)
+                .map(Users::getUsername)
+                .map(this::maskUsername);
+    }
+
+    // 아이디 마스킹
+    private String maskUsername(String username) {
+        if (username == null)
+            return null;
+
+        int len = username.length();
+        if (len <= 3) {
+            return username; // 너무 짧으면 그대로
+        } else if (len <= 6) {
+            return username.substring(0, len - 2) + "**";
+        } else {
+            return username.substring(0, len - 3) + "***";
+        }
+    }
+
+    // 비밀번호 찾기 (아이디 + 이름 + 이메일) -> 이후 비밀번호 수정
+    @Transactional
+    public void changeForgotPassword(String username, 
+                                    String name, 
+                                    String email,
+                                    String newpassword,
+                                    String confirmpassword){
+        if(name == null || name.isBlank()){
+            throw new IllegalArgumentException("이름을 입력하세요.");
+        }
+        if(username == null || username.isBlank()){
+            throw new IllegalArgumentException("아이디를 입력하세요.");
+        }
+        if(email == null || email.isBlank()){
+            throw new IllegalArgumentException("이메일을 입력하세요");
+        }
+        if(newpassword == null || newpassword.isBlank()){
+            throw new IllegalArgumentException("새 비밀번호를 입력하세요");
+        }
+        if(confirmpassword == null || confirmpassword.isBlank()){
+            throw new IllegalArgumentException("비밀번호 확인을 입력하세요");
+        }
+        if(!newpassword.equals(confirmpassword)){
+            throw new IllegalArgumentException("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        }
+        if(newpassword.length() < 10){
+            throw new IllegalArgumentException("새 비밀번호는 10자 이상이어야 합니다.");
+        }
+
+        final String normalizedEmail = email.trim();
+
+        Users users = usersRepository
+                        .findByEmailAndUsernameAndNameAndDeleteStatus(normalizedEmail, username, name, DeleteStatus.N)
+                        .orElseThrow(()-> new IllegalArgumentException("일치하는 회원정보가 없습니다."));
+
+        users.setPassword(passwordEncoder.encode(newpassword));
     }
 }

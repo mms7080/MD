@@ -42,7 +42,8 @@ public class SecurityConfig {
                     "/folios/**", // 추가 페이지 접근은 허용(준회)
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/uploads/**", // 이미지(훈희)
-                    "/home/**"
+                    "/home/**",
+                    "/forgot/**"
                    
                    
                    
@@ -55,9 +56,6 @@ public class SecurityConfig {
 
                 // 학생만 허용
                 // .requestMatchers().hasRole("STUDENT")
-
-                // 로그인 한 사용자만 접근 가능
-                //  .requestMatchers().authenticated()
 
                 .anyRequest().authenticated()
             )
