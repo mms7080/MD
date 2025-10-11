@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>아이디 찾기 결과</title>
+
+  <!-- 기존 공통 리소스 유지 -->
+  <link rel="stylesheet" th:href="@{/css/header.css}" />
+  <link rel="stylesheet" th:href="@{/css/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/users/auth-modal.css}" />
+  <link rel="stylesheet" th:href="@{/css/users/findsign.css}" />
+  <link rel="stylesheet" th:href="@{/css/users/find-id.css}"/>
+</head>
+<body>
+  <!-- 공통 헤더 유지 -->
+  <th:block th:replace="~{fragments/header :: header('find')}"></th:block>
+
+  <!-- 본문: 결과 카드만 중앙에 -->
+  <main class="kf-find">
+    <div class="kf-find__container">
+      <section class="kf-find-result" role="dialog" aria-modal="true" aria-labelledby="result-title">
+        <header class="kf-find-result__head">
+          <div class="kf-find-result__icon" aria-hidden="true">ID</div>
+          <div>
+            <h2 id="result-title" class="kf-find-result__title">아이디 찾기 결과</h2>
+            <p class="kf-find-result__desc">입력하신 정보로 조회된 결과입니다.</p>
+          </div>
+        </header>
+
+        <!-- ✅ 성공: 마스킹된 아이디 -->
+        <div th:if="${ok}">
+          <div class="kf-find-result__box" aria-live="polite">
+            <div class="kf-find-result__label">회원님의 아이디</div>
+            <div class="kf-find-result__id" th:text="${maskedId}">sample****</div>
+          </div>
+
+          <div class="kf-find-result__actions">
+            <a href="/" class="kf-btn">홈으로 가기</a>
+            <a href="/forgot?tab=pw" class="kf-btn">비밀번호 찾기</a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- 공통 푸터 유지 -->
+  <th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</body>
+</html>

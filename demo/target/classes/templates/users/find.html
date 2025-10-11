@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -11,6 +12,7 @@
   <link rel="stylesheet" th:href="@{/css/users/auth-modal.css}" />
   <link rel="stylesheet" th:href="@{/css/users/findsign.css}" />
 </head>
+
 <body>
   <!-- 공통 헤더 -->
   <th:block th:replace="~{fragments/header :: header('find')}"></th:block>
@@ -23,14 +25,17 @@
     <div th:if="${error}" class="kf-find__note error" th:text="${error}"></div>
 
     <!-- 탭 토글 (접근성 라디오) -->
-    <input id="tab-id" type="radio" name="finder" value="id" th:checked="${#strings.equals(param.tab,'pw')} ? false : true">
+    <input id="tab-id" type="radio" name="finder" value="id"
+      th:checked="${#strings.equals(param.tab,'pw')} ? false : true">
     <input id="tab-pw" type="radio" name="finder" value="pw" th:checked="${#strings.equals(param.tab,'pw')}">
 
     <section class="kf-find__card" aria-label="아이디/비밀번호 찾기">
       <!-- 탭 헤더 -->
       <div class="kf-find__head" role="tablist">
-        <label class="kf-find__tab" id="tab-id-label" role="tab" aria-controls="panel-id" aria-selected="true" for="tab-id">아이디 찾기</label>
-        <label class="kf-find__tab" id="tab-pw-label" role="tab" aria-controls="panel-pw" aria-selected="false" for="tab-pw">비밀번호 변경</label>
+        <label class="kf-find__tab" id="tab-id-label" role="tab" aria-controls="panel-id" aria-selected="true"
+          for="tab-id">아이디 찾기</label>
+        <label class="kf-find__tab" id="tab-pw-label" role="tab" aria-controls="panel-pw" aria-selected="false"
+          for="tab-pw">비밀번호 변경</label>
       </div>
 
       <div class="kf-find__body">
@@ -56,7 +61,8 @@
               <input class="kf-find__input" type="text" name="name" id="pwName" required autocomplete="name" />
             </label>
             <label class="kf-find__label">아이디
-              <input class="kf-find__input" type="text" name="username" id="pwUsername" required autocomplete="username" />
+              <input class="kf-find__input" type="text" name="username" id="pwUsername" required
+                autocomplete="username" />
             </label>
             <label class="kf-find__label">이메일
               <input class="kf-find__input" type="email" name="email" id="pwEmail" required autocomplete="email" />
@@ -86,25 +92,26 @@
           <div class="row"><span class="label">이름</span><span class="value" id="modalNameText">-</span></div>
         </div>
         <div class="kf-modal__confirm">
-           <div class="row"><span class="label">아이디</span><span class="value" id="modalUsernameText">-</span></div>
+          <div class="row"><span class="label">아이디</span><span class="value" id="modalUsernameText">-</span></div>
         </div>
 
-        <form id="pwResetForm" class="kf-find__form" method="post" th:action="@{/find/password/reset}">
+        <form id="pwResetForm" class="kf-find__form" method="post" th:action="@{/forgot/password}">
           <input type="hidden" name="name" id="modalName">
           <input type="hidden" name="username" id="modalUsername">
           <input type="hidden" name="email" id="modalEmail">
 
           <label class="kf-find__label">새 비밀번호
-            <input class="kf-find__input" id="newPassword" type="password" name="newPassword"
-                   required minlength="10" autocomplete="new-password" placeholder="10자 이상" />
+            <input class="kf-find__input" id="newPassword" type="password" name="newpassword" required minlength="10"
+              autocomplete="new-password" placeholder="10자 이상" />
           </label>
           <label class="kf-find__label">새 비밀번호 확인
-            <input class="kf-find__input" id="confirmPassword" type="password" required autocomplete="new-password" placeholder="다시 입력" />
+            <input class="kf-find__input" id="confirmPassword" type="password" name="confirmpassword" required
+              autocomplete="new-password" placeholder="다시 입력" />
           </label>
           <small id="pwStatus" class="kf-find__note" hidden></small>
 
           <input type="hidden" th:name="${_csrf?.parameterName}" th:value="${_csrf?.token}" />
-          <button id="pwSubmit" class="kf-find__submit" type="submit" disabled>비밀번호 변경</button>
+          <button id="pwSubmit" class="kf-find__submit" type="submit">비밀번호 변경</button>
         </form>
       </section>
     </div>
@@ -151,73 +158,54 @@
 
   <!-- ===== 비밀번호 설정 모달 동작 ===== -->
   <script>
-    (function pwModalFlow(){
-      const openBtn = document.getElementById('openPwModal');
-      const nameEl = document.getElementById('pwName');
-      const userEl = document.getElementById('pwUsername');
-      const emailEl = document.getElementById('pwEmail');
-      const toggle = document.getElementById('pwModalToggle');
+    // ✅ 모달에 값만 채워 넣고 열기. 그 외 어떤 검증/차단도 하지 않음.
+    (function () {
+      const $ = (s) => document.querySelector(s);
 
-      const modalNameText = document.getElementById('modalNameText');
-      const modalUsernameText = document.getElementById('modalUsernameText');
-      const modalName = document.getElementById('modalName');
-      const modalUsername = document.getElementById('modalUsername');
-      const modalEmail = document.getElementById('modalEmail');
+      const openBtn = $('#openPwModal');          // "비밀번호 재설정" 버튼
+      const nameEl = $('#pwName');                // 입력 폼의 이름
+      const userEl = $('#pwUsername');            // 입력 폼의 아이디
+      const emailEl = $('#pwEmail');              // 입력 폼의 이메일
+      const toggle = $('#pwModalToggle');         // 모달 토글 체크박스
 
-      const pw = document.getElementById('newPassword');
-      const conf = document.getElementById('confirmPassword');
-      const status = document.getElementById('pwStatus');
-      const submit = document.getElementById('pwSubmit');
+      const modalNameText = $('#modalNameText');  // 모달 표시용 이름
+      const modalUserText = $('#modalUsernameText'); // 모달 표시용 아이디
 
-      if(!openBtn) return;
+      const modalName = $('#modalName');          // 모달 hidden name
+      const modalUser = $('#modalUsername');      // 모달 hidden username
+      const modalEmail = $('#modalEmail');        // 모달 hidden email
 
-      // 1) 다음 → 입력 검증 후 모달 오픈 & 값 주입
-      openBtn.addEventListener('click', () => {
-        const name = (nameEl.value || '').trim();
-        const username = (userEl.value || '').trim();
-        const email = (emailEl.value || '').trim();
+      const submitBtn = $('#pwSubmit');           // 모달 submit 버튼
 
-        if(!name || !username || !email){
-          alert('이름, 아이디, 이메일을 모두 입력하세요.');
-          return;
-        }
-        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-          alert('올바른 이메일 형식이 아닙니다.');
-          emailEl.focus(); return;
-        }
+      if (!openBtn) return;
 
-        modalNameText.textContent = name;
-        modalUsernameText.textContent = username;
-        modalName.value = name;
-        modalUsername.value = username;
-        modalEmail.value = email;
+      // 혹시 마크업에 disabled가 남아있다면 제거 (제출 방해 방지)
+      submitBtn?.removeAttribute('disabled');
 
-        pw.value = ''; conf.value = '';
-        status.hidden = true; status.textContent = '';
-        submit.disabled = true;
+      openBtn.addEventListener('click', function () {
+        // 입력값 읽기만 함 (형식/일치/길이 검증 X)
+        const name = (nameEl?.value || '').trim();
+        const username = (userEl?.value || '').trim();
+        const email = (emailEl?.value || '').trim();
 
-        toggle.checked = true;
-        setTimeout(() => pw.focus(), 0);
+        // 모달 표시 영역/hidden 필드에 그대로 주입
+        if (modalNameText) modalNameText.textContent = name || '-';
+        if (modalUserText) modalUserText.textContent = username || '-';
+        if (modalName) modalName.value = name;
+        if (modalUser) modalUser.value = username;
+        if (modalEmail) modalEmail.value = email;
+
+        // 모달 열기
+        if (toggle) toggle.checked = true;
+
+        // 비번 입력창 포커스 (선택)
+        setTimeout(() => document.getElementById('newPassword')?.focus(), 0);
       });
 
-      // 2) 비밀번호 유효성/일치 체크
-      function show(msg, ok){
-        status.hidden = false;
-        status.textContent = msg;
-        status.className = ok ? "kf-find__note" : "kf-find__note error";
-        submit.disabled = !ok;
-      }
-      function check(){
-        const a = pw.value.trim();
-        const b = conf.value.trim();
-        if(!a && !b){ status.hidden = true; submit.disabled = true; return; }
-        if(a.length < 10){ show("비밀번호는 10자 이상이어야 합니다.", false); return; }
-        if(a !== b){ show("비밀번호가 일치하지 않습니다.", false); return; }
-        show("사용 가능한 비밀번호입니다.", true);
-      }
-      pw?.addEventListener('input', check);
-      conf?.addEventListener('input', check);
+      // 제출 흐름에 간섭하는 submit 핸들러/ preventDefault() 없음
     })();
   </script>
+
 </body>
+
 </html>
