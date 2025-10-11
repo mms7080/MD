@@ -150,8 +150,14 @@
                 </div>
                 <p class="kf-card__desc" th:text="${portfolio.desc}">설명 텍스트</p>
                 <div class="kf-card__tags">
-                    <span class="kf-tag" th:each="tag : ${portfolio.tags}" th:text="'#' + ${tag}">#태그</span>
-                </div>
+                    <span class="kf-tag"
+                          th:each="tag, iterStat : ${portfolio.tags}"
+                          th:if="${iterStat.index < 5}"
+                          th:text="'#' + ${tag}">
+                      #태그
+                    </span>
+                    <span th:if="${portfolio.tags.size() > 5}">...</span>
+                  </div>
             </div>
         </article>
     </section>

@@ -108,21 +108,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const token = document.querySelector("meta[name='_csrf']")?.content;
     const header = document.querySelector("meta[name='_csrf_header']")?.content;
 
-    fetch(`/portfolios/${portfolioId}/views`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        [header]: token
-      }
-    })
-      .then(res => {
-        if (!res.ok) throw new Error(`조회수 요청 실패: ${res.status}`);
-        return res.json();
+    if (portfolioId && token && header) {
+      fetch(`/portfolios/${portfolioId}/views`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [header]: token
+        }
       })
-      .then(count => {
-        viewCountEl.textContent = count;
-      })
-      .catch(err => console.error("조회수 증가 실패:", err));
+        .then(res => {
+          if (!res.ok) throw new Error(`조회수 요청 실패: ${res.status}`);
+          return res.json();
+        })
+        .then(count => {
+          viewCountEl.textContent = count;
+        })
+        .catch(err => console.error("조회수 증가 실패:", err));
+    }
   }
 
   /* ✅ 태그 더보기 초기화 */
@@ -159,13 +161,11 @@ document.addEventListener("DOMContentLoaded", () => {
       avgStars.innerHTML += i <= Math.round(avg) ? "★" : "☆";
     }
 
-    // ✅ 렌더링 완료 플래그
     avgStars.dataset.rendered = "true";
   }
 
-  /* ✅ 각 댓글의 "읽기 전용" 별점만 처리 (중복 완전 차단 버전) */
+  /* ✅ 각 댓글의 "읽기 전용" 별점만 처리 */
   document.querySelectorAll(".stars.readonly").forEach(starBox => {
-    // 이미 렌더링된 별이면 skip
     if (starBox.dataset.starsRendered === "true") return;
 
     const rating = parseInt(starBox.getAttribute("data-rating")) || 0;
@@ -178,7 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
       starBox.appendChild(span);
     }
 
-    // ✅ 중복 생성 방지 플래그 추가
     starBox.dataset.starsRendered = "true";
   });
 });
@@ -192,17 +191,12 @@ window.enableEdit = function (button) {
   const editForm = commentCard.querySelector(".edit-form");
   const readonlyStars = commentCard.querySelector(".stars.readonly");
 
-  // 본문 및 별점 숨기기
   if (contentEl) contentEl.style.display = "none";
   if (readonlyStars) readonlyStars.style.display = "none";
 
-  // 수정폼 표시
   editForm.style.display = "flex";
-
-  // textarea에 기존 본문 채우기
   editForm.querySelector("textarea").value = contentEl.innerText.trim();
 
-  // 기존 댓글 별점 값 반영
   const rating = parseInt(readonlyStars?.dataset.rating) || 0;
   if (rating > 0) {
     const radio = editForm.querySelector(`input[name="rating"][value="${rating}"]`);
@@ -222,23 +216,38 @@ window.cancelEdit = function (button) {
 };
 
 /* -----------------------------
-   좋아요 버튼 기능
+   좋아요 버튼 기능 (403 / undefined 방지)
 ----------------------------- */
 const likeBtn = document.getElementById("likeBtn");
 if (likeBtn) {
-  const portfolioId = likeBtn.dataset.id;
-  const csrfToken = likeBtn.dataset.csrf;
+  const portfolioId = document.getElementById("viewCount")?.dataset.id;
+  const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
+  const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
 
   likeBtn.addEventListener("change", function () {
-    const checked = this.checked;
+    if (!portfolioId || !csrfToken || !csrfHeader) {
+      console.warn("좋아요 요청 불가: 필수 데이터 누락");
+      return;
+    }
 
+    const checked = this.checked;
     fetch(`/portfolios/${portfolioId}/${checked ? "like" : "unlike"}`, {
       method: "POST",
-      headers: { "X-CSRF-TOKEN": csrfToken }
+      headers: {
+        [csrfHeader]: csrfToken
+      }
     })
-      .then(res => res.text())
+      .then(res => {
+        if (!res.ok) {
+          console.warn(`좋아요 요청 실패: ${res.status}`);
+          return null; // 실패 응답은 화면 표시 안 함
+        }
+        return res.text();
+      })
       .then(count => {
-        document.getElementById("likeCount").innerText = count;
+        if (count !== null && !isNaN(count)) {
+          document.getElementById("likeCount").innerText = count;
+        }
       })
       .catch(err => console.error("좋아요 처리 실패:", err));
   });
