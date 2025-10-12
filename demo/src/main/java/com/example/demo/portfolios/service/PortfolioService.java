@@ -6,9 +6,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,10 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.portfolios.dto.PortfolioFormDto;
 import com.example.demo.portfolios.dto.TeamMemberDto;
+import com.example.demo.portfolios.entity.PortfolioLikeEntity;
 import com.example.demo.portfolios.entity.PortfoliosEntity;
 import com.example.demo.portfolios.entity.TeamMemberEntity;
 import com.example.demo.portfolios.repository.PortfolioCommentRepository;
+import com.example.demo.portfolios.repository.PortfolioLikeRepository;
 import com.example.demo.portfolios.repository.PortfoliosRepository;
+import com.example.demo.users.UsersEntity.Users;
+import com.example.demo.users.UsersRepository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +37,8 @@ public class PortfolioService {
 
     private final PortfoliosRepository repository;
     private final PortfolioCommentRepository commentRepository;
+    private final PortfolioLikeRepository likeRepository;
+    private final UsersRepository usersRepository;
     /**
      * 파일 저장 (이미지/ZIP 구분)
      */
@@ -131,7 +139,7 @@ public class PortfolioService {
 
     @Transactional(readOnly = true)
     public PortfoliosEntity getPortfolioWithTeam(Long id) {
-        return repository.findDetailByIdWithTeam(id)
+        return repository.findDetailById(id)
             .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
     }
 
@@ -241,22 +249,76 @@ public PortfolioFormDto getPortfolioForm(Long id) {
 }
 
 
-// //  좋아요
-// @Transactional
-// public int likePortfolio(Long id) {
-//     PortfoliosEntity portfolio = repository.findById(id)
-//         .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음"));
-//     portfolio.setLikes(portfolio.getLikes() + 1); // 👍 JPA가 dirty checking으로 update
-//     return portfolio.getLikes();
-// }
+//  좋아요 버튼
+@Transactional
+    public int likePortfolio(Long id) {
+        repository.increaseLikes(id);
+        return repository.findById(id)
+                         .map(PortfoliosEntity::getLikes)
+                         .orElse(0);
+    }
 
-// @Transactional
-// public int unlikePortfolio(Long id) {
-//     PortfoliosEntity portfolio = repository.findById(id)
-//         .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음"));
-//     portfolio.setLikes(Math.max(0, portfolio.getLikes() - 1));
-//     return portfolio.getLikes();
-// }
+    @Transactional
+    public int unlikePortfolio(Long id) {
+        repository.decreaseLikes(id);
+        return repository.findById(id)
+                         .map(PortfoliosEntity::getLikes)
+                         .orElse(0);
+    }
+
+
+    @Transactional
+    public int toggleLike(Long portfolioId, Principal principal) {
+        // ✅ 사용자 정보 가져오기
+        Users user = usersRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+
+        // ✅ 포트폴리오 정보 가져오기
+        PortfoliosEntity portfolio = repository.findById(portfolioId)
+                .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음"));
+
+        // ✅ 이미 좋아요 눌렀는지 확인
+        Optional<PortfolioLikeEntity> existing = likeRepository.findByPortfolioAndUser(portfolio, user);
+
+        if (existing.isPresent()) {
+            // 이미 눌렀으면 취소
+            likeRepository.delete(existing.get());
+            portfolio.setLikes(Math.max(portfolio.getLikes() - 1, 0));
+        } else {
+            // 처음 누른 경우
+            PortfolioLikeEntity like = new PortfolioLikeEntity();
+            like.setPortfolio(portfolio);
+            like.setUser(user);
+            likeRepository.save(like);
+            portfolio.setLikes(portfolio.getLikes() + 1);
+        }
+
+        repository.save(portfolio);
+        return portfolio.getLikes();
+    }
+
+
+
+    /**
+ * 상세 페이지용 포트폴리오 조회 (댓글, 팀, 스크린샷 포함)
+ * - MultipleBagFetchException 방지
+ * - 순서 유지(List)
+ */
+@Transactional(readOnly = true)
+public PortfoliosEntity getPortfolioDetail(Long id) {
+    PortfoliosEntity portfolio = repository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
+
+    // 💡 Lazy 로딩된 모든 컬렉션 초기화
+    portfolio.getScreenshots().size();
+    portfolio.getComments().size();
+    portfolio.getTeam().size();
+    portfolio.getTags().size();
+
+    return portfolio;
+}
+
+
 
 
     

@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.portfolios.dto.PortfolioFormDto;
 import com.example.demo.portfolios.entity.PortfolioComment;
@@ -91,33 +93,52 @@ public String list(Model model,
 @GetMapping("/{id}")
 public String getPortfolio(@PathVariable Long id,
                            @RequestParam(defaultValue = "0") int page,
-                           Model model) {
-    // 포트폴리오 + 연관 데이터 가져오기
-    PortfoliosEntity portfolio = portfoliosRepository.findDetailById(id)
-        .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
+                           Model model,
+                           Principal principal) {
 
-    // 중복 제거
+    // ✅ 서비스에서 안전하게 가져오기 (LazyInitializationException 방지)
+    PortfoliosEntity portfolio = portfolioService.getPortfolioDetail(id);
+
+    // ✅ 접근 제한 (비공개 글일 때)
+    if (Boolean.FALSE.equals(portfolio.getIsPublic())) {
+        boolean isAdmin = false;
+
+        if (principal != null) {
+            Users user = usersRepository.findByUsername(principal.getName()).orElse(null);
+            if (user != null && user.getRole() == Role.ADMIN) {
+                isAdmin = true;
+            }
+        }
+
+        if (!isAdmin) {
+            model.addAttribute("notFound", true);
+            return "portfolios/detail";
+        }
+    }
+
+    // ✅ 중복 제거 (필요 시)
     portfolio.setScreenshots(new ArrayList<>(new LinkedHashSet<>(portfolio.getScreenshots())));
     portfolio.setTeam(new ArrayList<>(new LinkedHashSet<>(portfolio.getTeam())));
 
-    // 댓글 (페이지네이션 적용)
+    // ✅ 댓글 (페이지네이션 적용)
     int size = 5;
     Page<PortfolioComment> commentPage = commentService.getComments(id, page, size);
 
-    // 전체 평균 & 총 댓글 수
+    // ✅ 평균 별점 & 총 개수
     double avgRating = commentService.getAverageRating(id);
     long ratingCount = commentService.getCommentCount(id);
 
-    // 모델에 담기
+    // ✅ 모델 데이터 세팅
     model.addAttribute("portfolio", portfolio);
-    model.addAttribute("comments", commentPage.getContent());  // ✅ 페이징된 댓글만
-    model.addAttribute("avgRating", avgRating);                // ✅ 전체 평균
-    model.addAttribute("ratingCount", ratingCount);            // ✅ 전체 댓글 수
+    model.addAttribute("comments", commentPage.getContent());
+    model.addAttribute("avgRating", avgRating);
+    model.addAttribute("ratingCount", ratingCount);
     model.addAttribute("currentPage", commentPage.getNumber());
     model.addAttribute("totalPages", commentPage.getTotalPages());
 
     return "portfolios/detail";
 }
+
 
 
 
@@ -227,18 +248,16 @@ public String updatePortfolio(@PathVariable Long id,
     return "redirect:/portfolios/" + id; // 수정 후 detail 페이지로
 }
 
-// // 좋아요/ 취소
-// @PostMapping("/{id}/like")
-// @ResponseBody
-// public int likePortfolio(@PathVariable Long id) {
-//     return portfolioService.likePortfolio(id);
-// }
+@PostMapping("/{id}/like")
+@ResponseBody
+public int toggleLike(@PathVariable Long id, Principal principal) {
+    // principal == null → 로그인 안 되어 있음
+    if (principal == null) {
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
+    }
+    return portfolioService.toggleLike(id, principal);
+}
 
-// @PostMapping("/{id}/unlike")
-// @ResponseBody
-// public int unlikePortfolio(@PathVariable Long id) {
-//     return portfolioService.unlikePortfolio(id);
-// }
 
 
 

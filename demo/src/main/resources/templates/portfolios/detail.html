@@ -142,7 +142,8 @@
 
                     <!-- Uiverse.io Heart -->
                     <div class="heart-container" title="Like">
-                        <input type="checkbox" class="checkbox" id="likeBtn" />
+                        <input type="checkbox" class="checkbox" id="likeBtn" 
+                        th:data-authenticated="${#authorization.expression('isAuthenticated()')}"/>
                         <div class="svg-container">
                             <svg
                                 viewBox="0 0 24 24"
@@ -178,8 +179,11 @@
                         </div>
                     </div>
 
+
                     <!-- 좋아요 카운트 -->
-                    <span id="likeCount">0</span>
+                    <span id="likeCount" th:text="${portfolio.likes}">0</span>
+                
+
 
                     <!-- Download -->
                     <a th:if="${portfolio.download != null}" 
@@ -213,6 +217,7 @@
                         class="link-icon"/>
                     </a>
                 </div>
+
             </div>
 
             <div class="comment-section">

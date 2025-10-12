@@ -252,3 +252,68 @@ if (likeBtn) {
       .catch(err => console.error("좋아요 처리 실패:", err));
   });
 }
+
+
+
+/* -----------------------------
+   좋아요 버튼 기능 (로그인 여부 포함)
+----------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const likeBtn = document.getElementById("likeBtn");
+  const likeCountEl = document.getElementById("likeCount");
+  const viewCountEl = document.getElementById("viewCount");
+  const isAuthenticated = likeBtn?.dataset.authenticated === "true"; // ✅ 서버에서 주입된 로그인 여부
+
+  if (!likeBtn || !viewCountEl) return;
+
+  const portfolioId = viewCountEl.getAttribute("data-id");
+  const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
+  const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
+
+  likeBtn.addEventListener("change", function (event) {
+    // ✅ 비로그인 사용자 → 로그인 모달 또는 페이지 이동
+    if (!isAuthenticated) {
+      event.preventDefault();
+      this.checked = false; // 하트 원상복구
+
+      // 로그인 모달이 있는 경우
+      const loginModal = document.getElementById("modal-signin");
+      if (loginModal) {
+        loginModal.checked = true; // 모달 열기
+      } else {
+        // 로그인 페이지로 이동 (모달 없을 경우)
+        window.location.href = "/login";
+      }
+
+      return;
+    }
+
+    // ✅ 로그인된 사용자 → 좋아요 토글
+    if (!portfolioId || !csrfToken || !csrfHeader) {
+      console.warn("좋아요 요청 불가: 필수 데이터 누락");
+      return;
+    }
+
+    fetch(`/portfolios/${portfolioId}/like`, {
+      method: "POST",
+      headers: {
+        [csrfHeader]: csrfToken,
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    })
+      .then(res => {
+        if (res.status === 401) throw new Error("로그인이 필요합니다.");
+        if (!res.ok) throw new Error(`요청 실패: ${res.status}`);
+        return res.text();
+      })
+      .then(count => {
+        if (!isNaN(count)) {
+          likeCountEl.textContent = count;
+        }
+      })
+      .catch(err => {
+        console.error("좋아요 처리 실패:", err);
+        alert(err.message);
+      });
+  });
+});

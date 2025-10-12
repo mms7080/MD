@@ -71,14 +71,13 @@ public class PortfoliosEntity {
     @Column(name="p_desc", length=2000)
     private String desc;
 
-    // ✅ 스크린샷 (입력 순서 유지 → List + OrderColumn)
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
         name = "portfolio_screenshots",
         joinColumns = @JoinColumn(name = "portfolio_id")
     )
     @Column(name = "screenshot")
-    @Fetch(FetchMode.SUBSELECT) // ← ✅ 추가!
+    @Fetch(FetchMode.SUBSELECT) // ✅ MultipleBagFetch 방지
     private List<String> screenshots = new ArrayList<>();
 
     @Column(name="p_teamName")
@@ -103,5 +102,12 @@ public class PortfoliosEntity {
     private  Integer viewCount = 0;
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT) // ✅ 같이 적용 (comment와 함께)
     private List<PortfolioComment> comments = new ArrayList<>();
+
+
+    // ✅ 추가할 부분
+    @Column(name="p_is_public", nullable = false)
+    @Builder.Default
+    private Boolean isPublic = true; // true = 공개, false = 비공개 (ADMIN만)
 }
