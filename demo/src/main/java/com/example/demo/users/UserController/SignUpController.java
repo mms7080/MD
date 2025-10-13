@@ -113,4 +113,11 @@ public class SignUpController {
         boolean exists = usersService.isUsernameTaken(username); 
         return ResponseEntity.ok(exists);
     }
+
+    @GetMapping("/api/check-email")
+    public ResponseEntity<Boolean> checkemail(@RequestParam String email) {
+        boolean exists = usersService.isEmailTaken(email);
+        return ResponseEntity.ok(exists);
+    }
+    
 }
