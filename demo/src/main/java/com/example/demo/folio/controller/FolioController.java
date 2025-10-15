@@ -55,14 +55,29 @@ public class FolioController {
 
     // 5. 편집 페이지 뷰
     @GetMapping("/edit")
-    public String folioEditPage(Model model, Principal principal) {
-        // 현재 로그인한 사용자 정보 조회
-        Users currentUser = usersService.getUserByUsername(principal.getName());
-        // 모델에 사용자 정보 담아서 전달
-        model.addAttribute("currentUser", currentUser);
+    public String folioEditPage(
+            @RequestParam(name = "template", required = false, defaultValue = "dev-basic") String template,
+            Model model,
+            Principal principal
+    ) {
+        if (principal != null) {
+            Users currentUser = usersService.getUserByUsername(principal.getName());
+            model.addAttribute("currentUser", currentUser);
+        }
+        model.addAttribute("template", template); // edit.html에서 ${template} 사용
         return "folios/edit";
     }
-    
+
+    // 혹시 기존 북마크/링크 대비: /ppt → /edit로 리다이렉트
+    @GetMapping("/ppt")
+    public String pptRedirect(
+            @RequestParam(name = "template", required = false) String template
+    ) {
+        String q = (template != null && !template.isBlank())
+                ? "?template=" + java.net.URLEncoder.encode(template, java.nio.charset.StandardCharsets.UTF_8)
+                : "";
+        return "redirect:/folios/edit" + q;
+    }
 }
     
     

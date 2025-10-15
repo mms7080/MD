@@ -1,96 +1,382 @@
 <!DOCTYPE html>
-<html lang="ko" th:replace="~{fragments/folios-layout :: layout(
-    pageTitle = 'Folio 편집',
-    activeMenu = 'write',
-    css = ~{::#edit-css},
-    js = ~{::#edit-js},
-    content = ~{::#folios-edit-content}
-)}">
-<head>
-    <th:block id="edit-css">
-        <link th:href="@{/css/folios/edit.css}" rel="stylesheet" />
-    </th:block>
-</head>
-<body>
-    <div id="folios-edit-content">
-        <div class="edit-header">
-            <h1>나의 Folio 만들기</h1>
-            <p>자신을 멋지게 표현하고, 참여했던 프로젝트를 연결해보세요.</p>
+<html lang="ko" th:with="tpl=${template}">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link rel="stylesheet" href="/css/folios/edit.css" />
+        <script defer th:src="@{/js/folios/edit.js}"></script>
+        <title>개발자 포트폴리오 – 기본 템플릿</title>
+    </head>
+    <body>
+        <div class="top">
+            <div class="nav">
+                <button class="btn" data-goto="1">1. 소개</button>
+                <button class="btn" data-goto="2">2. 학력/경력</button>
+                <button class="btn" data-goto="3">3. 기술/역량</button>
+                <button class="btn" data-goto="4">4. 프로젝트</button>
+                <button class="btn" data-goto="5">5. 수상/자격</button>
+            </div>
+            <span class="chip" id="pageChip">1 / 5</span>
+            <div class="nav">
+                <button id="btnSave" class="btn">임시저장</button>
+                <button id="btnLoad" class="btn">불러오기</button>
+                <button id="btnPrint" class="btn primary">PDF로 저장</button>
+            </div>
         </div>
 
-        <div class="edit-container">
-            <aside class="preview-pane">
-                <div class="preview-card">
-                    <div class="preview-profile-pic" id="preview-profile-pic"></div>
-                    <h2 id="preview-name" th:text="${currentUser.name}">이름</h2>
-                    <p id="preview-job">희망 직무</p>
-                    <hr class="divider" />
-                     <div class="preview-info">
-                        <span class="icon">📧</span>
-                        <span id="preview-email" th:text="${currentUser.email}">이메일</span>
+        <div class="wrap">
+            <!-- 무대 -->
+            <section class="stage">
+                <!-- 슬라이드 1: 소개 -->
+                <article class="slide p1" data-page="1" aria-label="소개">
+                    <div class="pad">
+                        <span class="kicker">Profile</span>
+
+                        <div class="head">
+                            <!-- 왼쪽: 사진 + 기본정보 -->
+                            <div class="left">
+                                <div class="photo">
+                                    <img id="photo1" alt="프로필" />
+                                </div>
+
+                                <!-- <div class="name" data-bind="intro.name">
+                                    김개발
+                                </div> -->
+
+                                <div class="rows">
+                                    <div>
+                                        <span
+                                            class="name"
+                                            data-bind="intro.name"
+                                            >김개발</span
+                                        >
+                                    </div>
+                                    <div>
+                                        <span data-bind="intro.city"
+                                            >Seoul, Korea</span
+                                        >
+                                    </div>
+                                    <div>
+                                        <span data-bind="intro.birth"
+                                            >1996-07-15</span
+                                        >
+                                    </div>
+                                </div>
+                                <!--구분선 -->
+                                <div class="p1-mini-sep"></div>
+
+                                <div class="contact">
+                                    <span data-bind="intro.phone"
+                                        >010-1234-5678</span
+                                    >
+                                    <span data-bind="intro.email"
+                                        >me@example.com</span
+                                    >
+                                    <span data-bind="intro.site"
+                                        >github.com/me</span
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- 오른쪽: 자기소개 텍스트만 -->
+                            <div class="about">
+                                <div class="h3">
+                                    “사용자 성장에 맞춰 확장되는 백엔드를
+                                    설계합니다.”
+                                </div>
+                                <p class="muted" data-bind="intro.summary"></p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="preview-info skills">
-                        <span class="icon">🔧</span>
-                        <div class="tags" id="preview-skills"></div>
+
+                    <div class="footer">
+                        <span
+                            >© <span data-bind="meta.year">2025</span>
+                            <span data-bind="intro.name">Kim Dev</span></span
+                        >
                     </div>
-                </div>
+                </article>
+
+                <!-- 슬라이드 2: 학력/경력 -->
+                <article
+                    class="slide p2"
+                    data-page="2"
+                    hidden
+                    aria-label="학력 및 경력"
+                >
+                    <div class="pad">
+                        <div class="h2">학력</div>
+                        <div class="cols-2">
+                            <div class="card">
+                                <div class="h3" data-bind="edu.univ1.name">
+                                    KAFLAB University
+                                </div>
+                                <div class="muted" data-bind="edu.univ1.major">
+                                    컴퓨터공학과 (B.S.)
+                                </div>
+                                <div class="small" data-bind="edu.univ1.period">
+                                    2015 – 2019
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="h3" data-bind="edu.univ2.name">
+                                    KAFLAB Graduate
+                                </div>
+                                <div class="muted" data-bind="edu.univ2.major">
+                                    데이터공학 (M.S.)
+                                </div>
+                                <div class="small" data-bind="edu.univ2.period">
+                                    2019 – 2021
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="h2" style="margin-top: 24px">경력</div>
+                        <div class="grid">
+                            <div class="card">
+                                <div class="h3" data-bind="exp.job1.company">
+                                    Acme Corp
+                                </div>
+                                <div class="small" data-bind="exp.job1.period">
+                                    2021.03 – 2023.12 · Backend Engineer
+                                </div>
+                                <ul class="muted">
+                                    <li data-bind="exp.job1.desc1">
+                                        Spring 기반 주문 시스템 마이크로서비스
+                                        전환
+                                    </li>
+                                    <li data-bind="exp.job1.desc2">
+                                        MongoDB → PostgreSQL 마이그레이션 주도
+                                    </li>
+                                    <li data-bind="exp.job1.desc3">
+                                        CI/CD 파이프라인 최적화로 배포시간 40%
+                                        단축
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <div class="h3" data-bind="exp.job2.company">
+                                    Beta Studio
+                                </div>
+                                <div class="small" data-bind="exp.job2.period">
+                                    2024.01 – 현재 · Senior Backend
+                                </div>
+                                <ul class="muted">
+                                    <li data-bind="exp.job2.desc1">
+                                        대규모 이벤트 트래픽 대응 아키텍처 설계
+                                    </li>
+                                    <li data-bind="exp.job2.desc2">
+                                        Kafka 스트림 기반 통계 파이프라인 구축
+                                    </li>
+                                    <li data-bind="exp.job2.desc3">
+                                        성능 튜닝으로 P95 응답 320ms → 140ms
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 슬라이드 3: 기술/역량 -->
+                <article
+                    class="slide p3"
+                    data-page="3"
+                    hidden
+                    aria-label="기술 및 역량"
+                >
+                    <div class="pad">
+                        <div class="h2">기술스택</div>
+                        <div class="skills">
+                            <div class="skill">
+                                <div class="h3">Java / Spring</div>
+                                <div class="meter">
+                                    <i
+                                        style="width: 90%"
+                                        data-bind-style="skills.spring"
+                                    ></i>
+                                </div>
+                                <div class="small muted">
+                                    프로덕션 5년 / JPA, MVC, Security
+                                </div>
+                            </div>
+                            <div class="skill">
+                                <div class="h3">DB / SQL</div>
+                                <div class="meter">
+                                    <i
+                                        style="width: 80%"
+                                        data-bind-style="skills.db"
+                                    ></i>
+                                </div>
+                                <div class="small muted">
+                                    PostgreSQL, Redis, Query Tuning
+                                </div>
+                            </div>
+                            <div class="skill">
+                                <div class="h3">Cloud & DevOps</div>
+                                <div class="meter">
+                                    <i
+                                        style="width: 70%"
+                                        data-bind-style="skills.devops"
+                                    ></i>
+                                </div>
+                                <div class="small muted">
+                                    AWS, Docker, Github Actions
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="h2" style="margin-top: 24px">보유역량</div>
+                        <ul class="grid muted">
+                            <li data-bind="strengths.1">
+                                확장성과 유지보수를 고려한 모듈 설계
+                            </li>
+                            <li data-bind="strengths.2">
+                                문제 재현/측정/개선의 성과 지향 워크플로
+                            </li>
+                            <li data-bind="strengths.3">
+                                명확한 문서화와 팀 커뮤니케이션
+                            </li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- 슬라이드 4: 프로젝트 하이라이트 -->
+                <article
+                    class="slide p4"
+                    data-page="4"
+                    hidden
+                    aria-label="프로젝트"
+                >
+                    <div class="pad grid">
+                        <div class="h2">프로젝트 하이라이트</div>
+
+                        <!-- 프로젝트 1 -->
+                        <div class="proj">
+                            <div class="thumb">
+                                <img id="thumb1" alt="프로젝트1" />
+                            </div>
+                            <div>
+                                <div class="h3" data-bind="proj1.title">
+                                    실시간 주문 처리 시스템
+                                </div>
+                                <div class="small muted" data-bind="proj1.meta">
+                                    2024 · Backend Lead · Spring / Kafka / Redis
+                                </div>
+                                <p class="muted" data-bind="proj1.desc">
+                                    대규모 트래픽에 대응하는 이벤트 기반
+                                    아키텍처로 재설계.
+                                </p>
+                                <div class="badges">
+                                    <span class="pill" data-bind="proj1.link"
+                                        >github.com/acme/order</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 프로젝트 2 -->
+                        <div class="proj">
+                            <div class="thumb">
+                                <img id="thumb2" alt="프로젝트2" />
+                            </div>
+                            <div>
+                                <div class="h3" data-bind="proj2.title">
+                                    추천 모델 서빙 플랫폼
+                                </div>
+                                <div class="small muted" data-bind="proj2.meta">
+                                    2023 · Backend · Spring / gRPC / Kubernetes
+                                </div>
+                                <p class="muted" data-bind="proj2.desc">
+                                    모델 버전 관리와 롤백이 쉬운 서빙 파이프라인
+                                    구축.
+                                </p>
+                                <div class="badges">
+                                    <span class="pill" data-bind="proj2.link"
+                                        >github.com/acme/reco</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- 슬라이드 5: 수상/자격 & 마무리 -->
+                <article
+                    class="slide p5"
+                    data-page="5"
+                    hidden
+                    aria-label="수상 및 자격"
+                >
+                    <div class="pad">
+                        <div class="h2">수상 및 자격</div>
+                        <div class="grid">
+                            <div class="card">
+                                <div class="h3">Awards</div>
+                                <ul class="muted">
+                                    <li data-bind="awards.1">
+                                        2024 NAVI Hackathon – 최우수상
+                                    </li>
+                                    <li data-bind="awards.2">
+                                        2023 회사 기술 공모 – 최우수
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card">
+                                <div class="h3">Certifications</div>
+                                <ul class="muted">
+                                    <li data-bind="cert.1">
+                                        AWS Certified Solutions Architect –
+                                        Associate
+                                    </li>
+                                    <li data-bind="cert.2">
+                                        SQLD / 정보처리기사
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="h2" style="margin-top: 26px">Contact</div>
+                        <p class="muted">
+                            함께 성장할 팀을 찾고 있습니다. 아래 연락처로 편하게
+                            연락 주세요.
+                        </p>
+                        <div class="contact">
+                            <span class="pill" data-bind="intro.email"
+                                >me@example.com</span
+                            >
+                            <span class="pill" data-bind="intro.phone"
+                                >010-1234-5678</span
+                            >
+                            <span class="pill" data-bind="intro.site"
+                                >github.com/me</span
+                            >
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <span>감사합니다.</span
+                        ><span data-bind="intro.name">Kim Dev</span>
+                    </div>
+                </article>
+                <button
+                    class="navArrow left"
+                    type="button"
+                    aria-label="이전 슬라이드"
+                >
+                    ←
+                </button>
+                <button
+                    class="navArrow right"
+                    type="button"
+                    aria-label="다음 슬라이드"
+                >
+                    →
+                </button>
+            </section>
+
+            <!-- 사이드: 현재 페이지 폼 -->
+            <aside id="formPane">
+                <!-- 각 페이지별 폼이 JS로 교체 렌더링됩니다 -->
             </aside>
-
-            <main class="form-pane">
-                <form id="folio-edit-form" class="edit-form">
-                    <div class="form-section">
-                        <label>이름</label>
-                        <input type="text" th:value="${currentUser.name}" readonly disabled>
-                    </div>
-                    <div class="form-section">
-                        <label>이메일</label>
-                        <input type="email" th:value="${currentUser.email}" readonly disabled>
-                    </div>
-
-                    <div class="form-section">
-                        <label for="folio-job">희망 직무 <span class="req">*</span></label>
-                        <input type="text" id="folio-job" placeholder="예: 백엔드 개발자" required>
-                    </div>
-                    <div class="form-section">
-                        <label for="skills-input">기술 스택 <span class="req">*</span></label>
-                        <div id="skills-input-wrapper"></div>
-                    </div>
-                    <div class="form-section">
-                        <label for="folio-introduction">자기소개</label>
-                        <textarea id="folio-introduction" rows="6" placeholder="자신을 자유롭게 소개해 주세요."></textarea>
-                    </div>
-                    <div class="form-section">
-                        <label>대표 이미지 및 사진</label>
-                        <div class="upload-area">
-                            <label for="photos-input" class="custom-file-uploader">
-                                <span class="file-icon">+</span>
-                                <span class="file-text">사진 추가</span>
-                            </label>
-                            <input type="file" id="photos-input" multiple accept="image/*" style="display: none;">
-                            <div id="image-preview-container"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <label>참여 포트폴리오 연결</label>
-                        <div class="project-selector">
-                            <label class="checkbox-item" th:each="p : ${allPortfolios}">
-                                <input type="checkbox" name="projectIds" th:value="${p.portfolioId}">
-                                <span th:text="${p.title}">포트폴리오 제목</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <a th:href="@{/folios}" class="btn-cancel">취소</a>
-                        <button type="submit" class="btn-submit">저장하기</button>
-                    </div>
-                </form>
-            </main>
         </div>
-    </div>
-    <th:block id="edit-js">
-        <script th:src="@{/js/folios/edit.js}"></script>
-    </th:block>
-</body>
+    </body>
 </html>
