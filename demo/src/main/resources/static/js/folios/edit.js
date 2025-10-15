@@ -117,13 +117,31 @@ function set(path, value) {
 
 /* ---------- 페이지 전환 ---------- */
 let page = 1;
-const slides = [...document.querySelectorAll(".slide")];
-function go(n) {
-    page = Math.min(5, Math.max(1, n));
-    slides.forEach((s) => (s.hidden = s.dataset.page != page));
-    document.getElementById("pageChip").textContent = page + " / 5";
-    renderForm(page);
+const slides = [...document.querySelectorAll(".slide[data-page]")];
+const LAST = slides.length; // 전체 슬라이드 수 자동 계산
+
+function showActiveTab() {
+    const btns = document.querySelectorAll(".top [data-goto]");
+    btns.forEach((b) => {
+        const isActive = +b.dataset.goto === page;
+        b.classList.toggle("is-active", isActive);
+        b.setAttribute("aria-current", isActive ? "page" : "false");
+    });
 }
+
+function go(n) {
+    // 1..LAST 범위로 래핑
+    page = ((n - 1 + LAST) % LAST) + 1;
+
+    slides.forEach((s) => (s.hidden = s.dataset.page != page));
+    const chip = document.getElementById("pageChip");
+    if (chip) chip.textContent = `${page} / ${LAST}`;
+
+    renderForm(page);
+    showActiveTab();
+}
+
+// 상단 탭 이동
 document.querySelectorAll(".top [data-goto]").forEach((btn) => {
     btn.addEventListener("click", () => go(+btn.dataset.goto));
 });
@@ -326,6 +344,18 @@ function flash(msg) {
     document.body.appendChild(n);
     setTimeout(() => n.remove(), 1200);
 }
+/* ---------- 화살표/키보드 네비 ---------- */
+const btnPrev = document.querySelector(".navArrow.left");
+const btnNext = document.querySelector(".navArrow.right");
+
+btnPrev?.addEventListener("click", () => go(page - 1));
+btnNext?.addEventListener("click", () => go(page + 1));
+
+// 키보드 ← →
+window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") go(page - 1);
+    if (e.key === "ArrowRight") go(page + 1);
+});
 
 /* ---------- init ---------- */
 applyBindings();
