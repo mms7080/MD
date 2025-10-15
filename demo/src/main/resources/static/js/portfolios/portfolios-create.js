@@ -89,7 +89,7 @@ document.getElementById("image-input")?.addEventListener("change", function(even
 
         const img = document.createElement("img");
         img.src = e.target.result;
-        img.className = "screenshot-thumb";  // ✅ 변경
+        img.className = "thumb";  // ✅ 변경
 
         // 삭제 버튼
         const removeBtn = document.createElement("span");

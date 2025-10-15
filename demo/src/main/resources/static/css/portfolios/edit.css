@@ -253,16 +253,23 @@ button[type="submit"]:hover {
   border-radius: 6px;
 }
 
-/* 프로젝트 스크린샷 (작게) */
+/* 프로젝트 스크린샷 (작게)
 .screenshot-thumb {
   width: 100px !important;
   height: 100px !important;
   border-radius: 6px;
-}
+} */
 
 /* 아이콘 (크게, 동그랗게) */
 .icon-thumb {
   width: 120px !important;
   height: 120px !important;
   border-radius: 50%;
+}
+
+
+.thumb {
+  width: 100px !important;
+  height: 100px !important;
+  border-radius: 6px;
 }

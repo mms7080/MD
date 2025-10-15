@@ -132,6 +132,11 @@ public class UsersService {
         return usersRepository.existsByUsernameAndDeleteStatus(username, DeleteStatus.N);
     }
 
+    // 이메일 중복 체크(활동 중)
+    public boolean isEmailTaken(String email){
+        return usersRepository.existsByEmailAndDeleteStatus(email, DeleteStatus.N);
+    }    
+
     // 사용자 조회 (활동 중)
     public Users getUserByUsername(String username) {
         return usersRepository.findByUsernameAndDeleteStatus(username, DeleteStatus.N)

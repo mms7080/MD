@@ -66,7 +66,7 @@
              th:if="${img != null}"
              th:src="@{${img}}"
              th:alt="${img != null ? '스크린샷: ' + img : '이미지 없음'}"
-             class="screenshot-thumb"/>
+             class="thumb"/>
       </div>
     </div>
 
@@ -89,8 +89,9 @@
       <button type="button" onclick="addTag()">+ 추가</button>
     </div>
     <div id="tag-list">
-      <span th:each="tag : ${portfolioFormDto.tags}" class="tag-item" th:text="${tag}"></span>
+      <div th:each="tag : ${portfolioFormDto.tags}" class="tag-item" th:text="${tag}"></div>
     </div>
+    
     <div id="tags-hidden-box"></div>
 
     <!-- ZIP -->
