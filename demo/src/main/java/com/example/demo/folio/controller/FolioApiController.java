@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.example.demo.folio.dto.FolioRequestDto;
+import com.example.demo.folio.dto.FolioStateSaveRequest;
 import com.example.demo.folio.entity.Folio;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -83,7 +84,14 @@ public class FolioApiController {
 
         return ResponseEntity.ok(responseDto);
     }
-    
-    
 
+    @PostMapping("/dev-basic")
+    public ResponseEntity<FolioDetailDto> saveDevBasic(
+            @RequestBody FolioStateSaveRequest req,
+            Principal principal
+    ) {
+        if (principal == null) return ResponseEntity.status(403).build();
+        Folio saved = folioService.saveState(principal, req);
+        return ResponseEntity.ok(new FolioDetailDto(saved));
+    }
 }

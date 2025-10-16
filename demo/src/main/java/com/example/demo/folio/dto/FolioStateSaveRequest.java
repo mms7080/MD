@@ -1,5 +1,7 @@
 package com.example.demo.folio.dto;
 
+import com.example.demo.folio.entity.Folio;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FolioStateSaveRequest {
-    private String template; // "dev-basic"
-    private String status;   // "DRAFT" or "PUBLISHED"
-    private String data;     // 프론트 state JSON string
+    private String template;      // "dev-basic"
+    private String contentJson;   // 프론트 state JSON.stringify
+    private Folio.Status status;  // optional: DRAFT/PUBLISHED
+    private String thumbnail;     // optional
 }

@@ -475,26 +475,93 @@ textarea {
 .full {
     width: 100%;
 }
+/* 화면용: hidden 속성 존재 시 숨김 */
+.slide[hidden] {
+    display: none !important;
+}
 
+/* -------------------- PRINT ONLY -------------------- */
 @media print {
     @page {
         size: 1280px 720px;
         margin: 0;
     }
+
+    html,
+    body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
     .top,
-    aside {
+    aside,
+    .navArrow {
         display: none !important;
     }
-    .stage {
-        padding: 0;
+
+    .wrap {
+        display: block !important;
+        grid-template-columns: none !important;
+        height: auto !important;
     }
+
+    .stage {
+        display: block !important;
+        padding: 0 !important;
+        height: auto !important;
+    }
+
+    /* ✅ 프린트 시에만 모든 슬라이드 보이게 */
     .slide {
-        box-shadow: none;
-        border-radius: 0;
-        width: 100vw;
-        height: 56.25vw;
+        display: block !important; /* hidden 덮어쓰기 */
+        position: relative !important;
+        margin: 0 auto !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        width: 1280px !important;
+        height: 720px !important;
+        page-break-before: always !important;
+        page-break-after: always !important;
+        page-break-inside: avoid !important;
+        break-before: page !important;
+        break-after: page !important;
+        break-inside: avoid-page !important;
+    }
+
+    .slide:first-of-type {
+        page-break-before: avoid !important;
+        break-before: avoid !important;
+    }
+
+    .slide:last-of-type {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+
+    /* p1 레이아웃 고정 */
+    .slide.p1 .pad {
+        position: absolute !important;
+        inset: 36px 48px !important;
+    }
+
+    .slide.p1 .head {
+        display: grid !important;
+        grid-template-columns: 450px 1fr !important;
+        margin-left: 30px !important;
+        margin-top: 60px !important;
+    }
+
+    /* 나머지 슬라이드 패딩 */
+    .slide:not(.p1) .pad {
+        position: absolute !important;
+        inset: 48px 64px !important;
     }
 }
+
 /* ── stage 네비게이션 화살표 ── */
 .stage {
     position: relative;

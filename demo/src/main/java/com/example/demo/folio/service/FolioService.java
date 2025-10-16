@@ -11,7 +11,9 @@ import com.example.demo.portfolios.service.PortfolioService;
 import com.example.demo.users.UsersEntity.DeleteStatus;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
+import com.example.demo.users.UsersService.UsersService;
 import com.example.demo.folio.dto.FolioRequestDto;
+import com.example.demo.folio.dto.FolioStateSaveRequest;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -35,6 +37,7 @@ public class FolioService {
     // 임시로 PortfoliosController의 데이터를 사용
     private final PortfoliosController portfoliosController;
     private final PortfolioService portfolioService;
+    private final UsersService UsersService;
 
     public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
         Page<Folio> folioPage = folioRepository.findAll(pageable);
@@ -78,6 +81,27 @@ public class FolioService {
         } else {
             folio.setThumbnail("https://picsum.photos/seed/default/300");
         }
+
+        folio.setContentJson("{}");
+        return folioRepository.save(folio);
+    }
+
+    /** PPT 에디터 전체 상태 저장(JSON 통짜) */
+    @Transactional
+    public Folio saveState(Principal principal, FolioStateSaveRequest req) {
+        Users user = UsersService.getUserByUsername(principal.getName()); // ← 인스턴스 메서드
+
+        // 한 유저당 하나만 쓰려면 findByUserId(...)
+        // 템플릿별 1개라면 findByUserIdAndTemplate(...) 메서드 만들어서 사용 추천
+        Folio folio = folioRepository.findByUserId(user.getId())
+                .orElse(new Folio());
+
+        folio.setUser(user);
+        folio.setTemplate(req.getTemplate() != null ? req.getTemplate() : "dev-basic");
+        folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
+
+        if (req.getStatus() != null) folio.setStatus(req.getStatus());
+        if (req.getThumbnail() != null) folio.setThumbnail(req.getThumbnail());
 
         return folioRepository.save(folio);
     }

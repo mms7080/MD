@@ -8,7 +8,7 @@ import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "folio")
 public class Folio {
-    
+
     @Id
     @UuidGenerator
     private String id;
@@ -26,20 +26,22 @@ public class Folio {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    // ── 신규: 어떤 템플릿으로 만든 건지 (예: "dev-basic")
     @Column(length = 50, nullable = false)
     private String template = "dev-basic";
 
-    // ── 신규: DRAFT / PUBLISHED
+    public enum Status { DRAFT, PUBLISHED }
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20, nullable = false)
     private Status status = Status.DRAFT;
 
-    // ── 신규: PPT 편집기의 전체 state JSON (프론트 state 그대로)
-    // PostgreSQL이면 jsonb, 그 외 DB면 TEXT/CLOB 권장
+    // PPT 에디터 전체 상태
     @Lob
-    @Column(name = "data_json", columnDefinition = "CLOB", nullable = false)
-    private String data;  // 프론트 state JSON
+    @Column(name = "content_json", nullable = false)
+    private String contentJson;
+
+    // 아래 메타/보조 필드들은 유지해도 됨(목록/검색용)
+    private String thumbnail;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "folio_skills", joinColumns = @JoinColumn(name = "folio_id"))
@@ -47,12 +49,8 @@ public class Folio {
     private List<String> skills = new ArrayList<>();
 
     @Lob
-    @Column(columnDefinition = "CLOB")
     private String introduction;
 
-    private String thumbnail;
-
-    
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "folio_photos", joinColumns = @JoinColumn(name = "folio_id"))
     @Column(name = "photo_url")
@@ -65,11 +63,8 @@ public class Folio {
 
     @CreationTimestamp
     @Column(updatable = false)
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    private Instant updateAt;
-
-    public enum Status {DRAFT, PUBLISHED}
-    
+    private LocalDateTime updatedAt; 
 }

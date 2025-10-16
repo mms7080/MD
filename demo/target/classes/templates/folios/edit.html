@@ -3,9 +3,12 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
         <link rel="stylesheet" href="/css/folios/edit.css" />
         <script defer th:src="@{/js/folios/edit.js}"></script>
-        <title>개발자 포트폴리오 – 기본 템플릿</title>
+        <title>포트폴리오 – 기본 템플릿</title>
     </head>
     <body class="scrollbar-hidden">
         <div class="top">
@@ -20,6 +23,7 @@
             <div class="nav">
                 <button id="btnSave" class="btn">임시저장</button>
                 <button id="btnLoad" class="btn">불러오기</button>
+                <button id="btnUpload" class="btn primary">업로드</button>
                 <button id="btnPrint" class="btn primary">PDF로 저장</button>
             </div>
         </div>
