@@ -8,25 +8,6 @@
 <head>
     <meta name="_csrf" th:content="${_csrf?.token}" />
     <meta name="_csrf_header" th:content="${_csrf?.headerName}" />
-
-    <!-- ✅ 페이지 첫 페인트 전에 저장된 테마를 즉시 적용 (FOUC 방지) -->
-    <script>
-      (function () {
-        try {
-          var saved = localStorage.getItem('theme'); // 'light' | 'dark' | null
-          if (!saved) {
-            // 시스템 설정을 기본값으로
-            saved = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
-              ? 'light' : 'dark';
-          }
-          if (saved === 'light') {
-            document.documentElement.setAttribute('data-theme', 'light');
-          } else {
-            document.documentElement.removeAttribute('data-theme');
-          }
-        } catch (e) {}
-      })();
-    </script>
 </head>
 
 <th:block th:fragment="header(active)">
@@ -105,13 +86,13 @@
     </div>
   </header>
 
-  <!-- ✅ 추가 1: 모달 조각 포함 -->
+  <!-- 모달 조각 포함 -->
   <th:block th:replace="~{fragments/modals :: authModals}"></th:block>
 
-  <!-- ✅ 추가 2: 스크립트: 모달 자동 오픈 + 테마 토글 동기화 -->
+  <!-- 모달 자동 오픈 + 테마 토글(깜빡임 방지용 전환 제어 포함) -->
   <script>
     (function () {
-      /* --- 모달 오픈 (기존 유지) --- */
+      /* --- 모달 오픈 --- */
       var modal = new URLSearchParams(window.location.search).get('modal');
       if (modal === 'signin') {
         var r = document.getElementById('modal-signin');
@@ -121,42 +102,36 @@
         if (r2) r2.checked = true;
       }
 
-      /* --- ✅ 테마 토글 저장/복원 --- */
+      /* --- 테마 토글 저장/복원 --- */
       var cb = document.getElementById('themeToggle');
       if (!cb) return;
 
-      // 현재 문서 테마에 맞게 체크박스 초기화
-      var isLight = document.documentElement.getAttribute('data-theme') === 'light';
-      cb.checked = isLight;
+      // 저장값 우선 적용(레이아웃 스니펫이 없거나 늦을 때 대비)
+      var stored = null;
+      try { stored = localStorage.getItem('theme'); } catch(e) {}
+      if (stored === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else if (stored === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+      }
 
+      // 체크박스는 현재 테마와 강제 동기화
+      cb.checked = (document.documentElement.getAttribute('data-theme') === 'light');
+
+      // 변경 시: 전환은 사용자 토글 순간에만 활성화
       cb.addEventListener('change', function () {
-        var light = cb.checked;
-        if (light) {
-          document.documentElement.setAttribute('data-theme', 'light');
+        var root = document.documentElement;
+        root.classList.add('theme-anim');
+        setTimeout(function(){ root.classList.remove('theme-anim'); }, 300);
+
+        if (cb.checked) {
+          root.setAttribute('data-theme', 'light');
           try { localStorage.setItem('theme', 'light'); } catch (e) {}
         } else {
-          document.documentElement.removeAttribute('data-theme');
+          root.removeAttribute('data-theme');
           try { localStorage.setItem('theme', 'dark'); } catch (e) {}
         }
       });
-
-      // 시스템 테마 변경 감지(옵션): 사용자가 저장을 안 한 경우에만 동기화
-      try {
-        if (!localStorage.getItem('theme') && window.matchMedia) {
-          var mq = window.matchMedia('(prefers-color-scheme: light)');
-          mq.addEventListener('change', function (e) {
-            if (!localStorage.getItem('theme')) {
-              if (e.matches) {
-                document.documentElement.setAttribute('data-theme', 'light');
-                cb.checked = true;
-              } else {
-                document.documentElement.removeAttribute('data-theme');
-                cb.checked = false;
-              }
-            }
-          });
-        }
-      } catch (e) {}
     })();
   </script>
 </th:block>

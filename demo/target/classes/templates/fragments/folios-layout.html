@@ -8,11 +8,11 @@
   <meta name="_csrf" th:content="${_csrf?.token}" />
   <meta name="_csrf_header" th:content="${_csrf?.headerName}" />
 
-  <!-- ✅ 첫 페인트 전에 저장된 테마 적용 (CSS보다 먼저) -->
+  <!-- ✅ 첫 페인트 전에 저장된 테마 적용 (CSS보다 반드시 앞) -->
   <script>
     (function () {
       try {
-        var saved = localStorage.getItem('theme');
+        var saved = localStorage.getItem('theme'); // 'light' | 'dark' | null
         if (!saved) {
           saved = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)
                   ? 'light' : 'dark';
@@ -20,11 +20,18 @@
         if (saved === 'light') {
           document.documentElement.setAttribute('data-theme', 'light');
         } else {
-          document.documentElement.removeAttribute('data-theme');
+          document.documentElement.removeAttribute('data-theme'); // 기본: 다크
         }
       } catch (e) {}
     })();
   </script>
+
+  <!-- ✅ 크리티컬 배경: CSS 로드 전에도 정확히 칠하기 (깜빡임 방지) -->
+  <meta name="color-scheme" content="dark light">
+  <style>
+    html { background: #0f1114; }
+    html[data-theme="light"] { background: #f8fafc; }
+  </style>
 
   <!-- 공통 CSS -->
   <link th:href="@{/css/header.css}" rel="stylesheet" />

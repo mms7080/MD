@@ -45,12 +45,23 @@ body {
     -ms-overflow-style: none; /* IE/Edge */
     scrollbar-width: none; /* Firefox */
 }
+
+/* ✅ 초기 플래시 방지: html에도 배경 지정 */
+html { background: var(--bg); }
+
 body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
+    /* ❌ 기본 전환 제거: 첫 페인트/페이지 이동 시 깜빡임 예방 */
+    /* transition: background 0.2s ease, color 0.2s ease; */
+}
+
+/* ✅ 전환은 사용자 토글 때만 (root에 .theme-anim 붙는 동안) */
+.theme-anim body {
     transition: background 0.2s ease, color 0.2s ease;
 }
+
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
     display: none; /* Chrome/Safari */
