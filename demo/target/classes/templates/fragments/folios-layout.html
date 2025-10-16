@@ -1,37 +1,68 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout (pageTitle, activeMenu, content, css, js)">
+<head>
+  <meta charset="utf-8" />
+  <title th:text="|kafolio – ${pageTitle}|">kafolio</title>
+
+  <meta name="_csrf" th:content="${_csrf?.token}" />
+  <meta name="_csrf_header" th:content="${_csrf?.headerName}" />
+
+  <!-- ✅ 첫 페인트 전에 저장된 테마 적용 (CSS보다 반드시 앞) -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme'); // 'light' | 'dark' | null
+        if (!saved) {
+          saved = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)
+                  ? 'light' : 'dark';
+        }
+        if (saved === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+          document.documentElement.removeAttribute('data-theme'); // 기본: 다크
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- ✅ 크리티컬 배경: CSS 로드 전에도 정확히 칠하기 (깜빡임 방지) -->
+  <meta name="color-scheme" content="dark light">
+  <style>
+    html { background: #0f1114; }
+    html[data-theme="light"] { background: #f8fafc; }
+  </style>
+
+  <!-- 공통 CSS -->
+  <link th:href="@{/css/header.css}" rel="stylesheet" />
+  <link th:href="@{/css/footer.css}" rel="stylesheet" />
+  <link th:href="@{/css/users/auth-modal.css}" rel="stylesheet" />
+  <link th:href="@{/css/folios/layout.css}" rel="stylesheet" />
+
+  <!-- 페이지 전용 CSS 슬롯 -->
+  <th:block th:replace="${css} ?: ~{}"></th:block>
+</head>
+
 <body>
-  <th:block th:fragment="layout (pageTitle, activeMenu, content, css, js)">
-    <html lang="ko" data-theme="dark">
-      <head>
-        <meta charset="utf-8" />
-    <title th:text="|kafolio – ${pageTitle}|">kafolio</title>
+  <!-- 공통 헤더 -->
+  <div th:replace="~{fragments/header :: header('folio')}"></div>
 
-    <meta name="_csrf" th:content="${_csrf?.token}" />
-    <meta name="_csrf_header" th:content="${_csrf?.headerName}" />
+  <div class="folios-shell">
+    <main class="folios-content" th:replace="${content}"></main>
 
-    <link th:href="@{/css/header.css}" rel="stylesheet" />
-    <link th:href="@{/css/footer.css}" rel="stylesheet" />
-    <link th:href="@{/css/users/auth-modal.css}" rel="stylesheet" />
-    <link th:href="@{/css/folios/layout.css}" rel="stylesheet" />
-    <th:block th:replace="${css} ?: ~{}"></th:block>
-      </head>
-      <body>
-        <div th:replace="~{fragments/header :: header('folio')}"></div>
-        <div class="folios-shell">
-          <main class="folios-content" th:replace="${content}"></main>
-          <aside class="folios-sidebar">
-            <nav class="folios-menu">
-              <a th:href="@{/folios}" th:classappend="${activeMenu == 'list'} ? 'is-active'">🗂️ Folios 둘러보기</a>
-              <a th:href="@{/folios/write}" th:classappend="${activeMenu == 'write'} ? 'is-active'">✨ Folio 새로 만들기</a>
-              <a th:href="@{/folios/append}" th:classappend="${activeMenu == 'append'} ? 'is-active'">🛠️ 템플릿 관리 (Admin)</a>
-            </nav>
-          </aside>
-        </div>
-        <div th:replace="~{fragments/footer :: footer}"></div>
-        <th:block th:replace="${js} ?: ~{}"></th:block>
-      </body>
-    </html>
-  </th:block>
+    <aside class="folios-sidebar">
+      <nav class="folios-menu">
+        <a th:href="@{/folios}"        th:classappend="${activeMenu == 'list'}   ? 'is-active'">🗂️ Folios 둘러보기</a>
+        <a th:href="@{/folios/write}"  th:classappend="${activeMenu == 'write'}  ? 'is-active'">✨ Folio 새로 만들기</a>
+        <a th:href="@{/folios/append}" th:classappend="${activeMenu == 'append'} ? 'is-active'">🛠️ 템플릿 관리 (Admin)</a>
+      </nav>
+    </aside>
+  </div>
+
+  <!-- 공통 푸터 -->
+  <div th:replace="~{fragments/footer :: footer}"></div>
+
+  <!-- 페이지 전용 JS 슬롯 -->
+  <th:block th:replace="${js} ?: ~{}"></th:block>
 </body>
 </html>
