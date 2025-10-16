@@ -55,4 +55,18 @@ public class TeamMemberEntity {
         this.memberRole = memberRole;
         this.parts = parts;
     }
+
+    @Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof TeamMemberEntity)) return false;
+    return id != null && id.equals(((TeamMemberEntity) o).getId());
+}
+
+@Override
+public int hashCode() {
+    return getClass().hashCode();
+}
+
+
 }

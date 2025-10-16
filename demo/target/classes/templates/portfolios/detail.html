@@ -180,8 +180,11 @@
                     </div>
 
 
-                    <!-- 좋아요 카운트 -->
-                    <span id="likeCount" th:text="${portfolio.likes}">0</span>
+                    <!-- ❤️ 좋아요 개수 표시 -->
+<span class="like-box" title="좋아요 수">
+    <i class="fa-solid fa-heart"></i>
+    <span id="likeCount" th:text="${#lists.size(portfolio.likes)}">0</span>
+</span>
                 
 
 

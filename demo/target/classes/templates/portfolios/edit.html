@@ -17,6 +17,8 @@
 
   <form th:action="@{|/portfolios/${portfolioId}/edit|}"
         method="post" enctype="multipart/form-data">
+   <!-- ✅ CSRF 토큰 반드시 포함 -->
+   <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
 
     <!-- 제목 -->
     <label>제목</label>
@@ -82,17 +84,25 @@
     <input type="file" name="icon" id="icon-input" accept=".jpg,.jpeg,.png,.webp" />
     <div id="icon-preview" class="icon-preview"></div>
 
-    <!-- 태그 -->
-    <label>태그</label>
-    <div class="tag-input-box">
-      <input type="text" id="tag-input" placeholder="예: React" />
-      <button type="button" onclick="addTag()">+ 추가</button>
-    </div>
-    <div id="tag-list">
-      <div th:each="tag : ${portfolioFormDto.tags}" class="tag-item" th:text="${tag}"></div>
-    </div>
-    
-    <div id="tags-hidden-box"></div>
+<!-- ✅ 태그 입력/관리 영역 -->
+<label>태그</label>
+<div class="tag-input-box">
+  <input type="text" id="tag-input" placeholder="예: React" />
+  <button type="button" onclick="addTag()">+ 추가</button>
+</div>
+
+<!-- ✅ 기존 태그 목록 (클릭으로 삭제 가능) -->
+<div id="tag-list" th:if="${portfolioFormDto.tags != null and !portfolioFormDto.tags.isEmpty()}">
+  <div th:each="tag : ${portfolioFormDto.tags}" 
+       class="tag-item"
+       th:text="${tag != null ? tag : ''}"
+       onclick="removeTag(this)">
+  </div>
+</div>
+
+<!-- ✅ JavaScript가 hidden input을 채워 넣는 영역 -->
+<div id="tags-hidden-box"></div>
+
 
     <!-- ZIP -->
     <label>다운로드 ZIP 파일</label>

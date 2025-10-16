@@ -29,6 +29,7 @@ public class SecurityConfig {
       .ignoringRequestMatchers("/api/send-code"))
 
             .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/portfolios/*/edit","/portfolios/*/create").authenticated()
                 .requestMatchers(
                     "/", "/main",
                     "/signin",

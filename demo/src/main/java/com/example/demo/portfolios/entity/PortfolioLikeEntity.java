@@ -25,4 +25,17 @@ public class PortfolioLikeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
+
+    @Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof TeamMemberEntity)) return false;
+    return id != null && id.equals(((TeamMemberEntity) o).getId());
+}
+
+@Override
+public int hashCode() {
+    return getClass().hashCode();
+}
+
 }

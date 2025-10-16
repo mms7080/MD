@@ -9,8 +9,10 @@ import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,6 +41,15 @@ public class PortfolioService {
     private final PortfolioCommentRepository commentRepository;
     private final PortfolioLikeRepository likeRepository;
     private final UsersRepository usersRepository;
+
+    /**
+     * ✅ 리스트 페이지용 — LazyInitialization 방지용 트랜잭션 유지
+     */
+    @Transactional(readOnly = true)
+    public List<PortfoliosEntity> getAllPortfolios(org.springframework.data.domain.Pageable pageable) {
+        return repository.findAllBasic(pageable).getContent(); // ✅ EntityGraph로 미리 로드됨
+    }
+
     /**
      * 파일 저장 (이미지/ZIP 구분)
      */
@@ -64,13 +75,11 @@ public class PortfolioService {
             }
         }
 
-        // ✅ 프로젝트 내부 static/uploads/ 경로
         Path uploadPath = Paths.get(System.getProperty("user.dir"), "uploads");
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        // 파일명에 UUID 붙이기
         String filename = UUID.randomUUID() + "_" + originalName;
         Path filePath = uploadPath.resolve(filename);
 
@@ -78,7 +87,6 @@ public class PortfolioService {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
 
-        // ✅ DB에는 /uploads/filename 으로 저장
         return "/uploads/" + filename;
     }
 
@@ -89,13 +97,12 @@ public class PortfolioService {
     public void saveFromDto(PortfolioFormDto dto, String coverPath, String iconPath, String downloadPath) {
         String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        // ✅ 스크린샷 파일 저장 (MultipartFile → String 경로 리스트)
         List<String> screenshotPaths = dto.getScreenshots() != null
             ? dto.getScreenshots().stream()
                 .filter(file -> file != null && !file.isEmpty())
                 .map(file -> {
                     try {
-                        return saveFile(file, "image"); // 파일 저장 후 경로 반환
+                        return saveFile(file, "image");
                     } catch (IOException e) {
                         throw new RuntimeException("스크린샷 저장 실패", e);
                     }
@@ -103,7 +110,6 @@ public class PortfolioService {
                 .toList()
             : java.util.Collections.emptyList();
 
-        // ✅ 부모 엔티티 생성
         PortfoliosEntity entity = PortfoliosEntity.builder()
             .title(dto.getTitle())
             .creator(currentUser)
@@ -114,12 +120,11 @@ public class PortfolioService {
             .icon(iconPath)
             .link(dto.getLink())
             .download(downloadPath)
-            .likes(0)
+            .likes(new LinkedHashSet<>())
             .createdAt(LocalDateTime.now())
-            .teamName(dto.getTeamName()) // ✅ 팀명은 부모에 한 번만 저장
+            .teamName(dto.getTeamName())
             .build();
 
-        // ✅ 팀원 리스트 (teamName 제거됨)
         var team = dto.getTeam().stream()
             .map(t -> {
                 TeamMemberEntity member = new TeamMemberEntity(
@@ -133,7 +138,6 @@ public class PortfolioService {
             .toList();
 
         entity.setTeam(team);
-
         repository.save(entity);
     }
 
@@ -143,196 +147,167 @@ public class PortfolioService {
             .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
     }
 
-    // 삭제
     @Transactional
     public void deletePortfolio(Long id) {
         PortfoliosEntity portfolio = repository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 존재하지 않습니다. id=" + id));
 
-            commentRepository.deleteByPortfolioId(id);
-
-        repository.delete(portfolio);  // ✅ Cascade 때문에 팀원/태그/스크린샷도 자동 삭제
+        commentRepository.deleteByPortfolioId(id);
+        repository.delete(portfolio);
     }
-
 
     @Transactional
-public PortfoliosEntity increaseViewCount(Long id) {
-    PortfoliosEntity portfolio = repository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
+    public PortfoliosEntity increaseViewCount(Long id) {
+        PortfoliosEntity portfolio = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
 
-    // ✅ null 방어
-    if (portfolio.getViewCount() == null) {
-        portfolio.setViewCount(0);
-    }
-
-    portfolio.setViewCount(portfolio.getViewCount() + 1);
-    return repository.save(portfolio);
-}
-
-
-// 수정
-// 수정 처리
-@Transactional
-public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
-    PortfoliosEntity portfolio = getPortfolioWithTeam(id);
-
-    // ===== 일반 필드 수정 =====
-    portfolio.setTitle(dto.getTitle());
-    portfolio.setDesc(dto.getDesc());
-    portfolio.setLink(dto.getLink());
-
-    // ===== 파일 수정 =====
-    if (dto.getCover() != null && !dto.getCover().isEmpty()) {
-        String coverPath = saveFile(dto.getCover(), "image");
-        portfolio.setCover(coverPath);
-    }
-    if (dto.getIcon() != null && !dto.getIcon().isEmpty()) {
-        String iconPath = saveFile(dto.getIcon(), "image");
-        portfolio.setIcon(iconPath);
-    }
-    if (dto.getDownload() != null && !dto.getDownload().isEmpty()) {
-        String downloadPath = saveFile(dto.getDownload(), "zip");
-        portfolio.setDownload(downloadPath);
-    }
-    // 스크린샷 업데이트
-    if (dto.getScreenshots() != null && !dto.getScreenshots().isEmpty()) {
-        List<String> screenshotPaths = new ArrayList<>();
-        for (MultipartFile file : dto.getScreenshots()) {
-            if (!file.isEmpty()) {
-                String path = saveFile(file, "image");
-                screenshotPaths.add(path);
-            }
+        if (portfolio.getViewCount() == null) {
+            portfolio.setViewCount(0);
         }
-        portfolio.setScreenshots(screenshotPaths);
+
+        portfolio.setViewCount(portfolio.getViewCount() + 1);
+        return repository.save(portfolio);
     }
 
-    // ===== 태그 수정 =====
-    if (dto.getTags() != null) {
-        portfolio.setTags(dto.getTags());
-    }
-
-    // ===== 팀원 수정 =====
-    List<TeamMemberEntity> existing = portfolio.getTeam();
-
-    // 1) 기존 컬렉션 비우기
-    existing.clear();
-
-    // 2) DTO 기반으로 다시 채우기
-    for (TeamMemberDto t : dto.getTeam()) {
-        TeamMemberEntity member;
-
-        if (t.getId() != null) {
-            // 기존 멤버를 찾을 필요가 없음 → 어차피 clear() 했으니까 새로 채워야 함
-            member = new TeamMemberEntity();
-            member.setId(t.getId()); // 필요하다면 유지
+    @Transactional
+    public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
+        // ✅ 수정 전용 쿼리 (댓글/좋아요는 미포함)
+        PortfoliosEntity portfolio = repository.findForUpdate(id)
+                .orElseThrow(() -> new IllegalArgumentException("포트폴리오를 찾을 수 없습니다."));
+    
+        // ✅ 기본 텍스트 필드
+        portfolio.setTitle(dto.getTitle());
+        portfolio.setDesc(dto.getDesc());
+        portfolio.setLink(dto.getLink());
+        portfolio.setTeamName(dto.getTeamName());
+    
+        /* ---------------------------
+            ✅ 파일 관련 항목 (빈 값일 경우 기존 유지)
+        --------------------------- */
+    
+        // 대표 이미지
+        if (dto.getCover() != null && !dto.getCover().isEmpty()) {
+            // 새 이미지 업로드한 경우
+            portfolio.setCover(saveFile(dto.getCover(), "image"));
         } else {
-            member = new TeamMemberEntity();
+            // 기존 이미지 유지
+            portfolio.setCover(portfolio.getCover());
         }
+    
+        // 아이콘
+        if (dto.getIcon() != null && !dto.getIcon().isEmpty()) {
+            portfolio.setIcon(saveFile(dto.getIcon(), "image"));
+        } else {
+            portfolio.setIcon(portfolio.getIcon());
+        }
+    
+        // ZIP 파일
+        if (dto.getDownload() != null && !dto.getDownload().isEmpty()) {
+            portfolio.setDownload(saveFile(dto.getDownload(), "zip"));
+        } else {
+            portfolio.setDownload(portfolio.getDownload());
+        }
+    
+        // ✅ 스크린샷 (비었으면 기존 이미지 유지)
+        if (dto.getScreenshots() != null && !dto.getScreenshots().isEmpty()) {
+            List<String> screenshotPaths = new ArrayList<>();
+            for (MultipartFile file : dto.getScreenshots()) {
+                if (!file.isEmpty()) {
+                    screenshotPaths.add(saveFile(file, "image"));
+                }
+            }
+            portfolio.setScreenshots(screenshotPaths);
+        } else {
+            portfolio.setScreenshots(portfolio.getScreenshots());
+        }
+    
+            // ✅ 태그 병합 로직
+    if (dto.getTags() != null && !dto.getTags().isEmpty()) {
+        // 기존 태그 가져오기 (null-safe)
+        Set<String> existingTags = portfolio.getTags() != null
+                ? new LinkedHashSet<>(portfolio.getTags())
+                : new LinkedHashSet<>();
 
-        member.setMemberName(t.getMemberName());
-        member.setMemberRole(t.getMemberRole());
-        member.setParts(t.getParts());
-        member.setPortfolio(portfolio); // FK 연결
-        existing.add(member);
+        // 새로 입력된 태그 합치기
+        existingTags.addAll(dto.getTags());
+
+        // 병합 결과 다시 세팅
+        portfolio.setTags(existingTags);
     }
-
-    // repository.save(portfolio) 는 @Transactional 이라면 없어도 flush 됨
-    repository.save(portfolio);
-}
+    
+        /* ---------------------------
+            ✅ 팀원 갱신
+        --------------------------- */
+        if (dto.getTeam() != null && !dto.getTeam().isEmpty()) {
+            List<TeamMemberEntity> existing = portfolio.getTeam();
+            existing.clear();
+    
+            for (TeamMemberDto t : dto.getTeam()) {
+                TeamMemberEntity member = new TeamMemberEntity();
+                member.setMemberName(t.getMemberName());
+                member.setMemberRole(t.getMemberRole());
+                member.setParts(t.getParts());
+                member.setPortfolio(portfolio);
+                existing.add(member);
+            }
+        } else {
+            portfolio.setTeam(portfolio.getTeam()); // 기존 팀 유지
+        }
+    
+        repository.save(portfolio);
+    }
+    
 
 
 @Transactional(readOnly = true)
 public PortfolioFormDto getPortfolioForm(Long id) {
-    PortfoliosEntity portfolio = repository.findDetailById(id)
-        .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음: " + id));
-    return PortfolioFormDto.formEntityDto(portfolio); // 세션이 살아있으니 LAZY 초기화됨
+    // ✅ 기존: findDetailById() → comments, screenshots 둘 다 fetch
+    // ❌ 변경: 수정용으로 fetch 줄이기
+    PortfoliosEntity entity = repository.findForUpdate(id)
+            .orElseThrow(() -> new IllegalArgumentException("포트폴리오를 찾을 수 없습니다."));
+
+    return PortfolioFormDto.formEntityDto(entity);
 }
 
 
-//  좋아요 버튼
-@Transactional
-    public int likePortfolio(Long id) {
-        repository.increaseLikes(id);
-        return repository.findById(id)
-                         .map(PortfoliosEntity::getLikes)
-                         .orElse(0);
-    }
-
     @Transactional
-    public int unlikePortfolio(Long id) {
-        repository.decreaseLikes(id);
-        return repository.findById(id)
-                         .map(PortfoliosEntity::getLikes)
-                         .orElse(0);
-    }
-
-
-    @Transactional
-    public int toggleLike(Long portfolioId, Principal principal) {
-        // ✅ 사용자 정보 가져오기
+    public int toggleLike(Long id, Principal principal) {
         Users user = usersRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
-
-        // ✅ 포트폴리오 정보 가져오기
-        PortfoliosEntity portfolio = repository.findById(portfolioId)
-                .orElseThrow(() -> new IllegalArgumentException("포트폴리오 없음"));
-
-        // ✅ 이미 좋아요 눌렀는지 확인
-        Optional<PortfolioLikeEntity> existing = likeRepository.findByPortfolioAndUser(portfolio, user);
-
-        if (existing.isPresent()) {
-            // 이미 눌렀으면 취소
-            likeRepository.delete(existing.get());
-            portfolio.setLikes(Math.max(portfolio.getLikes() - 1, 0));
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        PortfoliosEntity portfolio = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("포트폴리오를 찾을 수 없습니다."));
+    
+        Optional<PortfolioLikeEntity> existingLike = likeRepository.findByPortfolioAndUser(portfolio, user);
+    
+        if (existingLike.isPresent()) {
+            // ✅ 이미 좋아요 눌렀으면 취소
+            likeRepository.delete(existingLike.get());
         } else {
-            // 처음 누른 경우
+            // ✅ 좋아요 추가
             PortfolioLikeEntity like = new PortfolioLikeEntity();
             like.setPortfolio(portfolio);
             like.setUser(user);
             likeRepository.save(like);
-            portfolio.setLikes(portfolio.getLikes() + 1);
         }
-
-        repository.save(portfolio);
-        return portfolio.getLikes();
+    
+        // ✅ 즉시 반영된 좋아요 개수 반환
+        return likeRepository.countByPortfolio(portfolio);
     }
+    
 
 
-
-    /**
- * 상세 페이지용 포트폴리오 조회 (댓글, 팀, 스크린샷 포함)
- * - MultipleBagFetchException 방지
- * - 순서 유지(List)
- */
-@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
 public PortfoliosEntity getPortfolioDetail(Long id) {
     PortfoliosEntity portfolio = repository.findById(id)
         .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
 
-    // 💡 Lazy 로딩된 모든 컬렉션 초기화
+    // ✅ Lazy 초기화 강제 (트랜잭션 내에서 미리 로드)
     portfolio.getScreenshots().size();
-    portfolio.getComments().size();
     portfolio.getTeam().size();
     portfolio.getTags().size();
+    portfolio.getLikes().size();
+    portfolio.getComments().size();
 
     return portfolio;
 }
-
-
-
-
-    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

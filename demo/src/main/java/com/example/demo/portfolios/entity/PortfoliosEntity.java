@@ -51,16 +51,16 @@ public class PortfoliosEntity {
 
     // ✅ 태그 (Set)
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(
-        name = "portfolio_tags",
-        joinColumns = @JoinColumn(name = "portfolio_id")
-    )
-    @Column(name = "tag", nullable = false)
-    @Fetch(FetchMode.SUBSELECT)
-    private Set<String> tags = new LinkedHashSet<>();
+@CollectionTable(
+    name = "portfolio_tags",
+    joinColumns = @JoinColumn(name = "portfolio_id")
+)
+@Column(name = "tag", nullable = false)
+@Fetch(FetchMode.SUBSELECT)
+private Set<String> tags = new LinkedHashSet<>();
 
-    @Column(name="p_likes")
-    private Integer likes = 0;
+@OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+private Set<PortfolioLikeEntity> likes ;
 
     @Column(name="p_createdAt")
     private LocalDateTime createdAt;
@@ -110,4 +110,9 @@ public class PortfoliosEntity {
     @Column(name="p_is_public", nullable = false)
     @Builder.Default
     private Boolean isPublic = true; // true = 공개, false = 비공개 (ADMIN만)
-}
+
+    public int getLikeCount(){
+        return likes != null ? likes.size() : 0 ;
+    }
+    
+    }

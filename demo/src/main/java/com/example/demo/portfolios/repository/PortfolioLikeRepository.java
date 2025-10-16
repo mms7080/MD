@@ -8,5 +8,7 @@ import com.example.demo.users.UsersEntity.Users;
 
 public interface PortfolioLikeRepository extends JpaRepository<PortfolioLikeEntity, Long> {
     Optional<PortfolioLikeEntity> findByPortfolioAndUser(PortfoliosEntity portfolio, Users user);
-    long countByPortfolio(PortfoliosEntity portfolio);
+    int countByPortfolio(PortfoliosEntity portfolio);
+
+    
 }

@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,7 +48,12 @@ public class PortfolioFormDto {
     public static PortfolioFormDto formEntityDto(PortfoliosEntity entity){
         return PortfolioFormDto.builder()
             .title(entity.getTitle())
-            .tags(entity.getTags() != null ? entity.getTags() : Set.of()) // ✅ null 방지
+            .tags(entity.getTags() != null 
+                ? entity.getTags()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(LinkedHashSet::new))
+                : Set.of())
             .coverPath(entity.getCover())
             .desc(entity.getDesc())
             .screenshotPaths(

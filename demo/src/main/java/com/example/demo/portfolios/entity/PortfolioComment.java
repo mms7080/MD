@@ -46,4 +46,18 @@ public class PortfolioComment {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PortfolioComment)) return false;
+        PortfolioComment that = (PortfolioComment) o;
+        return id != null && id.equals(that.getId());
+    }
+    
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+    
+    
 }
