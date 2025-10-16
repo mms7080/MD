@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const state = {
         meta: { year: new Date().getFullYear() },
         intro: {
-            title: "김개발 / Backend Developer",
+            title: "“사용자 성장에 맞춰 확장되는 백엔드를 설계합니다.”",
             name: "Kim Dev",
             birth: "1996-07-15",
             city: "Seoul, Korea",
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const forms = {
         1: () => `
         <div class="panel"><h3>소개</h3>
-          <div class="row"><label>이름/타이틀</label><input class="inpt" data-model="intro.title" value="${state.intro.title}"></div>
+          <div class="row"><label>타이틀</label><input class="inpt" data-model="intro.title" value="${state.intro.title}"></div>
           <div class="two">
             <div class="row"><label>이름(footer)</label><input class="inpt" data-model="intro.name" value="${state.intro.name}"></div>
             <div class="row"><label>생년월일</label><input class="inpt" data-model="intro.birth" value="${state.intro.birth}"></div>
