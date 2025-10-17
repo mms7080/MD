@@ -121,17 +121,20 @@
                       </span>
 
                     <!-- Tags -->
-<span class="tags-box" title="태그">
-    <i class="fa-solid fa-tags"></i>
-    <span class="tags-label">Tags :</span>
-    <span class="tags-list">
-      <a th:each="tag : ${portfolio.tags}"
-         th:href="@{|/portfolios?tag=${tag}|}" 
-         class="tag-item"
-         th:text="${tag}">Tag</a>
-    </span>
-    <button type="button" class="tag-more-btn" onclick="toggleTags(this)" data-expanded="false">+ 더보기</button>
-  </span>
+                    <div class="tags-box" title="태그">
+                        <i class="fa-solid fa-tags"></i>
+                        <span class="tags-label">Tags :</span>
+                      
+                        <!-- ✅ 실제 태그 리스트 -->
+                        <div class="tags-list">
+                          <a th:each="tag : ${portfolio.tags}"
+                             th:href="@{|/portfolios?tag=${tag}|}" 
+                             class="tag-item"
+                             th:text="${tag}">Tag</a>
+                        </div>
+                      
+                        <button type="button" class="tag-more-btn" onclick="toggleTags(this)" data-expanded="false">+ 더보기</button>
+                      </div>
                       
                       
 

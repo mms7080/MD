@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -90,30 +92,67 @@ public class PortfolioService {
         return "/uploads/" + filename;
     }
 
-    /**
-     * DB 저장 메서드
-     */
     @Transactional
     public void saveFromDto(PortfolioFormDto dto, String coverPath, String iconPath, String downloadPath) {
         String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+    
+        // ✅ 폴더명 자동 변환 (한글 → 영어 대응)
+        String folderName = (dto.getTeamName() != null && !dto.getTeamName().isBlank())
+                ? normalizeFolderName(dto.getTeamName())
+                : normalizeFolderName(dto.getTitle());
+    
+        /* 1️⃣ 대표 이미지 (cover) */
+        if (coverPath == null || coverPath.isBlank()) {
+            String staticCover = findStaticFile(folderName, "cover");
+            if (staticCover != null) coverPath = staticCover;
+        }
+    
+        /* 2️⃣ 아이콘 (icon) */
+        if (iconPath == null || iconPath.isBlank()) {
+            String staticIcon = findStaticFile(folderName, "icon");
+            if (staticIcon != null) iconPath = staticIcon;
+        }
+    
+       /* ======================================================
+   ✅ 3️⃣ 스크린샷 (screenshots)
+   ====================================================== */
+List<String> screenshotPaths = new ArrayList<>();
 
-        List<String> screenshotPaths = dto.getScreenshots() != null
-            ? dto.getScreenshots().stream()
-                .filter(file -> file != null && !file.isEmpty())
-                .map(file -> {
-                    try {
-                        return saveFile(file, "image");
-                    } catch (IOException e) {
-                        throw new RuntimeException("스크린샷 저장 실패", e);
-                    }
-                })
-                .toList()
-            : java.util.Collections.emptyList();
+boolean hasUploadedScreenshots = (dto.getScreenshots() != null) &&
+        dto.getScreenshots().stream().anyMatch(f -> f != null && !f.isEmpty());
 
+if (hasUploadedScreenshots) {
+    // ✅ 새로 업로드된 스크린샷이 있는 경우
+    screenshotPaths = dto.getScreenshots().stream()
+        .filter(file -> file != null && !file.isEmpty())
+        .map(file -> {
+            try {
+                return saveFile(file, "image");
+            } catch (IOException e) {
+                throw new RuntimeException("스크린샷 저장 실패", e);
+            }
+        })
+        .toList();
+} else {
+    // ✅ 업로드가 아예 없을 경우 → 정적 이미지 자동 불러오기
+    List<String> staticScreens = loadStaticScreenshots(folderName);
+    if (!staticScreens.isEmpty()) {
+        screenshotPaths = staticScreens;
+        System.out.println("✅ 정적 스크린샷 자동 로드: " + staticScreens.size() + "개");
+    } else {
+        System.out.println("⚠️ 정적 스크린샷 없음: " + folderName);
+    }
+}
+
+    
+        /* 4️⃣ 태그 (null-safe) */
+        Set<String> safeTags = (dto.getTags() != null) ? dto.getTags() : new LinkedHashSet<>();
+    
+        /* 5️⃣ 엔티티 생성 */
         PortfoliosEntity entity = PortfoliosEntity.builder()
             .title(dto.getTitle())
             .creator(currentUser)
-            .tags(dto.getTags())
+            .tags(safeTags)
             .cover(coverPath)
             .desc(dto.getDesc())
             .screenshots(screenshotPaths)
@@ -124,22 +163,24 @@ public class PortfolioService {
             .createdAt(LocalDateTime.now())
             .teamName(dto.getTeamName())
             .build();
-
-        var team = dto.getTeam().stream()
-            .map(t -> {
+    
+        /* 6️⃣ 팀원 */
+        List<TeamMemberEntity> team = new ArrayList<>();
+        if (dto.getTeam() != null) {
+            for (TeamMemberDto t : dto.getTeam()) {
                 TeamMemberEntity member = new TeamMemberEntity(
-                        t.getMemberName(),
-                        t.getMemberRole(),
-                        t.getParts()
+                    t.getMemberName(), t.getMemberRole(), t.getParts()
                 );
                 member.setPortfolio(entity);
-                return member;
-            })
-            .toList();
-
+                team.add(member);
+            }
+        }
+    
         entity.setTeam(team);
         repository.save(entity);
     }
+    
+    
 
     @Transactional(readOnly = true)
     public PortfoliosEntity getPortfolioWithTeam(Long id) {
@@ -170,94 +211,114 @@ public class PortfolioService {
     }
 
     @Transactional
-    public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
-        // ✅ 수정 전용 쿼리 (댓글/좋아요는 미포함)
-        PortfoliosEntity portfolio = repository.findForUpdate(id)
-                .orElseThrow(() -> new IllegalArgumentException("포트폴리오를 찾을 수 없습니다."));
-    
-        // ✅ 기본 텍스트 필드
-        portfolio.setTitle(dto.getTitle());
-        portfolio.setDesc(dto.getDesc());
-        portfolio.setLink(dto.getLink());
-        portfolio.setTeamName(dto.getTeamName());
-    
-        /* ---------------------------
-            ✅ 파일 관련 항목 (빈 값일 경우 기존 유지)
-        --------------------------- */
-    
-        // 대표 이미지
-        if (dto.getCover() != null && !dto.getCover().isEmpty()) {
-            // 새 이미지 업로드한 경우
-            portfolio.setCover(saveFile(dto.getCover(), "image"));
-        } else {
-            // 기존 이미지 유지
-            portfolio.setCover(portfolio.getCover());
-        }
-    
-        // 아이콘
-        if (dto.getIcon() != null && !dto.getIcon().isEmpty()) {
-            portfolio.setIcon(saveFile(dto.getIcon(), "image"));
-        } else {
-            portfolio.setIcon(portfolio.getIcon());
-        }
-    
-        // ZIP 파일
-        if (dto.getDownload() != null && !dto.getDownload().isEmpty()) {
-            portfolio.setDownload(saveFile(dto.getDownload(), "zip"));
-        } else {
-            portfolio.setDownload(portfolio.getDownload());
-        }
-    
-        // ✅ 스크린샷 (비었으면 기존 이미지 유지)
-        if (dto.getScreenshots() != null && !dto.getScreenshots().isEmpty()) {
+public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
+    PortfoliosEntity portfolio = repository.findForUpdate(id)
+            .orElseThrow(() -> new IllegalArgumentException("포트폴리오를 찾을 수 없습니다."));
+
+    portfolio.setTitle(dto.getTitle());
+    portfolio.setDesc(dto.getDesc());
+    portfolio.setLink(dto.getLink());
+    portfolio.setTeamName(dto.getTeamName());
+
+    // ✅ 폴더명 자동 변환
+    String folderName = (dto.getTeamName() != null && !dto.getTeamName().isBlank())
+            ? normalizeFolderName(dto.getTeamName())
+            : normalizeFolderName(dto.getTitle());
+
+    /* 대표 이미지 */
+    if (dto.getCover() != null && !dto.getCover().isEmpty()) {
+        portfolio.setCover(saveFile(dto.getCover(), "image"));
+    } else {
+        String staticCover = findStaticFile(folderName, "cover");
+        if (staticCover != null) portfolio.setCover(staticCover);
+    }
+
+    /* 아이콘 */
+    if (dto.getIcon() != null && !dto.getIcon().isEmpty()) {
+        portfolio.setIcon(saveFile(dto.getIcon(), "image"));
+    } else {
+        String staticIcon = findStaticFile(folderName, "icon");
+        if (staticIcon != null) portfolio.setIcon(staticIcon);
+    }
+
+    /* ZIP 파일 */
+    if (dto.getDownload() != null && !dto.getDownload().isEmpty()) {
+        portfolio.setDownload(saveFile(dto.getDownload(), "zip"));
+    }
+
+    /* 스크린샷 */
+    if (dto.getScreenshots() != null) {
+        List<MultipartFile> nonEmptyScreenshots = dto.getScreenshots().stream()
+                .filter(f -> f != null && !f.isEmpty())
+                .toList();
+
+        if (!nonEmptyScreenshots.isEmpty()) {
             List<String> screenshotPaths = new ArrayList<>();
-            for (MultipartFile file : dto.getScreenshots()) {
-                if (!file.isEmpty()) {
-                    screenshotPaths.add(saveFile(file, "image"));
-                }
+            for (MultipartFile file : nonEmptyScreenshots) {
+                screenshotPaths.add(saveFile(file, "image"));
             }
             portfolio.setScreenshots(screenshotPaths);
         } else {
-            portfolio.setScreenshots(portfolio.getScreenshots());
+            List<String> staticScreens = loadStaticScreenshots(folderName);
+            if (!staticScreens.isEmpty()) portfolio.setScreenshots(staticScreens);
         }
-    
-            // ✅ 태그 병합 로직
-    if (dto.getTags() != null && !dto.getTags().isEmpty()) {
-        // 기존 태그 가져오기 (null-safe)
-        Set<String> existingTags = portfolio.getTags() != null
-                ? new LinkedHashSet<>(portfolio.getTags())
-                : new LinkedHashSet<>();
-
-        // 새로 입력된 태그 합치기
-        existingTags.addAll(dto.getTags());
-
-        // 병합 결과 다시 세팅
-        portfolio.setTags(existingTags);
     }
-    
-        /* ---------------------------
-            ✅ 팀원 갱신
-        --------------------------- */
-        if (dto.getTeam() != null && !dto.getTeam().isEmpty()) {
-            List<TeamMemberEntity> existing = portfolio.getTeam();
-            existing.clear();
-    
-            for (TeamMemberDto t : dto.getTeam()) {
-                TeamMemberEntity member = new TeamMemberEntity();
-                member.setMemberName(t.getMemberName());
-                member.setMemberRole(t.getMemberRole());
-                member.setParts(t.getParts());
-                member.setPortfolio(portfolio);
-                existing.add(member);
-            }
-        } else {
-            portfolio.setTeam(portfolio.getTeam()); // 기존 팀 유지
+
+    /* 태그 */
+    Set<String> safeTags = (dto.getTags() != null && !dto.getTags().isEmpty())
+            ? dto.getTags()
+            : (portfolio.getTags() != null ? portfolio.getTags() : new LinkedHashSet<>());
+    portfolio.setTags(safeTags);
+
+    /* 팀원 */
+    if (dto.getTeam() != null && !dto.getTeam().isEmpty()) {
+        List<TeamMemberEntity> existing = portfolio.getTeam();
+        existing.clear();
+        for (TeamMemberDto t : dto.getTeam()) {
+            TeamMemberEntity member = new TeamMemberEntity(
+                t.getMemberName(), t.getMemberRole(), t.getParts()
+            );
+            member.setPortfolio(portfolio);
+            existing.add(member);
         }
-    
-        repository.save(portfolio);
     }
-    
 
+    repository.save(portfolio);
+}
+
+
+/* ======================================================
+   ✅ 정적 폴더 스크린샷 자동 로드 함수 (확장자 자동 인식)
+====================================================== */
+private List<String> loadStaticScreenshots(String folderName) {
+    List<String> images = new ArrayList<>();
+    try {
+        Path dirPath = Paths.get("src/main/resources/static/images", folderName);
+        if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
+            Files.list(dirPath)
+                .filter(path -> path.getFileName().toString().matches("^[0-9]+\\.(png|jpg|jpeg|webp)$"))
+                .sorted((a, b) -> {
+                    // 숫자 순 정렬 (1,2,3,10 순서 유지)
+                    String aNum = a.getFileName().toString().replaceAll("\\D+", "");
+                    String bNum = b.getFileName().toString().replaceAll("\\D+", "");
+                    return Integer.compare(
+                        aNum.isEmpty() ? 0 : Integer.parseInt(aNum),
+                        bNum.isEmpty() ? 0 : Integer.parseInt(bNum)
+                    );
+                })
+                .forEach(path -> {
+                    String relative = "/images/" + folderName + "/" + path.getFileName().toString();
+                    images.add(relative);
+                });
+        }
+    } catch (IOException e) {
+        System.err.println("⚠️ 정적 스크린샷 로드 실패: " + e.getMessage());
+    }
+    return images;
+}
+
+
+    
 
 @Transactional(readOnly = true)
 public PortfolioFormDto getPortfolioForm(Long id) {
@@ -310,4 +371,41 @@ public PortfoliosEntity getPortfolioDetail(Long id) {
 
     return portfolio;
 }
+
+/* ======================================================
+   ✅ 확장자 무관 자동 탐색 (cover, icon 전용)
+====================================================== */
+private String findStaticFile(String folderName, String baseName) {
+    String[] exts = {"png", "jpg", "jpeg", "webp"};
+    for (String ext : exts) {
+        Path path = Paths.get("src/main/resources/static/images", folderName, baseName + "." + ext);
+        if (Files.exists(path)) {
+            return "/images/" + folderName + "/" + baseName + "." + ext;
+        }
+    }
+    return null;
+}
+
+
+/* ======================================================
+   ✅ 공통: 폴더명 정규화 + 한글 → 영문 매핑
+====================================================== */
+private String normalizeFolderName(String rawName) {
+    if (rawName == null || rawName.isBlank()) return "default";
+
+    // 1️⃣ 공백, 특수문자 제거
+    String folder = rawName.toLowerCase().replaceAll("[^a-z0-9ㄱ-ㅎ가-힣]", "");
+
+    // 2️⃣ 한글 제목 매핑
+    switch (folder) {
+        case "취미존중" -> folder = "hobbyrespect";
+        case "오오커뮤니티" -> folder = "oo";
+        case "플레너포유" -> folder = "plannerforu";
+        
+        // ✅ 필요할 때마다 추가
+    }
+
+    return folder;
+}
+
 }

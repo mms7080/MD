@@ -124,6 +124,14 @@
 </main>
 
 <script src="/js/portfolios/portfolios-create.js"></script>
+<script>
+document.querySelector("form").addEventListener("submit", (e) => {
+  document.querySelectorAll("input[type='file']").forEach(input => {
+    if (!input.value) {
+      input.remove(); // ⚡️ 비어 있는 파일 input 제거
+    }
+  });
+});</script>
 <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

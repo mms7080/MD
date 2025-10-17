@@ -30,7 +30,7 @@ import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 
 @Controller
-@RequestMapping("portfolios")
+@RequestMapping("/portfolios")
 public class PortfoliosController {
 
     private final PortfolioService portfolioService;
@@ -204,11 +204,28 @@ public class PortfoliosController {
     }
 
     @PostMapping("/{id}/edit")
-    public String updatePortfolio(@PathVariable Long id,
-                                  @ModelAttribute PortfolioFormDto dto) throws IOException {
+public String updatePortfolio(@PathVariable Long id,
+                              @ModelAttribute PortfolioFormDto dto) {
+    try {
         portfolioService.updatePortfolio(id, dto);
-        return "redirect:/portfolios/" + id;
+    } 
+    catch (org.apache.tomcat.util.http.fileupload.FileUploadException e) {
+        // Tomcat 업로드 예외 (개수 초과 등)
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, 
+            "업로드 파일 개수 제한을 초과했습니다. (최대 20개까지 가능)"
+        );
+    } 
+    catch (IOException e) {
+        // 파일 저장 오류 등
+        throw new ResponseStatusException(
+            HttpStatus.INTERNAL_SERVER_ERROR, 
+            "파일 처리 중 오류가 발생했습니다."
+        );
     }
+
+    return "redirect:/portfolios/" + id;
+}
 
     @PostMapping("/{id}/like")
     @ResponseBody
