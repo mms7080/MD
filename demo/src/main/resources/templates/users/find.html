@@ -11,6 +11,8 @@
   <link rel="stylesheet" th:href="@{/css/footer.css}" />
   <link rel="stylesheet" th:href="@{/css/users/auth-modal.css}" />
   <link rel="stylesheet" th:href="@{/css/users/findsign.css}" />
+ 
+  <script src="/js/users/find.js" defer></script>
 </head>
 
 <body>
@@ -74,8 +76,6 @@
         </div>
       </div>
     </section>
-
-    <p class="kf-find__help" style="margin-top:12px;">이메일 발송 없이 본인확인(이름·아이디·이메일) 후 새 비밀번호를 설정합니다.</p>
   </main>
 
   <!-- ===== 비밀번호 설정 모달 ===== -->
@@ -119,93 +119,6 @@
 
   <!-- 공통 푸터 -->
   <th:block th:replace="~{fragments/footer :: footer}"></th:block>
-
-  <!-- ===== 탭 전환 ===== -->
-  <script>
-    (function () {
-      const $ = (s) => document.querySelector(s);
-      const tabId = $("#tab-id");
-      const tabPw = $("#tab-pw");
-      const labelId = $("#tab-id-label");
-      const labelPw = $("#tab-pw-label");
-      const panelId = $("#panel-id");
-      const panelPw = $("#panel-pw");
-
-      function setActive(which) {
-        labelId.classList.toggle("is-active", which === "id");
-        labelPw.classList.toggle("is-active", which === "pw");
-        labelId.setAttribute("aria-selected", String(which === "id"));
-        labelPw.setAttribute("aria-selected", String(which === "pw"));
-        panelId.classList.toggle("is-active", which === "id");
-        panelPw.classList.toggle("is-active", which === "pw");
-
-        // URL 상태 유지
-        const url = new URL(window.location.href);
-        url.searchParams.set("tab", which);
-        window.history.replaceState({}, "", url);
-      }
-      function initFromURL() {
-        const url = new URL(window.location.href);
-        const tab = url.searchParams.get("tab") === "pw" ? "pw" : "id";
-        (tab === "id" ? tabId : tabPw).checked = true;
-        setActive(tab);
-      }
-      tabId.addEventListener("change", () => tabId.checked && setActive("id"));
-      tabPw.addEventListener("change", () => tabPw.checked && setActive("pw"));
-      initFromURL();
-    })();
-  </script>
-
-  <!-- ===== 비밀번호 설정 모달 동작 ===== -->
-  <script>
-    // ✅ 모달에 값만 채워 넣고 열기. 그 외 어떤 검증/차단도 하지 않음.
-    (function () {
-      const $ = (s) => document.querySelector(s);
-
-      const openBtn = $('#openPwModal');          // "비밀번호 재설정" 버튼
-      const nameEl = $('#pwName');                // 입력 폼의 이름
-      const userEl = $('#pwUsername');            // 입력 폼의 아이디
-      const emailEl = $('#pwEmail');              // 입력 폼의 이메일
-      const toggle = $('#pwModalToggle');         // 모달 토글 체크박스
-
-      const modalNameText = $('#modalNameText');  // 모달 표시용 이름
-      const modalUserText = $('#modalUsernameText'); // 모달 표시용 아이디
-
-      const modalName = $('#modalName');          // 모달 hidden name
-      const modalUser = $('#modalUsername');      // 모달 hidden username
-      const modalEmail = $('#modalEmail');        // 모달 hidden email
-
-      const submitBtn = $('#pwSubmit');           // 모달 submit 버튼
-
-      if (!openBtn) return;
-
-      // 혹시 마크업에 disabled가 남아있다면 제거 (제출 방해 방지)
-      submitBtn?.removeAttribute('disabled');
-
-      openBtn.addEventListener('click', function () {
-        // 입력값 읽기만 함 (형식/일치/길이 검증 X)
-        const name = (nameEl?.value || '').trim();
-        const username = (userEl?.value || '').trim();
-        const email = (emailEl?.value || '').trim();
-
-        // 모달 표시 영역/hidden 필드에 그대로 주입
-        if (modalNameText) modalNameText.textContent = name || '-';
-        if (modalUserText) modalUserText.textContent = username || '-';
-        if (modalName) modalName.value = name;
-        if (modalUser) modalUser.value = username;
-        if (modalEmail) modalEmail.value = email;
-
-        // 모달 열기
-        if (toggle) toggle.checked = true;
-
-        // 비번 입력창 포커스 (선택)
-        setTimeout(() => document.getElementById('newPassword')?.focus(), 0);
-      });
-
-      // 제출 흐름에 간섭하는 submit 핸들러/ preventDefault() 없음
-    })();
-  </script>
-
 </body>
 
 </html>

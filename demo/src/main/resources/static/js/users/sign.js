@@ -131,7 +131,7 @@ function hideMessage() {
   const selEl   = document.getElementById("emailDomain");
   const custEl  = document.getElementById("emailDomainCustom");
   const hidden  = document.getElementById("email");
-  const btn     = document.getElementById("btnCheckEmail"); // ← 깔끔하게 이름 변경
+  const btn     = document.getElementById("btnCheckEmail"); 
   const notice  = document.getElementById("ajaxNotice");
   if (!combo || !localEl || !selEl || !hidden || !btn) return;
 
@@ -202,7 +202,7 @@ function hideMessage() {
 
     if (!isEmail(email)) {
       setNotice("올바른 이메일을 입력하세요.", false);
-      hidden.setCustomValidity("올바른 이메일을 입력하세요.");
+      validityTarget.setCustomValidity?.("올바른 이메일을 입력하세요.");
       hidden.reportValidity?.();
       return;
     }
@@ -238,3 +238,99 @@ function hideMessage() {
   if (!selEl.value) selEl.value = "gmail.com";
   syncEmail();
 })();
+
+/* ===== 모달 닫힘/열림 시 회원가입 폼 초기화 ===== */
+document.addEventListener("DOMContentLoaded", () => {
+  const rNone   = document.getElementById("modal-none");
+  const rSignin = document.getElementById("modal-signin");
+  const rSignup = document.getElementById("modal-signup");
+
+  const signupForm = document.querySelector('.kf-auth-modal.signup form.auth-form');
+  if (!signupForm || !rNone || !rSignin || !rSignup) return;
+
+  // 초기화 함수
+  function resetSignupForm() {
+    // 1) 기본 form reset
+    signupForm.reset();
+
+    // 2) 수동으로 남는 값/배너/클래스 정리
+    //   - 아이디 중복 배너
+    const userStatus = document.getElementById("usernameStatus");
+    if (userStatus) {
+      userStatus.textContent = "";
+      userStatus.hidden = true;
+      userStatus.className = "note-banner inline";
+    }
+
+    //   - 비밀번호 상태 배너
+    const pwStatus = document.getElementById("password-status");
+    if (pwStatus) {
+      pwStatus.textContent = "";
+      pwStatus.style.display = "none";
+      pwStatus.style.opacity = "0";
+      pwStatus.classList.remove("error");
+    }
+
+    //   - 이메일 컴포즈/중복배너/버튼 상태
+    const combo   = document.getElementById("emailCombo");
+    const localEl = document.getElementById("emailLocal");
+    const selEl   = document.getElementById("emailDomain");
+    const custEl  = document.getElementById("emailDomainCustom");
+    const hidden  = document.getElementById("email");
+    const btnMail = document.getElementById("btnCheckEmail");
+    const ajaxNt  = document.getElementById("ajaxNotice");
+
+    if (ajaxNt) {
+      ajaxNt.textContent = "";
+      ajaxNt.hidden = true;
+      ajaxNt.className = "note-banner";
+    }
+    if (hidden) hidden.value = "";
+
+    // 도메인은 기본값으로
+    if (selEl) selEl.value = "gmail.com";
+    // 직접 입력 필드/클래스 숨김
+    if (combo) combo.classList.remove("is-custom");
+    if (custEl) {
+      custEl.value = "";
+      custEl.classList.add("hidden");
+    }
+    // 로컬 아이디도 비움
+    if (localEl) localEl.value = "";
+
+    // 이메일 버튼 비활성화
+    if (btnMail) btnMail.disabled = true;
+
+    //   - 아이디 중복확인 버튼 비활성화 (입력 없으므로)
+    const btnId = document.getElementById("btnCheckId");
+    if (btnId) btnId.disabled = false; // 확인 버튼 자체는 클릭 가능하게 두고,
+    // 필요하면 true로 막고 입력 시 활성화하도록 바꿔도 됨
+
+    //   - 커스텀 유효성 메시지 제거
+    ["username","password","confirmPassword","name","birth","ageHidden"].forEach(id=>{
+      const el = document.getElementById(id);
+      try { el?.setCustomValidity?.(""); } catch (e) {}
+    });
+
+    // 3) 자동완성 흔적 제거(브라우저가 고집 세면 수동 초기화)
+    signupForm.querySelectorAll('input[type="text"], input[type="password"], input[type="date"]').forEach(el=>{
+      if (el.id !== "emailDomain") el.value = "";
+    });
+
+    // 4) 필요하면 포커스(선택)
+    const username = document.getElementById("username");
+    username?.focus();
+  }
+
+  // “닫힘(=modal-none)으로 전환될 때” 초기화
+  rNone.addEventListener("change", () => {
+    if (rNone.checked) resetSignupForm();
+  });
+
+  // “회원가입 모달을 열 때”도 항상 초기화(원하면 주석 처리)
+  rSignup.addEventListener("change", () => {
+    if (rSignup.checked) resetSignupForm();
+  });
+});
+
+
