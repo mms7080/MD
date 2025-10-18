@@ -100,32 +100,6 @@ function toggleTags(button) {
 /* -----------------------------
    초기화 (DOMContentLoaded)
 ----------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  /* ✅ 조회수 처리 */
-  const viewCountEl = document.getElementById("viewCount");
-  if (viewCountEl) {
-    const portfolioId = viewCountEl.getAttribute("data-id");
-    const token = document.querySelector("meta[name='_csrf']")?.content;
-    const header = document.querySelector("meta[name='_csrf_header']")?.content;
-
-    if (portfolioId && token && header) {
-      fetch(`/portfolios/${portfolioId}/views`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          [header]: token
-        }
-      })
-        .then(res => {
-          if (!res.ok) throw new Error(`조회수 요청 실패: ${res.status}`);
-          return res.json();
-        })
-        .then(count => {
-          viewCountEl.textContent = count;
-        })
-        .catch(err => console.error("조회수 증가 실패:", err));
-    }
-  }
 
   /* ✅ 태그 더보기 초기화 */
   document.querySelectorAll(".tags-list").forEach(tagsList => {
@@ -180,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     starBox.dataset.starsRendered = "true";
   });
-});
+
 
 /* -----------------------------
    댓글 수정 기능
@@ -216,53 +190,13 @@ window.cancelEdit = function (button) {
 };
 
 /* -----------------------------
-   좋아요 버튼 기능 (403 / undefined 방지)
------------------------------ */
-const likeBtn = document.getElementById("likeBtn");
-if (likeBtn) {
-  const portfolioId = document.getElementById("viewCount")?.dataset.id;
-  const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
-  const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
-
-  likeBtn.addEventListener("change", function () {
-    if (!portfolioId || !csrfToken || !csrfHeader) {
-      console.warn("좋아요 요청 불가: 필수 데이터 누락");
-      return;
-    }
-
-    const checked = this.checked;
-    fetch(`/portfolios/${portfolioId}/${checked ? "like" : "unlike"}`, {
-      method: "POST",
-      headers: {
-        [csrfHeader]: csrfToken
-      }
-    })
-      .then(res => {
-        if (!res.ok) {
-          console.warn(`좋아요 요청 실패: ${res.status}`);
-          return null; // 실패 응답은 화면 표시 안 함
-        }
-        return res.text();
-      })
-      .then(count => {
-        if (count !== null && !isNaN(count)) {
-          document.getElementById("likeCount").innerText = count;
-        }
-      })
-      .catch(err => console.error("좋아요 처리 실패:", err));
-  });
-}
-
-
-
-/* -----------------------------
    좋아요 버튼 기능 (로그인 여부 포함)
 ----------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   const likeBtn = document.getElementById("likeBtn");
   const likeCountEl = document.getElementById("likeCount");
   const viewCountEl = document.getElementById("viewCount");
-  const isAuthenticated = likeBtn?.dataset.authenticated === "true"; // ✅ 서버에서 주입된 로그인 여부
+  const isAuthenticated = likeBtn?.dataset.authenticated === "true";
 
   if (!likeBtn || !viewCountEl) return;
 
@@ -271,24 +205,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
 
   likeBtn.addEventListener("change", function (event) {
-    // ✅ 비로그인 사용자 → 로그인 모달 또는 페이지 이동
+    // ✅ 로그인 안된 사용자
     if (!isAuthenticated) {
       event.preventDefault();
-      this.checked = false; // 하트 원상복구
+      this.checked = false;
 
-      // 로그인 모달이 있는 경우
       const loginModal = document.getElementById("modal-signin");
-      if (loginModal) {
-        loginModal.checked = true; // 모달 열기
-      } else {
-        // 로그인 페이지로 이동 (모달 없을 경우)
-        window.location.href = "/login";
-      }
-
+      if (loginModal) loginModal.checked = true;
+      else window.location.href = "/login";
       return;
     }
 
-    // ✅ 로그인된 사용자 → 좋아요 토글
+    // ✅ 로그인된 사용자 → 좋아요 요청
     if (!portfolioId || !csrfToken || !csrfHeader) {
       console.warn("좋아요 요청 불가: 필수 데이터 누락");
       return;
@@ -307,9 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return res.text();
       })
       .then(count => {
-        if (!isNaN(count)) {
-          likeCountEl.textContent = count;
-        }
+        if (!isNaN(count)) likeCountEl.textContent = count;
       })
       .catch(err => {
         console.error("좋아요 처리 실패:", err);
@@ -317,3 +243,4 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 });
+

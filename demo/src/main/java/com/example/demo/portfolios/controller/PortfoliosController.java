@@ -227,12 +227,22 @@ public String updatePortfolio(@PathVariable Long id,
     return "redirect:/portfolios/" + id;
 }
 
-    @PostMapping("/{id}/like")
-    @ResponseBody
-    public int toggleLike(@PathVariable Long id, Principal principal) {
-        if (principal == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다.");
-        }
-        return portfolioService.toggleLike(id, principal);
+@PostMapping("/{id}/like")
+@ResponseBody
+public ResponseEntity<?> toggleLike(@PathVariable Long id, Principal principal) {
+    if (principal == null) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("로그인이 필요합니다.");
     }
+    try {
+        int count = portfolioService.toggleLike(id, principal);
+        return ResponseEntity.ok(count);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("좋아요 처리 중 오류가 발생했습니다.");
+    }
+}
+
+
 }

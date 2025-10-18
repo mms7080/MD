@@ -228,7 +228,7 @@ public void updatePortfolio(Long id, PortfolioFormDto dto) throws IOException {
     /* 대표 이미지 */
     if (dto.getCover() != null && !dto.getCover().isEmpty()) {
         portfolio.setCover(saveFile(dto.getCover(), "image"));
-    } else {
+    } else if (portfolio.getCover() == null || portfolio.getCover().isBlank()) {
         String staticCover = findStaticFile(folderName, "cover");
         if (staticCover != null) portfolio.setCover(staticCover);
     }
@@ -401,6 +401,7 @@ private String normalizeFolderName(String rawName) {
         case "취미존중" -> folder = "hobbyrespect";
         case "오오커뮤니티" -> folder = "oo";
         case "플레너포유" -> folder = "plannerforu";
+        case "필모라" -> folder = "filmora";
         
         // ✅ 필요할 때마다 추가
     }

@@ -568,3 +568,27 @@ body {
     }
 }
 
+/* ✅ 마키 영역 안정화 */
+.kf-mq-portfolios {
+    --speed: 40s;
+    --gap: 20px;
+    --item-w: 220px;
+    --img-h: 140px;
+    margin-top: 50px;
+    margin-bottom: 60px; /* ✅ footer와 여백 확보 */
+    min-height: 160px; /* ✅ 항상 공간 확보 (데이터 비어도 영역 유지) */
+  }
+  
+  /* ✅ 트랙 안정화 - 줄바꿈 방지 */
+  .kf-mq-portfolios .mq-track {
+    display: flex;
+    width: max-content;
+    gap: var(--gap);
+    white-space: nowrap; /* ✅ 애니메이션 부드럽게 유지 */
+    animation: marquee var(--speed) linear infinite;
+  }
+  
+  .kf-footer {
+    margin-top: 40px; /* ✅ footer 위 공간 확보 */
+  }
+  
