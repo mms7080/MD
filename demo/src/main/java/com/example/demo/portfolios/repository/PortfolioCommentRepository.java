@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +20,7 @@ public interface PortfolioCommentRepository extends JpaRepository<PortfolioComme
     @Query("SELECT c FROM PortfolioComment c JOIN FETCH c.user WHERE c.portfolio.id = :portfolioId ORDER BY c.createdAt DESC")
     List<PortfolioComment> findByPortfolioIdWithUser(@Param("portfolioId") Long portfolioId);
 
+  @EntityGraph(attributePaths = {"user"})
 Page<PortfolioComment> findByPortfolioId(Long portfolioId, Pageable pageable);
 
 @Query(

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <head>
         <meta charset="UTF-8" />
         <title th:text="${portfolio != null} ? ${portfolio.title} : '포트폴리오 없음'">Portfolio</title>
@@ -61,7 +62,8 @@
                 <div class="gallery">
                  <!-- 대표 이미지 -->
                  <figure class="main-photo" 
-                        th:if="${portfolio.screenshots != null and !portfolio.screenshots.isEmpty()}">
+                 th:if="${portfolio.screenshots != null and !#lists.isEmpty(portfolio.screenshots)}">
+
                         <img id="mainImage"
                         th:src="@{${portfolio.screenshots[0]}}"
                         alt="대표 이미지"

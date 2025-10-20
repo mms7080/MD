@@ -74,49 +74,45 @@ public class PortfoliosController {
     }
 
     @GetMapping("/{id}")
-    public String getPortfolio(@PathVariable Long id,
-                               @RequestParam(defaultValue = "0") int page,
-                               Model model,
-                               Principal principal) {
+public String getPortfolio(@PathVariable Long id,
+                           @RequestParam(defaultValue = "0") int page,
+                           Model model,
+                           Principal principal) {
 
-         // ✅ 페이지 열릴 때 조회수 증가
-        portfolioService.increaseViewCount(id);
+    portfolioService.increaseViewCount(id);
+    PortfoliosEntity portfolio = portfolioService.getPortfolioDetail(id);
+    
 
-        PortfoliosEntity portfolio = portfolioService.getPortfolioDetail(id);
-
-        if (Boolean.FALSE.equals(portfolio.getIsPublic())) {
-            boolean isAdmin = false;
-
-            if (principal != null) {
-                Users user = usersRepository.findByUsername(principal.getName()).orElse(null);
-                if (user != null && user.getRole() == Role.ADMIN) {
-                    isAdmin = true;
-                }
-            }
-
-            if (!isAdmin) {
-                model.addAttribute("notFound", true);
-                return "portfolios/detail";
+    if (Boolean.FALSE.equals(portfolio.getIsPublic())) {
+        boolean isAdmin = false;
+        if (principal != null) {
+            Users user = usersRepository.findByUsername(principal.getName()).orElse(null);
+            if (user != null && user.getRole() == Role.ADMIN) {
+                isAdmin = true;
             }
         }
-
-        portfolio.setScreenshots(new ArrayList<>(new LinkedHashSet<>(portfolio.getScreenshots())));
-        portfolio.setTeam(new ArrayList<>(new LinkedHashSet<>(portfolio.getTeam())));
-
-        int size = 5;
-        Page<PortfolioComment> commentPage = commentService.getComments(id, page, size);
-        double avgRating = commentService.getAverageRating(id);
-        long ratingCount = commentService.getCommentCount(id);
-
-        model.addAttribute("portfolio", portfolio);
-        model.addAttribute("comments", commentPage.getContent());
-        model.addAttribute("avgRating", avgRating);
-        model.addAttribute("ratingCount", ratingCount);
-        model.addAttribute("currentPage", commentPage.getNumber());
-        model.addAttribute("totalPages", commentPage.getTotalPages());
-
-        return "portfolios/detail";
+        if (!isAdmin) {
+            model.addAttribute("notFound", true);
+            return "portfolios/detail";
+        }
     }
+
+    int size = 5;
+    Page<PortfolioComment> commentPage = commentService.getComments(id, page, size);
+    double avgRating = commentService.getAverageRating(id);
+    long ratingCount = commentService.getCommentCount(id);
+
+    model.addAttribute("portfolio", portfolio);
+    model.addAttribute("comments", commentPage.getContent());
+    model.addAttribute("tags", portfolio.getTags());
+    model.addAttribute("screenshots", portfolio.getScreenshots());
+    model.addAttribute("avgRating", avgRating);
+    model.addAttribute("ratingCount", ratingCount);
+    model.addAttribute("currentPage", commentPage.getNumber());
+    model.addAttribute("totalPages", commentPage.getTotalPages());
+
+    return "portfolios/detail";
+}
 
     @GetMapping("/create")
     public String createForm(Model model) {
@@ -229,20 +225,22 @@ public String updatePortfolio(@PathVariable Long id,
 
 @PostMapping("/{id}/like")
 @ResponseBody
-public ResponseEntity<?> toggleLike(@PathVariable Long id, Principal principal) {
+public ResponseEntity<String> toggleLike(@PathVariable Long id, Principal principal) {
     if (principal == null) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body("로그인이 필요합니다.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("unauthorized");
     }
     try {
         int count = portfolioService.toggleLike(id, principal);
-        return ResponseEntity.ok(count);
+        // ✅ String 으로 명시적 변환, Spring이 text/plain 자동 설정
+        return ResponseEntity.ok(String.valueOf(count));
     } catch (Exception e) {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("좋아요 처리 중 오류가 발생했습니다.");
+                .body("error");
     }
 }
+
+
 
 
 }

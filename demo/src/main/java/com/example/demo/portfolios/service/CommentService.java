@@ -18,7 +18,7 @@ import com.example.demo.users.UsersEntity.Role;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -106,9 +106,10 @@ public void updateComment(Long portfolioId, Long commentId, String content, int 
 }
 
 
+@Transactional(readOnly = true)
 public Page<PortfolioComment> getComments(Long portfolioId, int page, int size) {
-    Pageable pageable = PageRequest.of(page, size);
-    return commentRepository.findByPortfolioIdWithUser(portfolioId, pageable);
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    return commentRepository.findByPortfolioId(portfolioId, pageable);
 }
 
 public double getAverageRating(Long portfolioId) {

@@ -16,7 +16,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
+import org.hibernate.Hibernate;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.portfolios.dto.PortfolioFormDto;
 import com.example.demo.portfolios.dto.TeamMemberDto;
+import com.example.demo.portfolios.entity.PortfolioComment;
 import com.example.demo.portfolios.entity.PortfolioLikeEntity;
 import com.example.demo.portfolios.entity.PortfoliosEntity;
 import com.example.demo.portfolios.entity.TeamMemberEntity;
@@ -331,46 +334,65 @@ public PortfolioFormDto getPortfolioForm(Long id) {
 }
 
 
-    @Transactional
-    public int toggleLike(Long id, Principal principal) {
-        Users user = usersRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        PortfoliosEntity portfolio = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("포트폴리오를 찾을 수 없습니다."));
-    
-        Optional<PortfolioLikeEntity> existingLike = likeRepository.findByPortfolioAndUser(portfolio, user);
-    
-        if (existingLike.isPresent()) {
-            // ✅ 이미 좋아요 눌렀으면 취소
-            likeRepository.delete(existingLike.get());
-        } else {
-            // ✅ 좋아요 추가
-            PortfolioLikeEntity like = new PortfolioLikeEntity();
-            like.setPortfolio(portfolio);
-            like.setUser(user);
-            likeRepository.save(like);
-        }
-    
-        // ✅ 즉시 반영된 좋아요 개수 반환
-        return likeRepository.countByPortfolio(portfolio);
-    }
-    
+@Transactional
+public int toggleLike(Long id, Principal principal) {
+    Users user = usersRepository.findByUsername(principal.getName())
+        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-
-    @Transactional(readOnly = true)
-public PortfoliosEntity getPortfolioDetail(Long id) {
     PortfoliosEntity portfolio = repository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("포트폴리오를 찾을 수 없습니다."));
+
+    Optional<PortfolioLikeEntity> existingLike = likeRepository.findByPortfolioAndUser(portfolio, user);
+    if (existingLike.isPresent()) {
+        likeRepository.delete(existingLike.get());
+    } else {
+        PortfolioLikeEntity like = PortfolioLikeEntity.builder()
+            .user(user)
+            .portfolio(portfolio)
+            .build();
+        likeRepository.save(like);
+    }
+
+    return likeRepository.countByPortfolioId(id);
+}
+
+
+    
+
+@Transactional(readOnly = true)
+public PortfoliosEntity getPortfolioDetail(Long id) {
+    PortfoliosEntity portfolio = repository.findDetailById(id)
         .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
 
-    // ✅ Lazy 초기화 강제 (트랜잭션 내에서 미리 로드)
-    portfolio.getScreenshots().size();
-    portfolio.getTeam().size();
-    portfolio.getTags().size();
-    portfolio.getLikes().size();
-    portfolio.getComments().size();
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    boolean isAdmin = auth != null && auth.getAuthorities().stream()
+        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    if (Boolean.FALSE.equals(portfolio.getIsPublic()) && !isAdmin) {
+        throw new AccessDeniedException("비공개 포트폴리오입니다.");
+    }
+
+    // ✅ Lazy 완전 초기화 (Hibernate.initialize() 사용)
+    Hibernate.initialize(portfolio.getTags());
+    Hibernate.initialize(portfolio.getTeam());
+    Hibernate.initialize(portfolio.getLikes());
+    Hibernate.initialize(portfolio.getScreenshots());
+    Hibernate.initialize(portfolio.getComments());
+    portfolio.getComments().forEach(c -> {
+        if (c.getUser() != null) Hibernate.initialize(c.getUser());
+    });
+
+    // ✅ 중복 정리
+    portfolio.setTeam(new ArrayList<>(new LinkedHashSet<>(portfolio.getTeam())));
+    portfolio.setTags(new LinkedHashSet<>(portfolio.getTags()));
+    portfolio.setLikes(new LinkedHashSet<>(portfolio.getLikes()));
+    portfolio.setComments(new ArrayList<>(new LinkedHashSet<>(portfolio.getComments())));
 
     return portfolio;
 }
+
+
+
+    
 
 /* ======================================================
    ✅ 확장자 무관 자동 탐색 (cover, icon 전용)

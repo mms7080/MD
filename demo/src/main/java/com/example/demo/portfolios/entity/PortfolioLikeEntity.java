@@ -27,15 +27,17 @@ public class PortfolioLikeEntity {
     private Users user;
 
     @Override
-public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof TeamMemberEntity)) return false;
-    return id != null && id.equals(((TeamMemberEntity) o).getId());
-}
-
-@Override
-public int hashCode() {
-    return getClass().hashCode();
-}
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PortfolioLikeEntity)) return false;
+        PortfolioLikeEntity that = (PortfolioLikeEntity) o;
+        return id != null && id.equals(that.getId());
+    }
+    
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+    
 
 }
