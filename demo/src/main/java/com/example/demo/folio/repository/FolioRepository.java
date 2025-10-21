@@ -29,4 +29,7 @@ public interface FolioRepository extends JpaRepository<Folio, String> {
     Optional<Folio> findTopByUserAndStatusOrderByUpdatedAtDesc(Users user, Folio.Status status);
 
     Optional<Folio> findByIdAndUser(String id, Users user);
+    
+     // 로그인 사용자 + 템플릿 최신 저장본
+    Optional<Folio> findTopByUserAndTemplateOrderByUpdatedAtDesc(Users user, String template);
 }

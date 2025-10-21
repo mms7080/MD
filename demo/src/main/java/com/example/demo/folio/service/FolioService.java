@@ -19,6 +19,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,7 +39,7 @@ public class FolioService {
     // 임시로 PortfoliosController의 데이터를 사용
     private final PortfoliosController portfoliosController;
     private final PortfolioService portfolioService;
-    private final UsersService UsersService;
+    private final UsersService usersService;
 
     public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
         Page<Folio> folioPage = folioRepository.findAll(pageable);
@@ -89,20 +91,36 @@ public class FolioService {
     /** PPT 에디터 전체 상태 저장(JSON 통짜) */
     @Transactional
     public Folio saveState(Principal principal, FolioStateSaveRequest req) {
-        Users user = UsersService.getUserByUsername(principal.getName()); // ← 인스턴스 메서드
+        if (principal == null) throw new AccessDeniedException("로그인 필요");
 
-        // 한 유저당 하나만 쓰려면 findByUserId(...)
-        // 템플릿별 1개라면 findByUserIdAndTemplate(...) 메서드 만들어서 사용 추천
-        Folio folio = folioRepository.findByUserId(user.getId())
-                .orElse(new Folio());
+        Users user = usersService.getUserByUsername(principal.getName()); // ★ 정적호출 금지
+
+        // 사용자+템플릿 최신본 조회 후 없으면 신규
+        String tpl = (req.getTemplate() != null && !req.getTemplate().isBlank())
+                ? req.getTemplate() : "dev-basic";
+
+        Folio folio = folioRepository
+                .findTopByUserAndTemplateOrderByUpdatedAtDesc(user, tpl)
+                .orElseGet(Folio::new);
 
         folio.setUser(user);
-        folio.setTemplate(req.getTemplate() != null ? req.getTemplate() : "dev-basic");
-        folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
+        folio.setTemplate(tpl);
 
-        if (req.getStatus() != null) folio.setStatus(req.getStatus());
+        // contentJson/thumbnail/status 반영
+        folio.setContentJson(
+                req.getContentJson() != null ? req.getContentJson() : "{}"
+        );
         if (req.getThumbnail() != null) folio.setThumbnail(req.getThumbnail());
+        if (req.getStatus() != null) folio.setStatus(req.getStatus());
 
         return folioRepository.save(folio);
+    }
+
+    /** 로그인 사용자의 최신 저장본(템플릿별) */
+    public Optional<Folio> getMyLatest(Principal principal, String template) {
+        if (principal == null) throw new AccessDeniedException("로그인 필요");
+        Users user = usersService.getUserByUsername(principal.getName());
+        String tpl = (template != null && !template.isBlank()) ? template : "dev-basic";
+        return folioRepository.findTopByUserAndTemplateOrderByUpdatedAtDesc(user, tpl);
     }
 }

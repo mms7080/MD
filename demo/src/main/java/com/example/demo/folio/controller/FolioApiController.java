@@ -94,4 +94,23 @@ public class FolioApiController {
         Folio saved = folioService.saveState(principal, req);
         return ResponseEntity.ok(new FolioDetailDto(saved));
     }
+
+    /** 로그인 사용자의 최신 저장본 불러오기 */
+    @GetMapping("/me/{template}")
+    public ResponseEntity<Map<String, Object>> loadMyFolio(
+            @PathVariable String template, Principal principal
+    ) {
+        return folioService.getMyLatest(principal, template)
+                .map(f -> {
+                    Map<String,Object> body = new HashMap<>();
+                    body.put("id", f.getId());
+                    body.put("template", f.getTemplate());
+                    body.put("status", f.getStatus());
+                    body.put("thumbnail", f.getThumbnail());
+                    body.put("contentJson", f.getContentJson());
+                    body.put("updatedAt", f.getUpdatedAt());
+                    return ResponseEntity.ok(body);
+                })
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
 }
