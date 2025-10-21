@@ -12,7 +12,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -73,46 +75,81 @@ public class PortfoliosController {
         return "portfolios/list";
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/{id}")
-public String getPortfolio(@PathVariable Long id,
-                           @RequestParam(defaultValue = "0") int page,
-                           Model model,
-                           Principal principal) {
-
-    portfolioService.increaseViewCount(id);
-    PortfoliosEntity portfolio = portfolioService.getPortfolioDetail(id);
+    public String getPortfolio(@PathVariable Long id,
+                               @RequestParam(defaultValue = "0") int page,
+                               Model model,
+                               Principal principal) {
+        try {
+            // ✅ 조회수 증가
+            portfolioService.increaseViewCount(id);
     
-
-    if (Boolean.FALSE.equals(portfolio.getIsPublic())) {
-        boolean isAdmin = false;
-        if (principal != null) {
-            Users user = usersRepository.findByUsername(principal.getName()).orElse(null);
-            if (user != null && user.getRole() == Role.ADMIN) {
-                isAdmin = true;
+            // ✅ 포트폴리오 상세 조회
+            PortfoliosEntity portfolio = portfolioService.getPortfolioDetail(id);
+    
+            // ✅ 비공개 처리
+            if (Boolean.FALSE.equals(portfolio.getIsPublic())) {
+                boolean isAdmin = false;
+                if (principal != null) {
+                    Users user = usersRepository.findByUsername(principal.getName()).orElse(null);
+                    if (user != null && user.getRole() == Role.ADMIN) {
+                        isAdmin = true;
+                    }
+                }
+                if (!isAdmin) {
+                    System.out.println("🚫 비공개 포트폴리오 접근 차단 (USER)");
+                    model.addAttribute("notFound", true);
+                    return "portfolios/detail";
+                }
             }
-        }
-        if (!isAdmin) {
+    
+            // ✅ 댓글, 별점 정보
+            int size = 5;
+            Page<PortfolioComment> commentPage = commentService.getComments(id, page, size);
+            double avgRating = commentService.getAverageRating(id);
+            long ratingCount = commentService.getCommentCount(id);
+    
+            // ✅ 모델 데이터 추가
+            model.addAttribute("portfolio", portfolio);
+            model.addAttribute("comments", commentPage.getContent());
+            model.addAttribute("tags", portfolio.getTags());
+            model.addAttribute("screenshots", portfolio.getScreenshots());
+            model.addAttribute("avgRating", avgRating);
+            model.addAttribute("ratingCount", ratingCount);
+            model.addAttribute("currentPage", commentPage.getNumber());
+            model.addAttribute("totalPages", commentPage.getTotalPages());
+    
+            // ✅ 디버그 로그
+            System.out.println("🟢 포트폴리오 접근 성공: " + portfolio.getTitle());
+            System.out.println(" - tags: " + portfolio.getTags());
+            System.out.println(" - comments: " + (portfolio.getComments() != null ? portfolio.getComments().size() : "null"));
+            System.out.println(" - screenshots: " + (portfolio.getScreenshots() != null ? portfolio.getScreenshots().size() : "null"));
+    
+            return "portfolios/detail";
+    
+        } catch (AccessDeniedException e) {
+            // ✅ 비공개 접근 거부
+            System.err.println("🚫 AccessDeniedException: 비공개 포트폴리오 접근 시도 - " + e.getMessage());
+            model.addAttribute("notFound", true);
+            return "portfolios/detail";
+    
+        } catch (org.hibernate.LazyInitializationException e) {
+            // ✅ Lazy 로딩 실패 (세션 닫힘)
+            System.err.println("⚠️ LazyInitializationException 발생: " + e.getMessage());
+            model.addAttribute("errorMsg", "데이터를 불러오는 중 문제가 발생했습니다. (Lazy)");
+            return "portfolios/detail";
+    
+        } catch (Exception e) {
+            // ✅ 그 외 모든 예외
+            System.err.println("❌ 예외 발생: " + e.getClass().getSimpleName());
+            e.printStackTrace();
+            model.addAttribute("errorMsg", "포트폴리오를 불러오는 중 오류가 발생했습니다.");
             model.addAttribute("notFound", true);
             return "portfolios/detail";
         }
     }
-
-    int size = 5;
-    Page<PortfolioComment> commentPage = commentService.getComments(id, page, size);
-    double avgRating = commentService.getAverageRating(id);
-    long ratingCount = commentService.getCommentCount(id);
-
-    model.addAttribute("portfolio", portfolio);
-    model.addAttribute("comments", commentPage.getContent());
-    model.addAttribute("tags", portfolio.getTags());
-    model.addAttribute("screenshots", portfolio.getScreenshots());
-    model.addAttribute("avgRating", avgRating);
-    model.addAttribute("ratingCount", ratingCount);
-    model.addAttribute("currentPage", commentPage.getNumber());
-    model.addAttribute("totalPages", commentPage.getTotalPages());
-
-    return "portfolios/detail";
-}
+    
 
     @GetMapping("/create")
     public String createForm(Model model) {

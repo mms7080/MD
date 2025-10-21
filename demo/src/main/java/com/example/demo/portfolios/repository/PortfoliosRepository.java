@@ -15,9 +15,17 @@ public interface PortfoliosRepository extends JpaRepository<PortfoliosEntity, Lo
 
     // ✅ 상세 페이지용 — 태그, 팀, 스크린샷, 댓글, 좋아요까지 미리 로드
     // 수정 ✅
-@EntityGraph(attributePaths = {"tags", "team", "comments", "likes"})
-@Query("SELECT p FROM PortfoliosEntity p WHERE p.id = :id")
-Optional<PortfoliosEntity> findDetailById(@Param("id") Long id);
+    @Query("""
+        SELECT DISTINCT p FROM PortfoliosEntity p
+        LEFT JOIN FETCH p.tags
+        LEFT JOIN FETCH p.team
+        LEFT JOIN FETCH p.likes
+        LEFT JOIN FETCH p.comments c
+        LEFT JOIN FETCH c.user
+        WHERE p.id = :id
+    """)
+    Optional<PortfoliosEntity> findDetailById(@Param("id") Long id);
+    
 
     @EntityGraph(attributePaths = {"tags", "screenshots", "team"}) // ❌ comments, likes 제외
 @Query("SELECT p FROM PortfoliosEntity p WHERE p.id = :id")

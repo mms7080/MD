@@ -1,3 +1,5 @@
+console.log("✅ portfolios-detail.js loaded");
+
 let currentIndex = 0;
 let images = [];
 

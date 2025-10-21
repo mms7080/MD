@@ -364,24 +364,27 @@ public PortfoliosEntity getPortfolioDetail(Long id) {
     PortfoliosEntity portfolio = repository.findDetailById(id)
         .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
 
+    // ✅ 권한 검사
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     boolean isAdmin = auth != null && auth.getAuthorities().stream()
         .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-    if (Boolean.FALSE.equals(portfolio.getIsPublic()) && !isAdmin) {
+    boolean isPublic = Boolean.TRUE.equals(portfolio.getIsPublic());
+    if (!isPublic && !isAdmin) {
         throw new AccessDeniedException("비공개 포트폴리오입니다.");
     }
 
-    // ✅ Lazy 완전 초기화 (Hibernate.initialize() 사용)
+    // ✅ Lazy 완전 초기화 (모든 사용자 공통)
     Hibernate.initialize(portfolio.getTags());
     Hibernate.initialize(portfolio.getTeam());
     Hibernate.initialize(portfolio.getLikes());
     Hibernate.initialize(portfolio.getScreenshots());
     Hibernate.initialize(portfolio.getComments());
+
     portfolio.getComments().forEach(c -> {
         if (c.getUser() != null) Hibernate.initialize(c.getUser());
     });
 
-    // ✅ 중복 정리
+    // ✅ 중복 방지 정리
     portfolio.setTeam(new ArrayList<>(new LinkedHashSet<>(portfolio.getTeam())));
     portfolio.setTags(new LinkedHashSet<>(portfolio.getTags()));
     portfolio.setLikes(new LinkedHashSet<>(portfolio.getLikes()));
