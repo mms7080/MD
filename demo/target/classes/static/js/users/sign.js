@@ -38,6 +38,48 @@
     });
 })();
 
+document.addEventListener("DOMContentLoaded", () => {
+    const pw = document.getElementById("password");
+    const pwCheck = document.getElementById("confirmPassword");
+    const pwStatus = document.getElementById("password-status");
+
+    if (!pw || !pwCheck || !pwStatus) return;
+
+    function showMessage(msg, isError = false) {
+        pwStatus.textContent = msg;
+        pwStatus.classList.toggle("error", isError);
+        pwStatus.style.display = "inline-block"; // 표시
+        requestAnimationFrame(() => {
+            pwStatus.style.opacity = "1";
+        });
+    }
+
+    function hideMessage() {
+        pwStatus.style.opacity = "0";
+        setTimeout(() => {
+            pwStatus.style.display = "none"; // 완전 숨김
+            pwStatus.textContent = "";
+            pwStatus.classList.remove("error");
+        }, 200);
+    }
+
+    // 일치 검사
+    function checkPasswordMatch() {
+        const a = pw.value.trim();
+        const b = pwCheck.value.trim();
+
+        if (!a && !b) return hideMessage();
+        if (!a || !b) return showMessage("비밀번호가 일치하지 않습니다.", true);
+        if (a === b) showMessage("비밀번호가 일치합니다.");
+        else showMessage("비밀번호가 일치하지 않습니다.", true);
+    }
+
+    ["input", "change", "keyup", "paste"].forEach((evt) => {
+        pw.addEventListener(evt, checkPasswordMatch);
+        pwCheck.addEventListener(evt, checkPasswordMatch);
+    });
+});
+
 /* ========== 생년월일 → 만 나이 자동 계산 ========== */
 (function () {
     const birth = document.getElementById("birth");
@@ -79,17 +121,15 @@
     if (!ageHidden.value) syncAge();
 })();
 
-/* ========== 이메일 콤보(아이디/도메인) → hidden email 동기화 + 인증코드 발송 ========== */
 (function () {
     const combo = document.getElementById("emailCombo");
     const localEl = document.getElementById("emailLocal");
     const selEl = document.getElementById("emailDomain");
     const custEl = document.getElementById("emailDomainCustom");
     const hidden = document.getElementById("email");
-    const btnSend = document.getElementById("btnSendCode"); // 인증코드 발송 버튼
-    const codeBlock = document.getElementById("codeBlock"); // 인증코드 입력 블록
-    const emailCode = document.getElementById("emailCode"); // 인증코드 입력칸
-    const notice = document.getElementById("ajaxNotice"); // 상태 표시
+    const btn = document.getElementById("btnCheckEmail");
+    const notice = document.getElementById("ajaxNotice");
+    if (!combo || !localEl || !selEl || !hidden || !btn) return;
 
     const csrfHeader = document.querySelector(
         'meta[name="_csrf_header"]'
@@ -97,55 +137,57 @@
     const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
 
     const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-
-    function setNotice(msg, ok) {
-        if (!notice) {
-            alert(msg);
-            return;
-        }
+    const setNotice = (msg, ok) => {
+        if (!notice) return alert(msg);
         notice.textContent = msg;
         notice.className = `note-banner${ok ? "" : " error"}`;
         notice.hidden = false;
-    }
+    };
+    const clearNotice = () => {
+        if (!notice) return;
+        notice.hidden = true;
+        notice.textContent = "";
+        notice.className = "note-banner";
+    };
 
-    // 이메일 동기화
-    function syncEmail() {
-        const local = (localEl?.value || "").trim();
+    const composeEmail = () => {
+        const id = (localEl.value || "").trim();
         const domain =
-            selEl?.value === "__custom__"
+            selEl.value === "__custom__"
                 ? (custEl?.value || "").trim()
-                : selEl?.value || "";
-        const val = local && domain ? `${local}@${domain}` : "";
-        hidden.value = val;
+                : selEl.value || "";
+        return id && domain ? `${id}@${domain}` : "";
+    };
 
-        // 버튼 활성화
-        btnSend.disabled = !isEmail(val);
+    const syncEmail = () => {
+        const v = composeEmail();
+        hidden.value = v;
+        btn.disabled = !isEmail(v);
+        hidden.setCustomValidity("");
+        clearNotice();
+    };
 
-        // 이메일 변경 시 코드 입력 영역 초기화
-        hideCodeBlock();
-    }
-
-    // 직접 입력 토글
-    selEl?.addEventListener("change", () => {
+    // 도메인 select ↔ 직접입력
+    selEl.addEventListener("change", () => {
         const custom = selEl.value === "__custom__";
-        combo?.classList.toggle("is-custom", custom);
-        // 보조: display 토글(프로젝트 CSS에 맞춰 hidden 클래스를 쓰고 있다면 그대로 두세요)
-        if (custEl) custEl.classList.toggle("hidden", !custom);
-        if (custom) custEl?.focus();
+        combo.classList.toggle("is-custom", custom);
+        if (custEl) {
+            custEl.classList.toggle("hidden", !custom);
+            if (custom) custEl.focus();
+        }
         syncEmail();
     });
 
-    // 로컬/커스텀 입력 변화
     [localEl, custEl].forEach((el) => el?.addEventListener("input", syncEmail));
 
-    // 'aaa@gmail.com' 전체 붙여넣기 보정
-    localEl?.addEventListener("input", () => {
+    // 'id@domain.com' 통째로 입력 시 자동 분리
+    localEl.addEventListener("input", () => {
         const raw = localEl.value;
         if (raw.includes("@")) {
             const [id, ...rest] = raw.split("@");
             localEl.value = id;
-            if (selEl) selEl.value = "__custom__";
-            combo?.classList.add("is-custom");
+            selEl.value = "__custom__";
+            combo.classList.add("is-custom");
             if (custEl) {
                 custEl.classList.remove("hidden");
                 custEl.value = rest.join("@");
@@ -154,85 +196,160 @@
         syncEmail();
     });
 
-    // 인증코드 영역 / 타이머
-    let cooldownTimer = null;
-    function showCodeBlock() {
-        if (codeBlock) codeBlock.hidden = false;
-        emailCode?.focus({ preventScroll: true });
-    }
-    function hideCodeBlock() {
-        if (codeBlock) codeBlock.hidden = true;
-        if (emailCode) emailCode.value = "";
-        stopCooldown();
-    }
-    function startCooldown(seconds = 60) {
-        let left = seconds;
-        btnSend.disabled = true;
-        const original = "인증코드 발송";
-        btnSend.textContent = `재발송(${left}s)`;
-        cooldownTimer = setInterval(() => {
-            left--;
-            btnSend.textContent = `재발송(${left}s)`;
-            if (left <= 0) {
-                clearInterval(cooldownTimer);
-                cooldownTimer = null;
-                btnSend.textContent = original;
-                btnSend.disabled = !isEmail(hidden.value);
-            }
-        }, 1000);
-    }
-    function stopCooldown() {
-        if (cooldownTimer) {
-            clearInterval(cooldownTimer);
-            cooldownTimer = null;
+    // 중복 확인
+    const checkEmailDup = async () => {
+        const email = composeEmail();
+        hidden.value = email;
+
+        if (!isEmail(email)) {
+            setNotice("올바른 이메일을 입력하세요.", false);
+            validityTarget.setCustomValidity?.("올바른 이메일을 입력하세요.");
+            hidden.reportValidity?.();
+            return;
         }
-        btnSend.textContent = "인증하기";
-    }
 
-    // 인증코드 발송 (AJAX)
-    btnSend?.addEventListener("click", async () => {
-        const email = hidden.value;
-        if (!isEmail(email)) return;
-
-        btnSend.disabled = true;
-        const body = new URLSearchParams({ email });
+        btn.disabled = true;
         try {
-            const res = await fetch("/api/send-code", {
-                method: "POST",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type":
-                        "application/x-www-form-urlencoded; charset=UTF-8",
-                    ...(csrfHeader && csrfToken
-                        ? { [csrfHeader]: csrfToken }
-                        : {}),
-                },
-                body,
-            });
-
-            const data = await res.json().catch(() => ({}));
-            if (res.ok && (data.ok ?? true)) {
-                setNotice(
-                    data.message || "인증 코드가 발송되었습니다. (5분 유효)",
-                    true
-                );
-                showCodeBlock();
-                startCooldown(60);
+            const res = await fetch(
+                `/api/check-email?email=${encodeURIComponent(email)}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        ...(csrfHeader && csrfToken
+                            ? { [csrfHeader]: csrfToken }
+                            : {}),
+                    },
+                }
+            );
+            const exists = await res.json(); // true: 중복, false: 사용 가능
+            if (exists) {
+                setNotice("이미 사용 중인 이메일입니다.", false);
+                hidden.setCustomValidity("이미 사용 중인 이메일입니다.");
             } else {
-                setNotice(
-                    data.message ||
-                        `메일 발송에 실패했습니다. (status ${res.status})`,
-                    false
-                );
-                btnSend.disabled = !isEmail(hidden.value);
+                setNotice("사용 가능한 이메일입니다.", true);
+                hidden.setCustomValidity("");
             }
-        } catch (e) {
-            setNotice("네트워크 오류로 발송 실패", false);
-            btnSend.disabled = !isEmail(hidden.value);
+        } catch {
+            setNotice("중복 확인 중 오류가 발생했습니다.", false);
+            hidden.setCustomValidity("이메일 중복 확인 실패");
+        } finally {
+            btn.disabled = !isEmail(hidden.value);
         }
-    });
+    };
 
-    // 초기값 세팅
-    if (selEl && !selEl.value) selEl.value = "gmail.com";
+    btn.addEventListener("click", checkEmailDup);
+
+    // 초기값
+    if (!selEl.value) selEl.value = "gmail.com";
     syncEmail();
 })();
+
+/* ===== 모달 닫힘/열림 시 회원가입 폼 초기화 ===== */
+document.addEventListener("DOMContentLoaded", () => {
+    const rNone = document.getElementById("modal-none");
+    const rSignin = document.getElementById("modal-signin");
+    const rSignup = document.getElementById("modal-signup");
+
+    const signupForm = document.querySelector(
+        ".kf-auth-modal.signup form.auth-form"
+    );
+    if (!signupForm || !rNone || !rSignin || !rSignup) return;
+
+    // 초기화 함수
+    function resetSignupForm() {
+        // 1) 기본 form reset
+        signupForm.reset();
+
+        // 2) 수동으로 남는 값/배너/클래스 정리
+        //   - 아이디 중복 배너
+        const userStatus = document.getElementById("usernameStatus");
+        if (userStatus) {
+            userStatus.textContent = "";
+            userStatus.hidden = true;
+            userStatus.className = "note-banner inline";
+        }
+
+        //   - 비밀번호 상태 배너
+        const pwStatus = document.getElementById("password-status");
+        if (pwStatus) {
+            pwStatus.textContent = "";
+            pwStatus.style.display = "none";
+            pwStatus.style.opacity = "0";
+            pwStatus.classList.remove("error");
+        }
+
+        //   - 이메일 컴포즈/중복배너/버튼 상태
+        const combo = document.getElementById("emailCombo");
+        const localEl = document.getElementById("emailLocal");
+        const selEl = document.getElementById("emailDomain");
+        const custEl = document.getElementById("emailDomainCustom");
+        const hidden = document.getElementById("email");
+        const btnMail = document.getElementById("btnCheckEmail");
+        const ajaxNt = document.getElementById("ajaxNotice");
+
+        if (ajaxNt) {
+            ajaxNt.textContent = "";
+            ajaxNt.hidden = true;
+            ajaxNt.className = "note-banner";
+        }
+        if (hidden) hidden.value = "";
+
+        // 도메인은 기본값으로
+        if (selEl) selEl.value = "gmail.com";
+        // 직접 입력 필드/클래스 숨김
+        if (combo) combo.classList.remove("is-custom");
+        if (custEl) {
+            custEl.value = "";
+            custEl.classList.add("hidden");
+        }
+        // 로컬 아이디도 비움
+        if (localEl) localEl.value = "";
+
+        // 이메일 버튼 비활성화
+        if (btnMail) btnMail.disabled = true;
+
+        //   - 아이디 중복확인 버튼 비활성화 (입력 없으므로)
+        const btnId = document.getElementById("btnCheckId");
+        if (btnId) btnId.disabled = false; // 확인 버튼 자체는 클릭 가능하게 두고,
+        // 필요하면 true로 막고 입력 시 활성화하도록 바꿔도 됨
+
+        //   - 커스텀 유효성 메시지 제거
+        [
+            "username",
+            "password",
+            "confirmPassword",
+            "name",
+            "birth",
+            "ageHidden",
+        ].forEach((id) => {
+            const el = document.getElementById(id);
+            try {
+                el?.setCustomValidity?.("");
+            } catch (e) {}
+        });
+
+        // 3) 자동완성 흔적 제거(브라우저가 고집 세면 수동 초기화)
+        signupForm
+            .querySelectorAll(
+                'input[type="text"], input[type="password"], input[type="date"]'
+            )
+            .forEach((el) => {
+                if (el.id !== "emailDomain") el.value = "";
+            });
+
+        // 4) 필요하면 포커스(선택)
+        const username = document.getElementById("username");
+        username?.focus();
+    }
+
+    // “닫힘(=modal-none)으로 전환될 때” 초기화
+    rNone.addEventListener("change", () => {
+        if (rNone.checked) resetSignupForm();
+    });
+
+    // “회원가입 모달을 열 때”도 항상 초기화(원하면 주석 처리)
+    rSignup.addEventListener("change", () => {
+        if (rSignup.checked) resetSignupForm();
+    });
+});

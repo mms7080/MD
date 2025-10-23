@@ -1,11 +1,118 @@
-<!DOCTYPE html>
-<html lang="ko">
+<!-- <!DOCTYPE html>
+<html lang="ko" th:replace="~{fragments/folios-layout :: layout(
+  pageTitle = 'Write',
+  activeMenu = 'write',
+  css = ~{::#write-css},
+  js = ~{},
+  content = ~{:: #folios-write-content}
+)}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <th:block id="write-css">
+    <link th:href="@{/css/folios/write.css}" rel="stylesheet" />
+  </th:block>
 </head>
-<body th:replace="fragments/layout :: body" th:with="title='Folios', active='folios'">
-    
+<body>
+  <div id="folios-write-content">
+    <div class="folio-create-header">
+      <h1>어떤 템플릿으로 Folio를 만들고 싶으신가요?</h1>
+      <p>원하는 템플릿을 선택하면 그에 최적화된 Folio를 만들어드려요.</p>
+    </div>
+    <div class="template-grid">
+      <a href="/folios/edit?template=1" class="template-card minimal">
+        <div class="template-card-visual"><div class="minimal-preview"><div class="line title"></div><div class="line"></div><div class="line short"></div></div></div>
+        <div class="template-card-footer"><span>기본 템플릿 1</span></div>
+      </a>
+
+      <a href="/folios/edit?template=2" class="template-card creative">
+        <div class="template-card-visual"><img src="https://picsum.photos/seed/template2/400/600" alt="크리에이티브 템플릿" /></div>
+        <div class="template-card-footer"><span>기본 템플릿 2</span></div>
+      </a>
+
+      <a href="/folios/edit?template=3" class="template-card professional">
+        <div class="template-card-visual"><div class="professional-preview"><span class="avatar"></span><span class="name">Your Name</span><span class="role">Job Title</span></div></div>
+        <div class="template-card-footer"><span>기본 템플릿 3</span></div>
+      </a>
+    </div>
+  </div>
 </body>
+</html> -->
+
+<!DOCTYPE html>
+<html
+    lang="ko"
+    th:replace="~{fragments/folios-layout :: layout(
+  pageTitle = 'Write',
+  activeMenu = 'write',
+  css = ~{::#write-css},
+  js = ~{},
+  content = ~{:: #folios-write-content}
+)}"
+>
+    <head>
+        <th:block id="write-css">
+            <link th:href="@{/css/folios/write.css}" rel="stylesheet" />
+        </th:block>
+    </head>
+    <body>
+        <div id="folios-write-content">
+            <div class="folio-create-header">
+                <h1>어떤 템플릿으로 Folio를 만들고 싶으신가요?</h1>
+                <p>
+                    원하는 템플릿을 선택하면 그에 최적화된 Folio를 만들어드려요.
+                </p>
+            </div>
+
+            <div class="template-grid">
+                <!-- ✅ 템플릿 1 (minimal) -->
+                <a
+                    th:href="@{/folios/edit(template='dev-basic')}"
+                    class="template-card minimal"
+                >
+                    <div class="template-card-visual">
+                        <div class="minimal-preview">
+                            <div class="line title"></div>
+                            <div class="line"></div>
+                            <div class="line short"></div>
+                        </div>
+                    </div>
+                    <div class="template-card-footer">
+                        <span>기본 템플릿 1</span>
+                    </div>
+                </a>
+
+                <!-- 템플릿 2 (creative) -->
+                <a
+                    th:href="@{/folios/ppt(template=2)}"
+                    class="template-card creative"
+                >
+                    <div class="template-card-visual">
+                        <img
+                            src="https://picsum.photos/seed/template2/400/600"
+                            alt="크리에이티브 템플릿"
+                        />
+                    </div>
+                    <div class="template-card-footer">
+                        <span>기본 템플릿 2</span>
+                    </div>
+                </a>
+
+                <!-- 템플릿 3 (professional) -->
+                <a
+                    th:href="@{/folios/ppt(template=3)}"
+                    class="template-card professional"
+                >
+                    <div class="template-card-visual">
+                        <div class="professional-preview">
+                            <span class="avatar"></span
+                            ><span class="name">Your Name</span
+                            ><span class="role">Job Title</span>
+                        </div>
+                    </div>
+                    <div class="template-card-footer">
+                        <span>기본 템플릿 3</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </body>
 </html>

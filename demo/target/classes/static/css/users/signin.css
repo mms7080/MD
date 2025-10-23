@@ -1,20 +1,18 @@
-/* ===== 모달 로그인 폼 스타일을 페이지로 1:1 이식 (업데이트: 여백 강화) ===== */
+/* ===== 모달 로그인 폼 스타일을 페이지로 이식 ===== */
 .auth {
     --form-max: 420px; /* 모달과 동일 폼 최대폭 */
 }
 
-/* 본문 패널 박스: 가운데 정렬 + 내부/외부 여백 확장 */
+/* 히어로는 그대로 두되 본문은 모달 박스를 중앙에 */
 .auth .kf-auth__content--page {
     position: relative;
     width: min(560px, calc(100% - 24px));
-    margin: 70px auto 88px; /* ⬆ 폼 박스 바깥 '아래' 여백 ↑ (56 → 88) */
+    margin: 24px auto 64px;
     border-radius: 18px;
     background: var(--bg, #111);
     border: 1px solid var(--border);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), 0 6px 18px rgba(0, 0, 0, 0.3);
-    padding: 26px 20px 24px; /* ⬆ 폼 박스 '내부' 위아래 여백 ↑ (20/16 → 26/24) */
-    display: grid;
-    justify-items: center; /* 내부 요소들을 수평 중앙으로 */
+    padding: 20px 18px 16px; /* 모달의 .auth-right padding */
 }
 
 /* 모달의 오른쪽 패널 그대로 */
@@ -25,34 +23,45 @@
     justify-content: center;
 }
 
-/* 제목/폼의 가로폭을 동일하게 맞춰 왼쪽선 정렬 */
+/* 제목/배너/폼 폭 중앙 정렬 */
 .auth .auth-title,
+.auth .note-banner,
 .auth .auth-form {
-    width: var(--form-max);
-    max-width: none;
-    margin-left: 0;
-    margin-right: 0;
+    max-width: var(--form-max);
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* 제목 간격/정렬 */
 .auth .auth-title {
-    text-align: left;
-    margin: 2px 0 18px; /* 제목-폼 간격 살짝 확보 */
+    margin: 4px 0 20px;
     font-size: 24px;
     font-weight: 800;
     color: var(--text, #fff);
 }
 
-/* 폼 베이스 (모달 동일) + 내부 패딩으로 위/아래 여백 추가 */
+.auth .note-banner {
+    margin: 0 0 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text, #fff);
+    font-weight: 700;
+    font-size: 13px;
+}
+.auth .note-banner.error {
+    background: rgba(239, 68, 68, 0.18);
+}
+
+/* 폼 베이스 (모달 동일) */
 .auth .auth-form {
     display: grid;
-    gap: 14px; /* 입력 요소 간 간격 살짝 ↑ (12 → 14) */
-    padding: 8px 0 10px; /* ⬆ 폼 내부 위/아래 여백 추가 */
+    justify-items: center; /* 내부 요소들을 수평 중앙으로 */
 }
 .auth .auth-field {
     display: grid;
     gap: 4px;
-} /* 라벨-인풋 간격 */
+}
 .auth .auth-label {
     font-size: 12px;
     font-weight: 800;
@@ -89,7 +98,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    margin: 10px 0 8px; /* 폼 내부 여백 확장과 균형 */
+    margin: 8px 0 6px;
     color: var(--text, #fff);
 }
 .auth .auth-keep input {
@@ -128,22 +137,9 @@
     filter: brightness(1.05);
 }
 
-/* 기존 카드형 로그인 스타일 무력화(겹침 방지) */
-.auth .auth-container {
-    display: block;
-}
+/* 기존 카드형 스타일이 남아있다면 무력화(겹침 방지) */
 .auth .auth-card {
     all: unset;
-}
-.auth .field,
-.auth .row,
-.auth .btn {
-    all: unset;
-}
-
-/* 히어로-본문 간격 살짝 정돈(옵션) */
-.auth-hero {
-    padding-bottom: 10px;
 }
 
 /* 반응형 */

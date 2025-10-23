@@ -1,0 +1,123 @@
+/* 토글 체크박스 */
+#modal-edit-profile { display: none; }
+
+/* 오버레이 + 컨테이너 */
+.kf-editmodal {
+  position: fixed; inset: 0; display: none;
+  align-items: center; justify-content: center;
+  z-index: 1000;
+}
+#modal-edit-profile:checked + .kf-editmodal { display: flex; }
+
+.kf-editmodal__overlay {
+  position: absolute; inset: 0; 
+  background: var(--overlay, rgba(0,0,0,.45));
+}
+
+/* 다이얼로그 */
+.kf-editmodal__dialog {
+  position: relative; z-index: 1;
+  width: min(680px, 90vw);
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 20px 22px;
+}
+.kf-editmodal__header { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.kf-editmodal__title { font-size: 18px; font-weight: 700; }
+.kf-editmodal__close {
+  border: 0; background: transparent; font-size: 22px; line-height: 1;
+  color: var(--text); cursor: pointer;
+}
+
+/* 테이블 폼 */
+.kf-formtable { width:100%; border-collapse: collapse; margin-top: 14px; }
+.kf-formtable th, .kf-formtable td { border-top:1px solid var(--border); padding:12px 10px; vertical-align: middle; }
+.kf-formtable th { width: 140px; text-align: left; color: var(--muted); font-weight:600; background: transparent; }
+
+/* 입력 공통 */
+.kf-editmodal input[type="text"],
+.kf-editmodal input[type="number"],
+.kf-editmodal input[type="password"] {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: 42px;
+  padding: 0 12px;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--page);
+  color: var(--text);
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+.kf-editmodal input[type="text"]:focus,
+.kf-editmodal input[type="number"]:focus,
+.kf-editmodal input[type="password"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg);
+}
+.kf-editmodal input.ro[disabled] {
+  background: var(--rail);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+/* 비밀번호 확인칸 간격 */
+.kf-editmodal input + input { margin-top: 8px; }
+
+/* 액션 영역 */
+.kf-editmodal__actions {
+  display:flex; gap:10px; justify-content:flex-end; margin-top:16px;
+}
+
+/* 버튼 */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  height:40px; padding:0 14px; border-radius:10px;
+  border:1px solid transparent; cursor:pointer;
+  -webkit-text-fill-color: currentColor;
+}
+.btn.primary {
+  background: var(--btn-primary-bg, #111);
+  color: var(--btn-primary-fg, #fff);
+  border-color: var(--btn-primary-border, #111);
+}
+.btn.primary:hover,
+.btn.primary:focus-visible { filter: brightness(1.08); }
+
+.btn.ghost {
+  background: var(--btn-bg, var(--page));
+  color: var(--btn-fg, var(--text));
+  border-color: var(--btn-border, var(--border));
+}
+.btn.ghost:hover,
+.btn.ghost:focus-visible { background: var(--accent-ghost); }
+
+/* 프로필 카드 하단 라벨형 버튼 */
+.profile-actions { margin-top: 12px; }
+.linklike-btn {
+  border:1px solid var(--btn-border, var(--border));
+  background: var(--btn-bg, var(--page));
+  color: var(--btn-fg, var(--text));
+  border-radius:10px; height:36px; padding:0 12px; cursor:pointer;
+  display:inline-flex; align-items:center; text-decoration:none;
+  -webkit-text-fill-color: currentColor;
+}
+.linklike-btn:hover { background: var(--accent-ghost); }
+
+.check-grid {
+  display: flex;
+  flex-wrap: wrap;        /* 줄바꿈 허용 */
+  gap: 12px;              /* 카드 간격 */
+}
+
+.check-grid label {
+  flex: 1 1 140px;        /* 각 라벨이 최소 140px, 자동으로 균등 배치 */
+  white-space: nowrap;    /* 텍스트 줄바꿈 방지 */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+} 

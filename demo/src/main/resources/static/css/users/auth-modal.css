@@ -1,0 +1,731 @@
+:root {
+    --auth-modal-min: 720px;
+    --email-verify-w: 96px; /* 인증하기 버튼 폭 */
+    --email-domain-w: 100px; /* 도메인 칸 폭 */
+}
+
+/* 1) 모달 컨테이너 & 오버레이 */
+.kf-auth-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    --form-max: 420px;
+}
+.kf-auth__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+}
+
+/* 2) 모달 박스(고정 높이, 내부 스크롤 없음) */
+.kf-auth-modal .auth-right .auth-title,
+.kf-auth-modal .auth-right .note-banner,
+.kf-auth-modal .auth-right .auth-form {
+    max-width: var(--form-max);
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.kf-auth-modal .kf-auth__content {
+    margin: 56px auto 24px;
+    height: clamp(620px, 75vh, var(--auth-modal-min));
+    overflow: hidden;
+}
+
+/* 공통 모달 박스 */
+.kf-auth__content {
+    position: relative;
+    width: clamp(820px, 78vw, 1000px);
+    max-height: calc(100vh - 48px);
+    border-radius: 18px;
+    background: var(--bg, #111);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), 0 6px 18px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.kf-auth__content::-webkit-scrollbar {
+    display: none;
+}
+
+/* 닫기 */
+.kf-auth__close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    z-index: 1;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text, #fff);
+    font-size: 20px;
+    line-height: 0;
+    cursor: pointer;
+}
+.kf-auth__close:hover {
+    filter: brightness(1.08);
+}
+
+/* 3) 좌/우 그리드 */
+.kf-auth-modal .kf-auth__grid {
+    height: clamp(620px, 75vh, var(--auth-modal-min));
+}
+.kf-auth__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 520px;
+    overflow: visible;
+}
+.auth-left,
+.auth-right {
+    min-width: 0;
+}
+.auth-right {
+    padding: 20px 18px 16px;
+    background: var(--bg, #0d0f12);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 4) 좌측 브랜딩 */
+.auth-left {
+    background: linear-gradient(180deg, #2b2f36, #1c2026);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+}
+.auth-left__inner {
+    text-align: center;
+}
+.auth-welcome {
+    margin: 0 0 8px;
+    font-weight: 700;
+    opacity: 0.9;
+}
+.brand-title {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+}
+.brand-sub {
+    margin: 4px 0 10px;
+    opacity: 0.9;
+}
+.auth-cta .link {
+    color: #a8d3ff;
+    cursor: pointer;
+}
+
+/* 5) 타이틀/배너 */
+.auth-title {
+    margin: 0 0 20px;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text, #fff);
+}
+.note-banner {
+    margin: 0 0 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text, #fff);
+    font-weight: 700;
+    font-size: 13px;
+}
+.note-banner.error {
+    background: rgba(239, 68, 68, 0.18);
+}
+
+/* 6) 폼 베이스 */
+.auth-form {
+    display: grid;
+    gap: 12px;
+}
+.auth-field {
+    display: grid;
+    gap: 4px;
+}
+.auth-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted, #9aa1a9);
+}
+.kf-auth-modal .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* 아이디 + 중복확인 */
+.kf-auth-modal .row-2.row-id {
+    grid-template-columns: 1fr auto;
+    column-gap: 12px;
+}
+.kf-auth-modal #btnCheckId {
+    min-width: 96px;
+    padding: 0 10px;
+}
+
+/* 인풋 공통 스타일(밑줄형) */
+.kf-auth-modal .auth-field input[type="text"],
+.kf-auth-modal .auth-field input[type="password"],
+.kf-auth-modal .auth-field input[type="email"],
+.kf-auth-modal .auth-field input[type="date"],
+.kf-auth-modal .email-combo input,
+.kf-auth-modal .email-combo select {
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1.5px solid var(--border, #2a2f38);
+    border-radius: 0;
+    color: var(--text, #fff);
+    box-shadow: none;
+    appearance: auto;
+}
+.kf-auth-modal .auth-field input:focus,
+.kf-auth-modal .email-combo input:focus,
+.kf-auth-modal .email-combo select:focus {
+    outline: none;
+    border-bottom-color: var(--border-strong, rgba(255, 255, 255, 0.25));
+    border-bottom-width: 2px;
+}
+.kf-auth-modal .auth-field input::placeholder,
+.kf-auth-modal .email-combo input::placeholder {
+    color: var(--muted, #9aa1a9);
+    opacity: 0.6;
+}
+
+/* 체크박스 */
+.auth-keep {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 6px;
+    color: var(--text);
+}
+.auth-keep input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--text, #fff);
+}
+
+/* CTA 버튼 */
+.auth-btn {
+    width: 100%;
+    height: 52px;
+    margin-top: 12px;
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(180deg, #2b2f36, #1c2026);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+}
+.auth-btn:hover {
+    filter: brightness(1.05);
+}
+
+.link {
+    color: #8cc3ff;
+    text-decoration: none;
+}
+.link.small {
+    font-size: 12px;
+}
+.auth-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+}
+.field-error {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #ff6b6b;
+}
+
+/* 7) 이메일 콤보 + 인증 코드 */
+/* DOM 순서 그대로 4칼럼: [local][@][domain][button] */
+.kf-auth-modal .email-combo,
+.kf-auth-modal .email-combo.email-combo--widebtn {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr) /* local (아이디) */
+        max-content /* @ */
+        var(--email-domain-w) /* domain 고정폭 */
+        var(--email-verify-w) /* 버튼 고정폭 */ !important;
+    column-gap: 10px;
+    align-items: end;
+    width: 100%;
+}
+/* 숨겨진 실제 이메일 input은 레이아웃 차지 X */
+.kf-auth-modal .email-combo input[type="hidden"] {
+    display: none !important;
+}
+
+.email-combo .at {
+    margin-bottom: 10px;
+    color: var(--muted, #9aa1a9);
+    font-weight: 800;
+    opacity: 0.7;
+}
+
+/* 도메인 select ↔ custom input 토글 */
+.domain-wrap {
+    position: relative;
+    display: grid;
+}
+.domain-wrap input {
+    display: none;
+}
+.domain-wrap:has(select option[value="__custom__"]:checked) select {
+    display: none;
+}
+.domain-wrap:has(select option[value="__custom__"]:checked) input {
+    display: block;
+}
+
+/* 버튼/도메인 칼럼 안에서만 줄도록 */
+.kf-auth-modal .email-combo .domain-wrap,
+.kf-auth-modal .email-combo .domain-wrap > * {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.kf-auth-modal .email-combo .domain-wrap select,
+.kf-auth-modal .email-combo .domain-wrap input {
+    padding-left: 6px;
+    padding-right: 6px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* 모달 범위 버튼 공통 */
+.kf-auth-modal .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border, #2a2f38);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text, #fff);
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: none;
+    text-shadow: none;
+}
+.kf-auth-modal .btn.small {
+    height: 44px;
+}
+.kf-auth-modal .btn:hover:not(:disabled) {
+    filter: brightness(1.06);
+}
+.kf-auth-modal .btn:disabled {
+    opacity: 0.55;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--muted, #9aa1a9);
+    border-color: var(--border, #2a2f38);
+}
+
+/* 인증 버튼을 칼럼 폭에 정확히 맞춤 */
+#btnSendCode {
+    width: var(--email-verify-w) !important;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+
+/* 이메일 줄: 내부 밑줄 제거 + @ 밑줄 없음 (두 조각으로 그리기) */
+.kf-auth-modal .email-combo input,
+.kf-auth-modal .email-combo select {
+    border-bottom: 1.5px solid var(--border, #2a2f38) !important;
+}
+.kf-auth-modal .email-combo::before,
+.kf-auth-modal .email-combo::after {
+    content: none !important;
+}
+.kf-auth-modal .email-combo::before {
+    grid-column: 1 / 2;
+} /* local 아래 */
+.kf-auth-modal .email-combo::after {
+    grid-column: 3 / 4;
+} /* domain 아래 */
+
+/* 인증코드 블록 */
+.code-block {
+    margin-top: 4px;
+    gap: 12px;
+    align-items: end;
+}
+#code-open:checked ~ .code-block,
+.code-block.is-open {
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+
+/* 8) 반응형 */
+@media (max-width: 760px) {
+    .kf-auth-modal .kf-auth__content {
+        height: auto;
+        max-height: calc(100vh - 48px);
+    }
+    .kf-auth-modal .kf-auth__grid {
+        height: auto;
+        min-height: unset;
+    }
+    .kf-auth__grid {
+        grid-template-columns: 1fr;
+    }
+    .auth-left {
+        display: none;
+    }
+    .kf-auth__content {
+        margin: 36px auto;
+        width: min(520px, calc(100% - 24px));
+    }
+
+    /* 버튼은 아래 줄, 윗줄은 [local][@][domain] */
+    .email-combo {
+        grid-template-columns: 1fr max-content 1fr;
+    }
+    .email-combo .btn.small {
+        grid-column: 1 / -1;
+    }
+    /* 밑줄 조각은 그대로: before=1/2, after=3/4 이므로 모바일에서도 @ 밑줄 없음 */
+}
+
+/* 9) 라디오 토글로 모달 열기/닫기 */
+#modal-signin:checked ~ .kf-auth-modal.signin,
+#modal-signup:checked ~ .kf-auth-modal.signup {
+    display: block;
+}
+
+/* 모달 열리면 본문 스크롤 잠금(형제에 .page-wrap 있을 때) */
+#modal-signin:checked ~ .page-wrap,
+#modal-signup:checked ~ .page-wrap {
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* === 날짜 입력 달력 아이콘 보이기 (모달 한정) === */
+.kf-auth-modal .auth-field input[type="date"] {
+    /* 기존 appearance: none; 덮어쓰기 */
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    -moz-appearance: auto !important;
+    padding-right: 10px; /* 아이콘 자리 */
+    background-color: transparent;
+    border-radius: 0;
+}
+
+/* Chrome/Edge/Safari: 네이티브 달력 아이콘 스타일 */
+.kf-auth-modal
+    .auth-field
+    input[type="date"]::-webkit-calendar-picker-indicator {
+    width: 18px;
+    height: 18px;
+    opacity: 0.9;
+    cursor: pointer;
+    filter: invert(80%) brightness(1.1); /* 다크 UI에서 보이게 */
+}
+
+/* 다크 컨트롤 색상 힌트 */
+.kf-auth-modal {
+    color-scheme: dark;
+}
+
+/* === 성별 라디오: 글씨 작게 + 가운데 정렬 === */
+.kf-auth-modal fieldset.auth-field .radios {
+    display: flex;
+    justify-content: center; /* 가로 가운데 */
+    align-items: center; /* 세로 정렬 */
+    gap: 12px; /* 버튼 사이 간격 (원하면 8~16px 조절) */
+}
+
+/* 라디오 라벨(남자/여자) 글씨 크기 축소 */
+.kf-auth-modal fieldset.auth-field .radio span {
+    font-size: 14px; /* 기본 12px (더 작게: 11px) */
+    line-height: 1.1;
+}
+
+/* 라벨 자체도 가운데 정렬되도록 정돈 */
+.kf-auth-modal fieldset.auth-field .radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px; /* 동그라미와 텍스트 사이 */
+}
+
+.kf-auth-modal .row-2 > fieldset.auth-field:has(input[name="gender"]) {
+    max-width: 178px;
+    width: 100%;
+    justify-self: left; /* 그리드 셀 안에서 가운데로 */
+    margin: 0;
+}
+
+/* === 브랜딩 패널 제거 + 오른쪽 폼만 중앙 배치 === */
+/* .kf-auth-modal .auth-left {
+    display: none !important;
+}
+.kf-auth-modal .kf-auth__grid {
+    grid-template-columns: 1fr !important; 
+}
+
+/* 모달 너비를 폼에 맞게 슬림화 + 가운데 정렬 유지 
+.kf-auth-modal .kf-auth__content {
+    width: min(
+        560px,
+        calc(100% - 24px)
+    ) !important; 
+    margin: 56px auto 24px !important; 
+} */
+
+/* ---------- Left Branding Panel (감각적/미니멀) ---------- */
+.auth-left {
+    position: relative;
+    background: radial-gradient(
+            800px 260px at 10% 0%,
+            color-mix(in oklab, var(--primary, #7aa8ff) 20%, transparent),
+            transparent 60%
+        ),
+        radial-gradient(
+            900px 260px at 95% 0%,
+            color-mix(in oklab, var(--accent, #ff9ecf) 22%, transparent),
+            transparent 60%
+        ),
+        linear-gradient(180deg, #15181d, #0f1216);
+    color: #fff;
+    padding: 28px 26px;
+    overflow: hidden;
+}
+
+/* 부드러운 그리드 무늬 */
+.auth-left::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background: repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.04) 0 1px,
+            transparent 1px 16px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.04) 0 1px,
+            transparent 1px 16px
+        );
+    opacity: 0.18;
+    pointer-events: none;
+    mask-image: radial-gradient(
+        120% 100% at 50% 0%,
+        #000 40%,
+        transparent 100%
+    );
+}
+
+/* 표면 */
+.kf-brand {
+    position: relative;
+    max-width: 460px;
+    width: 100%;
+    margin-inline: auto;
+}
+
+/* 상단: 워드마크/뱃지 */
+.kf-brand__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.kf-wordmark {
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    opacity: 0.95;
+}
+.kf-wordmark .star {
+    margin-left: 6px;
+    opacity: 0.9;
+}
+.kf-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* 헤드라인/서브 */
+.kf-headline {
+    margin: 10px 0 6px;
+    font-size: 26px;
+    font-weight: 900;
+    line-height: 1.25;
+}
+.kf-headline em {
+    color: color-mix(in oklab, var(--primary, #7aa8ff) 70%, #fff);
+    font-style: normal;
+}
+.kf-sub {
+    margin: 0 0 14px;
+    color: #d2d7de;
+    opacity: 0.9;
+}
+
+/* 시각 카드(겹친 스크린샷) */
+.kf-shots {
+    position: relative;
+    height: 220px; /* 패널 안에서 과하지 않게 */
+    margin: 12px 0 14px;
+}
+.kf-shots .shot {
+    --r: 12px;
+    position: absolute;
+    inset: auto;
+    width: 56%;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--r);
+    background: linear-gradient(180deg, #2b2f36, #1c2026);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.42), 0 6px 16px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+.kf-shots .shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* 좌/우 카드 배치 + 가벼운 부유 애니메이션 */
+.kf-shots .s1 {
+    left: 6%;
+    top: 12%;
+    transform: rotate(-6deg);
+    animation: float1 7s ease-in-out infinite;
+}
+.kf-shots .s2 {
+    right: 6%;
+    bottom: 4%;
+    transform: rotate(7deg);
+    animation: float2 7.5s ease-in-out infinite;
+}
+
+@keyframes float1 {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-6deg);
+    }
+    50% {
+        transform: translateY(-6px) rotate(-6deg);
+    }
+}
+@keyframes float2 {
+    0%,
+    100% {
+        transform: translateY(0) rotate(7deg);
+    }
+    50% {
+        transform: translateY(8px) rotate(7deg);
+    }
+}
+
+/* 기능 칩 */
+.kf-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 14px;
+}
+.kf-chips .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    font-size: 12px;
+    font-weight: 800;
+    color: #fff;
+}
+
+/* 소셜 프루프 */
+.kf-proof {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #d7dce2;
+    font-weight: 800;
+}
+.kf-proof .dots {
+    display: inline-flex;
+    gap: 4px;
+}
+.kf-proof .dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--primary, #7aa8ff) 60%, #fff);
+    box-shadow: 0 0 0 3px rgba(122, 168, 255, 0.18);
+}
+.kf-proof .dots span:nth-child(2) {
+    background: color-mix(in oklab, var(--accent, #ff9ecf) 70%, #fff);
+    box-shadow: 0 0 0 3px rgba(255, 158, 207, 0.18);
+}
+.kf-proof .dots span:nth-child(3) {
+    background: #8de0c6;
+    box-shadow: 0 0 0 3px rgba(141, 224, 198, 0.18);
+}
+
+/* 접근성: 모션 최소화 설정 존중 */
+@media (prefers-reduced-motion: reduce) {
+    .kf-shots .shot {
+        animation: none;
+    }
+}
+
+/* 모바일에서는 원래처럼 좌측 숨김 */
+@media (max-width: 760px) {
+    .auth-left {
+        display: none;
+    }
+}
+
+#password-status {
+  display: none; /* 기본은 숨김 */
+  opacity: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text, #fff);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#password-status.error {
+  background: rgba(239, 68, 68, 0.18);
+}

@@ -1,0 +1,116 @@
+/* /resources/static/css/folios/append.css */
+/* 페이지 공통 */
+.folios-append { display: grid; gap: 24px; }
+
+/* 헤더 */
+.page-head {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+}
+.page-head .folios-title { margin: 0 0 6px 0; }
+.page-head .head-actions { display: flex; gap: 8px; }
+
+/* 버튼 */
+.btn {
+  height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--chip); color: var(--text); font-weight: 600; cursor: pointer;
+}
+.btn:hover { filter: brightness(0.98); }
+.btn:active { transform: translateY(1px); }
+.btn.btn-accent {
+  background: var(--accent-ghost); color: var(--accent); border-color: transparent;
+}
+.btn.ghost { background: transparent; }
+.btn.ghost.danger { color: #e36464; }
+
+/* 패널 */
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(0,0,0,0.02);
+  background: var(--chip);
+  overflow: hidden;
+}
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+}
+.panel-head h2 { margin: 0; font-size: 16px; }
+.panel-body { padding: 16px; }
+
+.panel.is-collapsible .panel-body { display: block; }
+.panel.is-collapsed .panel-body { display: none; }
+
+/* 폼 레이아웃 */
+.form-grid {
+  display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 20px;
+}
+.form-col { display: grid; gap: 14px; }
+.form-col.meta { align-content: start; }
+
+.form-field label { display: block; font-weight: 700; margin-bottom: 8px; }
+.form-field .req { color: var(--accent); }
+.hint { margin-top: 6px; font-size: 12px; color: var(--muted); }
+
+.input, .select, .textarea, .file {
+  width: 100%; border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 12px; background: var(--bg, transparent); color: var(--text);
+  outline: none;
+}
+.textarea { resize: vertical; }
+.select { height: 40px; }
+.file { padding: 10px; background: transparent; }
+
+/* 메타 카드 */
+.meta-card {
+  display: grid; gap: 14px; padding: 14px; border: 1px solid var(--border);
+  border-radius: 12px; background: rgba(0,0,0,0.02); background: var(--chip);
+}
+.meta-row { display: grid; gap: 8px; }
+.meta-row > span { font-weight: 700; }
+
+/* 스위치 */
+.switch { position: relative; width: 46px; height: 26px; display: inline-block; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.switch .slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: #7a7a7a; border-radius: 20px; transition: .2s;
+}
+.switch .slider:before {
+  content: ""; position: absolute; height: 20px; width: 20px; left: 3px; top: 3px;
+  background: #fff; border-radius: 50%; transition: .2s;
+}
+.switch input:checked + .slider { background: var(--accent); }
+.switch input:checked + .slider:before { transform: translateX(20px); }
+
+/* 패널 액션 */
+.panel-actions { display: flex; gap: 8px; margin-top: 14px; }
+
+/* 필터 */
+.filters { display: flex; gap: 8px; align-items: center; }
+.select.compact { height: 32px; padding: 0 10px; }
+
+/* Empty State */
+.empty-state { text-align: center; padding: 32px 16px; }
+.empty-state .emoji { font-size: 32px; margin-bottom: 8px; }
+.empty-state .title { font-weight: 700; margin-bottom: 6px; }
+
+/* 테이블 */
+.table-wrap { overflow: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 12px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+.table thead th { font-size: 13px; color: var(--muted); font-weight: 700; }
+.thumb {
+  width: 72px; height: 48px; background: rgba(0,0,0,0.08); border-radius: 8px;
+}
+.row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.chip {
+  display: inline-block; padding: 4px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); font-weight: 700; font-size: 12px;
+}
+.chip.success { color: #1d9d73; background: rgba(29,157,115,0.12); }
+
+/* 반응형 */
+@media (max-width: 960px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .page-head { align-items: flex-start; flex-direction: column; }
+  .row-actions { justify-content: flex-start; }
+}

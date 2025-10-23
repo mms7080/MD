@@ -1,0 +1,98 @@
+.notice-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: var(--text);
+}
+.notice-form {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+/* 입력창 */
+.notice-form input,
+.notice-form textarea {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--page);
+    color: var(--text);
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.notice-form input:focus,
+.notice-form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-ghost);
+}
+
+/* 버튼 영역 */
+.notice-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* 버튼 공통 */
+.notice-actions .btn-list {
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: var(--radius);
+    font-weight: 700;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.25s ease;
+}
+
+/* hover 효과 */
+.notice-actions .btn-list:hover {
+    background: var(--accent-ghost);
+    color: var(--accent);
+    transform: translateY(-1px);
+}
+
+/* 수정 완료 버튼 강조 */
+.notice-actions button[type="submit"].btn-list {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg); 
+}
+
+.notice-actions button[type="submit"].btn-list:hover {
+    background: var(--accent-ghost);
+    color: var(--accent);
+}
+
+
+.btn-danger {
+    background: var(--danger);
+    border: 1px solid var(--danger);
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: transparent;
+    color: var(--danger);
+}

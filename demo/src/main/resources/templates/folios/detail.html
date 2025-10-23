@@ -1,11 +1,49 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" th:replace="~{fragments/folios-layout :: layout(
+    pageTitle = 'Folio 상세',
+    activeMenu = 'list',
+    css = ~{::#detail-css},
+    js = ~{::#detail-js},
+    content = ~{::#folio-detail-content}
+)}">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <th:block id="detail-css">
+        <link th:href="@{/css/folios/detail.css}" rel="stylesheet" />
+    </th:block>
 </head>
-<body th:replace="fragments/layout :: body" th:with="title='Folios', active='folios'">
-    
+
+<body>
+    <div id="folio-detail-content">
+        <div class="profile-header">
+            <img src="" alt="프로필 사진" class="profile-image" id="profile-image">
+            <div class="profile-info">
+                <h1 class="profile-name" id="profile-name"></h1>
+                <p class="profile-intro" id="profile-job"></p> <div class="tags" id="profile-skills">
+                    </div>
+            </div>
+        </div>
+
+        <div class="detail-section">
+            <h2>Introduction</h2>
+            <p id="introduction-text"></p>
+        </div>
+
+        <div class="detail-section">
+            <h2>참여 포트폴리오</h2>
+            <div class="project-list" id="project-list">
+                </div>
+        </div>
+
+        <div class="detail-section">
+            <h2>Photos</h2>
+            <div class="photo-gallery" id="photo-gallery">
+                </div>
+        </div>
+    </div>
+
+    <th:block id="detail-js">
+        <script th:src="@{/js/folios/detail.js}"></script>
+    </th:block>
 </body>
 </html>

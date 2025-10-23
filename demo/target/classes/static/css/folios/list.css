@@ -1,0 +1,45 @@
+/* /resources/static/css/folios/list.css */
+.folios-title {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+/* 페이지네이션 버튼 스타일 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 40px;
+}
+
+.page-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--chip);
+    color: var(--chip-text);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: var(--accent-ghost);
+    border-color: var(--border-strong);
+}
+
+.page-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    cursor: default;
+}
+
+.loading-message, .empty-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+}

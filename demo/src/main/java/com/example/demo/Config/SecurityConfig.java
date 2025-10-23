@@ -25,18 +25,29 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             // CSRF 기본 활성 (폼에 CSRF 토큰만 넣으면 됨)
-            .csrf(csrf -> { })
+            .csrf(csrf -> csrf
+      .ignoringRequestMatchers("/api/send-code"))
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/", "/main",
                     "/signin",
+                    "/notice/{id}",
+                    "/notice",
                     "/signup",
                     "/error",   
                     "/api/**",
+                    "/portfolios",
+                    "/portfolios/**",
+                    "/folios/**", // 추가 페이지 접근은 허용(준회)
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
-                    "/home/**"
-                    //  ,"/**" 
+                    "/uploads/**", // 이미지(훈희)
+                    "/home/**",
+                    "/forgot/**"
+                   
+                   
+                   
+                    ,"/**" 
                     //일단 테스트로 전체허용해놨다
                 ).permitAll()
 
@@ -46,19 +57,16 @@ public class SecurityConfig {
                 // 학생만 허용
                 // .requestMatchers().hasRole("STUDENT")
 
-                // 로그인 한 사용자만 접근 가능
-                //  .requestMatchers().authenticated()
-
                 .anyRequest().authenticated()
             )
 
             .formLogin(form -> form
-                .loginPage("/signin")              // 커스텀 로그인 페이지 (GET)
+                .loginPage("/home?modal=signin")              // 커스텀 로그인 페이지 (GET)
                 .loginProcessingUrl("/signin") 
                 .usernameParameter("username")
                 .passwordParameter("password")
                 .defaultSuccessUrl("/", true)     // 원래 가려던 페이지 우선
-                .failureUrl("/signin?error=true")
+                .failureUrl("/home?modal=signin")
                 .permitAll()
             )
 

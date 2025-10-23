@@ -1,0 +1,67 @@
+/* /resources/static/css/folios/write.css */
+.folio-create-header { text-align: center; margin-bottom: 50px; }
+.folio-create-header h1 { font-size: 26px; color: var(--text); }
+.folio-create-header p { color: var(--muted); }
+
+.template-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+/* 모든 카드의 공통 크기 지정 */
+.template-card {
+    width: 240px; /* 너비 고정 */
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background-color: var(--panel);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+    color: var(--text);
+    display: flex; /* 내부 요소 정렬을 위해 추가 */
+    flex-direction: column; /* 내부 요소를 세로로 쌓음 */
+}
+.template-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow);
+}
+
+/* 모든 카드의 시각적 영역 높이 고정 */
+.template-card-visual {
+    height: 320px; /* 높이 고정 */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1; /* 남는 공간을 채우도록 함 */
+}
+
+.template-card-footer {
+    padding: 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    flex-shrink: 0; /* 푸터 높이가 줄어들지 않도록 함 */
+}
+
+/* --- 각 템플릿의 고유한 내부 디자인 --- */
+
+/* 템플릿 1: 미니멀 */
+.template-card.minimal .template-card-visual { background: #f0f2f5; padding: 20px; }
+.minimal-preview { width: 100%; }
+.minimal-preview .line { height: 10px; background: #d9dde2; border-radius: 5px; margin-bottom: 12px; }
+.minimal-preview .line.title { height: 16px; width: 60%; }
+.minimal-preview .line.short { width: 80%; }
+
+/* 템플릿 2: 크리에이티브 */
+.template-card.creative img { width: 100%; height: 100%; object-fit: cover; }
+
+/* 템플릿 3: 프로페셔널 */
+.template-card.professional .template-card-visual { background: #1a1a1a; flex-direction: column; }
+.professional-preview { color: #fff; text-align: center; }
+.professional-preview .avatar { display: block; width: 80px; height: 80px; border-radius: 50%; background: #444; margin: 0 auto 12px; }
+.professional-preview .name { display: block; font-size: 18px; font-weight: bold; }
+.professional-preview .role { display: block; font-size: 14px; color: #999; }

@@ -1,11 +1,183 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" th:replace="~{fragments/folios-layout :: layout(
+    pageTitle = '템플릿 관리',
+    activeMenu = 'append',
+    css = ~{::#append-css},
+    js = ~{},
+    content = ~{::#folios-append-content}
+)}">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <th:block id="append-css">
+        <link th:href="@{/css/folios/append.css}" rel="stylesheet" />
+    </th:block>
 </head>
-<body th:replace="fragments/layout :: body" th:with="title='Folios', active='folios'">
-    
+
+<body>
+    <div id="folios-append-content">
+        <div id="folios-append-content" class="folios-append">
+  <!-- 페이지 헤더 & 액션 -->
+  <div class="page-head">
+    <div>
+      <h1 class="folios-title">Folio 템플릿 관리</h1>
+      <p class="muted">관리자용 Folio 템플릿의 생성 · 편집 · 상태 관리를 할 수 있습니다.</p>
+    </div>
+    <div class="head-actions">
+      <button type="button" class="btn btn-accent" data-toggle="new-form">＋ 새 템플릿</button>
+    </div>
+  </div>
+
+  <!-- 새 템플릿 폼 (기본 접힘) -->
+  <section class="panel is-collapsible is-collapsed" id="new-template-panel">
+    <div class="panel-head">
+      <h2>새 템플릿 만들기</h2>
+    </div>
+    <form class="panel-body form-grid" th:action="@{/folios/templates}" method="post" enctype="multipart/form-data">
+      <!-- 좌측 폼 -->
+      <div class="form-col">
+        <div class="form-field">
+          <label for="tplName">템플릿 이름 <span class="req">*</span></label>
+          <input id="tplName" name="name" type="text" class="input" placeholder="예) 기본 포트폴리오" required />
+        </div>
+
+        <div class="form-field">
+          <label for="tplSlug">슬러그 (URL 식별자)</label>
+          <input id="tplSlug" name="slug" type="text" class="input" placeholder="예) basic-portfolio" />
+          <p class="hint">영문 소문자, 숫자, 하이픈만 권장</p>
+        </div>
+
+        <div class="form-field">
+          <label for="tplCategory">카테고리</label>
+          <select id="tplCategory" name="category" class="select">
+            <option value="">선택하세요</option>
+            <option>개인 포트폴리오</option>
+            <option>팀/조직</option>
+            <option>케이스 스터디</option>
+            <option>기타</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="tplDesc">설명</label>
+          <textarea id="tplDesc" name="description" class="textarea" rows="4" placeholder="템플릿에 대한 간단한 설명을 입력하세요."></textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="tplTags">태그</label>
+          <input id="tplTags" name="tags" type="text" class="input" placeholder="예) design, ux, dev" />
+          <p class="hint">콤마(,)로 구분</p>
+        </div>
+      </div>
+
+      <!-- 우측 메타 -->
+      <aside class="form-col meta">
+        <div class="meta-card">
+          <div class="meta-row">
+            <span>공개 여부</span>
+            <label class="switch">
+              <input type="checkbox" name="isPublic" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="meta-row">
+            <label for="tplThumb">썸네일</label>
+            <input id="tplThumb" name="thumbnail" type="file" class="file" accept="image/*" />
+          </div>
+
+          <div class="meta-row">
+            <label for="tplPreview">미리보기 링크</label>
+            <input id="tplPreview" name="previewUrl" type="url" class="input" placeholder="https://…" />
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button type="submit" class="btn btn-accent">저장</button>
+          <button type="reset" class="btn">초기화</button>
+        </div>
+      </aside>
+    </form>
+  </section>
+
+  <!-- 템플릿 리스트 -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>템플릿 목록</h2>
+      <div class="filters">
+        <select class="select compact">
+          <option value="">전체 카테고리</option>
+          <option>개인 포트폴리오</option>
+          <option>팀/조직</option>
+          <option>케이스 스터디</option>
+          <option>기타</option>
+        </select>
+        <select class="select compact">
+          <option value="">정렬: 최신순</option>
+          <option>이름순</option>
+          <option>공개 우선</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 비어있는 상태 (데이터 연동 전) -->
+    <div class="empty-state">
+      <div class="emoji">📄</div>
+      <p class="title">등록된 템플릿이 없습니다</p>
+      <p class="desc muted">오른쪽 상단 <b>새 템플릿</b> 버튼으로 추가하세요.</p>
+    </div>
+
+    <!-- 테이블 스켈레톤 (연동 시 이 블록을 렌더링) -->
+    <!--
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>썸네일</th>
+            <th>이름</th>
+            <th>카테고리</th>
+            <th>공개</th>
+            <th>업데이트</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="thumb"></div></td>
+            <td>기본 포트폴리오</td>
+            <td>개인 포트폴리오</td>
+            <td><span class="chip success">공개</span></td>
+            <td>2025-09-25</td>
+            <td class="row-actions">
+              <button class="btn ghost">편집</button>
+              <button class="btn ghost danger">삭제</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    -->
+  </section>
+
+  <!-- (아주 가벼운) 토글 스크립트: 외부 JS 없이 동작 -->
+  <script>
+    (function () {
+      const btn = document.querySelector('[data-toggle="new-form"]');
+      const panel = document.getElementById('new-template-panel');
+      if (!btn || !panel) return;
+      const toggle = () => {
+        panel.classList.toggle('is-collapsed');
+        if (panel.classList.contains('is-collapsed')) {
+          btn.textContent = '＋ 새 템플릿';
+        } else {
+          btn.textContent = '－ 새 템플릿 닫기';
+        }
+      };
+      btn.addEventListener('click', toggle);
+    })();
+  </script>
+</div>
+
+
+        </div>
 </body>
 </html>

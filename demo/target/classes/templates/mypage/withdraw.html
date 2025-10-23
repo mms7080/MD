@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>회원 탈퇴 – kafolio</title>
+
+    <!-- 공통 헤더 -->
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
+    <!-- 마이페이지 전용 -->
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}" />
+    <!-- 모달/폼 공통 -->
+    <link rel="stylesheet" th:href="@{/css/users/auth-modal.css}" />
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage-modal.css}" />
+</head>
+
+<body>
+    <!-- 공통 헤더 -->
+    <div th:replace="fragments/header :: header('mypage')"></div>
+
+    <div class="admin-shell">
+        <!-- 사이드바 -->
+        <aside class="nav-rail">
+            <div class="org-name">마이페이지</div>
+            <nav class="rail-menu" id="sidebar">
+                <a href="/mypage/home" class="rail-item"><span class="dot"></span>홈</a>
+                <a href="/mypage/team" class="rail-item"><span class="dot"></span>팀 참여 정보</a>
+                <a href="/mypage/withdraw" class="rail-item is-active"><span class="dot"></span>회원 탈퇴</a>
+            </nav>
+        </aside>
+
+        <!-- 메인 -->
+        <main class="page">
+            <div class="page-header">
+                <div class="page-titles">
+                    <h1>회원 탈퇴</h1>
+                    <p class="page-sub">계정을 비활성화하려면 비밀번호를 확인하세요.</p>
+                </div>
+            </div>
+                <form th:action="@{/mypage/withdraw}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                    <input type="password" name="password" placeholder="비밀번호 입력" required>
+
+                    <button type="submit" class="btn danger">탈퇴하기</button>
+                </form>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

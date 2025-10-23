@@ -1,0 +1,76 @@
+.notice-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  color: var(--text);
+}
+
+.notice-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.notice-form .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.notice-form label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+.notice-form input,
+.notice-form textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--page);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.notice-form textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-submit,
+.btn-cancel {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-submit {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+}
+
+.btn-submit:hover {
+  background: var(--accent-ghost);
+  color: var(--text);
+}
+
+.btn-cancel {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-cancel:hover {
+  background: var(--accent-ghost);
+}
