@@ -19,7 +19,7 @@ import java.util.List;
 @Table(name = "folio",
         indexes = {
             @Index(name = "idx_folio_user", columnList = "user_id"),
-            @Index(name = "idx_folio_status_created", columnList = "status, created_at")
+            @Index(name = "idx_folio_status_created", columnList = "FOLIO_STATUS, created_at")
         })
 public class Folio {
 
@@ -43,7 +43,7 @@ public class Folio {
     // 상태
     public enum Status { DRAFT, PUBLISHED }
     @Enumerated(EnumType.STRING)
-    @Column(length = 20, nullable = false)
+    @Column(name = "FOLIO_STATUS", length = 20, nullable = false) 
     private Status status = Status.DRAFT;
 
     // 전체 에디터 상태 JSON

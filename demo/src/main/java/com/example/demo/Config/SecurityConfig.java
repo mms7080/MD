@@ -33,8 +33,6 @@ public class SecurityConfig {
              // ✅ 인증 필수 영역: 폴리오 작성/임시저장/업로드
                 .requestMatchers(
                     "/folios/write/**",
-                    "/folios/draft/**",
-                    "/folios/upload/**",
                     "/folios/edit/**",
                     "/mypage/**"
                 ).authenticated()
@@ -44,21 +42,21 @@ public class SecurityConfig {
                     "/signin", "/signup",
                     "/notice/{id}", "/notice",
                     "/error",   
-                    "/api/**",
-                    // "/portfolios",
-                    // "/portfolios/**",
-                    // "/folios/**", // 추가 페이지 접근은 허용(준회)
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/uploads/**", // 이미지(훈희)
-                    "/home/**", "/forgot/**"
-                    
-            
-                    // ,"/**" 
-                    //일단 테스트로 전체허용해놨다
+                    "/home/**", "/forgot/**",
+                    "/portfolios/**"
                 ).permitAll()
 
                 // 포트폴리오 목록/상세는 열람만 공개(GET만 허용)
-                .requestMatchers(HttpMethod.GET, "/portfolios", "/portfolios/**").permitAll()
+                .requestMatchers(
+                    HttpMethod.GET, 
+                    "/folios", 
+                    "/folios/detail/**", 
+                    "/api/folios", 
+                    "/api/folios/*"
+                ).permitAll()
+        
                 
                 // 관리자만 허용
                 // .requestMatchers().hasRole("ADMIN")

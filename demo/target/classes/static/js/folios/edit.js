@@ -27,14 +27,13 @@ document.addEventListener("DOMContentLoaded", () => {
             fr.readAsDataURL(file);
         });
 
-    /** data:URL → 서버 업로드(있으면)하여 URL로 변환. 엔드포인트가 없으면 그대로 null 반환 */
+    /** data:URL → 서버 업로드(있으면)하여 URL로 변환. 엔드포인트가 없으면 null */
     async function normalizeImageUrl(urlOrData) {
         if (!urlOrData) return null;
         if (!urlOrData.startsWith("data:")) return urlOrData;
 
-        // 서버에 이미지 업로드 API가 구현되어 있지 않다면,
-        // 아래를 주석해제하고 그냥 dataURL 사용(또는 null 처리)하세요.
-        // return urlOrData; // 혹은 return null;
+        // 서버 업로드 API가 없다면 다음 한 줄로 대체 사용 가능:
+        // return urlOrData; // 또는 return null;
 
         try {
             const fd = new FormData();
@@ -46,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             if (!res.ok) throw new Error("이미지 업로드 실패");
             const json = await res.json();
-            return json.url; // { url: "/uploads/..." } 형태라고 가정
+            return json.url; // {url: "..."} 가정
         } catch (e) {
             console.warn("normalizeImageUrl 실패:", e);
             return null;
@@ -65,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // ---------- 에디터 상태(템플릿 기본값) ----------
+    // ---------- 에디터 상태 ----------
     const state = {
         meta: { year: new Date().getFullYear() },
         intro: {
@@ -74,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
             birth: "1996-07-15",
             city: "Seoul, Korea",
             summary:
-                "서비스의 안정성과 확장성을 최우선으로 생각하는 백엔드 엔지니어 [이름] 입니다. 트래픽 급증 상황에서도 일관된 성능을 내는 아키텍처를 고민하고, 지표 기반으로 병목을 찾아 개선합니다. 주요 스택은 Java/Spring, JPA, PostgreSQL, Redis, Kafka이며, CI/CD 자동화와 모니터링 환경 구축을 즐깁니다. 협업에서는 코드 가독성과 문서화를 통해 팀의 학습 비용을 줄이는 데 집중합니다.",
+                "서비스의 안정성과 확장성을 최우선으로 생각하는 백엔드 엔지니어 [이름] 입니다...",
             email: "me@example.com",
             phone: "010-1234-5678",
             site: "github.com/me",
@@ -108,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 desc3: "성능 튜닝으로 P95 응답 320ms → 140ms",
             },
         },
-        // 퍼센트 게이지(시각화용)
         skills: { spring: 90, db: 80, devops: 70 },
         strengths: {
             1: "확장성과 유지보수를 고려한 모듈 설계",
@@ -117,15 +115,15 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         proj1: {
             title: "실시간 주문 처리 시스템",
-            meta: "2024 · Backend Lead · Spring / Kafka / Redis",
-            desc: "대규모 트래픽에 대응하는 이벤트 기반 아키텍처로 재설계.",
+            meta: "2024 · Backend Lead · Spring/Kafka/Redis",
+            desc: "대규모 트래픽 대응 아키텍처로 재설계.",
             link: "github.com/acme/order",
             thumb: "",
         },
         proj2: {
             title: "추천 모델 서빙 플랫폼",
-            meta: "2023 · Backend · Spring / gRPC / Kubernetes",
-            desc: "모델 버전 관리와 롤백이 쉬운 서빙 파이프라인 구축.",
+            meta: "2023 · Backend · Spring/gRPC/K8s",
+            desc: "버전 관리·롤백 쉬운 서빙 파이프라인.",
             link: "github.com/acme/reco",
             thumb: "",
         },
@@ -148,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         applyBindings();
     };
 
-    // ---------- 화면 바인딩 ----------
+    // ---------- 바인딩 ----------
     function applyBindings() {
         qsa("[data-bind]").forEach(
             (el) => (el.textContent = get(el.getAttribute("data-bind")) ?? "")
@@ -167,6 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function syncFormInputs() {
+        const pane = qs("#formPane");
         if (!pane) return;
         qsa("[data-model]", pane).forEach((inp) => {
             const path = inp.getAttribute("data-model");
@@ -184,7 +183,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let page = 1;
     const slides = qsa(".slide[data-page]");
     const LAST = slides.length;
-    const pane = qs("#formPane");
 
     function showActiveTab() {
         qsa(".top [data-goto]").forEach((b) => {
@@ -344,6 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     function renderForm(n) {
+        const pane = qs("#formPane");
         pane.innerHTML = forms[n]();
         // 입력 바인딩
         qsa("[data-model]", pane).forEach((inpt) => {
@@ -356,7 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 set(path, val);
             });
         });
-        // 이미지 업로드 -> dataURL -> 상태 반영
+        // 이미지 업로드 -> dataURL 상태 반영
         qsa("[data-upload]", pane).forEach((fi) => {
             fi.addEventListener("change", async () => {
                 const file = fi.files?.[0];
@@ -374,7 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnPrint = qs("#btnPrint");
     const btnExit = qs("#btnExit");
 
-    // 서버 임시저장 불러오기
+    // 서버 임시저장 불러오기 (로그인 필요)
     btnLoad?.addEventListener("click", async () => {
         try {
             const res = await fetch("/api/folios/me/dev-basic", {
@@ -397,16 +396,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 서버 임시저장(DRAFT)
+    // 서버 임시저장(DRAFT) - 단일 호출로 수정
     btnSave?.addEventListener("click", async () => {
         try {
             const contentJson = JSON.stringify(state);
-            const thumb =
+            const firstImg =
                 state.intro?.photo ||
                 state.proj1?.thumb ||
                 state.proj2?.thumb ||
                 null;
-            const thumbnailUrl = await normalizeImageUrl(thumb);
+            const thumbnailUrl = await normalizeImageUrl(firstImg);
 
             const payload = {
                 template: "dev-basic",
@@ -446,44 +445,31 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("beforeprint", unhideAllForPrint);
     window.addEventListener("afterprint", restoreHiddenAfterPrint);
 
-    // 발행(PUBLISHED) → 상세로 이동
+    // 발행(PUBLISHED) → 현재 백엔드 DTO(FolioRequestDto)에 맞춰 전송
     qs("#btnUpload")?.addEventListener("click", async () => {
         const button = qs("#btnUpload");
         try {
             button.disabled = true;
 
-            const contentJson = JSON.stringify(state);
-            // 제목은 intro.name(없으면 Untitled)로 사용
-            const title =
-                document
-                    .querySelector('[data-bind="intro.name"]')
-                    ?.textContent?.trim() || "Untitled";
-
-            // 상세 페이지에서 세로 슬라이드로 보여줄 사진들
+            // 상세에서 세로로 보여줄 사진들 (배열)
             const photos = [
                 state.intro?.photo,
                 state.proj1?.thumb,
                 state.proj2?.thumb,
             ].filter(Boolean);
 
-            // 필요하다면 skills CSV 입력을 만들어 사용하세요. (예: #skillsCsv)
+            // skills는 간단히 CSV 입력을 쓰거나 빈 배열로 전송
             const skillsCsv = qs("#skillsCsv")?.value || "";
             const skills = skillsCsv
                 .split(",")
                 .map((s) => s.trim())
                 .filter(Boolean);
 
-            const thumbnailUrl = await normalizeImageUrl(photos[0] || null);
-
             const payload = {
-                title,
                 introduction: state.intro?.summary || "",
                 skills,
                 photos,
-                template: "dev-basic",
-                status: "PUBLISHED",
-                contentJson,
-                thumbnail: thumbnailUrl,
+                projectIds: [], // 현재 미사용이면 빈 배열
             };
 
             const res = await fetch("/api/folios", {
@@ -492,7 +478,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify(payload),
             });
             if (!res.ok) throw new Error("발행 실패: " + (await res.text()));
-            const dto = await res.json();
+
+            const dto = await res.json(); // FolioDetailDto
+            // FolioDetailDto에 id 필드가 있다고 가정
             location.href = `/folios/detail/${dto.id}`;
         } catch (err) {
             console.error(err);
@@ -502,7 +490,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 나가기(같은 도메인 referrer면 back, 아니면 홈)
+    // 나가기
     btnExit?.addEventListener("click", (e) => {
         e.preventDefault();
         const ref = document.referrer;
@@ -518,7 +506,7 @@ document.addEventListener("DOMContentLoaded", () => {
         location.href = "/";
     });
 
-    // 키보드/화살표 네비게이션
+    // 키보드 네비
     qs(".navArrow.left")?.addEventListener("click", () => go(page - 1));
     qs(".navArrow.right")?.addEventListener("click", () => go(page + 1));
     window.addEventListener("keydown", (e) => {

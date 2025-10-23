@@ -80,9 +80,10 @@ public class FolioApiController {
             @PathVariable String template, Principal principal
     ) {
         if (principal == null) return ResponseEntity.status(403).build();
+
         return folioService.getMyLatest(principal, template)
                 .map(f -> {
-                    Map<String,Object> body = new HashMap<>();
+                    Map<String, Object> body = new HashMap<>();
                     body.put("id", f.getId());
                     body.put("template", f.getTemplate());
                     body.put("status", f.getStatus());
