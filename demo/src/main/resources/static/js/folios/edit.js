@@ -325,176 +325,139 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /* ---------- 저장/불러오기/출력 ---------- */
-    const btnSave = document.getElementById("btnSave");
-    const btnLoad = document.getElementById("btnLoad");
-    const btnPrint = document.getElementById("btnPrint");
+    // ---------- 저장/불러오기/프린트/나가기 ----------
+    const btnSave = qs("#btnSave"); // 임시저장(DRAFT)
+    const btnLoad = qs("#btnLoad"); // 불러오기
+    const btnPrint = qs("#btnPrint");
+    const btnExit = qs("#btnExit");
 
-    // ✅ 프린트 함수들을 btnPrint 선언 이후로 이동
-    function _unhideAllForPrint() {
-        document.querySelectorAll(".slide").forEach((s) => {
-            _hiddenMap.set(s, s.hidden);
-            s.hidden = false;
-            s.style.display = "block";
-        });
-    }
-
-    function _restoreHiddenAfterPrint() {
-        document.querySelectorAll(".slide").forEach((s) => {
-            const prev = _hiddenMap.get(s);
-            if (prev !== undefined) {
-                s.hidden = prev;
-                s.style.display = prev ? "none" : "block";
-            }
-        });
-        _hiddenMap.clear();
-    }
-
-    if (btnSave) {
-        btnSave.onclick = () => {
-            localStorage.setItem("folio-dev-basic", JSON.stringify(state));
-            flash("저장됨");
-        };
-    }
-
-    if (btnLoad) {
-        btnLoad.onclick = () => {
-            const raw = localStorage.getItem("folio-dev-basic");
-            if (!raw) return flash("저장된 내용이 없습니다");
-            const data = JSON.parse(raw);
-            Object.assign(state, data);
-            applyBindings();
-            renderForm(page);
-            flash("불러옴");
-        };
-    }
-
-    // 프린트 헬퍼 함수
-    function _unhideAllForPrint() {
-        document.querySelectorAll(".slide").forEach((s) => {
-            _hiddenMap.set(s, s.hidden);
-            s.hidden = false;
-        });
-    }
-
-    function _restoreHiddenAfterPrint() {
-        document.querySelectorAll(".slide").forEach((s) => {
-            const prev = _hiddenMap.get(s);
-            if (prev !== undefined) {
-                s.hidden = prev;
-            }
-        });
-        _hiddenMap.clear();
-    }
-
-    // 버튼 이벤트 수정 ✅
-    if (btnPrint) {
-        btnPrint.onclick = () => {
-            // ❌ 여기서 _unhideAllForPrint() 호출하지 않음!
-            // beforeprint 이벤트가 자동으로 처리함
-            window.print();
-        };
-    }
-
-    // 브라우저 프린트 이벤트 (이게 핵심!)
-    window.addEventListener("beforeprint", () => {
-        // ✅ 프린트 다이얼로그가 열리는 순간에만 실행
-        _unhideAllForPrint();
-    });
-
-    window.addEventListener("afterprint", () => {
-        // ✅ 프린트 다이얼로그가 닫히면 즉시 복원
-        _restoreHiddenAfterPrint();
-    });
-
-    function flash(msg) {
-        const n = document.createElement("div");
-        n.textContent = msg;
-        n.style.cssText =
-            "position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#1a2430;border:1px solid #2a3646;color:#dfe8f6;padding:8px 12px;border-radius:10px;z-index:9999";
-        document.body.appendChild(n);
-        setTimeout(() => n.remove(), 1200);
-    }
-
-    // CSRF 헬퍼
-    function getCsrf() {
-        const token = document.querySelector('meta[name="_csrf"]')?.content;
-        const header = document.querySelector(
-            'meta[name="_csrf_header"]'
-        )?.content;
-        return token && header ? { header, token } : null;
-    }
-
-    // dataURL이면 먼저 업로드해서 URL로 바꿔주기(선택)
-    async function normalizeImageUrl(urlOrData) {
-        if (!urlOrData) return null;
-        if (!urlOrData.startsWith("data:")) return urlOrData;
-
-        const fd = new FormData();
-        const blob = await (await fetch(urlOrData)).blob();
-        fd.append("file", blob, "thumbnail.png");
-
-        const res = await fetch("/api/uploads/images", {
-            method: "POST",
-            body: fd,
-        });
-        if (!res.ok) throw new Error("이미지 업로드 실패");
-        const json = await res.json();
-        return json.url; // UploadController가 주는 url
-    }
-
-    // 업로드 버튼
-    document.getElementById("btnUpload").addEventListener("click", async () => {
+    // 불러오기 (로그인 필요)
+    btnLoad?.addEventListener("click", async () => {
         try {
-            const btn = document.getElementById("btnUpload");
-            btn.disabled = true;
+            const res = await guardFetch("/api/folios/me/dev-basic");
+            if (res.status === 204) return flash("서버 임시저장 없음");
+            if (!res.ok) throw new Error("불러오기 실패");
+            const data = await res.json();
+            if (data.contentJson) {
+                Object.assign(state, JSON.parse(data.contentJson));
+                applyBindings();
+                flash("불러오기 완료");
+            } else {
+                flash("저장된 contentJson이 없습니다");
+            }
+        } catch (e) {
+            console.error(e);
+            if (e.message !== "인증 필요") flash("불러오기 중 오류");
+        }
+    });
 
-            // 1) contentJson 만들기 (state 전체 직렬화)
+    // 임시저장(DRAFT)
+    btnSave?.addEventListener("click", async () => {
+        try {
             const contentJson = JSON.stringify(state);
-
-            // 2) 썸네일 후보 결정 (프로필 사진 또는 프로젝트 썸네일 등)
-            let thumb =
+            const firstImg =
                 state.intro?.photo ||
                 state.proj1?.thumb ||
                 state.proj2?.thumb ||
                 null;
-            const thumbnailUrl = await normalizeImageUrl(thumb);
+            const thumbnail = await normalizeImageUrl(firstImg);
 
-            // 3) 페이로드
             const payload = {
                 template: "dev-basic",
                 contentJson,
-                status: "DRAFT", // 공개할 때는 'PUBLISHED'로
-                thumbnail: thumbnailUrl, // 없으면 null/생략 가능
+                status: "DRAFT",
+                thumbnail,
             };
 
-            // 4) CSRF 헤더
-            const csrf = getCsrf();
-            const headers = { "Content-Type": "application/json" };
-            if (csrf) headers[csrf.header] = csrf.token;
-
-            // 5) 서버로 전송
-            const res = await fetch("/folios/dev-basic", {
+            const res = await guardFetch("/api/folios/dev-basic", {
                 method: "POST",
-                headers,
+                headers: JSON_HEADERS,
                 body: JSON.stringify(payload),
             });
+            if (!res.ok) throw new Error(await res.text());
+            flash("임시저장 완료");
+        } catch (e) {
+            console.error(e);
+            if (e.message !== "인증 필요") flash("임시저장 중 오류");
+        }
+    });
 
-            if (!res.ok) {
-                const txt = await res.text();
-                throw new Error("업로드 실패: " + txt);
-            }
+    // 발행(PUBLISHED) → FolioStateSaveRequest와 1:1 매칭
+    qs("#btnUpload")?.addEventListener("click", async () => {
+        const button = qs("#btnUpload");
+        try {
+            button.disabled = true;
 
-            const data = await res.json(); // FolioDetailDto
-            flash("업로드 완료!");
-            // 필요하면 업로드된 folioId로 이동:
-            // window.location.href = `/folios/detail/${data.folioId}`;
+            const contentJson = JSON.stringify(state);
+            const firstImg =
+                state.intro?.photo ||
+                state.proj1?.thumb ||
+                state.proj2?.thumb ||
+                null;
+            const thumbnail = await normalizeImageUrl(firstImg);
+
+            // 제목은 intro.name(없으면 Untitled)
+            const title =
+                document
+                    .querySelector('[data-bind="intro.name"]')
+                    ?.textContent?.trim() || "Untitled";
+
+            const payload = {
+                template: "dev-basic",
+                title,
+                contentJson,
+                status: "PUBLISHED",
+                thumbnail,
+            };
+
+            const res = await guardFetch("/api/folios/dev-basic", {
+                method: "POST",
+                headers: JSON_HEADERS,
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error("발행 실패: " + (await res.text()));
+            const dto = await res.json(); // FolioDetailDto(id 포함)
+            location.href = `/folios/detail/${dto.id}`;
         } catch (err) {
             console.error(err);
-            flash("업로드 중 오류");
+            if (err.message !== "인증 필요") flash("업로드 중 오류");
         } finally {
-            document.getElementById("btnUpload").disabled = false;
+            button.disabled = false;
         }
+    });
+
+    // 프린트: 모두 보였다가 복원
+    function unhideAllForPrint() {
+        qsa(".slide").forEach((s) => {
+            _hiddenMap.set(s, s.hidden);
+            s.hidden = false;
+        });
+    }
+    function restoreHiddenAfterPrint() {
+        qsa(".slide").forEach((s) => {
+            const prev = _hiddenMap.get(s);
+            if (prev !== undefined) s.hidden = prev;
+        });
+        _hiddenMap.clear();
+    }
+    btnPrint?.addEventListener("click", () => window.print());
+    window.addEventListener("beforeprint", unhideAllForPrint);
+    window.addEventListener("afterprint", restoreHiddenAfterPrint);
+
+    // 나가기
+    btnExit?.addEventListener("click", (e) => {
+        e.preventDefault();
+        const ref = document.referrer;
+        try {
+            if (ref) {
+                const prev = new URL(ref);
+                if (prev.origin === location.origin) {
+                    history.back();
+                    return;
+                }
+            }
+        } catch {}
+        location.href = "/";
     });
 
     /* ---------- 화살표/키보드 네비 ---------- */
