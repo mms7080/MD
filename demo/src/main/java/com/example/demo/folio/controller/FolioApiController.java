@@ -20,10 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -58,13 +56,12 @@ public class FolioApiController {
     @GetMapping("/{id}")
     public ResponseEntity<FolioDetailDto> getFolioDetail(@PathVariable String id) {
         try{
-          FolioDetailDto folioDetail = folioService.getFolioDetail(id);
+            FolioDetailDto folioDetail = folioService.getFolioDetail(id);
             return ResponseEntity.ok(folioDetail);
         } catch (IllegalArgumentException e) {
             // 해당 ID의 Folio가 없을 경우 404 Not Found 응답을 보냅니다.
             return ResponseEntity.notFound().build();
         }
-       
     }
 
     @PostMapping
@@ -86,12 +83,36 @@ public class FolioApiController {
     }
 
     @PostMapping("/dev-basic")
-    public ResponseEntity<FolioDetailDto> saveDevBasic(
+    public ResponseEntity<Map<String, Object>> saveDevBasic(
             @RequestBody FolioStateSaveRequest req,
             Principal principal
     ) {
-        if (principal == null) return ResponseEntity.status(403).build();
+        if (principal == null) {
+            return ResponseEntity.status(403).build();
+        }
+
         Folio saved = folioService.saveState(principal, req);
-        return ResponseEntity.ok(new FolioDetailDto(saved));
+
+        // 응답 최소화: LAZY 초기화 이슈 방지
+        Map<String, Object> body = new HashMap<>();
+        body.put("id", saved.getId());
+
+        return ResponseEntity.ok(body);
+    }
+
+    // ① 에디터 불러오기(내 dev-basic 최신 상태) — 프런트 edit.js가 호출 중
+    @GetMapping("/me/dev-basic")
+    public ResponseEntity<?> getMyDevBasic(Principal principal) {
+        if (principal == null) return ResponseEntity.status(403).build();
+        return folioService.getMyDevBasicState(principal)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build()); // 204
+    }
+
+    // ② 마이페이지 요약용: 내 최신 DRAFT/PUBLISHED 모두
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyFoliosSummary(Principal principal) {
+        if (principal == null) return ResponseEntity.status(403).build();
+        return ResponseEntity.ok(folioService.getMyFoliosSummary(principal));
     }
 }

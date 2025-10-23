@@ -76,21 +76,5 @@ public class FolioController {
         return "folios/edit";
     }
 
-    // 혹시 기존 북마크/링크 대비: /ppt → /edit로 리다이렉트
-    @GetMapping("/ppt")
-    public String pptRedirect(
-            @RequestParam(name = "template", required = false) String template
-    ) {
-        String q = (template != null && !template.isBlank())
-                ? "?template=" + java.net.URLEncoder.encode(template, java.nio.charset.StandardCharsets.UTF_8)
-                : "";
-        return "redirect:/folios/edit" + q;
-    }
 
 }
-    
-    
-    
-    
-    
-

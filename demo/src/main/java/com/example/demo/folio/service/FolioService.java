@@ -5,7 +5,6 @@ import com.example.demo.folio.dto.FoliosSummaryDto;
 import com.example.demo.folio.dto.PortfolioInFolioDto;
 import com.example.demo.folio.entity.Folio;
 import com.example.demo.folio.repository.FolioRepository;
-import com.example.demo.portfolios.controller.PortfoliosController; // 임시 데이터용
 import com.example.demo.portfolios.entity.PortfoliosEntity; // 임시 데이터용
 import com.example.demo.portfolios.service.PortfolioService;
 import com.example.demo.users.UsersEntity.DeleteStatus;
@@ -16,9 +15,10 @@ import com.example.demo.folio.dto.FolioRequestDto;
 import com.example.demo.folio.dto.FolioStateSaveRequest;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -34,10 +34,8 @@ public class FolioService {
     
     private final FolioRepository folioRepository;
     private final UsersRepository usersRepository;
-    // 임시로 PortfoliosController의 데이터를 사용
-    private final PortfoliosController portfoliosController;
     private final PortfolioService portfolioService;
-    private final UsersService UsersService;
+    private final UsersService usersService;
 
     public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
         Page<Folio> folioPage = folioRepository.findAll(pageable);
@@ -89,10 +87,9 @@ public class FolioService {
     /** PPT 에디터 전체 상태 저장(JSON 통짜) */
     @Transactional
     public Folio saveState(Principal principal, FolioStateSaveRequest req) {
-        Users user = UsersService.getUserByUsername(principal.getName()); // ← 인스턴스 메서드
+        Users user = usersService.getUserByUsername(principal.getName());
 
-        // 한 유저당 하나만 쓰려면 findByUserId(...)
-        // 템플릿별 1개라면 findByUserIdAndTemplate(...) 메서드 만들어서 사용 추천
+        // 유저당 1개 저장 전략 (그대로 유지)
         Folio folio = folioRepository.findByUserId(user.getId())
                 .orElse(new Folio());
 
@@ -100,9 +97,53 @@ public class FolioService {
         folio.setTemplate(req.getTemplate() != null ? req.getTemplate() : "dev-basic");
         folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
 
-        if (req.getStatus() != null) folio.setStatus(req.getStatus());
-        if (req.getThumbnail() != null) folio.setThumbnail(req.getThumbnail());
+        // ✅ status 기본값
+        folio.setStatus(req.getStatus() != null ? req.getStatus() : Folio.Status.DRAFT);
+
+        // ✅ thumbnail 기본값
+        if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
+            folio.setThumbnail(req.getThumbnail());
+        } else if (folio.getThumbnail() == null || folio.getThumbnail().isBlank()) {
+            folio.setThumbnail("https://picsum.photos/seed/default/300");
+        }
 
         return folioRepository.save(folio);
+    }
+     // ① 에디터 불러오기 데이터 (edit.js가 기대하는 구조)
+    public Optional<Map<String, Object>> getMyDevBasicState(Principal principal) {
+        Users user = usersService.getUserByUsername(principal.getName());
+        // 우선순위: DRAFT 최신 → 없으면 최신 하나
+        Folio folio = folioRepository.findTopByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.DRAFT)
+                .or(() -> folioRepository.findTopByUserOrderByUpdatedAtDesc(user))
+                .orElse(null);
+        if (folio == null) return Optional.empty();
+
+        Map<String, Object> res = new HashMap<>();
+        res.put("id", folio.getId());                 // ⚠ dto.id로 쓰니 id 키 제공
+        res.put("template", folio.getTemplate());
+        res.put("contentJson", folio.getContentJson());
+        res.put("status", folio.getStatus());
+        res.put("thumbnail", folio.getThumbnail());
+        res.put("updatedAt", folio.getUpdatedAt());
+        return Optional.of(res);
+    }
+
+    // ② 마이페이지 요약 데이터
+    public Map<String, Object> getMyFoliosSummary(Principal principal) {
+        Users user = usersService.getUserByUsername(principal.getName());
+        Map<String, Object> res = new HashMap<>();
+        folioRepository.findTopByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.DRAFT)
+                .ifPresent(f -> res.put("draft", Map.of(
+                        "id", f.getId(),
+                        "updatedAt", f.getUpdatedAt(),
+                        "thumbnail", f.getThumbnail()
+                )));
+        folioRepository.findTopByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.PUBLISHED)
+                .ifPresent(f -> res.put("published", Map.of(
+                        "id", f.getId(),
+                        "updatedAt", f.getUpdatedAt(),
+                        "thumbnail", f.getThumbnail()
+                )));
+        return res;
     }
 }

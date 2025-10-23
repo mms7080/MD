@@ -48,8 +48,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const fd = new FormData();
             const blob = await (await fetch(urlOrData)).blob();
             fd.append("file", blob, "thumbnail.png");
+            const headers = {};
+            if (CSRF) headers[CSRF.header] = CSRF.token;
             const res = await guardFetch("/api/uploads/images", {
                 method: "POST",
+                headers,
                 body: fd,
             });
             if (!res.ok) throw new Error("이미지 업로드 실패");
@@ -396,7 +399,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 state.proj1?.thumb ||
                 state.proj2?.thumb ||
                 null;
-            const thumbnail = await normalizeImageUrl(firstImg);
+            const thumbnail =
+                (await normalizeImageUrl(firstImg)) ||
+                "https://picsum.photos/seed/default/300";
 
             const payload = {
                 template: "dev-basic",
@@ -430,7 +435,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 state.proj1?.thumb ||
                 state.proj2?.thumb ||
                 null;
-            const thumbnail = await normalizeImageUrl(firstImg);
+            const thumbnail =
+                (await normalizeImageUrl(firstImg)) ||
+                "https://picsum.photos/seed/default/300";
 
             // 제목은 intro.name(없으면 Untitled)
             const title =

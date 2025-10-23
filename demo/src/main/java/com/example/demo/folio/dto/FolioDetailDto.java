@@ -1,6 +1,8 @@
 package com.example.demo.folio.dto;
 
 import com.example.demo.folio.entity.Folio;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 
 import java.util.List;
@@ -14,6 +16,12 @@ public class FolioDetailDto {
     private List<String> skills;
     private List<String> photos;
     private List<PortfolioInFolioDto> projects;
+
+    // 프론트 호환용 별칭: JSON 응답에 "id" 키로 노출 (값은 folioId)
+    @JsonProperty("id")
+    public String getId() {
+        return folioId;
+    }
 
     // 1. 상세 정보 조회 시 사용 (포트폴리오 정보 포함)
     public FolioDetailDto(Folio folio, List<PortfolioInFolioDto> projects) {
