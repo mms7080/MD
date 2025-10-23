@@ -5,8 +5,7 @@ import com.example.demo.folio.dto.FoliosSummaryDto;
 import com.example.demo.folio.dto.PortfolioInFolioDto;
 import com.example.demo.folio.entity.Folio;
 import com.example.demo.folio.repository.FolioRepository;
-import com.example.demo.portfolios.controller.PortfoliosController; // 임시 데이터용
-import com.example.demo.portfolios.entity.PortfoliosEntity; // 임시 데이터용
+import com.example.demo.portfolios.entity.PortfoliosEntity; 
 import com.example.demo.portfolios.service.PortfolioService;
 import com.example.demo.users.UsersEntity.DeleteStatus;
 import com.example.demo.users.UsersEntity.Users;
@@ -16,9 +15,7 @@ import com.example.demo.folio.dto.FolioRequestDto;
 import com.example.demo.folio.dto.FolioStateSaveRequest;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -36,7 +33,7 @@ public class FolioService {
 
     private final FolioRepository folioRepository;
     private final UsersRepository usersRepository;
-    private final PortfolioService portfolioService; // ✅ 컨트롤러 주입 제거
+    private final PortfolioService portfolioService; // 포트폴리오 연계 사용 시
     private final UsersService usersService;
 
     /** 공개 목록: PUBLISHED만 (썸네일/제목/작성일/유저) */
@@ -56,7 +53,7 @@ public class FolioService {
                         PortfoliosEntity e = portfolioService.getPortfolioWithTeam(Long.valueOf(pid));
                         return (e != null) ? new PortfolioInFolioDto(e.getId(), e.getTitle()) : null;
                     } catch (NumberFormatException nfe) {
-                        return null; // projectIds에 숫자가 아닐 수 있음 → 무시
+                        return null;
                     }
                 })
                 .filter(p -> p != null)
@@ -76,7 +73,6 @@ public class FolioService {
         Folio folio = new Folio();
         folio.setUser(currentUser);
 
-        // 제목/소개/태그/사진/프로젝트
         if (req.getTitle() != null && !req.getTitle().isBlank()) {
             folio.setTitle(req.getTitle());
         }
@@ -85,7 +81,6 @@ public class FolioService {
         folio.setPhotos(req.getPhotos());
         folio.setProjectIds(req.getProjectIds());
 
-        // 썸네일: 사진 첫 장 또는 디폴트
         if (req.getPhotos() != null && !req.getPhotos().isEmpty()) {
             folio.setThumbnail(req.getPhotos().get(0));
         } else if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
@@ -94,17 +89,18 @@ public class FolioService {
             folio.setThumbnail("https://picsum.photos/seed/default/300");
         }
 
-        // 템플릿/상태/에디터JSON
         if (req.getTemplate() != null && !req.getTemplate().isBlank()) {
             folio.setTemplate(req.getTemplate());
         }
-        // 기본 DRAFT (엔티티 디폴트)
         folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
+        if (req.getStatus() != null) {
+            folio.setStatus(req.getStatus()); // 발행까지 같이 오는 경우 반영
+        }
 
         return folioRepository.save(folio);
     }
 
-    /** PPT 에디터 전체 상태 저장(JSON 통짜) – 템플릿별 최신본 유지 */
+    /** 에디터 전체 상태 저장(JSON 통짜) – 템플릿별 최신본 유지 */
     @Transactional
     public Folio saveState(Principal principal, FolioStateSaveRequest req) {
         if (principal == null) throw new AccessDeniedException("로그인이 필요합니다.");
@@ -128,15 +124,16 @@ public class FolioService {
             folio.setThumbnail(req.getThumbnail());
         }
         if (req.getStatus() != null) {
-            folio.setStatus(req.getStatus()); // DRAFT ↔ PUBLISHED 전환
+            folio.setStatus(req.getStatus()); // DRAFT ↔ PUBLISHED
         }
 
         return folioRepository.save(folio);
     }
+
     public int countMyPublished(Principal principal) {
         if (principal == null) throw new AccessDeniedException("로그인이 필요합니다.");
         Users user = usersService.getUserByUsername(principal.getName());
-        return folioRepository.countByUserAndStatus(user, Folio.Status.PUBLISHED);
+        return (int) folioRepository.countByUserAndStatus(user, Folio.Status.PUBLISHED);
     }
 
     public List<String> getMyRecentPublishedTitles(Principal principal, int limit) {

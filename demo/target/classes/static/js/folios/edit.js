@@ -19,6 +19,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const header = qs('meta[name="_csrf_header"]')?.content;
         return token && header ? { header, token } : null;
     };
+    const CSRF = getCsrf();
+    const JSON_HEADERS = { "Content-Type": "application/json" };
+    if (CSRF) JSON_HEADERS[CSRF.header] = CSRF.token;
+
+    // 401/403이면 로그인 모달(또는 페이지)로 보냄
+    const guardFetch = async (url, opts = {}) => {
+        const res = await fetch(url, opts);
+        if (res.status === 401 || res.status === 403) {
+            location.href = "/home?modal=signin";
+            throw new Error("인증 필요");
+        }
+        return res;
+    };
 
     const fileToDataURL = (file) =>
         new Promise((res) => {
@@ -27,44 +40,27 @@ document.addEventListener("DOMContentLoaded", () => {
             fr.readAsDataURL(file);
         });
 
-    /** data:URL → 서버 업로드(있으면)하여 URL로 변환. 엔드포인트가 없으면 null */
+    // data:URL이면 업로드 API에 올려 URL 받기 (실패/미구현 시 null)
     async function normalizeImageUrl(urlOrData) {
         if (!urlOrData) return null;
         if (!urlOrData.startsWith("data:")) return urlOrData;
-
-        // 서버 업로드 API가 없다면 다음 한 줄로 대체 사용 가능:
-        // return urlOrData; // 또는 return null;
-
         try {
             const fd = new FormData();
             const blob = await (await fetch(urlOrData)).blob();
             fd.append("file", blob, "thumbnail.png");
-            const res = await fetch("/api/uploads/images", {
+            const res = await guardFetch("/api/uploads/images", {
                 method: "POST",
                 body: fd,
             });
             if (!res.ok) throw new Error("이미지 업로드 실패");
             const json = await res.json();
-            return json.url; // {url: "..."} 가정
-        } catch (e) {
-            console.warn("normalizeImageUrl 실패:", e);
+            return json.url || null;
+        } catch {
             return null;
         }
     }
 
-    const csrf = getCsrf();
-    const baseHeads = { "Content-Type": "application/json" };
-    if (csrf) baseHeads[csrf.header] = csrf.token;
-
-    const safeJson = (s) => {
-        try {
-            return JSON.parse(s || "{}");
-        } catch {
-            return {};
-        }
-    };
-
-    // ---------- 에디터 상태 ----------
+    // ---------- 에디터 상태(템플릿 기본값) ----------
     const state = {
         meta: { year: new Date().getFullYear() },
         intro: {
@@ -155,11 +151,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const v = get(el.getAttribute("data-bind-style"));
             if (v != null) el.style.width = v + "%";
         });
-        if (state.intro.photo)
+        if (state.intro?.photo)
             qs("#photo1")?.setAttribute("src", state.intro.photo);
-        if (state.proj1.thumb)
+        if (state.proj1?.thumb)
             qs("#thumb1")?.setAttribute("src", state.proj1.thumb);
-        if (state.proj2.thumb)
+        if (state.proj2?.thumb)
             qs("#thumb2")?.setAttribute("src", state.proj2.thumb);
         syncFormInputs();
     }
@@ -170,12 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
         qsa("[data-model]", pane).forEach((inp) => {
             const path = inp.getAttribute("data-model");
             const val = get(path);
-            if (inp.type === "number") {
-                if (Number(inp.value) !== Number(val))
-                    inp.value = Number(val ?? 0);
-            } else {
-                if (inp.value !== (val ?? "")) inp.value = val ?? "";
-            }
+            if (inp.type === "number") inp.value = Number(val ?? 0);
+            else inp.value = val ?? "";
         });
     }
 
@@ -344,6 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderForm(n) {
         const pane = qs("#formPane");
         pane.innerHTML = forms[n]();
+
         // 입력 바인딩
         qsa("[data-model]", pane).forEach((inpt) => {
             inpt.addEventListener("input", () => {
@@ -355,6 +348,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 set(path, val);
             });
         });
+
         // 이미지 업로드 -> dataURL 상태 반영
         qsa("[data-upload]", pane).forEach((fi) => {
             fi.addEventListener("change", async () => {
@@ -373,30 +367,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnPrint = qs("#btnPrint");
     const btnExit = qs("#btnExit");
 
-    // 서버 임시저장 불러오기 (로그인 필요)
+    // 불러오기 (로그인 필요)
     btnLoad?.addEventListener("click", async () => {
         try {
-            const res = await fetch("/api/folios/me/dev-basic", {
-                method: "GET",
-            });
+            const res = await guardFetch("/api/folios/me/dev-basic");
             if (res.status === 204) return flash("서버 임시저장 없음");
             if (!res.ok) throw new Error("불러오기 실패");
             const data = await res.json();
             if (data.contentJson) {
-                Object.assign(state, safeJson(data.contentJson));
+                Object.assign(state, JSON.parse(data.contentJson));
                 applyBindings();
-                renderForm(page);
                 flash("불러오기 완료");
             } else {
                 flash("저장된 contentJson이 없습니다");
             }
         } catch (e) {
             console.error(e);
-            flash("불러오기 중 오류");
+            if (e.message !== "인증 필요") flash("불러오기 중 오류");
         }
     });
 
-    // 서버 임시저장(DRAFT) - 단일 호출로 수정
+    // 임시저장(DRAFT)
     btnSave?.addEventListener("click", async () => {
         try {
             const contentJson = JSON.stringify(state);
@@ -405,29 +396,73 @@ document.addEventListener("DOMContentLoaded", () => {
                 state.proj1?.thumb ||
                 state.proj2?.thumb ||
                 null;
-            const thumbnailUrl = await normalizeImageUrl(firstImg);
+            const thumbnail = await normalizeImageUrl(firstImg);
 
             const payload = {
                 template: "dev-basic",
                 contentJson,
                 status: "DRAFT",
-                thumbnail: thumbnailUrl,
+                thumbnail,
             };
 
-            const res = await fetch("/api/folios/dev-basic", {
+            const res = await guardFetch("/api/folios/dev-basic", {
                 method: "POST",
-                headers: baseHeads,
+                headers: JSON_HEADERS,
                 body: JSON.stringify(payload),
             });
-            if (!res.ok) throw new Error("임시저장 실패");
+            if (!res.ok) throw new Error(await res.text());
             flash("임시저장 완료");
         } catch (e) {
             console.error(e);
-            flash("임시저장 중 오류");
+            if (e.message !== "인증 필요") flash("임시저장 중 오류");
         }
     });
 
-    // 프린트: 모든 슬라이드 보였다가 복원
+    // 발행(PUBLISHED) → FolioStateSaveRequest와 1:1 매칭
+    qs("#btnUpload")?.addEventListener("click", async () => {
+        const button = qs("#btnUpload");
+        try {
+            button.disabled = true;
+
+            const contentJson = JSON.stringify(state);
+            const firstImg =
+                state.intro?.photo ||
+                state.proj1?.thumb ||
+                state.proj2?.thumb ||
+                null;
+            const thumbnail = await normalizeImageUrl(firstImg);
+
+            // 제목은 intro.name(없으면 Untitled)
+            const title =
+                document
+                    .querySelector('[data-bind="intro.name"]')
+                    ?.textContent?.trim() || "Untitled";
+
+            const payload = {
+                template: "dev-basic",
+                title,
+                contentJson,
+                status: "PUBLISHED",
+                thumbnail,
+            };
+
+            const res = await guardFetch("/api/folios/dev-basic", {
+                method: "POST",
+                headers: JSON_HEADERS,
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error("발행 실패: " + (await res.text()));
+            const dto = await res.json(); // FolioDetailDto(id 포함)
+            location.href = `/folios/detail/${dto.id}`;
+        } catch (err) {
+            console.error(err);
+            if (err.message !== "인증 필요") flash("업로드 중 오류");
+        } finally {
+            button.disabled = false;
+        }
+    });
+
+    // 프린트: 모두 보였다가 복원
     function unhideAllForPrint() {
         qsa(".slide").forEach((s) => {
             _hiddenMap.set(s, s.hidden);
@@ -445,51 +480,6 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("beforeprint", unhideAllForPrint);
     window.addEventListener("afterprint", restoreHiddenAfterPrint);
 
-    // 발행(PUBLISHED) → 현재 백엔드 DTO(FolioRequestDto)에 맞춰 전송
-    qs("#btnUpload")?.addEventListener("click", async () => {
-        const button = qs("#btnUpload");
-        try {
-            button.disabled = true;
-
-            // 상세에서 세로로 보여줄 사진들 (배열)
-            const photos = [
-                state.intro?.photo,
-                state.proj1?.thumb,
-                state.proj2?.thumb,
-            ].filter(Boolean);
-
-            // skills는 간단히 CSV 입력을 쓰거나 빈 배열로 전송
-            const skillsCsv = qs("#skillsCsv")?.value || "";
-            const skills = skillsCsv
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean);
-
-            const payload = {
-                introduction: state.intro?.summary || "",
-                skills,
-                photos,
-                projectIds: [], // 현재 미사용이면 빈 배열
-            };
-
-            const res = await fetch("/api/folios", {
-                method: "POST",
-                headers: baseHeads,
-                body: JSON.stringify(payload),
-            });
-            if (!res.ok) throw new Error("발행 실패: " + (await res.text()));
-
-            const dto = await res.json(); // FolioDetailDto
-            // FolioDetailDto에 id 필드가 있다고 가정
-            location.href = `/folios/detail/${dto.id}`;
-        } catch (err) {
-            console.error(err);
-            flash("업로드 중 오류");
-        } finally {
-            button.disabled = false;
-        }
-    });
-
     // 나가기
     btnExit?.addEventListener("click", (e) => {
         e.preventDefault();
@@ -502,7 +492,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
             }
-        } catch (_) {}
+        } catch {}
         location.href = "/";
     });
 
