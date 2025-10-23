@@ -2,27 +2,17 @@ package com.example.demo.folio.controller;
 
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersService.UsersService;
 import java.security.Principal;
 
-import com.example.demo.folio.dto.FolioDetailDto;
-import com.example.demo.folio.dto.FolioStateSaveRequest;
-import com.example.demo.folio.dto.PortfolioInFolioDto;
-import com.example.demo.folio.entity.Folio;
 import com.example.demo.folio.service.FolioService; // FolioService 주입
-import java.util.List;
-
-
 
 
 
