@@ -3,6 +3,7 @@ package com.example.demo.Config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,31 +27,39 @@ public class SecurityConfig {
         http
             // CSRF 기본 활성 (폼에 CSRF 토큰만 넣으면 됨)
             .csrf(csrf -> csrf
-      .ignoringRequestMatchers("/api/send-code"))
+                .ignoringRequestMatchers("/api/send-code"))
 
             .authorizeHttpRequests(auth -> auth
+             // ✅ 인증 필수 영역: 폴리오 작성/임시저장/업로드
+                .requestMatchers(
+                    "/folios/write/**",
+                    "/folios/draft/**",
+                    "/folios/upload/**",
+                    "/folios/edit/**",
+                    "/mypage/**"
+                ).authenticated()
+
                 .requestMatchers(
                     "/", "/main",
-                    "/signin",
-                    "/notice/{id}",
-                    "/notice",
-                    "/signup",
+                    "/signin", "/signup",
+                    "/notice/{id}", "/notice",
                     "/error",   
                     "/api/**",
-                    "/portfolios",
-                    "/portfolios/**",
-                    "/folios/**", // 추가 페이지 접근은 허용(준회)
+                    // "/portfolios",
+                    // "/portfolios/**",
+                    // "/folios/**", // 추가 페이지 접근은 허용(준회)
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/uploads/**", // 이미지(훈희)
-                    "/home/**",
-                    "/forgot/**"
-                   
-                   
-                   
-                    ,"/**" 
+                    "/home/**", "/forgot/**"
+                    
+            
+                    // ,"/**" 
                     //일단 테스트로 전체허용해놨다
                 ).permitAll()
 
+                // 포트폴리오 목록/상세는 열람만 공개(GET만 허용)
+                .requestMatchers(HttpMethod.GET, "/portfolios", "/portfolios/**").permitAll()
+                
                 // 관리자만 허용
                 // .requestMatchers().hasRole("ADMIN")
 
@@ -65,7 +74,7 @@ public class SecurityConfig {
                 .loginProcessingUrl("/signin") 
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .defaultSuccessUrl("/", true)     // 원래 가려던 페이지 우선
+                .defaultSuccessUrl("/", false)     // 원래 가려던 페이지 우선
                 .failureUrl("/home?modal=signin")
                 .permitAll()
             )

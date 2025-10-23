@@ -1,6 +1,7 @@
 package com.example.demo.users.UserController;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.demo.folio.service.FolioService;
 import com.example.demo.users.UsersDTO.HeaderLogin;
 import com.example.demo.users.UsersDTO.ProfileDTO;
 import com.example.demo.users.UsersEntity.DeleteStatus;
@@ -33,6 +35,7 @@ public class UserController {
     private final HeaderLogin keep;
     private final UsersService usersService;
     private final UsersRepository usersRepository;
+    private final FolioService folioService;
 
     @ModelAttribute
     public void addAttributes(Model model, Principal principal) {
@@ -48,6 +51,13 @@ public class UserController {
         Users users = usersService.getUserByUsername(principal.getName());
         ProfileDTO profile = usersService.loadProfileForm(users.getId());
         model.addAttribute("form", profile);
+
+        // 내 folio 현황(공개글 기준)
+        int myFolioCount = folioService.countMyPublished(principal);
+        List<String> myFolioRecent = folioService.getMyRecentPublishedTitles(principal, 3);
+        model.addAttribute("myFolioCount", myFolioCount);
+        model.addAttribute("myFolioRecent", myFolioRecent);
+
         return "mypage/mypage";
     }
 

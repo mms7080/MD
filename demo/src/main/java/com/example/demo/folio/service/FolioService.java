@@ -33,69 +33,83 @@ import org.springframework.security.access.AccessDeniedException;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class FolioService {
-    
+
     private final FolioRepository folioRepository;
     private final UsersRepository usersRepository;
-    // 임시로 PortfoliosController의 데이터를 사용
-    private final PortfoliosController portfoliosController;
-    private final PortfolioService portfolioService;
+    private final PortfolioService portfolioService; // ✅ 컨트롤러 주입 제거
     private final UsersService usersService;
 
+    /** 공개 목록: PUBLISHED만 (썸네일/제목/작성일/유저) */
     public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
-        Page<Folio> folioPage = folioRepository.findAll(pageable);
-        return folioPage.map(FoliosSummaryDto::new);
+        Page<Folio> page = folioRepository.findByStatusOrderByCreatedAtDesc(Folio.Status.PUBLISHED, pageable);
+        return page.map(FoliosSummaryDto::new);
     }
-    
+
+    /** 상세: 사진/스킬/프로젝트까지 페치 */
     public FolioDetailDto getFolioDetail(String id) {
         Folio folio = folioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Folio를 찾을 수 없습니다. id=" + id));
-        
+
         List<PortfolioInFolioDto> projects = folio.getProjectIds().stream()
-            .map(projectId -> {
-                PortfoliosEntity entity = portfolioService.getPortfolioWithTeam(Long.valueOf(projectId));
-                return (entity != null) ? new PortfolioInFolioDto(entity.getId(), entity.getTitle()) : null;
-            })
-            .filter(p -> p != null)
-            .collect(Collectors.toList());
+                .map(pid -> {
+                    try {
+                        PortfoliosEntity e = portfolioService.getPortfolioWithTeam(Long.valueOf(pid));
+                        return (e != null) ? new PortfolioInFolioDto(e.getId(), e.getTitle()) : null;
+                    } catch (NumberFormatException nfe) {
+                        return null; // projectIds에 숫자가 아닐 수 있음 → 무시
+                    }
+                })
+                .filter(p -> p != null)
+                .collect(Collectors.toList());
 
         return new FolioDetailDto(folio, projects);
     }
 
-    @Transactional 
-    public Folio createOrUpdateFolio(FolioRequestDto requestDto, Principal principal) {
-        
-        // UsersRepository 수정해서 현재 로그인했으면서 탈퇴를 하지 않은 사람 찾아오게 수정해놨습니다.
-        Users currentUser = usersRepository.findByUsernameAndDeleteStatus(principal.getName(), DeleteStatus.N)
+    /** 최초 생성(또는 새로운 버전 생성) – 기본 DRAFT */
+    @Transactional
+    public Folio createOrUpdateFolio(FolioRequestDto req, Principal principal) {
+        if (principal == null) throw new AccessDeniedException("로그인이 필요합니다.");
+        Users currentUser = usersRepository
+                .findByUsernameAndDeleteStatus(principal.getName(), DeleteStatus.N)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // --- 수정된 부분: 덮어쓰지 않고 항상 새로 생성하도록 변경 ---
-        Folio folio = new Folio(); 
-        // ---------------------------------------------------
-
+        Folio folio = new Folio();
         folio.setUser(currentUser);
-        folio.setIntroduction(requestDto.getIntroduction());
-        folio.setSkills(requestDto.getSkills());
-        folio.setPhotos(requestDto.getPhotos());
-        folio.setProjectIds(requestDto.getProjectIds());
-        
-        if (requestDto.getPhotos() != null && !requestDto.getPhotos().isEmpty()) {
-            folio.setThumbnail(requestDto.getPhotos().get(0));
+
+        // 제목/소개/태그/사진/프로젝트
+        if (req.getTitle() != null && !req.getTitle().isBlank()) {
+            folio.setTitle(req.getTitle());
+        }
+        folio.setIntroduction(req.getIntroduction());
+        folio.setSkills(req.getSkills());
+        folio.setPhotos(req.getPhotos());
+        folio.setProjectIds(req.getProjectIds());
+
+        // 썸네일: 사진 첫 장 또는 디폴트
+        if (req.getPhotos() != null && !req.getPhotos().isEmpty()) {
+            folio.setThumbnail(req.getPhotos().get(0));
+        } else if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
+            folio.setThumbnail(req.getThumbnail());
         } else {
             folio.setThumbnail("https://picsum.photos/seed/default/300");
         }
 
-        folio.setContentJson("{}");
+        // 템플릿/상태/에디터JSON
+        if (req.getTemplate() != null && !req.getTemplate().isBlank()) {
+            folio.setTemplate(req.getTemplate());
+        }
+        // 기본 DRAFT (엔티티 디폴트)
+        folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
+
         return folioRepository.save(folio);
     }
 
-    /** PPT 에디터 전체 상태 저장(JSON 통짜) */
+    /** PPT 에디터 전체 상태 저장(JSON 통짜) – 템플릿별 최신본 유지 */
     @Transactional
     public Folio saveState(Principal principal, FolioStateSaveRequest req) {
-        if (principal == null) throw new AccessDeniedException("로그인 필요");
+        if (principal == null) throw new AccessDeniedException("로그인이 필요합니다.");
+        Users user = usersService.getUserByUsername(principal.getName());
 
-        Users user = usersService.getUserByUsername(principal.getName()); // ★ 정적호출 금지
-
-        // 사용자+템플릿 최신본 조회 후 없으면 신규
         String tpl = (req.getTemplate() != null && !req.getTemplate().isBlank())
                 ? req.getTemplate() : "dev-basic";
 
@@ -105,22 +119,50 @@ public class FolioService {
 
         folio.setUser(user);
         folio.setTemplate(tpl);
+        if (req.getTitle() != null && !req.getTitle().isBlank()) {
+            folio.setTitle(req.getTitle());
+        }
+        folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
 
-        // contentJson/thumbnail/status 반영
-        folio.setContentJson(
-                req.getContentJson() != null ? req.getContentJson() : "{}"
-        );
-        if (req.getThumbnail() != null) folio.setThumbnail(req.getThumbnail());
-        if (req.getStatus() != null) folio.setStatus(req.getStatus());
+        if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
+            folio.setThumbnail(req.getThumbnail());
+        }
+        if (req.getStatus() != null) {
+            folio.setStatus(req.getStatus()); // DRAFT ↔ PUBLISHED 전환
+        }
 
         return folioRepository.save(folio);
+    }
+    public int countMyPublished(Principal principal) {
+        if (principal == null) throw new AccessDeniedException("로그인이 필요합니다.");
+        Users user = usersService.getUserByUsername(principal.getName());
+        return folioRepository.countByUserAndStatus(user, Folio.Status.PUBLISHED);
+    }
+
+    public List<String> getMyRecentPublishedTitles(Principal principal, int limit) {
+        if (principal == null) throw new AccessDeniedException("로그인이 필요합니다.");
+        Users user = usersService.getUserByUsername(principal.getName());
+        return folioRepository
+                .findTop3ByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.PUBLISHED)
+                .stream()
+                .limit(limit)
+                .map(Folio::getTitle)
+                .toList();
     }
 
     /** 로그인 사용자의 최신 저장본(템플릿별) */
     public Optional<Folio> getMyLatest(Principal principal, String template) {
-        if (principal == null) throw new AccessDeniedException("로그인 필요");
+        if (principal == null) throw new AccessDeniedException("로그인이 필요합니다.");
         Users user = usersService.getUserByUsername(principal.getName());
         String tpl = (template != null && !template.isBlank()) ? template : "dev-basic";
         return folioRepository.findTopByUserAndTemplateOrderByUpdatedAtDesc(user, tpl);
+    }
+
+    /** 내 공개 목록 (마이페이지) – PUBLISHED만 */
+    public Page<FoliosSummaryDto> getMyPublished(Principal principal, Pageable pageable) {
+        if (principal == null) throw new AccessDeniedException("로그인이 필요합니다.");
+        Users user = usersService.getUserByUsername(principal.getName());
+        Page<Folio> page = folioRepository.findByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.PUBLISHED, pageable);
+        return page.map(FoliosSummaryDto::new);
     }
 }

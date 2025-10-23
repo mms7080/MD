@@ -1,69 +1,76 @@
-/* /resources/static/js/folios/detail.js (최종 수정 완료) */
-document.addEventListener('DOMContentLoaded', () => {
-    const pathParts = window.location.pathname.split('/');
+// /js/folios/detail.js
+(function () {
+    // 서버에서 detail 페이지에 folioId를 모델로 안 주고 있다면,
+    // URL에서 마지막 세그먼트를 id로 사용
+    const pathParts = location.pathname.split("/").filter(Boolean);
     const folioId = pathParts[pathParts.length - 1];
 
-    const contentDiv = document.getElementById('folio-detail-content');
+    const $ = (sel) => document.querySelector(sel);
+    const profileImg = $("#profile-image");
+    const profileName = $("#profile-name");
+    const profileIntro = $("#profile-job");
+    const profileSkills = $("#profile-skills");
 
-    if (!folioId || folioId.trim() === 'detail' || folioId.trim() === '') {
-        contentDiv.innerHTML = '<p class="muted">잘못된 접근입니다. Folio ID가 필요합니다.</p>';
-        return;
+    const introText = $("#introduction-text");
+    const projectList = $("#project-list");
+    const gallery = $("#photo-gallery");
+
+    function pill(text) {
+        const s = document.createElement("span");
+        s.className = "pill";
+        s.textContent = text;
+        return s;
     }
 
-    loadFolioDetails(folioId);
-});
+    function liLink(text, href) {
+        const a = document.createElement("a");
+        a.textContent = text;
+        a.href = href || "#";
+        const li = document.createElement("div");
+        li.className = "project-item";
+        li.appendChild(a);
+        return li;
+    }
 
-async function loadFolioDetails(id) {
-    const contentDiv = document.getElementById('folio-detail-content');
-    try {
-        const response = await fetch(`/api/folios/${id}`);
-
-        if (!response.ok) {
-            contentDiv.innerHTML = `<div class="detail-section"><h2>오류</h2><p class="muted">Folio를 찾을 수 없습니다. (ID: ${id})</p></div>`;
+    async function load() {
+        const res = await fetch(`/api/folios/${folioId}`);
+        if (!res.ok) {
+            console.error("상세 로드 실패");
             return;
         }
+        const d = await res.json();
 
-        const data = await response.json();
+        // 상단 프로필: 작성자 이름/스킬/한줄소개
+        profileImg.src =
+            d.thumbnail || "https://picsum.photos/seed/placeholder/300";
+        profileName.textContent = d.title || "Untitled";
+        profileIntro.textContent = (d.introduction || "").trim();
 
-        // --- 수정된 부분: HTML ID와 정확히 일치하도록 수정 ---
-        document.getElementById('profile-image').src = data.photos?.[0] || 'https://picsum.photos/seed/default/150';
-        document.getElementById('profile-name').textContent = data.user?.name || '이름 없음';
-        document.getElementById('profile-job').textContent = data.introduction || '자기소개가 없습니다.'; // profile-intro 대신 profile-job에 자기소개 표시
+        profileSkills.innerHTML = "";
+        (d.skills || [])
+            .slice(0, 8)
+            .forEach((s) => profileSkills.appendChild(pill(s)));
 
-        const skillsContainer = document.getElementById('profile-skills');
-        skillsContainer.innerHTML = '';
-        (data.skills || []).forEach(skill => {
-            const tagEl = document.createElement('span');
-            tagEl.className = 'tag';
-            tagEl.textContent = `#${skill}`;
-            skillsContainer.appendChild(tagEl);
-        });
-        
-        // 자기소개 본문 채우기 (ID가 introduction-text인 요소에)
-        document.getElementById('introduction-text').textContent = data.introduction || '작성된 자기소개가 없습니다.';
+        // 소개 섹션
+        introText.textContent = (d.introduction || "").trim();
 
-        const projectList = document.getElementById('project-list');
-        projectList.innerHTML = '';
-        (data.projects || []).forEach(project => {
-            const projectCard = `
-                <a href="/portfolios/detail/${project.portfolioId}" class="project-card">
-                    <img src="https://picsum.photos/seed/${project.portfolioId}/300/200" alt="${project.title} 썸네일">
-                    <div class="project-title">${project.title}</div>
-                </a>`;
-            projectList.insertAdjacentHTML('beforeend', projectCard);
+        // 참여 포트폴리오 (있다면)
+        projectList.innerHTML = "";
+        (d.projects || []).forEach((p) => {
+            projectList.appendChild(liLink(p.title, `/folios/detail/${p.id}`));
         });
 
-        const photoGallery = document.getElementById('photo-gallery');
-        photoGallery.innerHTML = '';
-        (data.photos || []).forEach(photoUrl => {
-            const photoImg = document.createElement('img');
-            photoImg.src = photoUrl;
-            photoImg.alt = '개인 사진';
-            photoGallery.appendChild(photoImg);
+        // Photos: 세로로 모두 출력
+        gallery.innerHTML = "";
+        (d.photos || []).forEach((url) => {
+            const img = new Image();
+            img.src = url;
+            img.alt = "photo";
+            img.loading = "lazy";
+            img.className = "photo";
+            gallery.appendChild(img);
         });
-
-    } catch (error) {
-        console.error('상세 데이터를 불러오는 중 오류 발생:', error);
-        contentDiv.innerHTML = '<p class="muted">데이터를 불러오는 중 오류가 발생했습니다.</p>';
     }
-}
+
+    load();
+})();

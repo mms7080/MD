@@ -1,49 +1,63 @@
 <!DOCTYPE html>
-<html lang="ko" th:replace="~{fragments/folios-layout :: layout(
-    pageTitle = 'Folio 상세',
-    activeMenu = 'list',
-    css = ~{::#detail-css},
-    js = ~{::#detail-js},
-    content = ~{::#folio-detail-content}
-)}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <title>Folio 상세</title>
+        <meta name="_folio_id" th:content="${folioId}" />
+        <style>
+            .wrap {
+                max-width: 900px;
+                margin: 40px auto;
+                padding: 0 16px;
+            }
+            .hero {
+                margin-bottom: 16px;
+            }
+            .slides img {
+                width: 100%;
+                display: block;
+                margin: 20px 0;
+                border-radius: 12px;
+                background: #eee;
+            }
+            .meta {
+                color: #777;
+            }
+        </style>
+    </head>
+    <body>
+        <div th:replace="fragments/header :: header('folios')"></div>
 
-<head>
-    <th:block id="detail-css">
-        <link th:href="@{/css/folios/detail.css}" rel="stylesheet" />
-    </th:block>
-</head>
+        <main class="wrap">
+            <h1 id="title">제목</h1>
+            <div class="meta" id="meta"></div>
+            <article class="slides" id="slides"></article>
+        </main>
 
-<body>
-    <div id="folio-detail-content">
-        <div class="profile-header">
-            <img src="" alt="프로필 사진" class="profile-image" id="profile-image">
-            <div class="profile-info">
-                <h1 class="profile-name" id="profile-name"></h1>
-                <p class="profile-intro" id="profile-job"></p> <div class="tags" id="profile-skills">
-                    </div>
-            </div>
-        </div>
+        <script>
+            const id = document.querySelector('meta[name="_folio_id"]').content;
+            const titleEl = document.getElementById("title");
+            const metaEl = document.getElementById("meta");
+            const slidesEl = document.getElementById("slides");
 
-        <div class="detail-section">
-            <h2>Introduction</h2>
-            <p id="introduction-text"></p>
-        </div>
-
-        <div class="detail-section">
-            <h2>참여 포트폴리오</h2>
-            <div class="project-list" id="project-list">
-                </div>
-        </div>
-
-        <div class="detail-section">
-            <h2>Photos</h2>
-            <div class="photo-gallery" id="photo-gallery">
-                </div>
-        </div>
-    </div>
-
-    <th:block id="detail-js">
-        <script th:src="@{/js/folios/detail.js}"></script>
-    </th:block>
-</body>
+            async function load() {
+                const res = await fetch(`/api/folios/${id}`);
+                if (!res.ok) {
+                    titleEl.textContent = "존재하지 않는 Folio";
+                    return;
+                }
+                const d = await res.json();
+                titleEl.textContent = d.title || "Untitled";
+                metaEl.textContent = (d.createdAt || "").slice(0, 10);
+                slidesEl.innerHTML = "";
+                (d.photos || []).forEach((url) => {
+                    const img = new Image();
+                    img.src = url;
+                    img.alt = "slide";
+                    slidesEl.appendChild(img);
+                });
+            }
+            load();
+        </script>
+    </body>
 </html>

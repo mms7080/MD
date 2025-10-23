@@ -1,3 +1,4 @@
+// /js/folios/edit.js
 document.addEventListener("DOMContentLoaded", () => {
     // ---------- 유틸 ----------
     const qs = (s, r = document) => r.querySelector(s);
@@ -12,11 +13,13 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(n);
         setTimeout(() => n.remove(), 1200);
     };
+
     const getCsrf = () => {
         const token = qs('meta[name="_csrf"]')?.content;
         const header = qs('meta[name="_csrf_header"]')?.content;
         return token && header ? { header, token } : null;
     };
+
     const fileToDataURL = (file) =>
         new Promise((res) => {
             const fr = new FileReader();
@@ -24,22 +27,45 @@ document.addEventListener("DOMContentLoaded", () => {
             fr.readAsDataURL(file);
         });
 
+    /** data:URL → 서버 업로드(있으면)하여 URL로 변환. 엔드포인트가 없으면 그대로 null 반환 */
     async function normalizeImageUrl(urlOrData) {
         if (!urlOrData) return null;
         if (!urlOrData.startsWith("data:")) return urlOrData;
-        const fd = new FormData();
-        const blob = await (await fetch(urlOrData)).blob();
-        fd.append("file", blob, "thumbnail.png");
-        const res = await fetch("/api/uploads/images", {
-            method: "POST",
-            body: fd,
-        });
-        if (!res.ok) throw new Error("이미지 업로드 실패");
-        const json = await res.json();
-        return json.url;
+
+        // 서버에 이미지 업로드 API가 구현되어 있지 않다면,
+        // 아래를 주석해제하고 그냥 dataURL 사용(또는 null 처리)하세요.
+        // return urlOrData; // 혹은 return null;
+
+        try {
+            const fd = new FormData();
+            const blob = await (await fetch(urlOrData)).blob();
+            fd.append("file", blob, "thumbnail.png");
+            const res = await fetch("/api/uploads/images", {
+                method: "POST",
+                body: fd,
+            });
+            if (!res.ok) throw new Error("이미지 업로드 실패");
+            const json = await res.json();
+            return json.url; // { url: "/uploads/..." } 형태라고 가정
+        } catch (e) {
+            console.warn("normalizeImageUrl 실패:", e);
+            return null;
+        }
     }
 
-    // ---------- 상태 ----------
+    const csrf = getCsrf();
+    const baseHeads = { "Content-Type": "application/json" };
+    if (csrf) baseHeads[csrf.header] = csrf.token;
+
+    const safeJson = (s) => {
+        try {
+            return JSON.parse(s || "{}");
+        } catch {
+            return {};
+        }
+    };
+
+    // ---------- 에디터 상태(템플릿 기본값) ----------
     const state = {
         meta: { year: new Date().getFullYear() },
         intro: {
@@ -82,6 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 desc3: "성능 튜닝으로 P95 응답 320ms → 140ms",
             },
         },
+        // 퍼센트 게이지(시각화용)
         skills: { spring: 90, db: 80, devops: 70 },
         strengths: {
             1: "확장성과 유지보수를 고려한 모듈 설계",
@@ -116,12 +143,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const set = (path, value) => {
         const keys = path.split(".");
         const last = keys.pop();
-        const obj = keys.reduce((o, k) => o[k] ?? (o[k] = {}), state);
+        const obj = keys.reduce((o, k) => (o[k] ??= {}), state);
         obj[last] = value;
         applyBindings();
     };
 
-    // ---------- 바인딩 ----------
+    // ---------- 화면 바인딩 ----------
     function applyBindings() {
         qsa("[data-bind]").forEach(
             (el) => (el.textContent = get(el.getAttribute("data-bind")) ?? "")
@@ -329,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 set(path, val);
             });
         });
-        // 업로드 바인딩
+        // 이미지 업로드 -> dataURL -> 상태 반영
         qsa("[data-upload]", pane).forEach((fi) => {
             fi.addEventListener("change", async () => {
                 const file = fi.files?.[0];
@@ -342,30 +369,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ---------- 저장/불러오기/프린트/나가기 ----------
-    const btnSave = qs("#btnSave");
-    const btnLoad = qs("#btnLoad");
+    const btnSave = qs("#btnSave"); // 임시저장(DRAFT)
+    const btnLoad = qs("#btnLoad"); // 불러오기
     const btnPrint = qs("#btnPrint");
+    const btnExit = qs("#btnExit");
 
-    btnSave?.addEventListener("click", () => {
-        localStorage.setItem("folio-dev-basic", JSON.stringify(state));
-        flash("저장됨");
-    });
-
-    // 서버 저장본 불러오기
+    // 서버 임시저장 불러오기
     btnLoad?.addEventListener("click", async () => {
         try {
-            const res = await fetch("/folios/me/dev-basic", { method: "GET" });
-            if (res.status === 204) {
-                flash("서버에 저장된 내용이 없습니다");
-                return;
-            }
+            const res = await fetch("/api/folios/me/dev-basic", {
+                method: "GET",
+            });
+            if (res.status === 204) return flash("서버 임시저장 없음");
             if (!res.ok) throw new Error("불러오기 실패");
             const data = await res.json();
             if (data.contentJson) {
-                Object.assign(state, JSON.parse(data.contentJson));
+                Object.assign(state, safeJson(data.contentJson));
                 applyBindings();
                 renderForm(page);
-                flash("서버에서 불러옴");
+                flash("불러오기 완료");
             } else {
                 flash("저장된 contentJson이 없습니다");
             }
@@ -375,7 +397,38 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 프린트: 다이얼로그 열릴 때 전부 보이게, 닫히면 복원
+    // 서버 임시저장(DRAFT)
+    btnSave?.addEventListener("click", async () => {
+        try {
+            const contentJson = JSON.stringify(state);
+            const thumb =
+                state.intro?.photo ||
+                state.proj1?.thumb ||
+                state.proj2?.thumb ||
+                null;
+            const thumbnailUrl = await normalizeImageUrl(thumb);
+
+            const payload = {
+                template: "dev-basic",
+                contentJson,
+                status: "DRAFT",
+                thumbnail: thumbnailUrl,
+            };
+
+            const res = await fetch("/api/folios/dev-basic", {
+                method: "POST",
+                headers: baseHeads,
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error("임시저장 실패");
+            flash("임시저장 완료");
+        } catch (e) {
+            console.error(e);
+            flash("임시저장 중 오류");
+        }
+    });
+
+    // 프린트: 모든 슬라이드 보였다가 복원
     function unhideAllForPrint() {
         qsa(".slide").forEach((s) => {
             _hiddenMap.set(s, s.hidden);
@@ -393,48 +446,64 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("beforeprint", unhideAllForPrint);
     window.addEventListener("afterprint", restoreHiddenAfterPrint);
 
-    // 서버 업로드(임시 저장 DRAFT)
+    // 발행(PUBLISHED) → 상세로 이동
     qs("#btnUpload")?.addEventListener("click", async () => {
+        const button = qs("#btnUpload");
         try {
-            const b = qs("#btnUpload");
-            b.disabled = true;
+            button.disabled = true;
 
             const contentJson = JSON.stringify(state);
-            const thumb =
-                state.intro?.photo ||
-                state.proj1?.thumb ||
-                state.proj2?.thumb ||
-                null;
-            const thumbnailUrl = await normalizeImageUrl(thumb);
+            // 제목은 intro.name(없으면 Untitled)로 사용
+            const title =
+                document
+                    .querySelector('[data-bind="intro.name"]')
+                    ?.textContent?.trim() || "Untitled";
+
+            // 상세 페이지에서 세로 슬라이드로 보여줄 사진들
+            const photos = [
+                state.intro?.photo,
+                state.proj1?.thumb,
+                state.proj2?.thumb,
+            ].filter(Boolean);
+
+            // 필요하다면 skills CSV 입력을 만들어 사용하세요. (예: #skillsCsv)
+            const skillsCsv = qs("#skillsCsv")?.value || "";
+            const skills = skillsCsv
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+
+            const thumbnailUrl = await normalizeImageUrl(photos[0] || null);
 
             const payload = {
+                title,
+                introduction: state.intro?.summary || "",
+                skills,
+                photos,
                 template: "dev-basic",
+                status: "PUBLISHED",
                 contentJson,
-                status: "DRAFT",
                 thumbnail: thumbnailUrl,
             };
-            const csrf = getCsrf();
-            const headers = { "Content-Type": "application/json" };
-            if (csrf) headers[csrf.header] = csrf.token;
 
-            const res = await fetch("/folios/dev-basic", {
+            const res = await fetch("/api/folios", {
                 method: "POST",
-                headers,
+                headers: baseHeads,
                 body: JSON.stringify(payload),
             });
-            if (!res.ok) throw new Error("업로드 실패: " + (await res.text()));
-            await res.json();
-            flash("업로드 완료!");
+            if (!res.ok) throw new Error("발행 실패: " + (await res.text()));
+            const dto = await res.json();
+            location.href = `/folios/detail/${dto.id}`;
         } catch (err) {
             console.error(err);
             flash("업로드 중 오류");
         } finally {
-            qs("#btnUpload").disabled = false;
+            button.disabled = false;
         }
     });
 
-    // 나가기(같은 도메인에서 왔으면 back, 아니면 홈)
-    qs("#btnExit")?.addEventListener("click", (e) => {
+    // 나가기(같은 도메인 referrer면 back, 아니면 홈)
+    btnExit?.addEventListener("click", (e) => {
         e.preventDefault();
         const ref = document.referrer;
         try {
@@ -449,7 +518,7 @@ document.addEventListener("DOMContentLoaded", () => {
         location.href = "/";
     });
 
-    // ---------- 키보드/화살표 ----------
+    // 키보드/화살표 네비게이션
     qs(".navArrow.left")?.addEventListener("click", () => go(page - 1));
     qs(".navArrow.right")?.addEventListener("click", () => go(page + 1));
     window.addEventListener("keydown", (e) => {
@@ -457,7 +526,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.key === "ArrowRight") go(page + 1);
     });
 
-    // ---------- init ----------
+    // init
     applyBindings();
     go(1);
 });

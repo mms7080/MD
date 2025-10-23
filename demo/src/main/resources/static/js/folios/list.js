@@ -1,91 +1,84 @@
-/* /resources/static/js/folios/list.js */
-document.addEventListener('DOMContentLoaded', function() {
-    const grid = document.getElementById('folio-grid');
-    const paginationContainer = document.getElementById('pagination');
-    const cardTemplate = document.getElementById('folio-card-template');
+(function () {
+    const grid = document.getElementById("folio-grid");
+    const cardTmpl = document.getElementById("folio-card-template");
+    const pager = document.getElementById("pagination");
 
-    if (!grid || !paginationContainer || !cardTemplate) {
-        console.error('필수 HTML 요소(grid, pagination, template)를 찾을 수 없습니다.');
-        return;
+    let page = 1;
+    const size = 12;
+
+    async function fetchPage(p) {
+        const res = await fetch(`/api/folios?page=${p}&size=${size}`);
+        if (!res.ok) throw new Error("목록 로드 실패");
+        return await res.json(); // { page, items, totalPages, totalItems }
     }
 
-    async function fetchAndRenderFolios(page = 1) {
-        grid.innerHTML = '<p class="loading-message muted">데이터를 불러오는 중입니다...</p>';
-        paginationContainer.innerHTML = '';
+    function renderItems(items) {
+        grid.innerHTML = "";
+        items.forEach((it) => {
+            const node = cardTmpl.content.cloneNode(true);
 
+            // 링크 & 썸네일
+            const aThumb = node.querySelector(".kf-card__thumb");
+            const img = node.querySelector(".kf-card__thumb img");
+            aThumb.href = `/folios/detail/${it.id}`;
+            img.src =
+                it.thumbnail ||
+                "https://picsum.photos/seed/placeholder/400/250";
+
+            // 제목(=이름) + 작성일
+            const titleA = node.querySelector(".kf-card__title a");
+            titleA.textContent = it.title || "Untitled";
+            titleA.href = `/folios/detail/${it.id}`;
+
+            // 태그 영역은 요구사항상 숨기거나 skills 일부만 출력하고 싶다면 아래 사용
+            const tags = node.querySelector(".kf-card__tags");
+            tags.innerHTML = `
+        <span class="pill">${(it.createdAt || "").slice(0, 10)}</span>
+      `;
+
+            grid.appendChild(node);
+        });
+    }
+
+    function renderPager(pageNum, totalPages) {
+        pager.innerHTML = "";
+        const prev = document.createElement("button");
+        prev.textContent = "이전";
+        prev.disabled = pageNum <= 1;
+        prev.onclick = () => {
+            if (page > 1) {
+                page--;
+                load();
+            }
+        };
+
+        const next = document.createElement("button");
+        next.textContent = "다음";
+        next.disabled = pageNum >= totalPages;
+        next.onclick = () => {
+            if (page < totalPages) {
+                page++;
+                load();
+            }
+        };
+
+        pager.appendChild(prev);
+        const info = document.createElement("span");
+        info.style.margin = "0 12px";
+        info.textContent = `${pageNum} / ${totalPages}`;
+        pager.appendChild(info);
+        pager.appendChild(next);
+    }
+
+    async function load() {
         try {
-            const response = await fetch(`/api/folios?page=${page - 1}&size=10`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            grid.innerHTML = '';
-
-            if (data.items && data.items.length > 0) {
-                data.items.forEach(folio => {
-                    const cardClone = cardTemplate.content.cloneNode(true);
-                    
-                    const detailUrl = `/folios/detail/${folio.folioId}`;
-                    cardClone.querySelector('.kf-card__thumb').href = detailUrl;
-                    cardClone.querySelector('.kf-card__title a').href = detailUrl;
-
-                    const thumbnail = cardClone.querySelector('.kf-card__thumb img');
-                    thumbnail.src = folio.thumbnail || 'https://picsum.photos/seed/placeholder/400/250';
-                    
-                    // --- 수정된 부분 ---
-                    thumbnail.alt = `${folio.userName}의 Folio 썸네일`;
-                    cardClone.querySelector('.kf-card__title a').textContent = folio.userName;
-                    // --------------------
-
-                    const tagsContainer = cardClone.querySelector('.kf-card__tags');
-                    tagsContainer.innerHTML = '';
-                    (folio.skills || []).slice(0, 4).forEach(skill => {
-                        const tagEl = document.createElement('span');
-                        tagEl.className = 'kf-tag';
-                        tagEl.textContent = `#${skill}`;
-                        tagsContainer.appendChild(tagEl);
-                    });
-                    
-                    grid.appendChild(cardClone);
-                });
-
-                // API 응답의 page는 0부터 시작하므로 currentPage는 data.page + 1
-                renderPagination(data.page + 1, data.totalPages);
-            } else {
-                grid.innerHTML = '<p class="muted empty-message">아직 등록된 Folio가 없습니다.</p>';
-            }
-        } catch (error) {
-            console.error('Folio 데이터를 불러오는 데 실패했습니다:', error);
-            grid.innerHTML = '<p class="muted empty-message">데이터를 불러오는 중 오류가 발생했습니다.</p>';
+            const data = await fetchPage(page);
+            renderItems(data.items || []);
+            renderPager(data.page || 1, data.totalPages || 1);
+        } catch (e) {
+            console.error(e);
         }
     }
 
-    function renderPagination(currentPage, totalPages) {
-        paginationContainer.innerHTML = '';
-        if (totalPages <= 1) return;
-
-        for (let i = 1; i <= totalPages; i++) {
-            const pageButton = document.createElement('button');
-            pageButton.className = 'page-btn';
-            pageButton.textContent = i;
-            pageButton.dataset.page = i;
-
-            if (i === currentPage) {
-                pageButton.classList.add('active');
-                pageButton.disabled = true;
-            }
-
-            pageButton.addEventListener('click', (e) => {
-                const targetPage = e.target.dataset.page;
-                fetchAndRenderFolios(Number(targetPage));
-            });
-            
-            paginationContainer.appendChild(pageButton);
-        }
-    }
-
-    fetchAndRenderFolios(1);
-});
+    load();
+})();
