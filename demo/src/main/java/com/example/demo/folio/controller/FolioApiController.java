@@ -75,8 +75,7 @@ public class FolioApiController {
         
         Folio savedFolio = folioService.createOrUpdateFolio(requestDto, principal);
         
-        // --- 수정된 부분: Folio 객체 하나만 받는 생성자를 사용 ---
-        FolioDetailDto responseDto = new FolioDetailDto(savedFolio);
+        FolioDetailDto responseDto = new FolioDetailDto(savedFolio, Map.of());
         
 
         return ResponseEntity.ok(responseDto);

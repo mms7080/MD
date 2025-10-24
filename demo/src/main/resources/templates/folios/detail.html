@@ -1,49 +1,223 @@
 <!DOCTYPE html>
-<html lang="ko" th:replace="~{fragments/folios-layout :: layout(
-    pageTitle = 'Folio 상세',
-    activeMenu = 'list',
-    css = ~{::#detail-css},
-    js = ~{::#detail-js},
-    content = ~{::#folio-detail-content}
-)}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title
+            th:text="${folio != null and folio.user != null and folio.user.username != null
+                   ? folio.user.username + ' – Folio'
+                   : 'Folio 상세'}"
+        >
+            Folio 상세
+        </title>
 
-<head>
-    <th:block id="detail-css">
-        <link th:href="@{/css/folios/detail.css}" rel="stylesheet" />
-    </th:block>
-</head>
+        <link rel="stylesheet" th:href="@{/css/folios/detail.css}" />
+    </head>
+    <body>
+        <div class="viewer-wrap">
+            <main class="viewer-slides">
+                <!-- 1) 헤더(프로필) -->
+                <section class="slide">
+                    <div class="profile">
+                        <img
+                            th:src="${state != null and state.intro != null and state.intro.photo != null and state.intro.photo != '' 
+                      ? state.intro.photo 
+                      : '/img/default-profile.png'}"
+                            alt="profile"
+                        />
+                        <div>
+                            <h1
+                                th:text="${state != null and state.intro != null and state.intro.name != null and state.intro.name != '' 
+                           ? state.intro.name 
+                           : (folio != null and folio.user != null and folio.user.username != null 
+                              ? folio.user.username 
+                              : '이름 없음')}"
+                            >
+                                이름 없음
+                            </h1>
+                            <div
+                                class="headline muted"
+                                th:text="${state != null and state.intro != null and state.intro.title != null ? state.intro.title : ''}"
+                            >
+                                헤드라인
+                            </div>
 
-<body>
-    <div id="folio-detail-content">
-        <div class="profile-header">
-            <img src="" alt="프로필 사진" class="profile-image" id="profile-image">
-            <div class="profile-info">
-                <h1 class="profile-name" id="profile-name"></h1>
-                <p class="profile-intro" id="profile-job"></p> <div class="tags" id="profile-skills">
+                            <div class="tags">
+                                <span
+                                    class="tag"
+                                    th:each="e : ${state != null and state.skills != null ? state.skills.entrySet() : {}}"
+                                    th:text="${e.key + ' ' + e.value + '%'}"
+                                >
+                                    spring 80%
+                                </span>
+                            </div>
+                        </div>
                     </div>
-            </div>
-        </div>
+                </section>
 
-        <div class="detail-section">
-            <h2>Introduction</h2>
-            <p id="introduction-text"></p>
-        </div>
+                <!-- 2) Introduction -->
+                <section
+                    class="slide"
+                    th:if="${state != null and state.intro != null and state.intro.summary != null}"
+                >
+                    <h2>Introduction</h2>
+                    <p th:text="${state.intro.summary}">소개글</p>
+                </section>
 
-        <div class="detail-section">
-            <h2>참여 포트폴리오</h2>
-            <div class="project-list" id="project-list">
-                </div>
-        </div>
+                <!-- 3) Education -->
+                <section
+                    class="slide"
+                    th:if="${state != null and state.edu != null}"
+                >
+                    <h2>Education</h2>
 
-        <div class="detail-section">
-            <h2>Photos</h2>
-            <div class="photo-gallery" id="photo-gallery">
-                </div>
-        </div>
-    </div>
+                    <div th:if="${state.edu.univ1 != null}">
+                        <div>
+                            <strong th:text="${state.edu.univ1.name}"
+                                >학교명</strong
+                            >
+                            —
+                            <span th:text="${state.edu.univ1.major}">전공</span>
+                            <small
+                                class="muted"
+                                th:text="${state.edu.univ1.period}"
+                                >기간</small
+                            >
+                        </div>
+                    </div>
 
-    <th:block id="detail-js">
-        <script th:src="@{/js/folios/detail.js}"></script>
-    </th:block>
-</body>
+                    <div
+                        th:if="${state.edu.univ2 != null}"
+                        style="margin-top: 8px"
+                    >
+                        <div>
+                            <strong th:text="${state.edu.univ2.name}"
+                                >학교명</strong
+                            >
+                            —
+                            <span th:text="${state.edu.univ2.major}">전공</span>
+                            <small
+                                class="muted"
+                                th:text="${state.edu.univ2.period}"
+                                >기간</small
+                            >
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4) Experience -->
+                <section
+                    class="slide"
+                    th:if="${state != null and state.exp != null}"
+                >
+                    <h2>Experience</h2>
+
+                    <div
+                        th:each="job : ${state.exp.values()}"
+                        class="job"
+                        style="margin-bottom: 10px"
+                    >
+                        <div>
+                            <strong th:text="${job.company}">회사</strong>
+                            <small class="muted" th:text="${job.period}"
+                                >기간/직무</small
+                            >
+                        </div>
+                        <ul class="ul" style="margin: 6px 0 0 18px">
+                            <li
+                                th:if="${job.desc1 != null}"
+                                th:text="${job.desc1}"
+                            ></li>
+                            <li
+                                th:if="${job.desc2 != null}"
+                                th:text="${job.desc2}"
+                            ></li>
+                            <li
+                                th:if="${job.desc3 != null}"
+                                th:text="${job.desc3}"
+                            ></li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 5) Projects -->
+                <section
+                    class="slide"
+                    th:if="${state != null and (state.proj1 != null or state.proj2 != null)}"
+                >
+                    <h2>Projects</h2>
+
+                    <article class="project" th:if="${state.proj1 != null}">
+                        <img
+                            class="project-thumb"
+                            th:if="${state.proj1.thumb != null and state.proj1.thumb != ''}"
+                            th:src="${state.proj1.thumb}"
+                            alt=""
+                        />
+                        <div>
+                            <h3 th:text="${state.proj1.title}">프로젝트</h3>
+                            <p class="muted" th:text="${state.proj1.meta}"></p>
+                            <p th:text="${state.proj1.desc}"></p>
+                            <a
+                                th:if="${state.proj1.link != null and state.proj1.link != ''}"
+                                th:href="${state.proj1.link.startsWith('http') ? state.proj1.link : 'https://' + state.proj1.link}"
+                                target="_blank"
+                                rel="noopener"
+                                >Link</a
+                            >
+                        </div>
+                    </article>
+
+                    <article class="project" th:if="${state.proj2 != null}">
+                        <img
+                            class="project-thumb"
+                            th:if="${state.proj2.thumb != null and state.proj2.thumb != ''}"
+                            th:src="${state.proj2.thumb}"
+                            alt=""
+                        />
+                        <div>
+                            <h3 th:text="${state.proj2.title}">프로젝트</h3>
+                            <p class="muted" th:text="${state.proj2.meta}"></p>
+                            <p th:text="${state.proj2.desc}"></p>
+                            <a
+                                th:if="${state.proj2.link != null and state.proj2.link != ''}"
+                                th:href="${state.proj2.link.startsWith('http') ? state.proj2.link : 'https://' + state.proj2.link}"
+                                target="_blank"
+                                rel="noopener"
+                                >Link</a
+                            >
+                        </div>
+                    </article>
+                </section>
+
+                <!-- 6) Awards -->
+                <section
+                    class="slide"
+                    th:if="${state != null and state.awards != null}"
+                >
+                    <h2>Awards</h2>
+                    <ul class="ul" style="margin: 6px 0 0 18px">
+                        <li
+                            th:each="a : ${state.awards.values()}"
+                            th:text="${a}"
+                        ></li>
+                    </ul>
+                </section>
+
+                <!-- 7) Certifications -->
+                <section
+                    class="slide"
+                    th:if="${state != null and state.cert != null}"
+                >
+                    <h2>Certifications</h2>
+                    <ul class="ul" style="margin: 6px 0 0 18px">
+                        <li
+                            th:each="c : ${state.cert.values()}"
+                            th:text="${c}"
+                        ></li>
+                    </ul>
+                </section>
+            </main>
+        </div>
+    </body>
 </html>

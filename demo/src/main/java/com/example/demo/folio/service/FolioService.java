@@ -1,18 +1,18 @@
 package com.example.demo.folio.service;
 
 import com.example.demo.folio.dto.FolioDetailDto;
-import com.example.demo.folio.dto.FoliosSummaryDto;
 import com.example.demo.folio.dto.PortfolioInFolioDto;
 import com.example.demo.folio.entity.Folio;
 import com.example.demo.folio.repository.FolioRepository;
-import com.example.demo.portfolios.entity.PortfoliosEntity; // 임시 데이터용
 import com.example.demo.portfolios.service.PortfolioService;
 import com.example.demo.users.UsersEntity.DeleteStatus;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 import com.example.demo.users.UsersService.UsersService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.demo.folio.dto.FolioRequestDto;
 import com.example.demo.folio.dto.FolioStateSaveRequest;
+import com.example.demo.folio.dto.FoliosSummaryDto;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -22,39 +22,45 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class FolioService {
     
+    private final ObjectMapper objectMapper;
     private final FolioRepository folioRepository;
     private final UsersRepository usersRepository;
     private final PortfolioService portfolioService;
     private final UsersService usersService;
 
-    public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
-        Page<Folio> folioPage = folioRepository.findAll(pageable);
-        return folioPage.map(FoliosSummaryDto::new);
-    }
-    
     public FolioDetailDto getFolioDetail(String id) {
         Folio folio = folioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 Folio를 찾을 수 없습니다. id=" + id));
-        
+            .orElseThrow(() -> new IllegalArgumentException("해당 Folio를 찾을 수 없습니다. id=" + id));
+
+        // projectIds -> projects 매핑 (생략 가능: 기존 로직)
         List<PortfolioInFolioDto> projects = folio.getProjectIds().stream()
-            .map(projectId -> {
-                PortfoliosEntity entity = portfolioService.getPortfolioWithTeam(Long.valueOf(projectId));
-                return (entity != null) ? new PortfolioInFolioDto(entity.getId(), entity.getTitle()) : null;
+            .map(pid -> {
+                var ent = portfolioService.getPortfolioWithTeam(Long.valueOf(pid));
+                return ent != null ? new PortfolioInFolioDto(ent.getId(), ent.getTitle()) : null;
             })
             .filter(p -> p != null)
             .collect(Collectors.toList());
 
-        return new FolioDetailDto(folio, projects);
+        Map<String, Object> state = Map.of();
+        try {
+            String cj = folio.getContentJson();
+            if (cj != null && !cj.isBlank()) {
+                state = objectMapper.readValue(cj, Map.class);
+            }
+        } catch (Exception ignored) {}
+
+        return new FolioDetailDto(folio, projects, state);
     }
 
     @Transactional 
@@ -145,5 +151,9 @@ public class FolioService {
                         "thumbnail", f.getThumbnail()
                 )));
         return res;
+    }
+    @Transactional(readOnly = true)
+    public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
+        return folioRepository.findAll(pageable).map(FoliosSummaryDto::new);
     }
 }

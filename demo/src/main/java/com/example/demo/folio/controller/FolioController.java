@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersService.UsersService;
+
 import java.security.Principal;
 
 import com.example.demo.folio.service.FolioService; // FolioService 주입
@@ -23,7 +24,7 @@ import com.example.demo.folio.service.FolioService; // FolioService 주입
 public class FolioController {
 
     private final UsersService usersService;
-    private final FolioService folioService; 
+    private final FolioService folioService;
 
     // 1. 목록 페이지 뷰
     @GetMapping
@@ -34,10 +35,14 @@ public class FolioController {
     // 2. 상세 페이지 뷰
     @GetMapping("/detail/{id}")
     public String folioDetailPage(@PathVariable String id, Model model) {
-        // 상세 페이지 로직은 나중에 API와 함께 구현합니다.
-        model.addAttribute("folioId", id);
+        var detail = folioService.getFolioDetail(id);
+
+        model.addAttribute("folio", detail);
+        model.addAttribute("state", detail.getState() != null ? detail.getState() : java.util.Map.of());
+
         return "folios/detail";
     }
+
 
     // 3. 작성 페이지 뷰
     @GetMapping("/write")
