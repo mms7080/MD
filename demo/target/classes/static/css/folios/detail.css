@@ -89,3 +89,18 @@ aside,
         border-radius: 12px;
     }
 }
+
+/* ✅ 슬라이드 간 여백 제거 */
+.slide {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important; /* 둥근 모서리 제거 */
+}
+
+/* 혹시 wrapper에도 여백이 있다면 추가 */
+.slide-wrapper,
+section,
+.container {
+    margin: 0 !important;
+    padding: 0 !important;
+}

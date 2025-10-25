@@ -550,17 +550,24 @@ document.addEventListener("DOMContentLoaded", () => {
             btnUpload.disabled = true;
             btnUpload.textContent = "업로딩...";
 
-            // 보이는 슬라이드 우선, 없으면 전체
-            const visible = [...document.querySelectorAll(".slide")].filter(
-                (el) => !el.hasAttribute("hidden")
-            );
-            const targets = visible.length
-                ? visible
-                : [...document.querySelectorAll(".slide")];
+            // ✅ 전체 슬라이드를 모두 캡처 (숨김도 일시적으로 표시)
+            const targets = [...document.querySelectorAll(".slide")];
             if (!targets.length) {
                 alert("캡처할 슬라이드가 없습니다.");
                 return;
             }
+            // 기존 hidden 상태 저장 후 전부 표시
+            const wasHidden = targets.map(
+                (s) => s.hidden || s.hasAttribute("hidden")
+            );
+            targets.forEach((s) => {
+                s.hidden = false;
+                s.removeAttribute("hidden");
+            });
+            // 레이아웃 반영 대기
+            await new Promise((r) =>
+                requestAnimationFrame(() => requestAnimationFrame(r))
+            );
 
             // DOM → PNG dataURL
             const images = [];
@@ -573,16 +580,32 @@ document.addEventListener("DOMContentLoaded", () => {
                     backgroundColor: "#ffffff",
                     scale: 2,
                     useCORS: true,
+                    // windowWidth/Height를 넉넉히 주면 일부 스타일 이슈를 피할 수 있어요 (선택)
+                    windowWidth: Math.max(
+                        document.documentElement.clientWidth,
+                        el.scrollWidth
+                    ),
+                    windowHeight: Math.max(
+                        document.documentElement.clientHeight,
+                        el.scrollHeight
+                    ),
                 });
                 images.push(canvas.toDataURL("image/png"));
             }
+
+            // 캡처 완료 후 원래 hidden 상태로 복구
+            targets.forEach((s, i) => {
+                s.hidden = wasHidden[i];
+                if (wasHidden[i]) s.setAttribute("hidden", "");
+            });
 
             const title =
                 (
                     document.querySelector('[data-bind="intro.name"]')
                         ?.textContent || ""
                 ).trim() || "Folio";
-            const contentJson = JSON.stringify(state); // 또는 collectEditorStateJsonSafely()
+
+            const contentJson = JSON.stringify(state); // 전체 상태도 같이 저장
 
             const payload = {
                 folioId: getCurrentFolioIdSafely(),
