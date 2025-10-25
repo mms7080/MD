@@ -1188,4 +1188,88 @@ html[data-theme="light"] .edit-form .btn-cancel {
   color: #666;
 }
 
+   /* ======================
+   Light Mode: Delete Modal Fix
+   ====================== */
+html[data-theme="light"] #deleteModal,
+html[data-theme="light"] .delete-modal {
+  background-color: rgba(255, 255, 255, 0.5); /* 밝은 반투명 배경 */
+}
+
+html[data-theme="light"] #deleteModal .modal-content,
+html[data-theme="light"] .delete-modal-content {
+  background: #fff;             /* 흰색 카드 배경 */
+  color: #000;                  /* 검은 글씨 */
+  border: 1px solid #ddd;       /* 연한 테두리 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+html[data-theme="light"] #deleteModal .modal-content p,
+html[data-theme="light"] .delete-modal-content p {
+  color: #000;
+}
+
+html[data-theme="light"] #deleteModal .btn-confirm,
+html[data-theme="light"] .btn-confirm {
+  background: transparent;
+  border: 2px solid #000;
+  color: #000;
+}
+
+html[data-theme="light"] #deleteModal .btn-confirm:hover,
+html[data-theme="light"] .btn-confirm:hover {
+  background: #000;
+  color: #fff;
+}
+
+
+/* ======================
+   Delete Modal 전체 레이아웃 Fix
+   ====================== */
+   #deleteModal,
+   .delete-modal {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     position: fixed;
+     inset: 0; /* top, right, bottom, left 전부 0 */
+     background-color: rgba(0, 0, 0, 0.5); /* ✅ 부드러운 어두운 배경 */
+     backdrop-filter: blur(3px); /* ✅ 살짝 흐림 효과 */
+     z-index: 9999;
+     padding: 0 16px; /* ✅ 좌우 여백 (모바일 대비용) */
+   }
+   
+   /* 모달 내용 중앙 배치 */
+   #deleteModal .modal-content,
+   .delete-modal-content {
+     background: var(--card, #fff);
+     color: var(--text, #000);
+     border-radius: 12px;
+     padding: 32px 40px;
+     text-align: center;
+     box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+     max-width: 400px;  /* ✅ 너무 넓지 않게 제한 */
+     width: 100%;
+     animation: modalFadeIn 0.25s ease-out; /* ✅ 등장 애니메이션 */
+   }
+   
+   /* 라이트 모드용 배경 */
+   html[data-theme="light"] #deleteModal,
+   html[data-theme="light"] .delete-modal {
+     background-color: rgba(255, 255, 255, 0.5);
+   }
+   
+   /* ======================
+      애니메이션 (부드럽게 등장)
+      ====================== */
+   @keyframes modalFadeIn {
+     from {
+       opacity: 0;
+       transform: translateY(-10px) scale(0.98);
+     }
+     to {
+       opacity: 1;
+       transform: translateY(0) scale(1);
+     }
+   }
    

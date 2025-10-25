@@ -164,3 +164,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+/* -----------------------------
+   삭제 모달 열기/닫기
+----------------------------- */
+window.openDeleteModal = function () {
+  const modal = document.getElementById("deleteModal");
+  if (modal) {
+    modal.style.display = "flex";
+    modal.style.justifyContent = "center";
+    modal.style.alignItems = "center";
+  }
+};
+
+window.closeDeleteModal = function () {
+  const modal = document.getElementById("deleteModal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+};
+
+// 모달 바깥 클릭 시 닫기
+document.addEventListener("click", (e) => {
+  const modal = document.getElementById("deleteModal");
+  if (modal && e.target === modal) {
+    modal.style.display = "none";
+  }
+});

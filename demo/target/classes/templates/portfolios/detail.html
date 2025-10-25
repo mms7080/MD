@@ -222,9 +222,16 @@
         <div class="comment" th:each="comment : ${comments}">
           <div class="meta">
             <div class="left-box">
-              <span class="author" th:text="${comment.user != null ? comment.user.username : '익명'}"></span>
+              <!-- 🔹 ADMIN인 경우 실제 작성자 이름 표시 -->
+              <span class="author" sec:authorize="hasRole('ADMIN')" 
+                    th:text="${comment.user != null ? comment.user.username : '익명'}"></span>
+            
+              <!-- 🔹 ADMIN이 아닐 경우 항상 익명 표시 -->
+              <span class="author" sec:authorize="!hasRole('ADMIN')">익명</span>
+            
               <div class="stars readonly" th:attr="data-rating=${comment.rating}"></div>
             </div>
+            
 
             <div class="right-box">
               <span class="date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd')}"></span>
