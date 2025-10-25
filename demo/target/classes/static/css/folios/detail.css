@@ -1,37 +1,49 @@
-/* ===== edit.css 레이아웃을 상세 뷰에 맞게 해제/오버라이드 ===== */
+/* ===========================
+   detail.css (상세 페이지 전용)
+   =========================== */
+
+/* (선택) 사용 폰트 */
+@font-face {
+    font-family: "Paperozi";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2")
+        format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 색/레이아웃 변수 */
+:root {
+    --bg: #0e1116;
+    --text: #e8edf4;
+    --muted: #9aa3ad;
+    --border: #212933;
+    --maxw: 980px;
+}
+
+/* 기본 */
 html,
 body {
-    height: auto !important;
-    overflow: auto !important;
+    margin: 0;
+    padding: 0;
     background: var(--bg);
     color: var(--text);
+    font-family: "Paperozi", "Pretendard", system-ui, -apple-system,
+        "Noto Sans KR", sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* 편집 상단바/사이드/내비 화살표는 상세에선 숨김 */
-.top,
-aside,
-.navArrow {
-    display: none !important;
-}
-
-/* edit.css가 .wrap/.stage에 고정 레이아웃을 주는데, 상세에선 자연 흐름 */
-.wrap,
-.stage {
-    display: block !important;
-    height: auto !important;
-    padding: 0 !important;
-    max-width: none !important;
-}
-
-/* ===== 상세 전용 레이아웃 ===== */
+/* 컨테이너 */
 .fd-wrap {
-    max-width: 980px;
+    max-width: var(--maxw);
     margin: 32px auto 80px;
     padding: 0 16px;
+    box-sizing: border-box;
 }
 
+/* 헤더 */
 .fd-head {
-    margin-bottom: 16px;
+    margin: 0 0 16px;
 }
 .fd-title {
     font-size: 28px;
@@ -39,44 +51,50 @@ aside,
     margin: 0 0 6px;
 }
 .fd-meta {
-    color: #9aa3ad;
-    font-size: 14px;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 14px;
+    color: var(--muted);
 }
 .fd-meta .dot {
     opacity: 0.6;
 }
 .fd-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
     background: #eef2ff;
     color: #4f46e5;
-    border-radius: 999px;
-    padding: 2px 8px;
     font-size: 12px;
 }
 
+/* 슬라이드 스택: 간격/여백/라운드/그림자 없음 */
 .fd-stack {
     display: grid;
-    gap: 16px;
+    gap: 0; /* ← 공백 제거 */
 }
-
+.fd-slide {
+    margin: 0;
+    padding: 0;
+}
 .fd-slide img {
+    display: block; /* 인라인 간격 제거 */
     width: 100%;
     height: auto;
-    display: block;
-    border-radius: 16px;
-    background: #0b0f14;
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--muted);
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
 }
 
+/* 비었을 때 */
 .fd-empty {
-    color: #9aa3ad;
     text-align: center;
+    color: var(--muted);
     padding: 48px 0;
 }
 
-/* 모바일 간격/라운드 축소 */
+/* 모바일 */
 @media (max-width: 768px) {
     .fd-wrap {
         margin: 16px auto 48px;
@@ -85,22 +103,33 @@ aside,
     .fd-title {
         font-size: 22px;
     }
-    .fd-slide img {
-        border-radius: 12px;
+}
+
+/* (선택) 프린트: 이미지 한 장씩 페이지 분리 */
+@media print {
+    @page {
+        margin: 0;
     }
-}
-
-/* ✅ 슬라이드 간 여백 제거 */
-.slide {
-    margin: 0 !important;
-    padding: 0 !important;
-    border-radius: 0 !important; /* 둥근 모서리 제거 */
-}
-
-/* 혹시 wrapper에도 여백이 있다면 추가 */
-.slide-wrapper,
-section,
-.container {
-    margin: 0 !important;
-    padding: 0 !important;
+    html,
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .fd-wrap {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+    .fd-head {
+        padding: 16px;
+    }
+    .fd-slide img {
+        page-break-before: always;
+        page-break-after: auto;
+        break-before: page;
+    }
+    .fd-slide:first-child img {
+        page-break-before: auto;
+        break-before: auto;
+    }
 }

@@ -4,10 +4,6 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title th:text="${folio.title} ?: 'Folio 상세'">Folio 상세</title>
-
-        <!-- 기존 edit 변수/톤을 그대로 쓰기 위해 edit.css 사용 -->
-        <link rel="stylesheet" th:href="@{/css/folios/edit.css}" />
-        <!-- 상세 전용 오버라이드 -->
         <link rel="stylesheet" th:href="@{/css/folios/detail.css}" />
     </head>
     <body>
