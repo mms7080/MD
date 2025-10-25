@@ -1,8 +1,6 @@
 package com.example.demo.folio.service;
 
-import com.example.demo.folio.dto.FolioDetailDto;
-import com.example.demo.folio.dto.FolioPublishRequest;
-import com.example.demo.folio.dto.PortfolioInFolioDto;
+import com.example.demo.folio.dto.*;
 import com.example.demo.folio.entity.Folio;
 import com.example.demo.folio.repository.FolioRepository;
 import com.example.demo.portfolios.service.PortfolioService;
@@ -11,34 +9,25 @@ import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 import com.example.demo.users.UsersService.UsersService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.example.demo.folio.dto.FolioRequestDto;
-import com.example.demo.folio.dto.FolioStateSaveRequest;
-import com.example.demo.folio.dto.FoliosSummaryDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.Principal;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class FolioService {
-    
+
     private final ObjectMapper objectMapper;
     private final FolioRepository folioRepository;
     private final UsersRepository usersRepository;
@@ -47,16 +36,15 @@ public class FolioService {
 
     public FolioDetailDto getFolioDetail(String id) {
         Folio folio = folioRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("해당 Folio를 찾을 수 없습니다. id=" + id));
+                .orElseThrow(() -> new IllegalArgumentException("해당 Folio를 찾을 수 없습니다. id=" + id));
 
-        // projectIds -> projects 매핑 (생략 가능: 기존 로직)
         List<PortfolioInFolioDto> projects = folio.getProjectIds().stream()
-            .map(pid -> {
-                var ent = portfolioService.getPortfolioWithTeam(Long.valueOf(pid));
-                return ent != null ? new PortfolioInFolioDto(ent.getId(), ent.getTitle()) : null;
-            })
-            .filter(p -> p != null)
-            .collect(Collectors.toList());
+                .map(pid -> {
+                    var ent = portfolioService.getPortfolioWithTeam(Long.valueOf(pid));
+                    return ent != null ? new PortfolioInFolioDto(ent.getId(), ent.getTitle()) : null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         Map<String, Object> state = Map.of();
         try {
@@ -69,23 +57,19 @@ public class FolioService {
         return new FolioDetailDto(folio, projects, state);
     }
 
-    @Transactional 
+    @Transactional
     public Folio createOrUpdateFolio(FolioRequestDto requestDto, Principal principal) {
-        
-        // UsersRepository 수정해서 현재 로그인했으면서 탈퇴를 하지 않은 사람 찾아오게 수정해놨습니다.
-        Users currentUser = usersRepository.findByUsernameAndDeleteStatus(principal.getName(), DeleteStatus.N)
+        Users currentUser = usersRepository
+                .findByUsernameAndDeleteStatus(principal.getName(), DeleteStatus.N)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // --- 수정된 부분: 덮어쓰지 않고 항상 새로 생성하도록 변경 ---
-        Folio folio = new Folio(); 
-        // ---------------------------------------------------
-
+        Folio folio = new Folio(); // 항상 새로 생성
         folio.setUser(currentUser);
         folio.setIntroduction(requestDto.getIntroduction());
-        folio.setSkills(requestDto.getSkills());
-        folio.setPhotos(requestDto.getPhotos());
-        folio.setProjectIds(requestDto.getProjectIds());
-        
+        folio.setSkills(requestDto.getSkills());       // 세터가 가변화
+        folio.setPhotos(requestDto.getPhotos());       // 세터가 가변화
+        folio.setProjectIds(requestDto.getProjectIds());// 세터가 가변화
+
         if (requestDto.getPhotos() != null && !requestDto.getPhotos().isEmpty()) {
             folio.setThumbnail(requestDto.getPhotos().get(0));
         } else {
@@ -100,10 +84,10 @@ public class FolioService {
     public Folio saveState(Principal principal, FolioStateSaveRequest req) {
         Users user = usersService.getUserByUsername(principal.getName());
 
-        Folio folio = null;
+        Folio folio;
         if (req.getFolioId() != null && !req.getFolioId().isBlank()) {
             folio = folioRepository.findByIdAndUser(req.getFolioId(), user)
-                .orElseThrow(() -> new IllegalArgumentException("권한 없거나 없는 folioId"));
+                    .orElseThrow(() -> new IllegalArgumentException("권한 없거나 없는 folioId"));
         } else {
             folio = new Folio();
         }
@@ -125,30 +109,27 @@ public class FolioService {
         return folioRepository.save(folio);
     }
 
-
     @Transactional
     public Folio publishAsImages(Principal principal, FolioPublishRequest req) {
         Users user = usersService.getUserByUsername(principal.getName());
 
-        Folio folio;
-        if (req.getFolioId() != null && !req.getFolioId().isBlank()) {
-            folio = folioRepository.findByIdAndUser(req.getFolioId(), user)
-                    .orElse(new Folio());
-        } else {
-            // id 없으면 새로(또는 최신 DRAFT 선택 로직 유지해도 되지만 권장 X)
-            folio = new Folio();
-        }
+        Folio folio = (req.getFolioId() != null && !req.getFolioId().isBlank())
+                ? folioRepository.findByIdAndUser(req.getFolioId(), user).orElse(new Folio())
+                : new Folio();
 
         folio.setUser(user);
         folio.setTemplate(req.getTemplate() != null ? req.getTemplate() : "dev-basic");
-        folio.setTitle(req.getTitle() != null && !req.getTitle().isBlank() ? req.getTitle() : user.getName());
+        folio.setTitle((req.getTitle() != null && !req.getTitle().isBlank()) ? req.getTitle() : user.getName());
         folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
         folio.setStatus(Folio.Status.PUBLISHED);
 
+        // id 확보
         folio = folioRepository.save(folio);
 
-        var slides = saveBase64Images(folio.getId(), req.getImages());
+        // ⬇ 저장 후 컬렉션 갱신 (가변 리스트)
+        List<String> slides = saveBase64Images(folio.getId(), req.getImages());
         folio.setPhotos(slides);
+
         if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
             folio.setThumbnail(req.getThumbnail());
         } else if (!slides.isEmpty()) {
@@ -160,28 +141,25 @@ public class FolioService {
         return folioRepository.save(folio);
     }
 
-
+    /** ⬇️ 빈 경우에도 반드시 가변 리스트 반환 */
     private List<String> saveBase64Images(String folioId, List<String> dataUrls) {
-        if (dataUrls == null || dataUrls.isEmpty()) return List.of();
+        if (dataUrls == null || dataUrls.isEmpty()) return new ArrayList<>();
 
         try {
             Path root = Paths.get("uploads/folios", folioId, "slides");
             Files.createDirectories(root);
 
             int idx = 1;
-            var out = new java.util.ArrayList<String>();
+            var out = new ArrayList<String>();
             for (String dataUrl : dataUrls) {
-                // data:image/png;base64,xxxx...
                 String base64 = dataUrl.substring(dataUrl.indexOf(",") + 1);
-                byte[] bytes = Base64.getDecoder().decode(base64);
+                byte[] bytes = java.util.Base64.getDecoder().decode(base64);
 
                 String name = String.format("slide-%03d.png", idx++);
                 Path file = root.resolve(name);
                 Files.write(file, bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
-                // 정적 리소스 매핑이 file:uploads/ 로 되어 있으니 URL은 /uploads/부터 시작
-                String url = "/uploads/folios/" + folioId + "/slides/" + name;
-                out.add(url);
+                out.add("/uploads/folios/" + folioId + "/slides/" + name);
             }
             return out;
         } catch (Exception e) {
@@ -189,17 +167,16 @@ public class FolioService {
         }
     }
 
-     // ① 에디터 불러오기 데이터 (edit.js가 기대하는 구조)
+    // --- 마이페이지용 데이터들 (변경 없음) ---
     public Optional<Map<String, Object>> getMyDevBasicState(Principal principal) {
         Users user = usersService.getUserByUsername(principal.getName());
-        // 우선순위: DRAFT 최신 → 없으면 최신 하나
         Folio folio = folioRepository.findTopByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.DRAFT)
                 .or(() -> folioRepository.findTopByUserOrderByUpdatedAtDesc(user))
                 .orElse(null);
         if (folio == null) return Optional.empty();
 
         Map<String, Object> res = new HashMap<>();
-        res.put("id", folio.getId());                 // ⚠ dto.id로 쓰니 id 키 제공
+        res.put("id", folio.getId());
         res.put("template", folio.getTemplate());
         res.put("contentJson", folio.getContentJson());
         res.put("status", folio.getStatus());
@@ -208,7 +185,6 @@ public class FolioService {
         return Optional.of(res);
     }
 
-    // ② 마이페이지 요약 데이터
     public Map<String, Object> getMyFoliosSummary(Principal principal) {
         Users user = usersService.getUserByUsername(principal.getName());
         Map<String, Object> res = new HashMap<>();
@@ -226,7 +202,7 @@ public class FolioService {
                 )));
         return res;
     }
-    
+
     @Transactional(readOnly = true)
     public Page<FoliosSummaryDto> getMyFolioSummaries(Principal principal, Pageable pageable) {
         var user = usersService.getUserByUsername(principal.getName());
@@ -241,8 +217,6 @@ public class FolioService {
     @Transactional(readOnly = true)
     public Map<String, List<Map<String, Object>>> getMyFoliosBuckets(Principal principal) {
         Users user = usersService.getUserByUsername(principal.getName());
-
-        // ✅ 리포지토리에 "findAllByUserAndStatusOrderByUpdatedAtDesc" 가 실제 존재해야 함
         List<Folio> drafts    = folioRepository.findAllByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.DRAFT);
         List<Folio> published = folioRepository.findAllByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.PUBLISHED);
 
@@ -256,18 +230,16 @@ public class FolioService {
         Map<String, Object> m = new HashMap<>();
         m.put("id", f.getId());
         m.put("status", f.getStatus().name());
-        m.put("template", f.getTemplate());     // 하드코딩 금지
+        m.put("template", f.getTemplate());
         m.put("updatedAt", f.getUpdatedAt());
-        m.put("title", safeTitle(f));           // 목록용 표시 제목
+        m.put("title", safeTitle(f));
         return m;
     }
 
     private String safeTitle(Folio folio) {
-        // 1순위: 엔티티 필드 title (발행 시 이미 세팅)
         if (folio.getTitle() != null && !folio.getTitle().isBlank()) {
             return folio.getTitle().trim();
         }
-        // 2순위: contentJson.intro.name
         try {
             String cj = folio.getContentJson();
             if (cj != null && !cj.isBlank()) {

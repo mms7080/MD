@@ -47,7 +47,7 @@ public class Folio {
     private String contentJson = "{}";
 
     /** 목록 썸네일 URL */
-    @Column(name = "thumbnail")
+    @Column(name = "thumbnail", length = 1000) // 여유롭게
     private String thumbnail;
 
     /** (선택) 보조 메타들 — 기존 유지 */
@@ -85,5 +85,18 @@ public class Folio {
         if (status == null) status = Status.DRAFT;
         if (title == null || title.isBlank()) title = "Untitled";
         if (contentJson == null) contentJson = "{}";
+    }
+
+    /* ========================
+       ✅ 불변 리스트 방지 세터
+       ======================== */
+    public void setSkills(List<String> skills) {
+        this.skills = (skills == null) ? new ArrayList<>() : new ArrayList<>(skills);
+    }
+    public void setPhotos(List<String> photos) {
+        this.photos = (photos == null) ? new ArrayList<>() : new ArrayList<>(photos);
+    }
+    public void setProjectIds(List<String> projectIds) {
+        this.projectIds = (projectIds == null) ? new ArrayList<>() : new ArrayList<>(projectIds);
     }
 }
