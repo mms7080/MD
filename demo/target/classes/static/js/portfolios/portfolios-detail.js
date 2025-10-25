@@ -1,5 +1,9 @@
 console.log("✅ portfolios-detail.js loaded");
-
+window.enableEdit = function (button) {
+  const card = button.closest(".comment");
+  const editForm = card.querySelector(".edit-form");
+  console.log("🔍 editForm:", editForm);
+};
 let currentIndex = 0;
 let images = [];
 

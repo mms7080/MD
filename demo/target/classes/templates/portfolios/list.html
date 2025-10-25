@@ -21,92 +21,98 @@
     <main class="kf-main">
 
         <!-- 검색 & 필터 영역 -->
-        <section class="kf-hero">
-            <div class="kf-search">
-                <svg class="kf-search__icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M21 21l-4.35-4.35m1.1-4.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0z"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-                <input class="kf-search__input" placeholder="URL 또는 서비스명, 필터를 입력해보세요" />
+<section class="kf-hero">
+    <!-- ✅ 검색 입력창 (폼 추가됨) -->
+    <form action="/portfolios" method="get" class="kf-search">
+        <svg class="kf-search__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 21l-4.35-4.35m1.1-4.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0z"
+                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <input class="kf-search__input"
+               type="text"
+               name="keyword"
+               placeholder="URL 또는 서비스명, 필터를 입력해보세요"
+               th:value="${keyword}">
+    </form>
+
+    <!-- 필터 바 -->
+    <div class="kf-filterbar">
+        <form id="filters" class="kf-filterform">
+            <!-- 언어/툴 체크박스 (숨김) -->
+            <input id="open-lang" type="checkbox" hidden />
+            <input id="open-tools" type="checkbox" hidden />
+            <input id="lang-js" type="checkbox" hidden />
+            <input id="lang-ts" type="checkbox" hidden />
+            <input id="lang-java" type="checkbox" hidden />
+            <input id="lang-python" type="checkbox" hidden />
+            <input id="tool-react" type="checkbox" hidden />
+            <input id="tool-next" type="checkbox" hidden />
+            <input id="tool-spring" type="checkbox" hidden />
+            <input id="tool-tailwind" type="checkbox" hidden />
+            <input id="tool-express" type="checkbox" hidden />
+            <input id="tool-thymeleaf" type="checkbox" hidden />
+
+            <!-- LANGUAGE -->
+            <div class="kf-dd kf-dd--lang">
+                <label class="kf-chip" for="open-lang">LANGUAGE</label>
+                <div class="kf-dd__panel">
+                    <input class="opt-search" type="search" placeholder="언어 검색 (예: Java)" />
+                    <ul class="opt-list">
+                        <li><label class="opt" for="lang-js">JavaScript</label></li>
+                        <li><label class="opt" for="lang-ts">TypeScript</label></li>
+                        <li><label class="opt" for="lang-java">Java</label></li>
+                        <li><label class="opt" for="lang-python">Python</label></li>
+                    </ul>
+                    <div class="dd-actions">
+                        <button class="btn ghost" type="reset">초기화</button>
+                        <label class="btn primary" for="open-lang">적용</label>
+                    </div>
+                </div>
             </div>
 
-            <!-- 필터 바 -->
-            <div class="kf-filterbar">
-                <form id="filters" class="kf-filterform">
-                    <!-- 언어/툴 체크박스 (숨김) -->
-                    <input id="open-lang" type="checkbox" hidden />
-                    <input id="open-tools" type="checkbox" hidden />
-                    <input id="lang-js" type="checkbox" hidden />
-                    <input id="lang-ts" type="checkbox" hidden />
-                    <input id="lang-java" type="checkbox" hidden />
-                    <input id="lang-python" type="checkbox" hidden />
-                    <input id="tool-react" type="checkbox" hidden />
-                    <input id="tool-next" type="checkbox" hidden />
-                    <input id="tool-spring" type="checkbox" hidden />
-                    <input id="tool-tailwind" type="checkbox" hidden />
-                    <input id="tool-express" type="checkbox" hidden />
-                    <input id="tool-thymeleaf" type="checkbox" hidden />
-
-                    <!-- LANGUAGE -->
-                    <div class="kf-dd kf-dd--lang">
-                        <label class="kf-chip" for="open-lang">LANGUAGE</label>
-                        <div class="kf-dd__panel">
-                            <input class="opt-search" type="search" placeholder="언어 검색 (예: Java)" />
-                            <ul class="opt-list">
-                                <li><label class="opt" for="lang-js">JavaScript</label></li>
-                                <li><label class="opt" for="lang-ts">TypeScript</label></li>
-                                <li><label class="opt" for="lang-java">Java</label></li>
-                                <li><label class="opt" for="lang-python">Python</label></li>
-                            </ul>
-                            <div class="dd-actions">
-                                <button class="btn ghost" type="reset">초기화</button>
-                                <label class="btn primary" for="open-lang">적용</label>
-                            </div>
-                        </div>
+            <!-- TOOLS -->
+            <div class="kf-dd kf-dd--tools">
+                <label class="kf-chip" for="open-tools">TOOLS</label>
+                <div class="kf-dd__panel">
+                    <input class="opt-search" type="search" placeholder="툴 검색 (예: React)" />
+                    <ul class="opt-list">
+                        <li><label class="opt" for="tool-react">React</label></li>
+                        <li><label class="opt" for="tool-next">Next.js</label></li>
+                        <li><label class="opt" for="tool-spring">Spring Boot</label></li>
+                        <li><label class="opt" for="tool-tailwind">Tailwind</label></li>
+                        <li><label class="opt" for="tool-express">Express</label></li>
+                        <li><label class="opt" for="tool-thymeleaf">Thymeleaf</label></li>
+                    </ul>
+                    <div class="dd-actions">
+                        <button class="btn ghost" type="reset">초기화</button>
+                        <label class="btn primary" for="open-tools">적용</label>
                     </div>
-
-                    <!-- TOOLS -->
-                    <div class="kf-dd kf-dd--tools">
-                        <label class="kf-chip" for="open-tools">TOOLS</label>
-                        <div class="kf-dd__panel">
-                            <input class="opt-search" type="search" placeholder="툴 검색 (예: React)" />
-                            <ul class="opt-list">
-                                <li><label class="opt" for="tool-react">React</label></li>
-                                <li><label class="opt" for="tool-next">Next.js</label></li>
-                                <li><label class="opt" for="tool-spring">Spring Boot</label></li>
-                                <li><label class="opt" for="tool-tailwind">Tailwind</label></li>
-                                <li><label class="opt" for="tool-express">Express</label></li>
-                                <li><label class="opt" for="tool-thymeleaf">Thymeleaf</label></li>
-                            </ul>
-                            <div class="dd-actions">
-                                <button class="btn ghost" type="reset">초기화</button>
-                                <label class="btn primary" for="open-tools">적용</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 선택된 항목 -->
-                    <div class="kf-selected">
-                        <div class="kf-selected__cloud">
-                            <label class="chip" for="lang-js">JavaScript<span class="x">×</span></label>
-                            <label class="chip" for="lang-ts">TypeScript<span class="x">×</span></label>
-                            <label class="chip" for="lang-java">Java<span class="x">×</span></label>
-                            <label class="chip" for="lang-python">Python<span class="x">×</span></label>
-                            <label class="chip" for="tool-react">React<span class="x">×</span></label>
-                            <label class="chip" for="tool-next">Next.js<span class="x">×</span></label>
-                            <label class="chip" for="tool-spring">Spring Boot<span class="x">×</span></label>
-                            <label class="chip" for="tool-tailwind">Tailwind<span class="x">×</span></label>
-                            <label class="chip" for="tool-express">Express<span class="x">×</span></label>
-                            <label class="chip" for="tool-thymeleaf">Thymeleaf<span class="x">×</span></label>
-                        </div>
-                    </div>
-                </form>
-
-                <a href="/portfolios/create" class="btn primary kf-create-btn" sec:authorize="hasRole('ADMIN')">
-                    CREATE
-                </a>
+                </div>
             </div>
-        </section>
+
+            <!-- 선택된 항목 -->
+            <div class="kf-selected">
+                <div class="kf-selected__cloud">
+                    <label class="chip" for="lang-js">JavaScript<span class="x">×</span></label>
+                    <label class="chip" for="lang-ts">TypeScript<span class="x">×</span></label>
+                    <label class="chip" for="lang-java">Java<span class="x">×</span></label>
+                    <label class="chip" for="lang-python">Python<span class="x">×</span></label>
+                    <label class="chip" for="tool-react">React<span class="x">×</span></label>
+                    <label class="chip" for="tool-next">Next.js<span class="x">×</span></label>
+                    <label class="chip" for="tool-spring">Spring Boot<span class="x">×</span></label>
+                    <label class="chip" for="tool-tailwind">Tailwind<span class="x">×</span></label>
+                    <label class="chip" for="tool-express">Express<span class="x">×</span></label>
+                    <label class="chip" for="tool-thymeleaf">Thymeleaf<span class="x">×</span></label>
+                </div>
+            </div>
+        </form>
+
+        <a href="/portfolios/create" class="btn primary kf-create-btn" sec:authorize="hasRole('ADMIN')">
+            CREATE
+        </a>
+    </div>
+</section>
+
 
         <!-- 정렬 툴바 -->
         <section class="kf-toolbar">
@@ -171,12 +177,12 @@
             </p>
         </section>
 
-        <!-- 포트폴리오 마퀴 -->
+        <!-- 포트폴리오 마퀴
         <section class="kf-mq-portfolios" aria-label="포트폴리오"
         th:if="${portfolios != null and portfolios.size() > 0}">
    <div class="mq-mask">
        <div class="mq-track">
-           <!-- 시퀀스 A -->
+           시퀀스 A
            <div class="mq-seq">
                <div class="mq-item"
                     th:each="portfolio : ${#lists.take(portfolios, 10)}"
@@ -192,7 +198,7 @@
                </div>
            </div>
 
-           <!-- 시퀀스 B -->
+           시퀀스 B
            <div class="mq-seq">
                <div class="mq-item"
                     th:each="portfolio : ${#lists.take(portfolios, 10)}"
@@ -209,7 +215,7 @@
            </div>
        </div>
    </div>
-</section>
+</section> -->
 
 <!-- ✅ 포트폴리오가 비어 있을 경우 (디버깅용 메시지) -->
 <section th:if="${portfolios == null or portfolios.isEmpty()}"
