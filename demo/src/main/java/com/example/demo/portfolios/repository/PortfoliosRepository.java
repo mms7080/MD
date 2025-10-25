@@ -1,5 +1,6 @@
 package com.example.demo.portfolios.repository;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,4 +45,46 @@ Optional<PortfoliosEntity> findDetailByIdForEdit(@Param("id") Long id);
      @EntityGraph(attributePaths = {"screenshots", "team"})
      @Query("SELECT p FROM PortfoliosEntity p WHERE p.id = :id")
      Optional<PortfoliosEntity> findForUpdate(@Param("id") Long id);
+
+
+
+     @Query("""
+    SELECT DISTINCT p FROM PortfoliosEntity p
+    LEFT JOIN p.tags t
+    WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+       OR LOWER(p.desc) LIKE LOWER(CONCAT('%', :keyword, '%'))
+       OR LOWER(t) LIKE LOWER(CONCAT('%', :keyword, '%'))
+""")
+Page<PortfoliosEntity> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+
+
+
+// 제목만 검색
+@Query("""
+    SELECT DISTINCT p FROM PortfoliosEntity p
+    WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+""")
+Page<PortfoliosEntity> searchByTitle(@Param("keyword") String keyword, Pageable pageable);
+
+// 태그 필터링
+@Query("""
+    SELECT DISTINCT p FROM PortfoliosEntity p
+    JOIN p.tags t
+    WHERE t IN :tags
+""")
+Page<PortfoliosEntity> searchByTags(@Param("tags") List<String> tags, Pageable pageable);
+
+// 제목 + 태그 조합
+@Query("""
+    SELECT DISTINCT p FROM PortfoliosEntity p
+    JOIN p.tags t
+    WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    AND t IN :tags
+""")
+Page<PortfoliosEntity> searchByTitleAndTags(@Param("keyword") String keyword,
+                                            @Param("tags") List<String> tags,
+                                            Pageable pageable);
+
+
 }

@@ -17,6 +17,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -364,27 +365,24 @@ public PortfoliosEntity getPortfolioDetail(Long id) {
     PortfoliosEntity portfolio = repository.findDetailById(id)
         .orElseThrow(() -> new IllegalArgumentException("해당 포트폴리오가 없습니다. id=" + id));
 
-    // ✅ 권한 검사
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     boolean isAdmin = auth != null && auth.getAuthorities().stream()
         .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     boolean isPublic = Boolean.TRUE.equals(portfolio.getIsPublic());
+
     if (!isPublic && !isAdmin) {
         throw new AccessDeniedException("비공개 포트폴리오입니다.");
     }
 
-    // ✅ Lazy 완전 초기화 (모든 사용자 공통)
     Hibernate.initialize(portfolio.getTags());
     Hibernate.initialize(portfolio.getTeam());
     Hibernate.initialize(portfolio.getLikes());
     Hibernate.initialize(portfolio.getScreenshots());
     Hibernate.initialize(portfolio.getComments());
-
     portfolio.getComments().forEach(c -> {
         if (c.getUser() != null) Hibernate.initialize(c.getUser());
     });
 
-    // ✅ 중복 방지 정리
     portfolio.setTeam(new ArrayList<>(new LinkedHashSet<>(portfolio.getTeam())));
     portfolio.setTags(new LinkedHashSet<>(portfolio.getTags()));
     portfolio.setLikes(new LinkedHashSet<>(portfolio.getLikes()));
@@ -392,6 +390,7 @@ public PortfoliosEntity getPortfolioDetail(Long id) {
 
     return portfolio;
 }
+
 
 
 
@@ -433,5 +432,28 @@ private String normalizeFolderName(String rawName) {
 
     return folder;
 }
+
+
+@Transactional(readOnly = true)
+public List<PortfoliosEntity> searchPortfolios(String keyword, Pageable pageable) {
+    return repository.searchByKeyword(keyword, pageable).getContent();
+}
+
+@Transactional(readOnly = true)
+public List<PortfoliosEntity> searchByTitle(String keyword, Pageable pageable) {
+    return repository.searchByTitle(keyword, pageable).getContent();
+}
+
+@Transactional(readOnly = true)
+public List<PortfoliosEntity> searchByTags(List<String> tags, Pageable pageable) {
+    return repository.searchByTags(tags, pageable).getContent();
+}
+
+@Transactional(readOnly = true)
+public List<PortfoliosEntity> searchByTitleAndTags(String keyword, List<String> tags, Pageable pageable) {
+    return repository.searchByTitleAndTags(keyword, tags, pageable).getContent();
+}
+
+
 
 }

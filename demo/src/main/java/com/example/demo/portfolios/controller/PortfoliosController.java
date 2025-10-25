@@ -61,57 +61,57 @@ public class PortfoliosController {
     @GetMapping
     public String list(Model model,
                        @RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "12") int size) {
-
+                       @RequestParam(defaultValue = "12") int size,
+                       @RequestParam(required = false) String keyword,
+                       @RequestParam(required = false) List<String> tags) {
+    
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-        // 🔥 Service를 통해 가져오기 (트랜잭션 유지됨)
-        List<PortfoliosEntity> portfolios = portfolioService.getAllPortfolios(pageable);
-
-        System.out.println("✅ Portfolio count: " + portfolios.size());
-        portfolios.forEach(p -> System.out.println(" - " + p.getTitle()));
-
+        List<PortfoliosEntity> portfolios;
+    
+        // ✅ 1. 검색 + 필터 조합
+        if ((keyword != null && !keyword.isBlank()) && (tags != null && !tags.isEmpty())) {
+            portfolios = portfolioService.searchByTitleAndTags(keyword, tags, pageable);
+        }
+        // ✅ 2. 검색만
+        else if (keyword != null && !keyword.isBlank()) {
+            portfolios = portfolioService.searchByTitle(keyword, pageable);
+        }
+        // ✅ 3. 태그 필터만
+        else if (tags != null && !tags.isEmpty()) {
+            portfolios = portfolioService.searchByTags(tags, pageable);
+        }
+        // ✅ 4. 기본 전체 목록
+        else {
+            portfolios = portfolioService.getAllPortfolios(pageable);
+        }
+    
         model.addAttribute("portfolios", portfolios);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedTags", tags);
         return "portfolios/list";
     }
+    
 
-    @Transactional(readOnly = true)
+
     @GetMapping("/{id}")
     public String getPortfolio(@PathVariable Long id,
                                @RequestParam(defaultValue = "0") int page,
                                Model model,
                                Principal principal) {
         try {
-            // ✅ 조회수 증가
             portfolioService.increaseViewCount(id);
     
-            // ✅ 포트폴리오 상세 조회
             PortfoliosEntity portfolio = portfolioService.getPortfolioDetail(id);
+            model.addAttribute("portfolio", portfolio);
+
+           
+
     
-            // ✅ 비공개 처리
-            if (Boolean.FALSE.equals(portfolio.getIsPublic())) {
-                boolean isAdmin = false;
-                if (principal != null) {
-                    Users user = usersRepository.findByUsername(principal.getName()).orElse(null);
-                    if (user != null && user.getRole() == Role.ADMIN) {
-                        isAdmin = true;
-                    }
-                }
-                if (!isAdmin) {
-                    System.out.println("🚫 비공개 포트폴리오 접근 차단 (USER)");
-                    model.addAttribute("notFound", true);
-                    return "portfolios/detail";
-                }
-            }
-    
-            // ✅ 댓글, 별점 정보
             int size = 5;
             Page<PortfolioComment> commentPage = commentService.getComments(id, page, size);
             double avgRating = commentService.getAverageRating(id);
             long ratingCount = commentService.getCommentCount(id);
     
-            // ✅ 모델 데이터 추가
-            model.addAttribute("portfolio", portfolio);
             model.addAttribute("comments", commentPage.getContent());
             model.addAttribute("tags", portfolio.getTags());
             model.addAttribute("screenshots", portfolio.getScreenshots());
@@ -119,36 +119,27 @@ public class PortfoliosController {
             model.addAttribute("ratingCount", ratingCount);
             model.addAttribute("currentPage", commentPage.getNumber());
             model.addAttribute("totalPages", commentPage.getTotalPages());
+            model.addAttribute("commentsPage", commentPage);
+
     
-            // ✅ 디버그 로그
             System.out.println("🟢 포트폴리오 접근 성공: " + portfolio.getTitle());
-            System.out.println(" - tags: " + portfolio.getTags());
-            System.out.println(" - comments: " + (portfolio.getComments() != null ? portfolio.getComments().size() : "null"));
-            System.out.println(" - screenshots: " + (portfolio.getScreenshots() != null ? portfolio.getScreenshots().size() : "null"));
-    
             return "portfolios/detail";
     
         } catch (AccessDeniedException e) {
-            // ✅ 비공개 접근 거부
-            System.err.println("🚫 AccessDeniedException: 비공개 포트폴리오 접근 시도 - " + e.getMessage());
-            model.addAttribute("notFound", true);
+            System.err.println("🚫 비공개 포트폴리오 접근 차단: " + e.getMessage());
+            model.addAttribute("errorMsg", "비공개 포트폴리오입니다.");
             return "portfolios/detail";
-    
-        } catch (org.hibernate.LazyInitializationException e) {
-            // ✅ Lazy 로딩 실패 (세션 닫힘)
-            System.err.println("⚠️ LazyInitializationException 발생: " + e.getMessage());
-            model.addAttribute("errorMsg", "데이터를 불러오는 중 문제가 발생했습니다. (Lazy)");
-            return "portfolios/detail";
-    
         } catch (Exception e) {
-            // ✅ 그 외 모든 예외
-            System.err.println("❌ 예외 발생: " + e.getClass().getSimpleName());
             e.printStackTrace();
             model.addAttribute("errorMsg", "포트폴리오를 불러오는 중 오류가 발생했습니다.");
-            model.addAttribute("notFound", true);
             return "portfolios/detail";
         }
+        
+
     }
+    
+    
+
     
 
     @GetMapping("/create")
