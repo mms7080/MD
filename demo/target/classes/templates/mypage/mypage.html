@@ -201,11 +201,23 @@
                             </div>
                             <div class="stat-num" id="folio-count">0</div>
 
-                            <ul class="recent-list" id="folio-recent-list">
-                                <li class="ghost">
-                                    최근 발행/임시저장 목록이 여기에 표시됩니다.
-                                </li>
-                            </ul>
+                            <div class="two-col" id="folio-two-col">
+                                <div class="col">
+                                    <div class="col-title">임시저장</div>
+                                    <ul
+                                        class="recent-list"
+                                        id="folio-draft-list"
+                                    >
+                                        <li class="ghost">임시저장 없음</li>
+                                    </ul>
+                                </div>
+                                <div class="col">
+                                    <div class="col-title">업로드</div>
+                                    <ul class="recent-list" id="folio-pub-list">
+                                        <li class="ghost">업로드 없음</li>
+                                    </ul>
+                                </div>
+                            </div>
 
                             <div class="stat-foot">
                                 <a class="link" href="/folios">더보기</a>

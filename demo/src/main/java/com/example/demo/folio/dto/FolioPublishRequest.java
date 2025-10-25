@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter @Setter
 public class FolioPublishRequest {
+    private String folioId;
     private String template;          // "dev-basic"
     private String title;             // 카드/상세에 쓸 제목
     private String contentJson;       // 전체 상태 JSON

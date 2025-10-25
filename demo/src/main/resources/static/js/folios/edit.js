@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const qsa = (s, r = document) => [...r.querySelectorAll(s)];
     const _hiddenMap = new Map();
 
-    const flash = (msg) => {
+    const toast = (msg) => {
         const n = document.createElement("div");
         n.textContent = msg;
         n.style.cssText =
@@ -20,10 +20,16 @@ document.addEventListener("DOMContentLoaded", () => {
         return token && header ? { header, token } : null;
     };
     const CSRF = getCsrf();
-    const JSON_HEADERS = { "Content-Type": "application/json" };
-    if (CSRF) JSON_HEADERS[CSRF.header] = CSRF.token;
+    const JSON_HEADERS = {
+        "Content-Type": "application/json",
+        ...(CSRF ? { [CSRF.header]: CSRF.token } : {}),
+    };
 
-    // 401/403이면 로그인 모달(또는 페이지)로 보냄
+    // 현재 작업 folio 식별자 (?id=...)
+    const params = new URLSearchParams(location.search);
+    let currentFolioId = params.get("id") || null;
+
+    // 인증 가드
     const guardFetch = async (url, opts = {}) => {
         const res = await fetch(url, opts);
         if (res.status === 401 || res.status === 403) {
@@ -40,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fr.readAsDataURL(file);
         });
 
-    // data:URL이면 업로드 API에 올려 URL 받기 (실패/미구현 시 null)
+    // data:URL → 서버 업로드 후 URL 받기
     async function normalizeImageUrl(urlOrData) {
         if (!urlOrData) return null;
         if (!urlOrData.startsWith("data:")) return urlOrData;
@@ -63,8 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ---------- 에디터 상태(템플릿 기본값) ----------
-    const state = {
+    // ---------- 기본 템플릿(원본) ----------
+    const defaultState = {
         meta: { year: new Date().getFullYear() },
         intro: {
             title: "“사용자 성장에 맞춰 확장되는 백엔드를 설계합니다.”",
@@ -135,6 +141,28 @@ document.addEventListener("DOMContentLoaded", () => {
             2: "SQLD / 정보처리기사",
         },
     };
+
+    // 깊은 복사/병합
+    const deepClone = (o) => JSON.parse(JSON.stringify(o || {}));
+    const deepMerge = (base, patch) => {
+        if (!patch || typeof patch !== "object") return deepClone(base);
+        const out = deepClone(base);
+        const walk = (t, s) => {
+            Object.keys(s).forEach((k) => {
+                if (s[k] && typeof s[k] === "object" && !Array.isArray(s[k])) {
+                    t[k] = t[k] && typeof t[k] === "object" ? t[k] : {};
+                    walk(t[k], s[k]);
+                } else {
+                    t[k] = s[k];
+                }
+            });
+        };
+        walk(out, patch);
+        return out;
+    };
+
+    // 작업용 상태(항상 기본 템플릿의 clone에서 시작)
+    let state = deepClone(defaultState);
 
     const get = (path) => path.split(".").reduce((o, k) => o && o[k], state);
     const set = (path, value) => {
@@ -366,48 +394,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------- 저장/불러오기/프린트/나가기 ----------
     const btnSave = qs("#btnSave"); // 임시저장(DRAFT)
-    const btnLoad = qs("#btnLoad"); // 불러오기
+    const btnLoad = qs("#btnLoad"); // 수동 불러오기
     const btnPrint = qs("#btnPrint");
     const btnExit = qs("#btnExit");
 
-    // 불러오기 (로그인 필요)
+    // 초기 로드: id가 있을 때만 해당 초안을 자동 로드 / id 없으면 기본 템플릿로 시작
+    async function loadInitial() {
+        try {
+            if (currentFolioId) {
+                const res = await guardFetch(
+                    `/api/folios/${encodeURIComponent(currentFolioId)}`
+                );
+                if (!res.ok) throw new Error("불러오기 실패");
+                const data = await res.json();
+                const incoming =
+                    (data &&
+                    typeof data.state === "object" &&
+                    Object.keys(data.state).length
+                        ? data.state
+                        : null) ||
+                    (data && typeof data.contentJson === "string"
+                        ? JSON.parse(data.contentJson)
+                        : null);
+
+                if (incoming) state = deepMerge(defaultState, incoming);
+                if (data.id || data.folioId)
+                    currentFolioId = data.id || data.folioId;
+            }
+            // ★ id가 없으면 서버 자동 불러오기 하지 않음(기본 템플릿 유지)
+        } catch (e) {
+            console.warn("초기 로드 실패(기본 템플릿로 진행):", e);
+        }
+    }
+
+    // (선택) 수동 불러오기 버튼: 내 최신 DRAFT를 가져와 적용
     btnLoad?.addEventListener("click", async () => {
         try {
             const res = await guardFetch("/api/folios/me/dev-basic");
-            if (res.status === 204) return flash("서버 임시저장 없음");
+            if (res.status === 204) {
+                toast("서버 임시저장 없음");
+                return;
+            }
             if (!res.ok) throw new Error("불러오기 실패");
             const data = await res.json();
-            if (data.contentJson) {
-                Object.assign(state, JSON.parse(data.contentJson));
-                applyBindings();
-                flash("불러오기 완료");
-            } else {
-                flash("저장된 contentJson이 없습니다");
-            }
+            const incoming = data?.contentJson
+                ? JSON.parse(data.contentJson)
+                : null;
+            if (incoming) state = deepMerge(defaultState, incoming);
+            if (data.id) currentFolioId = data.id;
+            applyBindings();
+            go(1);
+            toast("불러오기 완료");
         } catch (e) {
             console.error(e);
-            if (e.message !== "인증 필요") flash("불러오기 중 오류");
+            if (e.message !== "인증 필요") toast("불러오기 중 오류");
         }
     });
 
     // 임시저장(DRAFT)
     btnSave?.addEventListener("click", async () => {
         try {
-            const contentJson = JSON.stringify(state);
+            const snapshot = JSON.parse(JSON.stringify(state));
+            const contentJson = JSON.stringify(snapshot);
             const firstImg =
-                state.intro?.photo ||
-                state.proj1?.thumb ||
-                state.proj2?.thumb ||
+                snapshot.intro?.photo ||
+                snapshot.proj1?.thumb ||
+                snapshot.proj2?.thumb ||
                 null;
             const thumbnail =
                 (await normalizeImageUrl(firstImg)) ||
                 "https://picsum.photos/seed/default/300";
 
             const payload = {
+                folioId: currentFolioId || null, // ★ 같은 글 업데이트
                 template: "dev-basic",
                 contentJson,
                 status: "DRAFT",
                 thumbnail,
+                title: (snapshot.intro?.name || "Untitled").trim(),
             };
 
             const res = await guardFetch("/api/folios/dev-basic", {
@@ -416,10 +480,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify(payload),
             });
             if (!res.ok) throw new Error(await res.text());
-            flash("임시저장 완료");
+            const saved = await res.json(); // { id: ... }
+            if (saved?.id) currentFolioId = saved.id;
+
+            toast("임시저장 완료");
         } catch (e) {
             console.error(e);
-            if (e.message !== "인증 필요") flash("임시저장 중 오류");
+            if (e.message !== "인증 필요") toast("임시저장 중 오류");
         }
     });
 
@@ -456,14 +523,12 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch {}
         location.href = "/";
     });
+
     // --- 발행(PUBLISHED): 이미지 렌더 → 업로드(JSON) ---
     async function captureSlidesAsImages() {
-        // 1) 폰트 로드 대기 (가능한 경우)
         try {
             if (document.fonts?.ready) await document.fonts.ready;
         } catch {}
-
-        // 2) 일시적으로 모든 슬라이드 표시
         const slides = [...document.querySelectorAll(".slide")];
         const prevHidden = slides.map((s) => s.hidden);
         slides.forEach((s) => (s.hidden = false));
@@ -471,68 +536,63 @@ document.addEventListener("DOMContentLoaded", () => {
         const images = [];
         try {
             for (const el of slides) {
-                // html2canvas 옵션
                 const canvas = await html2canvas(el, {
                     backgroundColor: "#ffffff",
-                    scale: 2, // 해상도(품질) 조절
-                    useCORS: true, // 원격 이미지 CORS 필요
+                    scale: 2,
+                    useCORS: true,
                     removeContainer: true,
                 });
-
-                // 용량을 줄이고 싶다면 JPEG로 저장(품질 조정)
                 const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
                 images.push(dataUrl);
             }
         } finally {
-            // 3) 표시 상태 복구
             slides.forEach((s, i) => (s.hidden = prevHidden[i]));
         }
         return images;
     }
 
-    document
-        .querySelector("#btnUpload")
-        ?.addEventListener("click", async () => {
-            const button = document.querySelector("#btnUpload");
-            try {
-                button.disabled = true;
+    qs("#btnUpload")?.addEventListener("click", async () => {
+        const button = qs("#btnUpload");
+        try {
+            button.disabled = true;
 
-                const contentJson = JSON.stringify(state);
-                const images = await captureSlidesAsImages();
+            const snapshot = JSON.parse(JSON.stringify(state));
+            const contentJson = JSON.stringify(snapshot);
+            const images = await captureSlidesAsImages();
 
-                // 제목: intro.name 우선 → 없으면 "Untitled"
-                const title =
-                    document
-                        .querySelector('[data-bind="intro.name"]')
-                        ?.textContent?.trim() ||
-                    state?.intro?.name ||
-                    "Untitled";
+            const title =
+                document
+                    .querySelector('[data-bind="intro.name"]')
+                    ?.textContent?.trim() ||
+                snapshot?.intro?.name ||
+                "Untitled";
 
-                const payload = {
-                    template: "dev-basic",
-                    title,
-                    contentJson,
-                    status: "PUBLISHED",
-                    thumbnail: images[0] ?? null, // 첫 슬라이드
-                    images, // data:image/... 배열
-                };
+            const payload = {
+                folioId: currentFolioId || null, // ★ 같은 글 업데이트
+                template: "dev-basic",
+                title,
+                contentJson,
+                status: "PUBLISHED",
+                thumbnail: images[0] ?? null,
+                images,
+            };
 
-                const res = await guardFetch("/api/folios/dev-basic/publish", {
-                    method: "POST",
-                    headers: JSON_HEADERS, // CSRF 포함됨
-                    body: JSON.stringify(payload),
-                });
-                if (!res.ok) throw new Error(await res.text());
+            const res = await guardFetch("/api/folios/dev-basic/publish", {
+                method: "POST",
+                headers: JSON_HEADERS,
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error(await res.text());
 
-                const { id } = await res.json();
-                location.href = `/folios/detail/${id}`;
-            } catch (e) {
-                console.error(e);
-                if (e.message !== "인증 필요") flash("업로드 중 오류");
-            } finally {
-                button.disabled = false;
-            }
-        });
+            const { id } = await res.json();
+            location.href = `/folios/detail/${id}`;
+        } catch (e) {
+            console.error(e);
+            if (e.message !== "인증 필요") toast("업로드 중 오류");
+        } finally {
+            button.disabled = false;
+        }
+    });
 
     // 키보드 네비
     qs(".navArrow.left")?.addEventListener("click", () => go(page - 1));
@@ -542,7 +602,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.key === "ArrowRight") go(page + 1);
     });
 
-    // init
-    applyBindings();
-    go(1);
+    // ========== init ==========
+    (async function init() {
+        await loadInitial(); // id 있으면 그 초안만 자동 로드
+        applyBindings();
+        go(1);
+    })();
 });

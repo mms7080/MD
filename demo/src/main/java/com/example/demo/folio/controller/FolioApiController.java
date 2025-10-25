@@ -5,6 +5,8 @@ import com.example.demo.folio.dto.FolioPublishRequest;
 import com.example.demo.folio.dto.FoliosSummaryDto;
 import com.example.demo.folio.service.FolioService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +55,27 @@ public class FolioApiController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 🔹 추가: 마이페이지 통계/최근목록용 — 로그인 사용자의 것만
+    @GetMapping("/me/list")
+    public ResponseEntity<Map<String, Object>> getMyFoliosPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Principal principal
+    ) {
+        if (principal == null) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt", "id"));
+        Page<FoliosSummaryDto> folioPage = folioService.getMyFolioSummaries(principal, pageable);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("page", folioPage.getNumber() + 1);
+        response.put("items", folioPage.getContent());
+        response.put("totalPages", folioPage.getTotalPages());
+        response.put("totalItems", folioPage.getTotalElements());
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<FolioDetailDto> getFolioDetail(@PathVariable String id) {
@@ -124,4 +147,10 @@ public class FolioApiController {
         if (principal == null) return ResponseEntity.status(403).build();
         return ResponseEntity.ok(folioService.getMyFoliosSummary(principal));
     }
+    @GetMapping("/me/buckets")
+    public ResponseEntity<?> getMyFoliosBuckets(Principal principal) {
+        if (principal == null) return ResponseEntity.status(403).build();
+        return ResponseEntity.ok(folioService.getMyFoliosBuckets(principal));
+    }
+    
 }

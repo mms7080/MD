@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FolioStateSaveRequest {
+    private String folioId;
     private String template;        // "dev-basic"
     private String contentJson;     // 프론트 state JSON.stringify(...)
     private Folio.Status status;    // DRAFT/PUBLISHED

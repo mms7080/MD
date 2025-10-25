@@ -96,53 +96,59 @@ public class FolioService {
         return folioRepository.save(folio);
     }
 
-    /** PPT 에디터 전체 상태 저장(JSON 통짜) */
     @Transactional
     public Folio saveState(Principal principal, FolioStateSaveRequest req) {
         Users user = usersService.getUserByUsername(principal.getName());
 
-        // 유저당 1개 저장 전략 (그대로 유지)
-        Folio folio = folioRepository.findByUserId(user.getId())
-                .orElse(new Folio());
+        Folio folio = null;
+        if (req.getFolioId() != null && !req.getFolioId().isBlank()) {
+            folio = folioRepository.findByIdAndUser(req.getFolioId(), user)
+                .orElseThrow(() -> new IllegalArgumentException("권한 없거나 없는 folioId"));
+        } else {
+            folio = new Folio();
+        }
 
         folio.setUser(user);
         folio.setTemplate(req.getTemplate() != null ? req.getTemplate() : "dev-basic");
         folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
-
-        // ✅ status 기본값
         folio.setStatus(req.getStatus() != null ? req.getStatus() : Folio.Status.DRAFT);
 
-        // ✅ thumbnail 기본값
         if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
             folio.setThumbnail(req.getThumbnail());
         } else if (folio.getThumbnail() == null || folio.getThumbnail().isBlank()) {
             folio.setThumbnail("https://picsum.photos/seed/default/300");
         }
+        if (req.getTitle() != null && !req.getTitle().isBlank()) {
+            folio.setTitle(req.getTitle());
+        }
 
         return folioRepository.save(folio);
     }
+
 
     @Transactional
     public Folio publishAsImages(Principal principal, FolioPublishRequest req) {
         Users user = usersService.getUserByUsername(principal.getName());
 
-        // 유저당 1개 전략 유지: 최신 DRAFT 없으면 새로 생성
-        Folio folio = folioRepository.findTopByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.DRAFT)
-                .orElse(new Folio());
+        Folio folio;
+        if (req.getFolioId() != null && !req.getFolioId().isBlank()) {
+            folio = folioRepository.findByIdAndUser(req.getFolioId(), user)
+                    .orElse(new Folio());
+        } else {
+            // id 없으면 새로(또는 최신 DRAFT 선택 로직 유지해도 되지만 권장 X)
+            folio = new Folio();
+        }
+
         folio.setUser(user);
         folio.setTemplate(req.getTemplate() != null ? req.getTemplate() : "dev-basic");
         folio.setTitle(req.getTitle() != null && !req.getTitle().isBlank() ? req.getTitle() : user.getName());
         folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
         folio.setStatus(Folio.Status.PUBLISHED);
 
-        // 먼저 저장해서 id 확보
         folio = folioRepository.save(folio);
 
-        // uploads/folios/{id}/slides/slide-001.png ...
         var slides = saveBase64Images(folio.getId(), req.getImages());
         folio.setPhotos(slides);
-
-        // 썸네일
         if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
             folio.setThumbnail(req.getThumbnail());
         } else if (!slides.isEmpty()) {
@@ -153,6 +159,7 @@ public class FolioService {
 
         return folioRepository.save(folio);
     }
+
 
     private List<String> saveBase64Images(String folioId, List<String> dataUrls) {
         if (dataUrls == null || dataUrls.isEmpty()) return List.of();
@@ -219,8 +226,59 @@ public class FolioService {
                 )));
         return res;
     }
+    
     @Transactional(readOnly = true)
+    public Page<FoliosSummaryDto> getMyFolioSummaries(Principal principal, Pageable pageable) {
+        var user = usersService.getUserByUsername(principal.getName());
+        var page = folioRepository.findAllByUser(user, pageable);
+        return page.map(FoliosSummaryDto::new);
+    }
+
     public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
         return folioRepository.findAll(pageable).map(FoliosSummaryDto::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, List<Map<String, Object>>> getMyFoliosBuckets(Principal principal) {
+        Users user = usersService.getUserByUsername(principal.getName());
+
+        // ✅ 리포지토리에 "findAllByUserAndStatusOrderByUpdatedAtDesc" 가 실제 존재해야 함
+        List<Folio> drafts    = folioRepository.findAllByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.DRAFT);
+        List<Folio> published = folioRepository.findAllByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.PUBLISHED);
+
+        Map<String, List<Map<String, Object>>> result = new HashMap<>();
+        result.put("DRAFT", drafts.stream().map(this::toBucketItem).collect(Collectors.toList()));
+        result.put("PUBLISHED", published.stream().map(this::toBucketItem).collect(Collectors.toList()));
+        return result;
+    }
+
+    private Map<String, Object> toBucketItem(Folio f) {
+        Map<String, Object> m = new HashMap<>();
+        m.put("id", f.getId());
+        m.put("status", f.getStatus().name());
+        m.put("template", f.getTemplate());     // 하드코딩 금지
+        m.put("updatedAt", f.getUpdatedAt());
+        m.put("title", safeTitle(f));           // 목록용 표시 제목
+        return m;
+    }
+
+    private String safeTitle(Folio folio) {
+        // 1순위: 엔티티 필드 title (발행 시 이미 세팅)
+        if (folio.getTitle() != null && !folio.getTitle().isBlank()) {
+            return folio.getTitle().trim();
+        }
+        // 2순위: contentJson.intro.name
+        try {
+            String cj = folio.getContentJson();
+            if (cj != null && !cj.isBlank()) {
+                var root = objectMapper.readTree(cj);
+                var nameNode = root.path("intro").path("name");
+                if (!nameNode.isMissingNode() && !nameNode.isNull()) {
+                    String name = nameNode.asText();
+                    if (name != null && !name.isBlank()) return name;
+                }
+            }
+        } catch (Exception ignore) {}
+        return "제목 없음";
     }
 }

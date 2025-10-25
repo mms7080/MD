@@ -17,7 +17,6 @@ import com.example.demo.folio.service.FolioService; // FolioService 주입
 
 
 
-
 @Controller
 @RequestMapping("/folios") // 이 컨트롤러의 모든 주소는 /folios로 시작
 @RequiredArgsConstructor
