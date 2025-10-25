@@ -65,13 +65,14 @@ public class FolioService {
                 .findByUsernameAndDeleteStatus(principal.getName(), DeleteStatus.N)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        Folio folio = new Folio(); // 항상 새로 생성
+        Folio folio = new Folio();
         folio.setUser(currentUser);
         folio.setIntroduction(requestDto.getIntroduction());
-        folio.setSkills(requestDto.getSkills());        // 가변 리스트 세팅
+        folio.setSkills(requestDto.getSkills());
         folio.setPhotos(requestDto.getPhotos());
         folio.setProjectIds(requestDto.getProjectIds());
 
+        // 썸네일은 항상 URL만 저장(없으면 기본)
         if (requestDto.getPhotos() != null && !requestDto.getPhotos().isEmpty()) {
             folio.setThumbnail(requestDto.getPhotos().get(0));
         } else {
@@ -99,15 +100,23 @@ public class FolioService {
         folio.setTemplate(req.getTemplate() != null ? req.getTemplate() : "dev-basic");
         folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
         folio.setStatus(req.getStatus() != null ? req.getStatus() : Folio.Status.DRAFT);
-
-        if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
-            folio.setThumbnail(req.getThumbnail());
-        } else if (folio.getThumbnail() == null || folio.getThumbnail().isBlank()) {
-            folio.setThumbnail("https://picsum.photos/seed/default/300");
-        }
         if (req.getTitle() != null && !req.getTitle().isBlank()) {
             folio.setTitle(req.getTitle());
         }
+
+        // 1차 저장: ID 확보
+        folio = folioRepository.save(folio);
+
+        // 썸네일 정규화(dataURL이면 파일저장 후 URL만)
+        String thumbUrl = normalizeToUrl(req.getThumbnail(), folio.getId(), "thumb");
+        if (thumbUrl == null || thumbUrl.isBlank()) {
+            if (folio.getThumbnail() == null || folio.getThumbnail().isBlank()) {
+                thumbUrl = "https://picsum.photos/seed/default/300";
+            } else {
+                thumbUrl = folio.getThumbnail();
+            }
+        }
+        folio.setThumbnail(thumbUrl);
 
         return folioRepository.save(folio);
     }
@@ -127,22 +136,52 @@ public class FolioService {
         folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
         folio.setStatus(Folio.Status.PUBLISHED);
 
-        // ID 확보
+        // 1) ID 확보
         folio = folioRepository.save(folio);
 
-        // 가변 리스트로 교체
+        // 2) 슬라이드 저장(dataURL -> 파일 -> URL)
         List<String> slides = saveBase64Images(folio.getId(), req.getImages());
         folio.setPhotos(slides);
 
-        if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
-            folio.setThumbnail(req.getThumbnail());
-        } else if (!slides.isEmpty()) {
-            folio.setThumbnail(slides.get(0));
-        } else {
-            folio.setThumbnail("https://picsum.photos/seed/default/300");
+        // 3) 썸네일 정규화: 요청에 오면 dataURL일 수 있으니 변환, 없으면 첫 슬라이드, 그래도 없으면 기본
+        String thumbUrl = normalizeToUrl(req.getThumbnail(), folio.getId(), "thumb");
+        if (thumbUrl == null || thumbUrl.isBlank()) {
+            thumbUrl = !slides.isEmpty() ? slides.get(0) : "https://picsum.photos/seed/default/300";
         }
+        folio.setThumbnail(thumbUrl);
 
         return folioRepository.save(folio);
+    }
+
+    /** dataURL이면 파일로 저장해 URL 리턴, 이미 URL이면 그대로 리턴 */
+    private String normalizeToUrl(String candidate, String folioId, String subdir) {
+        if (candidate == null || candidate.isBlank()) return null;
+        if (!candidate.startsWith("data:")) {
+            // 이미 http/https 또는 /uploads 같은 URL이라고 가정
+            return candidate;
+        }
+        // dataURL -> 파일 저장
+        try {
+            int comma = candidate.indexOf(',');
+            if (comma < 0) return null;
+            String meta = candidate.substring(0, comma); // e.g. data:image/png;base64
+            String base64 = candidate.substring(comma + 1);
+            String ext = meta.contains("image/png") ? ".png"
+                        : meta.contains("image/jpeg") ? ".jpg"
+                        : ".bin";
+
+            byte[] bytes = Base64.getDecoder().decode(base64);
+            String filename = UUID.randomUUID() + ext;
+
+            Path dir = Paths.get("uploads/folios", folioId, subdir == null ? "misc" : subdir);
+            Files.createDirectories(dir);
+            Files.write(dir.resolve(filename), bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+            return "/uploads/folios/" + folioId + "/" + (subdir == null ? "misc" : subdir) + "/" + filename;
+        } catch (Exception e) {
+            // 실패해도 DB에 base64를 넣지 않도록 null 반환
+            return null;
+        }
     }
 
     /** 빈 경우에도 가변 리스트 반환(불변 리스트 금지) */
@@ -156,7 +195,17 @@ public class FolioService {
             int idx = 1;
             var out = new ArrayList<String>();
             for (String dataUrl : dataUrls) {
-                String base64 = dataUrl.substring(dataUrl.indexOf(",") + 1);
+                if (dataUrl == null || dataUrl.isBlank()) continue;
+
+                // 이미 URL이면 그대로 사용
+                if (!dataUrl.startsWith("data:")) {
+                    out.add(dataUrl);
+                    continue;
+                }
+
+                int comma = dataUrl.indexOf(',');
+                if (comma < 0) continue;
+                String base64 = dataUrl.substring(comma + 1);
                 byte[] bytes = java.util.Base64.getDecoder().decode(base64);
 
                 String name = String.format("slide-%03d.png", idx++);
@@ -215,7 +264,7 @@ public class FolioService {
     public Page<FoliosSummaryDto> getMyFolioSummaries(Principal principal, Pageable pageable) {
         var user = usersService.getUserByUsername(principal.getName());
         var page = folioRepository.findAllByUser(user, pageable);
-        return page.map(FoliosSummaryDto::from);   // 엔티티 → DTO 즉시 변환
+        return page.map(FoliosSummaryDto::from);
     }
 
     /** 전체 목록(페이지) */
@@ -245,7 +294,7 @@ public class FolioService {
         if (status == null || status.isBlank()) {
             page = folioRepository.findAllByUser(user, pageable);
         } else {
-            Folio.Status st = Folio.Status.valueOf(status); // "DRAFT" / "PUBLISHED"만 허용
+            Folio.Status st = Folio.Status.valueOf(status); // "DRAFT" / "PUBLISHED"
             page = folioRepository.findAllByUserAndStatus(user, st, pageable);
         }
         return page.map(FoliosSummaryDto::from);
@@ -275,7 +324,6 @@ public class FolioService {
 
     // ===== 내부 유틸 =====
 
-    /** 모달/카드용 최소 필드만 꺼내는 아이템(컬렉션 접근 없음) */
     private Map<String, Object> toBucketItem(Folio f) {
         Map<String, Object> m = new HashMap<>();
         m.put("id", f.getId());

@@ -1,5 +1,8 @@
-// /js/folios/edit.js
 document.addEventListener("DOMContentLoaded", () => {
+    const TEMPLATE =
+        document.querySelector('meta[name="folio-template"]')?.content ||
+        "dev-basic";
+
     // ---------- 유틸 ----------
     const qs = (s, r = document) => r.querySelector(s);
     const qsa = (s, r = document) => [...r.querySelectorAll(s)];
@@ -46,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
             fr.readAsDataURL(file);
         });
 
-    // data:URL → 서버 업로드 후 URL 받기
+    // data:URL → 서버 업로드 후 URL 받기 (썸네일 등에 사용)
     async function normalizeImageUrl(urlOrData) {
         if (!urlOrData) return null;
         if (!urlOrData.startsWith("data:")) return urlOrData;
@@ -397,6 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnLoad = qs("#btnLoad"); // 수동 불러오기
     const btnPrint = qs("#btnPrint");
     const btnExit = qs("#btnExit");
+    const btnUpload = qs("#btnUpload");
 
     // 초기 로드: id가 있을 때만 해당 초안을 자동 로드 / id 없으면 기본 템플릿로 시작
     async function loadInitial() {
@@ -421,7 +425,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.id || data.folioId)
                     currentFolioId = data.id || data.folioId;
             }
-            // ★ id가 없으면 서버 자동 불러오기 하지 않음(기본 템플릿 유지)
         } catch (e) {
             console.warn("초기 로드 실패(기본 템플릿로 진행):", e);
         }
@@ -466,9 +469,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 "https://picsum.photos/seed/default/300";
 
             const payload = {
-                folioId: currentFolioId || null, // ★ 같은 글 업데이트
-                template: "dev-basic",
-                contentJson,
+                folioId: currentFolioId || null,
+                template: TEMPLATE, // ← 변수로!
+                contentJson, // 위에서 만든 contentJson 그대로
                 status: "DRAFT",
                 thumbnail,
                 title: (snapshot.intro?.name || "Untitled").trim(),
@@ -524,92 +527,104 @@ document.addEventListener("DOMContentLoaded", () => {
         location.href = "/";
     });
 
-    // --- 발행(PUBLISHED): 이미지 렌더 → 업로드(JSON) ---
-    async function captureSlidesAsImages(maxSlides = 1) {
+    // ---- 업로드(PUBLISHED): 모든 슬라이드 캡처 → 서버 전송 ----
+    function collectEditorStateJsonSafely() {
         try {
-            if (document.fonts?.ready) await document.fonts.ready;
-        } catch {}
-        const slides = [...document.querySelectorAll(".slide")];
-        const prevHidden = slides.map((s) => s.hidden);
-        slides.forEach((s) => (s.hidden = false));
-
-        const images = [];
-        try {
-            for (let i = 0; i < slides.length && i < maxSlides; i++) {
-                const el = slides[i];
-                const canvas = await html2canvas(el, {
-                    backgroundColor: "#ffffff",
-                    scale: 1, // 🔽 낮춤
-                    useCORS: true,
-                    removeContainer: true,
-                });
-                const dataUrl = canvas.toDataURL("image/jpeg", 0.6); // 🔽 낮춤
-                images.push(dataUrl);
-            }
-        } finally {
-            slides.forEach((s, i) => (s.hidden = prevHidden[i]));
+            return window.__folioStateJson__
+                ? JSON.stringify(window.__folioStateJson__)
+                : "{}";
+        } catch {
+            return "{}";
         }
-        return images;
+    }
+    function getCurrentFolioIdSafely() {
+        try {
+            return window.__folioId__ || currentFolioId || null;
+        } catch {
+            return currentFolioId || null;
+        }
     }
 
-    document
-        .querySelector("#btnUpload")
-        ?.addEventListener("click", async () => {
-            const button = document.querySelector("#btnUpload");
-            try {
-                button.disabled = true;
+    btnUpload?.addEventListener("click", async () => {
+        try {
+            btnUpload.disabled = true;
+            btnUpload.textContent = "업로딩...";
 
-                const snapshot = JSON.parse(JSON.stringify(state));
-                const contentJson = JSON.stringify(snapshot);
-
-                // (선택) 첫 슬라이드 캡처, 하지만 DB에는 base64를 넣지 않습니다.
-                const cap = await captureSlidesAsImages(1); // 이미 있던 함수
-                // 썸네일 원본 후보: 캡처 1장 또는 기존 입력 썸네일들
-                const thumbSource =
-                    cap?.[0] ||
-                    snapshot.intro?.photo ||
-                    snapshot.proj1?.thumb ||
-                    snapshot.proj2?.thumb ||
-                    null;
-
-                // 🔴 여기! base64 → /api/uploads/images 로 업로드 → 짧은 URL로 변환
-                const thumbnail =
-                    (await normalizeImageUrl(thumbSource)) ||
-                    "https://picsum.photos/seed/default/300";
-
-                const title =
-                    document
-                        .querySelector('[data-bind="intro.name"]')
-                        ?.textContent?.trim() ||
-                    snapshot?.intro?.name ||
-                    "Untitled";
-
-                const payload = {
-                    folioId: currentFolioId || null,
-                    template: "dev-basic",
-                    title,
-                    contentJson,
-                    status: "PUBLISHED",
-                    thumbnail, // ← URL만 저장
-                    images: [], // ← 지금 단계에선 비워서 가볍게 보냅니다
-                };
-
-                const res = await guardFetch("/api/folios/dev-basic/publish", {
-                    method: "POST",
-                    headers: JSON_HEADERS,
-                    body: JSON.stringify(payload),
-                });
-                if (!res.ok) throw new Error(await res.text());
-
-                // 지금은 상세페이지 패스하고 마이페이지로 이동해서 업로드 칸에 바로 보이게
-                location.href = "/mypage/home";
-            } catch (e) {
-                console.error(e);
-                if (e.message !== "인증 필요") flash("업로드 중 오류");
-            } finally {
-                button.disabled = false;
+            // 보이는 슬라이드 우선, 없으면 전체
+            const visible = [...document.querySelectorAll(".slide")].filter(
+                (el) => !el.hasAttribute("hidden")
+            );
+            const targets = visible.length
+                ? visible
+                : [...document.querySelectorAll(".slide")];
+            if (!targets.length) {
+                alert("캡처할 슬라이드가 없습니다.");
+                return;
             }
-        });
+
+            // DOM → PNG dataURL
+            const images = [];
+            // 폰트 로딩 대기(가능한 경우)
+            try {
+                if (document.fonts?.ready) await document.fonts.ready;
+            } catch {}
+            for (const el of targets) {
+                const canvas = await html2canvas(el, {
+                    backgroundColor: "#ffffff",
+                    scale: 2,
+                    useCORS: true,
+                });
+                images.push(canvas.toDataURL("image/png"));
+            }
+
+            const title =
+                (
+                    document.querySelector('[data-bind="intro.name"]')
+                        ?.textContent || ""
+                ).trim() || "Folio";
+            const contentJson = JSON.stringify(state); // 또는 collectEditorStateJsonSafely()
+
+            const payload = {
+                folioId: getCurrentFolioIdSafely(),
+                template: TEMPLATE, // ← 대문자 변수 사용
+                title,
+                contentJson,
+                images, // 슬라이드 dataURL 배열
+            };
+
+            const res = await fetch("/api/folios/dev-basic/publish", {
+                method: "POST",
+                headers: JSON_HEADERS,
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) {
+                const t = await res.text().catch(() => "");
+                throw new Error(
+                    `업로드 실패 ${res.status} ${res.statusText}\n${t.slice(
+                        0,
+                        300
+                    )}`
+                );
+            }
+
+            const data = await res.json();
+            const newId = data?.id;
+            if (!newId) {
+                alert("업로드는 되었지만 ID를 받지 못했습니다.");
+                return;
+            }
+
+            // 완료 → 상세 페이지로 이동
+            location.href = `/folios/detail/${encodeURIComponent(newId)}`;
+        } catch (err) {
+            console.error(err);
+            alert("업로드 중 오류가 발생했습니다.\n" + err.message);
+        } finally {
+            btnUpload.disabled = false;
+            btnUpload.textContent = "업로드";
+        }
+    });
 
     // 키보드 네비
     qs(".navArrow.left")?.addEventListener("click", () => go(page - 1));

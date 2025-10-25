@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,38 +28,36 @@ public class Folio {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    /** 템플릿 식별자 (예: "dev-basic") */
     @Column(name = "template", length = 50, nullable = false)
     private String template = "dev-basic";
 
     public enum Status { DRAFT, PUBLISHED }
 
-    /** 상태 */
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
     private Status status = Status.DRAFT;
 
-    /** 목록/상세 표기용 제목 */
     @Column(name = "title", length = 200, nullable = false)
     private String title = "Untitled";
 
-    /** 에디터 전체 상태 JSON */
+    /** ✅ CLOB 로 *명확히* 바인딩 */
     @Lob
-    @Column(name = "content_json", nullable = false)
-    private String contentJson = "{}";
+    @JdbcTypeCode(SqlTypes.CLOB)
+    @Column(name = "content_json", columnDefinition = "CLOB")
+    private String contentJson;
 
-    /** 목록 썸네일 URL */
-    @Column(name = "thumbnail", length = 1000) // 여유롭게
+    @Column(name = "thumbnail", length = 1000)
     private String thumbnail;
 
-    /** (선택) 보조 메타들 — 기존 유지 */
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "folio_skills", joinColumns = @JoinColumn(name = "folio_id"))
     @Column(name = "skill")
     private List<String> skills = new ArrayList<>();
 
+    /** ✅ 이것도 CLOB 로 명확히 */
     @Lob
-    @Column(name = "introduction")
+    @JdbcTypeCode(SqlTypes.CLOB)
+    @Column(name = "introduction", columnDefinition = "CLOB")
     private String introduction;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -78,7 +78,6 @@ public class Folio {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    /** 널 방어 – DB 기본값이 아닌 JPA 필드 기본값이 적용되도록 보강 */
     @PrePersist
     protected void prePersist() {
         if (template == null || template.isBlank()) template = "dev-basic";
@@ -87,9 +86,6 @@ public class Folio {
         if (contentJson == null) contentJson = "{}";
     }
 
-    /* ========================
-       ✅ 불변 리스트 방지 세터
-       ======================== */
     public void setSkills(List<String> skills) {
         this.skills = (skills == null) ? new ArrayList<>() : new ArrayList<>(skills);
     }
