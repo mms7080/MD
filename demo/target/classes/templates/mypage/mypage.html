@@ -220,7 +220,9 @@
                             </div>
 
                             <div class="stat-foot">
-                                <a class="link" href="/folios">더보기</a>
+                                <button id="folio-more-btn" class="inbtn">
+                                    더보기
+                                </button>
                             </div>
                         </article>
                     </div>
@@ -501,6 +503,60 @@
                         <button type="submit" class="btn">변경</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        <!-- Folio 모달 -->
+        <div id="folioModal" class="folio-modal" hidden>
+            <div class="folio-modal__backdrop" data-close></div>
+            <div
+                class="folio-modal__panel"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="folioModalTitle"
+            >
+                <div class="folio-modal__head">
+                    <h3 id="folioModalTitle">내 폴리오 현황</h3>
+                    <button
+                        class="folio-modal__close"
+                        data-close
+                        aria-label="닫기"
+                    >
+                        ×
+                    </button>
+                </div>
+
+                <div class="folio-modal__tabs">
+                    <button class="is-active" data-tab="DRAFT">임시저장</button>
+                    <button data-tab="PUBLISHED">업로드</button>
+                </div>
+
+                <div class="folio-modal__body">
+                    <ul
+                        id="folioListDraft"
+                        data-pane="DRAFT"
+                        class="folio-modal__list"
+                    ></ul>
+                    <ul
+                        id="folioListPub"
+                        data-pane="PUBLISHED"
+                        class="folio-modal__list"
+                        hidden
+                    ></ul>
+                </div>
+
+                <div class="folio-modal__foot">
+                    <button class="inbtn" id="folioMoreDraft" data-more="DRAFT">
+                        더보기
+                    </button>
+                    <button
+                        class="inbtn"
+                        id="folioMorePub"
+                        data-more="PUBLISHED"
+                        hidden
+                    >
+                        더보기
+                    </button>
+                </div>
             </div>
         </div>
     </body>

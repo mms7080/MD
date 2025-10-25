@@ -37,4 +37,6 @@ public interface FolioRepository extends JpaRepository<Folio, String> {
     
     @EntityGraph(attributePaths = {"user", "skills"})
     List<Folio> findAllByUserAndStatusOrderByUpdatedAtDesc(Users user, Folio.Status status);
+
+    Page<Folio> findAllByUserAndStatus(Users user, Folio.Status status, Pageable pageable);
 }

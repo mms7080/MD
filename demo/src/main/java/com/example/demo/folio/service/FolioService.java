@@ -34,6 +34,7 @@ public class FolioService {
     private final PortfolioService portfolioService;
     private final UsersService usersService;
 
+    /** 상세 */
     public FolioDetailDto getFolioDetail(String id) {
         Folio folio = folioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Folio를 찾을 수 없습니다. id=" + id));
@@ -57,6 +58,7 @@ public class FolioService {
         return new FolioDetailDto(folio, projects, state);
     }
 
+    /** 새 Folio 생성 (폼 제출) */
     @Transactional
     public Folio createOrUpdateFolio(FolioRequestDto requestDto, Principal principal) {
         Users currentUser = usersRepository
@@ -66,9 +68,9 @@ public class FolioService {
         Folio folio = new Folio(); // 항상 새로 생성
         folio.setUser(currentUser);
         folio.setIntroduction(requestDto.getIntroduction());
-        folio.setSkills(requestDto.getSkills());       // 세터가 가변화
-        folio.setPhotos(requestDto.getPhotos());       // 세터가 가변화
-        folio.setProjectIds(requestDto.getProjectIds());// 세터가 가변화
+        folio.setSkills(requestDto.getSkills());        // 가변 리스트 세팅
+        folio.setPhotos(requestDto.getPhotos());
+        folio.setProjectIds(requestDto.getProjectIds());
 
         if (requestDto.getPhotos() != null && !requestDto.getPhotos().isEmpty()) {
             folio.setThumbnail(requestDto.getPhotos().get(0));
@@ -80,6 +82,7 @@ public class FolioService {
         return folioRepository.save(folio);
     }
 
+    /** 에디터 상태 저장 (임시저장) */
     @Transactional
     public Folio saveState(Principal principal, FolioStateSaveRequest req) {
         Users user = usersService.getUserByUsername(principal.getName());
@@ -109,6 +112,7 @@ public class FolioService {
         return folioRepository.save(folio);
     }
 
+    /** 발행 + 슬라이드 이미지 저장 */
     @Transactional
     public Folio publishAsImages(Principal principal, FolioPublishRequest req) {
         Users user = usersService.getUserByUsername(principal.getName());
@@ -123,10 +127,10 @@ public class FolioService {
         folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
         folio.setStatus(Folio.Status.PUBLISHED);
 
-        // id 확보
+        // ID 확보
         folio = folioRepository.save(folio);
 
-        // ⬇ 저장 후 컬렉션 갱신 (가변 리스트)
+        // 가변 리스트로 교체
         List<String> slides = saveBase64Images(folio.getId(), req.getImages());
         folio.setPhotos(slides);
 
@@ -141,7 +145,7 @@ public class FolioService {
         return folioRepository.save(folio);
     }
 
-    /** ⬇️ 빈 경우에도 반드시 가변 리스트 반환 */
+    /** 빈 경우에도 가변 리스트 반환(불변 리스트 금지) */
     private List<String> saveBase64Images(String folioId, List<String> dataUrls) {
         if (dataUrls == null || dataUrls.isEmpty()) return new ArrayList<>();
 
@@ -167,7 +171,9 @@ public class FolioService {
         }
     }
 
-    // --- 마이페이지용 데이터들 (변경 없음) ---
+    // ===== 마이페이지/목록용 =====
+
+    /** 에디터가 처음 열 때 불러가는 최신 상태 */
     public Optional<Map<String, Object>> getMyDevBasicState(Principal principal) {
         Users user = usersService.getUserByUsername(principal.getName());
         Folio folio = folioRepository.findTopByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.DRAFT)
@@ -185,6 +191,7 @@ public class FolioService {
         return Optional.of(res);
     }
 
+    /** 마이페이지 카드용 요약 */
     public Map<String, Object> getMyFoliosSummary(Principal principal) {
         Users user = usersService.getUserByUsername(principal.getName());
         Map<String, Object> res = new HashMap<>();
@@ -203,17 +210,20 @@ public class FolioService {
         return res;
     }
 
+    /** 내 목록(페이지) */
     @Transactional(readOnly = true)
     public Page<FoliosSummaryDto> getMyFolioSummaries(Principal principal, Pageable pageable) {
         var user = usersService.getUserByUsername(principal.getName());
         var page = folioRepository.findAllByUser(user, pageable);
-        return page.map(FoliosSummaryDto::new);
+        return page.map(FoliosSummaryDto::from);   // 엔티티 → DTO 즉시 변환
     }
 
+    /** 전체 목록(페이지) */
     public Page<FoliosSummaryDto> getFolioSummaries(Pageable pageable) {
-        return folioRepository.findAll(pageable).map(FoliosSummaryDto::new);
+        return folioRepository.findAll(pageable).map(FoliosSummaryDto::from);
     }
 
+    /** 모달용 버킷(임시저장/업로드) */
     @Transactional(readOnly = true)
     public Map<String, List<Map<String, Object>>> getMyFoliosBuckets(Principal principal) {
         Users user = usersService.getUserByUsername(principal.getName());
@@ -226,16 +236,57 @@ public class FolioService {
         return result;
     }
 
+    /** 상태별 페이지 */
+    @Transactional(readOnly = true)
+    public Page<FoliosSummaryDto> getMyListByStatus(Principal principal, String status, Pageable pageable) {
+        Users user = usersService.getUserByUsername(principal.getName());
+
+        Page<Folio> page;
+        if (status == null || status.isBlank()) {
+            page = folioRepository.findAllByUser(user, pageable);
+        } else {
+            Folio.Status st = Folio.Status.valueOf(status); // "DRAFT" / "PUBLISHED"만 허용
+            page = folioRepository.findAllByUserAndStatus(user, st, pageable);
+        }
+        return page.map(FoliosSummaryDto::from);
+    }
+
+    /** 소유자 삭제 */
+    @Transactional
+    public void deleteIfOwner(Principal principal, String id) {
+        var user = usersService.getUserByUsername(principal.getName());
+        var folio = folioRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new IllegalArgumentException("권한 없거나 없는 folio"));
+        try {
+            Path root = Paths.get("uploads/folios", folio.getId());
+            if (Files.exists(root)) deleteRecursively(root);
+        } catch (Exception ignore) {}
+        folioRepository.delete(folio);
+    }
+
+    private void deleteRecursively(Path path) throws Exception {
+        if (!Files.exists(path)) return;
+        try (var s = Files.walk(path)) {
+            s.sorted(Comparator.reverseOrder()).forEach(p -> {
+                try { Files.deleteIfExists(p); } catch (Exception ignore) {}
+            });
+        }
+    }
+
+    // ===== 내부 유틸 =====
+
+    /** 모달/카드용 최소 필드만 꺼내는 아이템(컬렉션 접근 없음) */
     private Map<String, Object> toBucketItem(Folio f) {
         Map<String, Object> m = new HashMap<>();
         m.put("id", f.getId());
-        m.put("status", f.getStatus().name());
+        m.put("status", f.getStatus() != null ? f.getStatus().name() : "DRAFT");
         m.put("template", f.getTemplate());
         m.put("updatedAt", f.getUpdatedAt());
         m.put("title", safeTitle(f));
         return m;
     }
 
+    /** 제목 안전 추출(없으면 contentJson.intro.name → 최종 “제목 없음”) */
     private String safeTitle(Folio folio) {
         if (folio.getTitle() != null && !folio.getTitle().isBlank()) {
             return folio.getTitle().trim();
