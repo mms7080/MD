@@ -121,10 +121,13 @@
 
         <div class="icon-right">
 
-          <!-- 좋아요 -->
+          <!-- 좋아요 (로그인 여부별 분리) -->
           <div class="heart-container" title="Like">
             <input type="checkbox" class="checkbox" id="likeBtn"
-                   th:data-authenticated="${#authorization.expression('isAuthenticated()')}"/>
+                   sec:authorize="isAuthenticated()" data-authenticated="true"/>
+            <input type="checkbox" class="checkbox" id="likeBtn"
+                   sec:authorize="isAnonymous()" data-authenticated="false"/>
+
             <div class="svg-container">
               <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967
@@ -219,16 +222,14 @@
         <div class="comment" th:each="comment : ${comments}">
           <div class="meta">
             <div class="left-box">
-              <span class="author" sec:authorize="hasRole('ADMIN')" 
-                    th:text="${comment.user != null ? comment.user.username : '익명'}"></span>
-              <span class="author" sec:authorize="!hasRole('ADMIN')">익명</span>
+              <span class="author" th:text="${comment.user != null ? comment.user.username : '익명'}"></span>
               <div class="stars readonly" th:attr="data-rating=${comment.rating}"></div>
             </div>
 
             <div class="right-box">
               <span class="date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd')}"></span>
               <div class="comment-actions"
-                   sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
+                   sec:authorize="hasRole('ADMIN')">
                 <button type="button" class="btn-mini" onclick="enableEdit(this)">수정</button>
                 <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/delete|}" 
                       method="post" class="delete-form"
@@ -245,7 +246,7 @@
           <!-- ✅ 수정 폼 -->
           <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/edit|}"
                 method="post" class="edit-form" style="display:none;"
-                sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
+                sec:authorize="hasRole('ADMIN')">
             <div class="edit-rating">
               <input type="radio" name="rating" value="5" th:id="'edit-star5-' + ${comment.id}" />
               <label th:for="'edit-star5-' + ${comment.id}">★</label>
@@ -264,6 +265,21 @@
             <button type="button" class="btn-cancel" onclick="cancelEdit(this)">취소</button>
           </form>
         </div>
+      </div>
+
+      <!-- ✅ 페이지네이션 -->
+      <div class="pagination" th:if="${totalPages > 1}">
+        <a th:if="${currentPage > 0}"
+           th:href="@{|/portfolios/${portfolio.id}?page=${currentPage - 1}|}" class="page-btn">이전</a>
+
+        <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+           th:href="@{|/portfolios/${portfolio.id}?page=${i}|}"
+           th:text="${i + 1}"
+           th:classappend="${i == currentPage} ? 'active' : ''"
+           class="page-btn"></a>
+
+        <a th:if="${currentPage + 1 < totalPages}"
+           th:href="@{|/portfolios/${portfolio.id}?page=${currentPage + 1}|}" class="page-btn">다음</a>
       </div>
     </div>
   </main>
