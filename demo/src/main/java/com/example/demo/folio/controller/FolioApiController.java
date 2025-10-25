@@ -1,6 +1,7 @@
 package com.example.demo.folio.controller;
 
 import com.example.demo.folio.dto.FolioDetailDto;
+import com.example.demo.folio.dto.FolioPublishRequest;
 import com.example.demo.folio.dto.FoliosSummaryDto;
 import com.example.demo.folio.service.FolioService;
 import lombok.RequiredArgsConstructor;
@@ -97,6 +98,15 @@ public class FolioApiController {
         body.put("id", saved.getId());
 
         return ResponseEntity.ok(body);
+    }
+
+    @PostMapping("/dev-basic/publish")
+    public ResponseEntity<Map<String, Object>> publishDevBasic(
+            @RequestBody FolioPublishRequest req, Principal principal
+    ) {
+        if (principal == null) return ResponseEntity.status(403).build();
+        var saved = folioService.publishAsImages(principal, req); // 새 서비스 메서드
+        return ResponseEntity.ok(Map.of("id", saved.getId()));
     }
 
     // ① 에디터 불러오기(내 dev-basic 최신 상태) — 프런트 edit.js가 호출 중

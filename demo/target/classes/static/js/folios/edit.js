@@ -48,8 +48,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const fd = new FormData();
             const blob = await (await fetch(urlOrData)).blob();
             fd.append("file", blob, "thumbnail.png");
+            const headers = {};
+            if (CSRF) headers[CSRF.header] = CSRF.token;
             const res = await guardFetch("/api/uploads/images", {
                 method: "POST",
+                headers,
                 body: fd,
             });
             if (!res.ok) throw new Error("이미지 업로드 실패");
@@ -396,7 +399,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 state.proj1?.thumb ||
                 state.proj2?.thumb ||
                 null;
-            const thumbnail = await normalizeImageUrl(firstImg);
+            const thumbnail =
+                (await normalizeImageUrl(firstImg)) ||
+                "https://picsum.photos/seed/default/300";
 
             const payload = {
                 template: "dev-basic",
@@ -415,50 +420,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (e) {
             console.error(e);
             if (e.message !== "인증 필요") flash("임시저장 중 오류");
-        }
-    });
-
-    // 발행(PUBLISHED) → FolioStateSaveRequest와 1:1 매칭
-    qs("#btnUpload")?.addEventListener("click", async () => {
-        const button = qs("#btnUpload");
-        try {
-            button.disabled = true;
-
-            const contentJson = JSON.stringify(state);
-            const firstImg =
-                state.intro?.photo ||
-                state.proj1?.thumb ||
-                state.proj2?.thumb ||
-                null;
-            const thumbnail = await normalizeImageUrl(firstImg);
-
-            // 제목은 intro.name(없으면 Untitled)
-            const title =
-                document
-                    .querySelector('[data-bind="intro.name"]')
-                    ?.textContent?.trim() || "Untitled";
-
-            const payload = {
-                template: "dev-basic",
-                title,
-                contentJson,
-                status: "PUBLISHED",
-                thumbnail,
-            };
-
-            const res = await guardFetch("/api/folios/dev-basic", {
-                method: "POST",
-                headers: JSON_HEADERS,
-                body: JSON.stringify(payload),
-            });
-            if (!res.ok) throw new Error("발행 실패: " + (await res.text()));
-            const dto = await res.json(); // FolioDetailDto(id 포함)
-            location.href = `/folios/detail/${dto.id}`;
-        } catch (err) {
-            console.error(err);
-            if (err.message !== "인증 필요") flash("업로드 중 오류");
-        } finally {
-            button.disabled = false;
         }
     });
 
@@ -495,6 +456,83 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch {}
         location.href = "/";
     });
+    // --- 발행(PUBLISHED): 이미지 렌더 → 업로드(JSON) ---
+    async function captureSlidesAsImages() {
+        // 1) 폰트 로드 대기 (가능한 경우)
+        try {
+            if (document.fonts?.ready) await document.fonts.ready;
+        } catch {}
+
+        // 2) 일시적으로 모든 슬라이드 표시
+        const slides = [...document.querySelectorAll(".slide")];
+        const prevHidden = slides.map((s) => s.hidden);
+        slides.forEach((s) => (s.hidden = false));
+
+        const images = [];
+        try {
+            for (const el of slides) {
+                // html2canvas 옵션
+                const canvas = await html2canvas(el, {
+                    backgroundColor: "#ffffff",
+                    scale: 2, // 해상도(품질) 조절
+                    useCORS: true, // 원격 이미지 CORS 필요
+                    removeContainer: true,
+                });
+
+                // 용량을 줄이고 싶다면 JPEG로 저장(품질 조정)
+                const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+                images.push(dataUrl);
+            }
+        } finally {
+            // 3) 표시 상태 복구
+            slides.forEach((s, i) => (s.hidden = prevHidden[i]));
+        }
+        return images;
+    }
+
+    document
+        .querySelector("#btnUpload")
+        ?.addEventListener("click", async () => {
+            const button = document.querySelector("#btnUpload");
+            try {
+                button.disabled = true;
+
+                const contentJson = JSON.stringify(state);
+                const images = await captureSlidesAsImages();
+
+                // 제목: intro.name 우선 → 없으면 "Untitled"
+                const title =
+                    document
+                        .querySelector('[data-bind="intro.name"]')
+                        ?.textContent?.trim() ||
+                    state?.intro?.name ||
+                    "Untitled";
+
+                const payload = {
+                    template: "dev-basic",
+                    title,
+                    contentJson,
+                    status: "PUBLISHED",
+                    thumbnail: images[0] ?? null, // 첫 슬라이드
+                    images, // data:image/... 배열
+                };
+
+                const res = await guardFetch("/api/folios/dev-basic/publish", {
+                    method: "POST",
+                    headers: JSON_HEADERS, // CSRF 포함됨
+                    body: JSON.stringify(payload),
+                });
+                if (!res.ok) throw new Error(await res.text());
+
+                const { id } = await res.json();
+                location.href = `/folios/detail/${id}`;
+            } catch (e) {
+                console.error(e);
+                if (e.message !== "인증 필요") flash("업로드 중 오류");
+            } finally {
+                button.disabled = false;
+            }
+        });
 
     // 키보드 네비
     qs(".navArrow.left")?.addEventListener("click", () => go(page - 1));

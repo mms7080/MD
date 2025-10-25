@@ -1,6 +1,7 @@
 package com.example.demo.folio.service;
 
 import com.example.demo.folio.dto.FolioDetailDto;
+import com.example.demo.folio.dto.FolioPublishRequest;
 import com.example.demo.folio.dto.PortfolioInFolioDto;
 import com.example.demo.folio.entity.Folio;
 import com.example.demo.folio.repository.FolioRepository;
@@ -14,7 +15,12 @@ import com.example.demo.folio.dto.FolioRequestDto;
 import com.example.demo.folio.dto.FolioStateSaveRequest;
 import com.example.demo.folio.dto.FoliosSummaryDto;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.Principal;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,6 +121,67 @@ public class FolioService {
 
         return folioRepository.save(folio);
     }
+
+    @Transactional
+    public Folio publishAsImages(Principal principal, FolioPublishRequest req) {
+        Users user = usersService.getUserByUsername(principal.getName());
+
+        // 유저당 1개 전략 유지: 최신 DRAFT 없으면 새로 생성
+        Folio folio = folioRepository.findTopByUserAndStatusOrderByUpdatedAtDesc(user, Folio.Status.DRAFT)
+                .orElse(new Folio());
+        folio.setUser(user);
+        folio.setTemplate(req.getTemplate() != null ? req.getTemplate() : "dev-basic");
+        folio.setTitle(req.getTitle() != null && !req.getTitle().isBlank() ? req.getTitle() : user.getName());
+        folio.setContentJson(req.getContentJson() != null ? req.getContentJson() : "{}");
+        folio.setStatus(Folio.Status.PUBLISHED);
+
+        // 먼저 저장해서 id 확보
+        folio = folioRepository.save(folio);
+
+        // uploads/folios/{id}/slides/slide-001.png ...
+        var slides = saveBase64Images(folio.getId(), req.getImages());
+        folio.setPhotos(slides);
+
+        // 썸네일
+        if (req.getThumbnail() != null && !req.getThumbnail().isBlank()) {
+            folio.setThumbnail(req.getThumbnail());
+        } else if (!slides.isEmpty()) {
+            folio.setThumbnail(slides.get(0));
+        } else {
+            folio.setThumbnail("https://picsum.photos/seed/default/300");
+        }
+
+        return folioRepository.save(folio);
+    }
+
+    private List<String> saveBase64Images(String folioId, List<String> dataUrls) {
+        if (dataUrls == null || dataUrls.isEmpty()) return List.of();
+
+        try {
+            Path root = Paths.get("uploads/folios", folioId, "slides");
+            Files.createDirectories(root);
+
+            int idx = 1;
+            var out = new java.util.ArrayList<String>();
+            for (String dataUrl : dataUrls) {
+                // data:image/png;base64,xxxx...
+                String base64 = dataUrl.substring(dataUrl.indexOf(",") + 1);
+                byte[] bytes = Base64.getDecoder().decode(base64);
+
+                String name = String.format("slide-%03d.png", idx++);
+                Path file = root.resolve(name);
+                Files.write(file, bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+                // 정적 리소스 매핑이 file:uploads/ 로 되어 있으니 URL은 /uploads/부터 시작
+                String url = "/uploads/folios/" + folioId + "/slides/" + name;
+                out.add(url);
+            }
+            return out;
+        } catch (Exception e) {
+            throw new RuntimeException("슬라이드 이미지 저장 실패", e);
+        }
+    }
+
      // ① 에디터 불러오기 데이터 (edit.js가 기대하는 구조)
     public Optional<Map<String, Object>> getMyDevBasicState(Principal principal) {
         Users user = usersService.getUserByUsername(principal.getName());
