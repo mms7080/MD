@@ -38,19 +38,12 @@ public class FolioApiController {
     private final FolioService folioService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getFoliosPage(
+    public Page<FoliosSummaryDto> getFoliosPage(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "12") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        Page<FoliosSummaryDto> folioPage = folioService.getFolioSummaries(pageable);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("page", folioPage.getNumber() + 1);
-        response.put("items", folioPage.getContent());
-        response.put("totalPages", folioPage.getTotalPages());
-        response.put("totalItems", folioPage.getTotalElements());
-        return ResponseEntity.ok(response);
+        Pageable pageable = PageRequest.of(page, Math.min(size, 48), Sort.by(Sort.Direction.DESC, "updatedAt"));
+        return folioService.getPublishedSummaries(pageable);
     }
 
     // ✅ status 있을 때

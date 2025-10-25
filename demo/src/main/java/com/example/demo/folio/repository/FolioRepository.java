@@ -39,4 +39,6 @@ public interface FolioRepository extends JpaRepository<Folio, String> {
     List<Folio> findAllByUserAndStatusOrderByUpdatedAtDesc(Users user, Folio.Status status);
 
     Page<Folio> findAllByUserAndStatus(Users user, Folio.Status status, Pageable pageable);
+    Page<Folio> findAllByStatusOrderByUpdatedAtDesc(Folio.Status status, Pageable pageable);
+    
 }

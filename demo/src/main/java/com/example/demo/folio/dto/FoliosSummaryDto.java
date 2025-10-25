@@ -16,6 +16,7 @@ public class FoliosSummaryDto {
     private final String template;
     private final String status;        // "DRAFT" | "PUBLISHED"
     private final LocalDateTime updatedAt;
+    private final String thumbnail;
 
     public static FoliosSummaryDto from(Folio f) {
         String title = (f.getTitle() != null && !f.getTitle().isBlank())
@@ -26,7 +27,8 @@ public class FoliosSummaryDto {
                 title,
                 f.getTemplate(),
                 f.getStatus().name(),
-                f.getUpdatedAt()
+                f.getUpdatedAt(),
+                f.getThumbnail()
         );
     }
 }

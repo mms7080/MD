@@ -94,6 +94,70 @@ body {
     padding: 48px 0;
 }
 
+/* 나가기 버튼 */
+.exit-btn {
+    --h: 37px;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: var(--h);
+    min-width: var(--h);
+    width: var(--h);
+    padding: 0 10px;
+    border-radius: 10px;
+    background: #172233;
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    overflow: hidden;
+    transition: width 0.2s ease, background 0.2s ease, border-radius 0.2s ease;
+}
+
+.exit-btn .sign {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.2s ease;
+}
+
+.exit-btn .sign svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+
+.exit-btn .text {
+    white-space: nowrap;
+    margin-left: 8px;
+    width: 0;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: opacity 0.2s ease, width 0.2s ease, transform 0.2s ease;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.exit-btn:hover {
+    background: #121922;
+    width: 120px;
+    border-radius: 40px;
+}
+
+.exit-btn:hover .sign {
+    width: 36%;
+}
+
+.exit-btn:hover .text {
+    width: auto;
+    opacity: 1;
+    transform: none;
+}
+
 /* 모바일 */
 @media (max-width: 768px) {
     .fd-wrap {

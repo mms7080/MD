@@ -259,6 +259,13 @@ public class FolioService {
         return res;
     }
 
+    @Transactional(readOnly = true)
+    public Page<FoliosSummaryDto> getPublishedSummaries(Pageable pageable) {
+        return folioRepository
+                .findAllByStatusOrderByUpdatedAtDesc(Folio.Status.PUBLISHED, pageable)
+                .map(FoliosSummaryDto::from);
+    }
+
     /** 내 목록(페이지) */
     @Transactional(readOnly = true)
     public Page<FoliosSummaryDto> getMyFolioSummaries(Principal principal, Pageable pageable) {
