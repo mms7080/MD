@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -453,6 +454,24 @@ public List<PortfoliosEntity> searchByTags(List<String> tags, Pageable pageable)
 public List<PortfoliosEntity> searchByTitleAndTags(String keyword, List<String> tags, Pageable pageable) {
     return repository.searchByTitleAndTags(keyword, tags, pageable).getContent();
 }
+
+
+ /**
+     * ✅ 공개 포트폴리오 전체 조회 (Lazy 초기화 포함)
+     */
+    @Transactional(readOnly = true)
+    public List<PortfoliosEntity> getPublicPortfolios() {
+        List<PortfoliosEntity> portfolios = repository.findAllWithScreenshots();
+    
+        portfolios.forEach(p -> {
+            if (p.getScreenshots() != null) p.getScreenshots().size(); // ✅ 이미지만 초기화
+        });
+    
+        return portfolios;
+    }
+    
+    
+
 
 
 

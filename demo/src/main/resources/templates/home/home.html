@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="dark">
+<html lang="ko" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,8 +12,8 @@
     </head>
 
     <body>
-        <div th:replace="fragments/modals :: authModals"></div>
-        <div th:replace="fragments/header :: header('')"></div>
+        <div th:replace="~{fragments/header :: header('')}"></div>
+        <div th:replace="~{fragments/modals :: authModals}"></div>
 
         <!-- home.html (본문만) -->
         <main class="kf-home">
@@ -196,308 +197,52 @@
             <section class="home-collections">
                 <h2 class="home-section-title">포트폴리오</h2>
                 <div class="col-grid">
-                    <!-- Pawple -->
-                    <article class="collection">
-                        <header class="col-head">
-                            <span class="brand">P</span>
-                            <div class="info">
-                                <h3>Pawple</h3>
-                                <p class="sub">
-                                    반려동물 건강 관리 웹사이트 프로젝트
-                                </p>
-                            </div>
-                        </header>
-                        <div class="shots-row">
-                            <a class="shot" href="/portfolios/1"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2025/7/9/boards/ZWY1ZDE0NjY2MjM0Yzg5MDY0MDAzZWVkZTM5Y2E1ZWJjNmYyMDg0YjI0MDc1ODY5OTg5OTljMTY1YTBlODI4Nw==.png"
-                                    alt="Pawple 화면"
-                            /></a>
-                            <a class="shot" href="/portfolios/1"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2025/7/9/boards/NmI2MTk3MzEwZTFkODBmMTRhMTI1NWRlMmE1ODI2NWZkZTg0OWJkNzJlOTM5ZDg3MGFlMjc5Yzc4NzViOThhMw==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                            <a class="shot" href="/portfolios/1"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2025/7/9/boards/YWFmYmFhOTM1OTI1MWVjMzU1N2Q2NmZjYTc5OTg0MjliYTI4YzdmZDRhMDE0YWNjMTM1OTQzZjQ0ZGUxMDNmMg==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                        </div>
-                    </article>
+              
+                  <article class="collection" th:each="portfolio : ${portfolios}">
+                    <header class="col-head">
+                      <!-- 아이콘 -->
+                      <span class="brand"
+                            th:if="${#strings.isEmpty(portfolio.icon)}"
+                            th:text="${portfolio.title != null ? portfolio.title.substring(0,1) : '•'}">
+                      </span>
+                      <img th:if="${!#strings.isEmpty(portfolio.icon)}"
+                           class="brand"
+                           th:src="${portfolio.icon}"
+                           alt="icon" />
+              
+                      <div class="info">
+                        <h3 th:text="${portfolio.title}">프로젝트명</h3>
+                        <p class="sub" th:text="${portfolio.desc}">프로젝트 설명</p>
+                      </div>
+                    </header>
+              
+                    <!-- ✅ 대표 이미지 (3개까지) -->
+                    <div class="shots-row"
+     th:if="${portfolio.screenshots != null and portfolio.screenshots.size() > 0}">
+  <a class="shot"
+     th:each="shot, iter : ${portfolio.screenshots}"
+     th:if="${iter.index < 3}"
+     th:href="@{|/portfolios/${portfolio.id}|}">
+    <img class="shot-img"
+         th:src="${shot}"
+         th:alt="${portfolio.title + ' 화면'}" />
+  </a>
+</div>
 
-                    <!-- Filmora -->
-                    <article class="collection">
-                        <header class="col-head">
-                            <span class="brand">F</span>
-                            <div class="info">
-                                <h3>Filmora</h3>
-                                <p class="sub">영화 예매 사이트</p>
-                            </div>
-                        </header>
-                        <div class="shots-row">
-                            <a class="shot" href="/portfolios/2"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2025/7/9/boards/ZTI0YmNkZTMxMjIzY2VkNmRlYmFkZDYyY2M4M2Q2NDJlNTE2MTdmZGUzZDE3MWVkMmE1ZTMxYTc0YjBmNWQ4Yw==.png"
-                                    alt="Filmora 화면"
-                            /></a>
-                            <a class="shot" href="/portfolios/2"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2025/7/9/boards/YjZlODczYTY5ZjM2YjIxZGU0N2IxYjYwN2M0NTQ4ZGE5N2M2YTczYjkzNWYxMDJlYzY2ZTg3YzhjZjlmMGJkOA==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                            <a class="shot" href="/portfolios/2"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2025/7/9/boards/MDc1NzdhZmQwZTdhODFjNjZkZDQ1ZjgwMmZmNjI1NmIwNWMzNzQwOWRlYmE4ZDQzNGEyYjk1OWM4ZGFkYzI3MA==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                        </div>
-                    </article>
-
-                    <!-- ModeMe -->
-                    <article class="collection">
-                        <header class="col-head">
-                            <span class="brand">M</span>
-                            <div class="info">
-                                <h3>ModeMe</h3>
-                                <p class="sub">패션 커머스 사이트</p>
-                            </div>
-                        </header>
-                        <div class="shots-row">
-                            <a class="shot" href="/portfolios/3"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2025/3/27/boards/OTZjOTNiYWJkMjNhMjA0ZTI2MGI1YWZmMmNiYTlhNmVmOGZlODJlYjlhODBkNmU0OTdjZmY3ZTM1MmNmMTI2Mg==.jpg"
-                                    alt="ModeMe 화면"
-                            /></a>
-                            <a class="shot" href="/portfolios/3"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2025/3/27/boards/NzQ2MTIwOTFlMmY1ZTY0ZjVjNDg3MzY3NzRiNzhhNDlhZTFlOTUxMWEwYTBjNjQ5YmFkMjE3ODY1OTM5NDdmMg==.jpg"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                            <a class="shot" href="/portfolios/3"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2025/3/27/boards/MjcyN2QzM2EzNmY4YjQyZTkwYzM3NjU3NjlmZDIxMzY2ODEwMGNjMmYxNTZiMjgxZjk5YjYyNGYwYjA4OTlmMQ==.jpg"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                        </div>
-                    </article>
-
-                    <!-- OSPE -->
-                    <article class="collection">
-                        <header class="col-head">
-                            <span class="brand">O</span>
-                            <div class="info">
-                                <h3>OSPE</h3>
-                                <p class="sub">
-                                    진료 예약 및 처방전 출력 사이트
-                                </p>
-                            </div>
-                        </header>
-                        <div class="shots-row">
-                            <a class="shot" href="/portfolios/4"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/12/30/boards/MGFiYzI1YmM1MzBlYmM2M2FjYzFkYzgxZmIyNWVkMzBkN2Q0MWEzODVmYzM0OTZlNzY4MjA0NjFiYTk2MDljOA==.png"
-                                    alt="OSPE 화면"
-                            /></a>
-                            <a class="shot" href="/portfolios/4"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/12/30/boards/NzRiMTFlMjY5NmY3ZGY5MmM4MWQxODkyYjUwOGRmMDMzMzkyYjNmZGUwZDM5ZjhmNzQ3Y2YwZDlhZWUzZjI5Ng==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                            <a class="shot" href="/portfolios/4"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/12/30/boards/ZDhiNjcxMTg0MjhkNWMyZmIzNjBlNmE5YmY3NGU2YjAxYzRhYjQwMzI1NWZkZTc1ZTVkNGY4ZjEzNGI0MjBlNA==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                        </div>
-                    </article>
-
-                    <!-- NotePad -->
-                    <article class="collection">
-                        <header class="col-head">
-                            <span class="brand">N</span>
-                            <div class="info">
-                                <h3>NotePad</h3>
-                                <p class="sub">메모장 웹앱</p>
-                            </div>
-                        </header>
-                        <div class="shots-row">
-                            <a class="shot" href="/portfolios/5"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg"
-                                    alt="NotePad 화면"
-                            /></a>
-                            <a class="shot" href="/portfolios/5"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                            <a class="shot" href="/portfolios/5"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/9/5/boards/OGRiMjA2YmEyYWMxY2VmOGMxNDJkNjI2ZGM0YTZmMjVlN2VlNzdjYjZlOGE1ZDQzYWI3YTJiNzIxMzgwZjMzOQ==.jpg"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                        </div>
-                    </article>
-
-                    <!-- Planner for U -->
-                    <article class="collection">
-                        <header class="col-head">
-                            <span class="brand">P</span>
-                            <div class="info">
-                                <h3>Planner for U</h3>
-                                <p class="sub">일정 관리 웹앱</p>
-                            </div>
-                        </header>
-                        <div class="shots-row">
-                            <a class="shot" href="/portfolios/6"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/9/4/boards/NjRlNGMwMzJkZDc0OTJlYzZjYTdiYTk3ZTE5YjEyOTEyZmYwODhhZDE4NmM5MjExZDNkYzgzZmE4ZThmZjhkOA==.png"
-                                    alt="Planner for U 화면"
-                            /></a>
-                            <a class="shot" href="/portfolios/6"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/9/4/boards/YzcxZDg2MmVhMzE3NWY4MDJiZGVmOGJlM2U5NWQwYWZkMWUzYzY0YzEyYjMxZGU3ZTYzNjg4NjVlMjBlZDVkMw==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                            <a class="shot" href="/portfolios/6"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/9/4/boards/NTJlMjNkMzIxYzAyZTE1OTA0MjAxYmRkZjFkN2IyZTI0Y2YzN2M1MzJiYTJiZjc3MjU2MjRiMTVmZDllY2UzMg==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                        </div>
-                    </article>
-
-                    <!-- 취미존중 -->
-                    <article class="collection">
-                        <header class="col-head">
-                            <span class="brand">취</span>
-                            <div class="info">
-                                <h3>취미존중</h3>
-                                <p class="sub">게시판 커뮤니티</p>
-                            </div>
-                        </header>
-                        <div class="shots-row">
-                            <a class="shot" href="/portfolios/7"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/9/5/boards/NmQ4OTU1OGMwZTQ4ODcyZTFmMTExY2M3ZTEwOTA4ZjBlNzAxMDBlMTJkZGEyZDg5MDBmMjM3NzA4ZmY2ZDYxMw==.png"
-                                    alt="취미존중 화면"
-                            /></a>
-                            <a class="shot" href="/portfolios/7"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/9/5/boards/ZTM1NTUwNjBkM2FhMTIwMzE4YjlmYjY3MTE3NzY1NzZiZjYyNWM4NjM2N2VmMjhiMThmMTE5YjlkOTY4NjEyOA==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                            <a class="shot" href="/portfolios/7"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/12/30/boards/ZDhiNjcxMTg0MjhkNWMyZmIzNjBlNmE5YmY3NGU2YjAxYzRhYjQwMzI1NWZkZTc1ZTVkNGY4ZjEzNGI0MjBlNA==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                        </div>
-                    </article>
-
-                    <!-- O_O 커뮤니티 -->
-                    <article class="collection">
-                        <header class="col-head">
-                            <span class="brand">O</span>
-                            <div class="info">
-                                <h3>O_O 커뮤니티</h3>
-                                <p class="sub">커뮤니티 사이트</p>
-                            </div>
-                        </header>
-                        <div class="shots-row">
-                            <a class="shot" href="/portfolios/8"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/5/3/boards/MjFhOWE5YzMxZmYxMjFmN2E0MzBlZDk1NmRmMDU2MGE5Y2ZkYzZkMmI1ZDIyMzBlNzRhYWE5Nzc5NzE0ODY1Yw==.png"
-                                    alt="O_O 커뮤니티 화면"
-                            /></a>
-                            <a class="shot" href="/portfolios/8"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/5/3/boards/OGU4NGU5YzZlZDFhMDQ2OTQyNzE4MWE5MTgyYWY3Y2QyOWEwYzc5Mjg4NzNkNjQ4NmVlZDA1MTExYzM1OGFmMQ==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                            <a class="shot" href="/portfolios/8"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/5/3/boards/MGY5MTZhYjYzYjk0MzU1MTZkNTZjNjYxYThjODJiODcxZGNjMzYxYjQyYmNjNDA0ODZlOTEzNzUyNGJhZWIxOA==.png"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                        </div>
-                    </article>
-
-                    <!-- Pickup -->
-                    <article class="collection">
-                        <header class="col-head">
-                            <span class="brand">P</span>
-                            <div class="info">
-                                <h3>Pickup</h3>
-                                <p class="sub">리그오브레전드 아이템 계산기</p>
-                            </div>
-                        </header>
-                        <div class="shots-row">
-                            <a class="shot" href="/portfolios/9"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/4/26/boards/MTkyMzEwZTdiOTM2Mjk0NjQ3NDdhMjBiNGQ4OGEwNjdmYWI3YzlkMDk1MGQ5ODg5ZmIyMTBiNzg4NTBjOGIxZA==.jpg"
-                                    alt="Pickup 화면"
-                            /></a>
-                            <a class="shot" href="/portfolios/9"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/4/26/boards/NmQ5MDM0NzVjYjMyZGJiY2JhMDkwYzgzODgwMzI4ZGMwMTlmZmI5M2M3YWUwY2M3NGRjYjY1M2M3YmYxYmI0Nw==.jpg"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                            <a class="shot" href="/portfolios/9"
-                                ><img
-                                    class="shot-img"
-                                    src="https://kafolio.kr/static/requests/2024/4/26/boards/ZGJhYTc2MWM1ZjFkODY5N2RhZmMwYjYyYTA0ZGI1YzE3NmI4YmViNzZhODU0YjdkYTIxNzNkMjQyYzI5MDM1MQ==.jpg"
-                                    alt=""
-                                    aria-hidden="true"
-                            /></a>
-                        </div>
-                    </article>
+              
+                    <div class="shots-row"
+                         th:if="${portfolio.screenshots == null or portfolio.screenshots.size() == 0}">
+                      <p class="no-img">이미지가 없습니다</p>
+                    </div>
+                  </article>
+              
                 </div>
-            </section>
+              </section>
+              
+              
+              
+              
+              
 
             <!-- 더보기 -->
             <div class="home-more">
@@ -505,6 +250,6 @@
             </div>
         </main>
 
-        <div th:replace="fragments/footer :: footer"></div>
+        <div th:replace="~{fragments/footer :: footer}"></div>
     </body>
 </html>

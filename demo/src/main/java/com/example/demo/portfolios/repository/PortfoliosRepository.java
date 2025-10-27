@@ -87,4 +87,22 @@ Page<PortfoliosEntity> searchByTitleAndTags(@Param("keyword") String keyword,
                                             Pageable pageable);
 
 
-}
+
+
+@Query("""
+    SELECT DISTINCT p 
+    FROM PortfoliosEntity p 
+    LEFT JOIN FETCH p.screenshots 
+    WHERE p.isPublic = true 
+    ORDER BY p.id DESC
+    """)
+    List<PortfoliosEntity> findAllWithScreenshots();
+                                                
+                                            
+
+                                            
+
+
+
+
+                                        }
