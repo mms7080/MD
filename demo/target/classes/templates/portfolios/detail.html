@@ -20,244 +20,275 @@
 
   <main class="container">
 
-    <!-- ❌ Not Found -->
-    <div th:if="${notFound}" class="error-box">
+    <!-- 🚫 포트폴리오 없음 -->
+    <div th:if="${portfolio == null}" class="error-box">
       <h1>포트폴리오를 찾을 수 없습니다.</h1>
       <a href="/home">← 홈으로</a>
     </div>
 
-    <!-- ✅ 관리자 버튼 -->
-    <div class="detail-admin-actions" sec:authorize="hasRole('ADMIN')">
-      <a th:href="@{|/portfolios/edit/${portfolio.id}|}">
-        <button class="edit-btn">edit</button>
-      </a>
-      <button type="button" class="edit-btn" onclick="openDeleteModal()">delete</button>
-    </div>
+    <!-- ✅ 포트폴리오 존재 시 -->
+    <div th:if="${portfolio != null}">
 
-    <div class="center-box">
-      <div class="title-row">
-        <h1 class="title">
-          <a th:href="${portfolio.link}" target="_blank" th:text="${portfolio.title}">제목</a>
-        </h1>
+      <!-- 관리자 전용 버튼 -->
+      <div class="detail-admin-actions" sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{|/portfolios/edit/${portfolio.id}|}">
+          <button class="edit-btn">edit</button>
+        </a>
+        <button type="button" class="edit-btn" onclick="openDeleteModal()">delete</button>
       </div>
-      <p class="desc" th:if="${portfolio.desc != null}" th:text="${portfolio.desc}"></p>
-    </div>
 
-    <!-- ✅ Portfolio Content -->
-    <div th:if="${portfolio != null}" class="portfolio-detail-grid">
+      <!-- 제목 / 설명 -->
+      <div class="center-box">
+        <div class="title-row">
+          <h1 class="title">
+            <a th:href="${portfolio.link}" target="_blank" th:text="${portfolio.title}">제목</a>
+          </h1>
+        </div>
+        <p class="desc" th:if="${portfolio.desc != null}" th:text="${portfolio.desc}"></p>
+      </div>
 
-      <!-- 왼쪽: 이미지 -->
-      <div class="gallery">
+      <!-- 포트폴리오 상세 -->
+      <div class="portfolio-detail-grid">
 
-        <!-- 대표 이미지 -->
-        <figure class="main-photo"
-                th:if="${portfolio.screenshots != null and !#lists.isEmpty(portfolio.screenshots)}">
-          <img id="mainImage"
-               th:src="${portfolio.screenshots[0]}"
-               alt="대표 이미지"
-               onclick="openModal(0)" />
-        </figure>
+        <!-- 왼쪽: 이미지 -->
+        <div class="gallery">
+          <figure class="main-photo"
+                  th:if="${portfolio.screenshots != null and !#lists.isEmpty(portfolio.screenshots)}">
+            <img id="mainImage"
+                 th:src="${portfolio.screenshots[0]}"
+                 alt="대표 이미지"
+                 onclick="openModal(0)" />
+          </figure>
 
-        <!-- 썸네일 목록 -->
-        <div class="thumb-list"
-             th:if="${portfolio.screenshots != null and portfolio.screenshots.size() > 1}">
-          <img th:each="img, iter : ${portfolio.screenshots}"
-               th:if="${iter.index > 0}"
-               th:src="${img}"
-               th:attr="data-index=${iter.index}, onclick='openModal(' + ${iter.index} + ')' "
-               alt="썸네일"
-               class="thumb" />
+          <div class="thumb-list"
+               th:if="${portfolio.screenshots != null and portfolio.screenshots.size() > 1}">
+            <img th:each="img, iter : ${portfolio.screenshots}"
+                 th:if="${iter.index > 0}"
+                 th:src="${img}"
+                 th:attr="data-index=${iter.index}, onclick='openModal(' + ${iter.index} + ')' "
+                 alt="썸네일"
+                 class="thumb" />
+          </div>
+        </div>
+
+        <!-- 이미지 모달 -->
+        <div id="imageModal" class="modal">
+          <span class="close" onclick="closeModal()">&times;</span>
+          <img class="modal-content" id="modalImage" />
+          <a class="prev" onclick="changeImage(-1)">&#10094;</a>
+          <a class="next" onclick="changeImage(1)">&#10095;</a>
+        </div>
+
+        <!-- 오른쪽: 팀 정보 -->
+        <div class="info-box" th:if="${portfolio.team != null and !portfolio.team.isEmpty()}">
+          <h2>팀원 & 역할</h2>
+          <ul class="team-list">
+            <li class="team-item" th:each="member : ${portfolio.team}">
+              <div class="team-name">
+                <strong th:text="${member.memberName}">팀원 이름</strong>
+                <span class="role" th:text="${member.memberRole}">역할</span>
+              </div>
+              <p class="parts" th:text="${member.parts}">담당 기능</p>
+            </li>
+          </ul>
         </div>
       </div>
 
-      <!-- 📌 모달 -->
-      <div id="imageModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modalImage" />
-        <a class="prev" onclick="changeImage(-1)">&#10094;</a>
-        <a class="next" onclick="changeImage(1)">&#10095;</a>
-      </div>
+      <!-- 아이콘 바 -->
+      <div class="icon-bar">
+        <div class="icon-left">
 
-      <!-- 오른쪽: 팀 정보 -->
-      <div class="info-box" th:if="${portfolio.team != null and !portfolio.team.isEmpty()}">
-        <h2>팀원 & 역할</h2>
-        <ul class="team-list">
-          <li class="team-item" th:each="member : ${portfolio.team}">
-            <div class="team-name">
-              <strong th:text="${member.memberName}">팀원 이름</strong>
-              <span class="role" th:text="${member.memberRole}">역할</span>
+          <!-- 조회수 -->
+          <span class="view-box" title="조회수">
+            <i class="fa-solid fa-eye"></i>
+            <span class="view-label">Views :</span>
+            <span id="viewCount" th:attr="data-id=${portfolio.id}" th:text="${portfolio.viewCount}">0</span>
+          </span>
+
+          <!-- 태그 -->
+          <div class="tags-box" title="태그">
+            <i class="fa-solid fa-tags"></i>
+            <span class="tags-label">Tags :</span>
+            <div class="tags-list">
+              <a th:each="tag : ${portfolio.tags}"
+                 th:href="@{|/portfolios?tag=${tag}|}"
+                 class="tag-item"
+                 th:text="${tag}">Tag</a>
             </div>
-            <p class="parts" th:text="${member.parts}">담당 기능</p>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 아이콘 바 -->
-    <div class="icon-bar">
-      <div class="icon-left">
-        <!-- 조회수 -->
-        <span class="view-box" title="조회수">
-          <i class="fa-solid fa-eye"></i>
-          <span class="view-label">Views :</span>
-          <span id="viewCount" th:attr="data-id=${portfolio.id}" th:text="${portfolio.viewCount}">0</span>
-        </span>
-
-        <!-- 태그 -->
-        <div class="tags-box" title="태그">
-          <i class="fa-solid fa-tags"></i>
-          <span class="tags-label">Tags :</span>
-          <div class="tags-list">
-            <a th:each="tag : ${portfolio.tags}"
-               th:href="@{|/portfolios?tag=${tag}|}"
-               class="tag-item"
-               th:text="${tag}">Tag</a>
-          </div>
-          <button type="button" class="tag-more-btn" onclick="toggleTags(this)" data-expanded="false">+ 더보기</button>
-        </div>
-      </div>
-
-      <div class="icon-right">
-
-        <!-- 좋아요 -->
-        <div class="heart-container" title="Like">
-          <input type="checkbox" class="checkbox" id="likeBtn"
-                 th:data-authenticated="${#authorization.expression('isAuthenticated()')}"/>
-          <div class="svg-container">
-            <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967
-                       c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,
-                       24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0
-                       C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967
-                       a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967
-                       C22,11.87,19.053,16.006,13.915,20.313Z"></path>
-            </svg>
-            <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967
-                       c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,
-                       24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
-            </svg>
-            <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-              <polygon points="10,10 20,20"></polygon>
-              <polygon points="10,50 20,50"></polygon>
-              <polygon points="20,80 30,70"></polygon>
-              <polygon points="90,10 80,20"></polygon>
-              <polygon points="90,50 80,50"></polygon>
-              <polygon points="80,80 70,70"></polygon>
-            </svg>
+            <button type="button" class="tag-more-btn" onclick="toggleTags(this)" data-expanded="false">+ 더보기</button>
           </div>
         </div>
 
-        <!-- 좋아요 수 -->
-        <span class="like-box" title="좋아요 수">
-          <i class="fa-solid fa-heart"></i>
-          <span id="likeCount" th:text="${#lists.size(portfolio.likes)}">0</span>
-        </span>
+        <div class="icon-right">
 
-        <!-- 다운로드 -->
-        <a th:if="${portfolio.download != null}"
-           th:href="${portfolio.download}"
-           download class="Btn" title="Download">
-          <svg class="svgIcon" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg">
-            <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5
-                     12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8
-                     224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32v306.7
-                     L54.6 265.4c-12.5-12.5 -32.8-12.5-45.3 0
-                     s-12.5 32.8 0 45.3l160 160z"></path>
-          </svg>
-        </a>
+          <!-- 좋아요 (로그인 여부별 분리) -->
+          <div class="heart-container" title="Like">
+            <input type="checkbox" class="checkbox" id="likeBtn"
+                   sec:authorize="isAuthenticated()" data-authenticated="true"/>
+            <input type="checkbox" class="checkbox" id="likeBtn"
+                   sec:authorize="isAnonymous()" data-authenticated="false"/>
 
-        <!-- 링크 -->
-        <a th:href="${portfolio.link}" target="_blank" title="Link" class="icon-link">
-          <img th:if="${portfolio.icon != null}" th:src="${portfolio.icon}"
-               alt="홈페이지 아이콘" class="link-icon" />
-        </a>
-      </div>
-    </div>
-
-    <!-- 댓글 섹션 -->
-    <div class="comment-section">
-      <h2>Comments</h2>
-
-      <div class="rating-summary">
-        <span class="avg-label">평균 별점:</span>
-        <span th:text="${#numbers.formatDecimal(avgRating, 1, 1)}">0.0</span> 점
-        <span class="count">(<span th:text="${ratingCount}">0</span>개)</span>
-      </div>
-    </div>
-
-    <div sec:authorize="isAuthenticated()">
-      <form th:action="@{|/portfolios/${portfolio.id}/comments|}" method="post" class="comment-form">
-        <div class="rate-input">
-          <label class="rate-label">별점:</label>
-          <div class="rating">
-            <input type="radio" name="rating" value="5" id="star5" required><label for="star5"></label>
-            <input type="radio" name="rating" value="4" id="star4"><label for="star4"></label>
-            <input type="radio" name="rating" value="3" id="star3"><label for="star3"></label>
-            <input type="radio" name="rating" value="2" id="star2"><label for="star2"></label>
-            <input type="radio" name="rating" value="1" id="star1"><label for="star1"></label>
-          </div>
-        </div>
-        <input type="text" name="content" placeholder="한 줄 평가를 남겨주세요..." required>
-        <button type="submit">등록</button>
-      </form>
-    </div>
-
-    <div sec:authorize="isAnonymous()" class="login-prompt">
-      <p class="muted">
-        로그인 후 댓글/별점을 남길 수 있습니다.
-        <label for="modal-signin" class="login-btn">로그인</label>
-      </p>
-    </div>
-
-    <div id="commentList" class="comments">
-      <div class="comment" th:each="comment : ${comments}"
-           th:classappend="${#authentication.name == comment.user.username} ? ' mine'">
-        <div class="meta">
-          <div class="left-box">
-            <span class="author">익명</span>
-            <div class="stars readonly" th:attr="data-rating=${comment.rating}"></div>
-
-          </div>
-          <div class="right-box">
-            <span class="date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd')}"></span>
-            <div class="comment-actions"
-                 sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
-              <button type="button" class="btn-mini" onclick="enableEdit(this)">수정</button>
-              <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/delete|}" method="post"
-                    class="delete-form" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-                <button type="submit" class="btn-mini danger">삭제</button>
-              </form>
+            <div class="svg-container">
+              <svg viewBox="0 0 24 24" class="svg-outline" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967
+                         c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,
+                         24,8.967A6.8,6.8,0,0,0,17.5,1.917Zm-3.585,18.4a2.973,2.973,0,0,1-3.83,0
+                         C4.947,16.006,2,11.87,2,8.967a4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,11,8.967
+                         a1,1,0,0,0,2,0,4.8,4.8,0,0,1,4.5-5.05A4.8,4.8,0,0,1,22,8.967
+                         C22,11.87,19.053,16.006,13.915,20.313Z"></path>
+              </svg>
+              <svg viewBox="0 0 24 24" class="svg-filled" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.5,1.917a6.4,6.4,0,0,0-5.5,3.3,6.4,6.4,0,0,0-5.5-3.3A6.8,6.8,0,0,0,0,8.967
+                         c0,4.547,4.786,9.513,8.8,12.88a4.974,4.974,0,0,0,6.4,0C19.214,18.48,24,13.514,
+                         24,8.967A6.8,6.8,0,0,0,17.5,1.917Z"></path>
+              </svg>
+              <svg class="svg-celebrate" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="10,10 20,20"></polygon>
+                <polygon points="10,50 20,50"></polygon>
+                <polygon points="20,80 30,70"></polygon>
+                <polygon points="90,10 80,20"></polygon>
+                <polygon points="90,50 80,50"></polygon>
+                <polygon points="80,80 70,70"></polygon>
+              </svg>
             </div>
           </div>
+
+          <!-- 좋아요 수 -->
+          <span class="like-box" title="좋아요 수">
+            <i class="fa-solid fa-heart"></i>
+            <span id="likeCount" th:text="${#lists.size(portfolio.likes)}">0</span>
+          </span>
+
+          <!-- 다운로드 -->
+          <a th:if="${portfolio.download != null}"
+             th:href="${portfolio.download}"
+             download class="Btn" title="Download">
+            <svg class="svgIcon" viewBox="0 0 384 512" height="1em" xmlns="http://www.w3.org/2000/svg">
+              <path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5
+                       12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8
+                       224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32v306.7
+                       L54.6 265.4c-12.5-12.5 -32.8-12.5-45.3 0
+                       s-12.5 32.8 0 45.3l160 160z"></path>
+            </svg>
+          </a>
+
+          <!-- 링크 -->
+          <a th:href="${portfolio.link}" target="_blank" title="Link" class="icon-link">
+            <img th:if="${portfolio.icon != null}" th:src="${portfolio.icon}"
+                 alt="홈페이지 아이콘" class="link-icon" />
+          </a>
         </div>
+      </div>
 
-        <p class="content" th:text="${comment.content}"></p>
+      <!-- 댓글 섹션 -->
+      <div class="comment-section">
+        <h2>Comments</h2>
 
-        <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/edit|}"
-              method="post" class="edit-form" style="display:none;"
-              sec:authorize="hasRole('ADMIN') or #authentication.name == comment.user.username">
-          <div class="edit-rating">
-            <input type="radio" name="rating" value="5" th:id="'edit-star5-' + ${comment.id}" />
-            <label th:for="'edit-star5-' + ${comment.id}">★</label>
-            <input type="radio" name="rating" value="4" th:id="'edit-star4-' + ${comment.id}" />
-            <label th:for="'edit-star4-' + ${comment.id}">★</label>
-            <input type="radio" name="rating" value="3" th:id="'edit-star3-' + ${comment.id}" />
-            <label th:for="'edit-star3-' + ${comment.id}">★</label>
-            <input type="radio" name="rating" value="2" th:id="'edit-star2-' + ${comment.id}" />
-            <label th:for="'edit-star2-' + ${comment.id}">★</label>
-            <input type="radio" name="rating" value="1" th:id="'edit-star1-' + ${comment.id}" />
-            <label th:for="'edit-star1-' + ${comment.id}">★</label>
+        <div class="rating-summary">
+          <span class="avg-label">평균 별점:</span>
+          <span th:text="${#numbers.formatDecimal(avgRating, 1, 1)}">0.0</span> 점
+          <span class="count">(<span th:text="${ratingCount}">0</span>개)</span>
+        </div>
+      </div>
+
+      <!-- 댓글 작성 (로그인 사용자만) -->
+      <div sec:authorize="isAuthenticated()">
+        <form th:action="@{|/portfolios/${portfolio.id}/comments|}" method="post" class="comment-form">
+          <div class="rate-input">
+            <label class="rate-label">별점:</label>
+            <div class="rating">
+              <input type="radio" name="rating" value="5" id="star5" required><label for="star5"></label>
+              <input type="radio" name="rating" value="4" id="star4"><label for="star4"></label>
+              <input type="radio" name="rating" value="3" id="star3"><label for="star3"></label>
+              <input type="radio" name="rating" value="2" id="star2"><label for="star2"></label>
+              <input type="radio" name="rating" value="1" id="star1"><label for="star1"></label>
+            </div>
           </div>
-          <textarea name="content" rows="2"></textarea>
-          <input type="hidden" name="_csrf" th:value="${_csrf.token}">
-          <button type="submit" class="btn-save">저장</button>
-          <button type="button" class="btn-cancel" onclick="cancelEdit(this)">취소</button>
+          <input type="text" name="content" placeholder="한 줄 평가를 남겨주세요..." required>
+          <button type="submit">등록</button>
         </form>
       </div>
-    </div>
 
+      <!-- 비로그인 유저 -->
+      <div sec:authorize="isAnonymous()" class="login-prompt">
+        <p class="muted">
+          로그인 후 댓글을 작성할 수 있습니다.
+          <label for="modal-signin" class="login-btn">로그인</label>
+        </p>
+      </div>
+
+      <!-- ✅ 댓글 목록 -->
+      <div id="commentList" class="comments" sec:authorize="isAuthenticated()">
+        <div class="comment" th:each="comment : ${comments}">
+          <div class="meta">
+            <div class="left-box">
+              <!-- 🔹 ADMIN인 경우 실제 작성자 이름 표시 -->
+              <span class="author" sec:authorize="hasRole('ADMIN')" 
+                    th:text="${comment.user != null ? comment.user.username : '익명'}"></span>
+            
+              <!-- 🔹 ADMIN이 아닐 경우 항상 익명 표시 -->
+              <span class="author" sec:authorize="!hasRole('ADMIN')">익명</span>
+            
+              <div class="stars readonly" th:attr="data-rating=${comment.rating}"></div>
+            </div>
+            
+
+            <div class="right-box">
+              <span class="date" th:text="${#temporals.format(comment.createdAt, 'yyyy-MM-dd')}"></span>
+              <div class="comment-actions"
+                   sec:authorize="hasRole('ADMIN')">
+                <button type="button" class="btn-mini" onclick="enableEdit(this)">수정</button>
+                <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/delete|}" 
+                      method="post" class="delete-form"
+                      onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                  <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                  <button type="submit" class="btn-mini danger">삭제</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <p class="content" th:text="${comment.content}"></p>
+
+          <!-- ✅ 수정 폼 -->
+          <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/edit|}"
+                method="post" class="edit-form" style="display:none;"
+                sec:authorize="hasRole('ADMIN')">
+            <div class="edit-rating">
+              <input type="radio" name="rating" value="5" th:id="'edit-star5-' + ${comment.id}" />
+              <label th:for="'edit-star5-' + ${comment.id}">★</label>
+              <input type="radio" name="rating" value="4" th:id="'edit-star4-' + ${comment.id}" />
+              <label th:for="'edit-star4-' + ${comment.id}">★</label>
+              <input type="radio" name="rating" value="3" th:id="'edit-star3-' + ${comment.id}" />
+              <label th:for="'edit-star3-' + ${comment.id}">★</label>
+              <input type="radio" name="rating" value="2" th:id="'edit-star2-' + ${comment.id}" />
+              <label th:for="'edit-star2-' + ${comment.id}">★</label>
+              <input type="radio" name="rating" value="1" th:id="'edit-star1-' + ${comment.id}" />
+              <label th:for="'edit-star1-' + ${comment.id}">★</label>
+            </div>
+            <textarea name="content" rows="2"></textarea>
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+            <button type="submit" class="btn-save">저장</button>
+            <button type="button" class="btn-cancel" onclick="cancelEdit(this)">취소</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ✅ 페이지네이션 -->
+      <div class="pagination" th:if="${totalPages > 1}">
+        <a th:if="${currentPage > 0}"
+           th:href="@{|/portfolios/${portfolio.id}?page=${currentPage - 1}|}" class="page-btn">이전</a>
+
+        <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+           th:href="@{|/portfolios/${portfolio.id}?page=${i}|}"
+           th:text="${i + 1}"
+           th:classappend="${i == currentPage} ? 'active' : ''"
+           class="page-btn"></a>
+
+        <a th:if="${currentPage + 1 < totalPages}"
+           th:href="@{|/portfolios/${portfolio.id}?page=${currentPage + 1}|}" class="page-btn">다음</a>
+      </div>
+    </div>
   </main>
 
   <!-- 삭제 모달 -->
@@ -274,14 +305,7 @@
     </div>
   </div>
 
-  <!-- JS -->
-  <script>
-    function changeMainImage(src) {
-      document.getElementById("mainImage").src = src;
-    }
-  </script>
   <script src="/js/portfolios/portfolios-detail.js" defer></script>
-
   <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

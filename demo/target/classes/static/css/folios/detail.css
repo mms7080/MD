@@ -1,110 +1,199 @@
-/* /resources/static/css/folios/detail.css */
+/* ===========================
+   detail.css (상세 페이지 전용)
+   =========================== */
 
-/* --- 프로필 헤더 --- */
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    padding: 24px;
-    background-color: var(--panel);
-    border-radius: 16px;
-    margin-bottom: 40px;
-    border: 1px solid var(--border);
+/* (선택) 사용 폰트 */
+@font-face {
+    font-family: "Paperozi";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2")
+        format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
 }
 
-.profile-image {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--border-strong);
+/* 색/레이아웃 변수 */
+:root {
+    --bg: #0e1116;
+    --text: #e8edf4;
+    --muted: #9aa3ad;
+    --border: #212933;
+    --maxw: 980px;
 }
 
-.profile-name {
+/* 기본 */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Paperozi", "Pretendard", system-ui, -apple-system,
+        "Noto Sans KR", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 컨테이너 */
+.fd-wrap {
+    max-width: var(--maxw);
+    margin: 32px auto 80px;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+
+/* 헤더 */
+.fd-head {
+    margin: 0 0 16px;
+}
+.fd-title {
     font-size: 28px;
     font-weight: 800;
-    margin: 0 0 10px;
+    margin: 0 0 6px;
 }
-
-.profile-intro {
-    font-size: 16px;
+.fd-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
     color: var(--muted);
-    margin: 0 0 16px;
-    font-style: italic;
+}
+.fd-meta .dot {
+    opacity: 0.6;
+}
+.fd-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 12px;
 }
 
-.tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.tags .tag {
-    background: var(--chip); color: var(--chip-text);
-    padding: 5px 12px; border-radius: 999px;
-    font-size: 0.8rem; font-weight: 600;
-}
-
-/* --- 공통 섹션 스타일 --- */
-.detail-section {
-    margin-bottom: 40px;
-}
-
-.detail-section h2 {
-    font-size: 22px;
-    font-weight: 700;
-    border-bottom: 2px solid var(--border);
-    padding-bottom: 8px;
-    margin-bottom: 20px;
-}
-
-.detail-section p {
-    line-height: 1.7;
-    font-size: 16px;
-    color: var(--text);
-}
-
-/* --- 참여 포트폴리오 리스트 --- */
-.project-list {
+/* 슬라이드 스택: 간격/여백/라운드/그림자 없음 */
+.fd-stack {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+    gap: 0; /* ← 공백 제거 */
+}
+.fd-slide {
+    margin: 0;
+    padding: 0;
+}
+.fd-slide img {
+    display: block; /* 인라인 간격 제거 */
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--muted);
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
 }
 
-.project-card {
-    text-decoration: none;
-    color: var(--text);
+/* 비었을 때 */
+.fd-empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 48px 0;
+}
+
+/* 나가기 버튼 */
+.exit-btn {
+    --h: 37px;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: var(--h);
+    min-width: var(--h);
+    width: var(--h);
+    padding: 0 10px;
+    border-radius: 10px;
+    background: #172233;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    color: var(--text);
+    cursor: pointer;
     overflow: hidden;
-    transition: box-shadow .2s, transform .2s;
-    background: var(--panel);
+    transition: width 0.2s ease, background 0.2s ease, border-radius 0.2s ease;
 }
 
-.project-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow);
-}
-
-.project-card img {
+.exit-btn .sign {
     width: 100%;
-    aspect-ratio: 16/9;
-    object-fit: cover;
-    display: block;
-    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.2s ease;
 }
 
-.project-card .project-title {
-    padding: 14px;
-    font-weight: 600;
+.exit-btn .sign svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
 }
 
-/* --- 사진 갤러리 --- */
-.photo-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
+.exit-btn .text {
+    white-space: nowrap;
+    margin-left: 8px;
+    width: 0;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: opacity 0.2s ease, width 0.2s ease, transform 0.2s ease;
+    font-weight: 700;
+    font-size: 14px;
 }
 
-.photo-gallery img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 12px;
-    border: 1px solid var(--border);
+.exit-btn:hover {
+    background: #121922;
+    width: 120px;
+    border-radius: 40px;
+}
+
+.exit-btn:hover .sign {
+    width: 36%;
+}
+
+.exit-btn:hover .text {
+    width: auto;
+    opacity: 1;
+    transform: none;
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+    .fd-wrap {
+        margin: 16px auto 48px;
+        padding: 0 10px;
+    }
+    .fd-title {
+        font-size: 22px;
+    }
+}
+
+/* (선택) 프린트: 이미지 한 장씩 페이지 분리 */
+@media print {
+    @page {
+        margin: 0;
+    }
+    html,
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .fd-wrap {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+    .fd-head {
+        padding: 16px;
+    }
+    .fd-slide img {
+        page-break-before: always;
+        page-break-after: auto;
+        break-before: page;
+    }
+    .fd-slide:first-child img {
+        page-break-before: auto;
+        break-before: auto;
+    }
 }

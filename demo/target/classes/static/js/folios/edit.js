@@ -1,6 +1,79 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
+    const TEMPLATE =
+        document.querySelector('meta[name="folio-template"]')?.content ||
+        "dev-basic";
+
+    // ---------- 유틸 ----------
+    const qs = (s, r = document) => r.querySelector(s);
+    const qsa = (s, r = document) => [...r.querySelectorAll(s)];
     const _hiddenMap = new Map();
-    const state = {
+
+    const toast = (msg) => {
+        const n = document.createElement("div");
+        n.textContent = msg;
+        n.style.cssText =
+            "position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#1a2430;border:1px solid #2a3646;color:#dfe8f6;padding:8px 12px;border-radius:10px;z-index:9999";
+        document.body.appendChild(n);
+        setTimeout(() => n.remove(), 1200);
+    };
+
+    const getCsrf = () => {
+        const token = qs('meta[name="_csrf"]')?.content;
+        const header = qs('meta[name="_csrf_header"]')?.content;
+        return token && header ? { header, token } : null;
+    };
+    const CSRF = getCsrf();
+    const JSON_HEADERS = {
+        "Content-Type": "application/json",
+        ...(CSRF ? { [CSRF.header]: CSRF.token } : {}),
+    };
+
+    // 현재 작업 folio 식별자 (?id=...)
+    const params = new URLSearchParams(location.search);
+    let currentFolioId = params.get("id") || null;
+
+    // 인증 가드
+    const guardFetch = async (url, opts = {}) => {
+        const res = await fetch(url, opts);
+        if (res.status === 401 || res.status === 403) {
+            location.href = "/home?modal=signin";
+            throw new Error("인증 필요");
+        }
+        return res;
+    };
+
+    const fileToDataURL = (file) =>
+        new Promise((res) => {
+            const fr = new FileReader();
+            fr.onload = () => res(fr.result);
+            fr.readAsDataURL(file);
+        });
+
+    // data:URL → 서버 업로드 후 URL 받기 (썸네일 등에 사용)
+    async function normalizeImageUrl(urlOrData) {
+        if (!urlOrData) return null;
+        if (!urlOrData.startsWith("data:")) return urlOrData;
+        try {
+            const fd = new FormData();
+            const blob = await (await fetch(urlOrData)).blob();
+            fd.append("file", blob, "thumbnail.png");
+            const headers = {};
+            if (CSRF) headers[CSRF.header] = CSRF.token;
+            const res = await guardFetch("/api/uploads/images", {
+                method: "POST",
+                headers,
+                body: fd,
+            });
+            if (!res.ok) throw new Error("이미지 업로드 실패");
+            const json = await res.json();
+            return json.url || null;
+        } catch {
+            return null;
+        }
+    }
+
+    // ---------- 기본 템플릿(원본) ----------
+    const defaultState = {
         meta: { year: new Date().getFullYear() },
         intro: {
             title: "“사용자 성장에 맞춰 확장되는 백엔드를 설계합니다.”",
@@ -8,11 +81,11 @@ document.addEventListener("DOMContentLoaded", function () {
             birth: "1996-07-15",
             city: "Seoul, Korea",
             summary:
-                "서비스의 안정성과 확장성을 최우선으로 생각하는 백엔드 엔지니어 [이름] 입니다. 트래픽 급증 상황에서도 일관된 성능을 내는 아키텍처를 고민하고, 지표 기반으로 병목을 찾아 개선합니다. 주요 스택은 Java/Spring, JPA, PostgreSQL, Redis, Kafka이며, CI/CD 자동화와 모니터링 환경 구축을 즐깁니다. 협업에서는 코드 가독성과 문서화를 통해 팀의 학습 비용을 줄이는 데 집중합니다.",
+                "서비스의 안정성과 확장성을 최우선으로 생각하는 백엔드 엔지니어 [이름] 입니다...",
             email: "me@example.com",
             phone: "010-1234-5678",
             site: "github.com/me",
-            photo: "", // dataURL
+            photo: "",
         },
         edu: {
             univ1: {
@@ -50,15 +123,15 @@ document.addEventListener("DOMContentLoaded", function () {
         },
         proj1: {
             title: "실시간 주문 처리 시스템",
-            meta: "2024 · Backend Lead · Spring / Kafka / Redis",
-            desc: "대규모 트래픽에 대응하는 이벤트 기반 아키텍처로 재설계.",
+            meta: "2024 · Backend Lead · Spring/Kafka/Redis",
+            desc: "대규모 트래픽 대응 아키텍처로 재설계.",
             link: "github.com/acme/order",
             thumb: "",
         },
         proj2: {
             title: "추천 모델 서빙 플랫폼",
-            meta: "2023 · Backend · Spring / gRPC / Kubernetes",
-            desc: "모델 버전 관리와 롤백이 쉬운 서빙 파이프라인 구축.",
+            meta: "2023 · Backend · Spring/gRPC/K8s",
+            desc: "버전 관리·롤백 쉬운 서빙 파이프라인.",
             link: "github.com/acme/reco",
             thumb: "",
         },
@@ -72,242 +145,247 @@ document.addEventListener("DOMContentLoaded", function () {
         },
     };
 
-    /* ---------- 데이터 바인딩 ---------- */
-    function applyBindings() {
-        document.querySelectorAll("[data-bind]").forEach((el) => {
-            const path = el.getAttribute("data-bind");
-            el.textContent = get(path) ?? "";
-        });
-        // meter style
-        document.querySelectorAll("[data-bind-style]").forEach((el) => {
-            const path = el.getAttribute("data-bind-style");
-            const v = get(path);
-            if (v != null) el.style.width = v + "%";
-        });
-        // images
-        if (state.intro.photo)
-            document.getElementById("photo1").src = state.intro.photo;
-        if (state.proj1.thumb)
-            document.getElementById("thumb1").src = state.proj1.thumb;
-        if (state.proj2.thumb)
-            document.getElementById("thumb2").src = state.proj2.thumb;
-        syncFormInputs();
-    }
-    function syncFormInputs() {
-        if (!pane) return;
-        pane.querySelectorAll("[data-model]").forEach((inp) => {
-            const path = inp.getAttribute("data-model");
-            const val = get(path);
-            if (inp.type === "number") {
-                if (Number(inp.value) !== Number(val))
-                    inp.value = Number(val ?? 0);
-            } else {
-                if (inp.value !== (val ?? "")) inp.value = val ?? "";
-            }
-        });
-    }
+    // 깊은 복사/병합
+    const deepClone = (o) => JSON.parse(JSON.stringify(o || {}));
+    const deepMerge = (base, patch) => {
+        if (!patch || typeof patch !== "object") return deepClone(base);
+        const out = deepClone(base);
+        const walk = (t, s) => {
+            Object.keys(s).forEach((k) => {
+                if (s[k] && typeof s[k] === "object" && !Array.isArray(s[k])) {
+                    t[k] = t[k] && typeof t[k] === "object" ? t[k] : {};
+                    walk(t[k], s[k]);
+                } else {
+                    t[k] = s[k];
+                }
+            });
+        };
+        walk(out, patch);
+        return out;
+    };
 
-    function get(path) {
-        return path.split(".").reduce((o, k) => o && o[k], state);
-    }
-    function set(path, value) {
+    // 작업용 상태(항상 기본 템플릿의 clone에서 시작)
+    let state = deepClone(defaultState);
+
+    const get = (path) => path.split(".").reduce((o, k) => o && o[k], state);
+    const set = (path, value) => {
         const keys = path.split(".");
         const last = keys.pop();
-        const obj = keys.reduce((o, k) => o[k] ?? (o[k] = {}), state);
+        const obj = keys.reduce((o, k) => (o[k] ??= {}), state);
         obj[last] = value;
         applyBindings();
+    };
+
+    // ---------- 바인딩 ----------
+    function applyBindings() {
+        qsa("[data-bind]").forEach(
+            (el) => (el.textContent = get(el.getAttribute("data-bind")) ?? "")
+        );
+        qsa("[data-bind-style]").forEach((el) => {
+            const v = get(el.getAttribute("data-bind-style"));
+            if (v != null) el.style.width = v + "%";
+        });
+        if (state.intro?.photo)
+            qs("#photo1")?.setAttribute("src", state.intro.photo);
+        if (state.proj1?.thumb)
+            qs("#thumb1")?.setAttribute("src", state.proj1.thumb);
+        if (state.proj2?.thumb)
+            qs("#thumb2")?.setAttribute("src", state.proj2.thumb);
+        syncFormInputs();
     }
 
-    /* ---------- 페이지 전환 ---------- */
+    function syncFormInputs() {
+        const pane = qs("#formPane");
+        if (!pane) return;
+        qsa("[data-model]", pane).forEach((inp) => {
+            const path = inp.getAttribute("data-model");
+            const val = get(path);
+            if (inp.type === "number") inp.value = Number(val ?? 0);
+            else inp.value = val ?? "";
+        });
+    }
+
+    // ---------- 페이지 전환 ----------
     let page = 1;
-    const slides = [...document.querySelectorAll(".slide[data-page]")];
-    const LAST = slides.length; // 전체 슬라이드 수 자동 계산
+    const slides = qsa(".slide[data-page]");
+    const LAST = slides.length;
 
     function showActiveTab() {
-        const btns = document.querySelectorAll(".top [data-goto]");
-        btns.forEach((b) => {
-            const isActive = +b.dataset.goto === page;
-            b.classList.toggle("is-active", isActive);
-            b.setAttribute("aria-current", isActive ? "page" : "false");
+        qsa(".top [data-goto]").forEach((b) => {
+            const active = +b.dataset.goto === page;
+            b.classList.toggle("is-active", active);
+            b.setAttribute("aria-current", active ? "page" : "false");
         });
     }
 
     function go(n) {
-        // 1..LAST 범위로 래핑
         page = ((n - 1 + LAST) % LAST) + 1;
-
         slides.forEach((s) => (s.hidden = s.dataset.page != page));
-        const chip = document.getElementById("pageChip");
+        const chip = qs("#pageChip");
         if (chip) chip.textContent = `${page} / ${LAST}`;
-
         renderForm(page);
         showActiveTab();
     }
 
-    // 상단 탭 이동
-    document.querySelectorAll(".top [data-goto]").forEach((btn) => {
-        btn.addEventListener("click", () => go(+btn.dataset.goto));
-    });
+    qsa(".top [data-goto]").forEach((btn) =>
+        btn.addEventListener("click", () => go(+btn.dataset.goto))
+    );
 
-    /* ---------- 사이드 폼 ---------- */
-    const pane = document.getElementById("formPane");
-
+    // ---------- 사이드 폼 ----------
     const forms = {
         1: () => `
-        <div class="panel"><h3>소개</h3>
-          <div class="row"><label>타이틀</label><input class="inpt" data-model="intro.title" value="${state.intro.title}"></div>
-          <div class="two">
-            <div class="row"><label>이름(footer)</label><input class="inpt" data-model="intro.name" value="${state.intro.name}"></div>
-            <div class="row"><label>생년월일</label><input class="inpt" data-model="intro.birth" value="${state.intro.birth}"></div>
-          </div>
-          <div class="row"><label>거주지</label><input class="inpt" data-model="intro.city" value="${state.intro.city}"></div>
-          <div class="row"><label>자기소개</label><textarea rows="4" data-model="intro.summary">${state.intro.summary}</textarea></div>
+      <div class="panel"><h3>소개</h3>
+        <div class="row"><label>타이틀</label><input class="inpt" data-model="intro.title" value="${state.intro.title}"></div>
+        <div class="two">
+          <div class="row"><label>이름(footer)</label><input class="inpt" data-model="intro.name" value="${state.intro.name}"></div>
+          <div class="row"><label>생년월일</label><input class="inpt" data-model="intro.birth" value="${state.intro.birth}"></div>
         </div>
-        <div class="panel"><h3>연락처</h3>
-          <div class="two">
-            <div class="row"><label>이메일</label><input class="inpt" data-model="intro.email" value="${state.intro.email}"></div>
-            <div class="row"><label>전화번호</label><input class="inpt" data-model="intro.phone" value="${state.intro.phone}"></div>
-          </div>
-          <div class="row"><label>사이트</label><input class="inpt" data-model="intro.site" value="${state.intro.site}"></div>
-          <div class="row"><label>프로필 사진</label>
-            <label class="inbtn">업로드<input type="file" hidden accept="image/*" data-upload="intro.photo"></label>
-          </div>
+        <div class="row"><label>거주지</label><input class="inpt" data-model="intro.city" value="${state.intro.city}"></div>
+        <div class="row"><label>자기소개</label><textarea rows="4" data-model="intro.summary">${state.intro.summary}</textarea></div>
+      </div>
+      <div class="panel"><h3>연락처</h3>
+        <div class="two">
+          <div class="row"><label>이메일</label><input class="inpt" data-model="intro.email" value="${state.intro.email}"></div>
+          <div class="row"><label>전화번호</label><input class="inpt" data-model="intro.phone" value="${state.intro.phone}"></div>
         </div>
-      `,
+        <div class="row"><label>사이트</label><input class="inpt" data-model="intro.site" value="${state.intro.site}"></div>
+        <div class="row"><label>프로필 사진</label>
+          <label class="inbtn">업로드<input type="file" hidden accept="image/*" data-upload="intro.photo"></label>
+        </div>
+      </div>`,
         2: () => `
-        <div class="panel"><h3>학력</h3>
-          <div class="row"><label>학교 1</label><input class="inpt" data-model="edu.univ1.name" value="${
-              state.edu.univ1.name
+      <div class="panel"><h3>학력</h3>
+        <div class="row"><label>학교 1</label><input class="inpt" data-model="edu.univ1.name" value="${
+            state.edu.univ1.name
+        }"></div>
+        <div class="two">
+          <div class="row"><label>전공</label><input class="inpt" data-model="edu.univ1.major" value="${
+              state.edu.univ1.major
           }"></div>
-          <div class="two">
-            <div class="row"><label>전공</label><input class="inpt" data-model="edu.univ1.major" value="${
-                state.edu.univ1.major
-            }"></div>
-            <div class="row"><label>기간</label><input class="inpt" data-model="edu.univ1.period" value="${
-                state.edu.univ1.period
-            }"></div>
-          </div>
-          <hr class="small" style="border:none;border-top:1px solid var(--border)">
-          <div class="row"><label>학교 2</label><input class="inpt" data-model="edu.univ2.name" value="${
-              state.edu.univ2.name
+          <div class="row"><label>기간</label><input class="inpt" data-model="edu.univ1.period" value="${
+              state.edu.univ1.period
           }"></div>
-          <div class="two">
-            <div class="row"><label>전공</label><input class="inpt" data-model="edu.univ2.major" value="${
-                state.edu.univ2.major
-            }"></div>
-            <div class="row"><label>기간</label><input class="inpt" data-model="edu.univ2.period" value="${
-                state.edu.univ2.period
-            }"></div>
-          </div>
         </div>
-        <div class="panel"><h3>경력</h3>
-          ${[1, 2]
-              .map(
-                  (i) => `
-            <div class="row"><label>회사 ${i}</label><input class="inpt" data-model="exp.job${i}.company" value="${
-                      state.exp["job" + i].company
-                  }"></div>
-            <div class="row"><label>기간/직무</label><input class="inpt" data-model="exp.job${i}.period" value="${
-                      state.exp["job" + i].period
-                  }"></div>
-            <div class="row"><label>성과1</label><input class="inpt" data-model="exp.job${i}.desc1" value="${
-                      state.exp["job" + i].desc1
-                  }"></div>
-            <div class="row"><label>성과2</label><input class="inpt" data-model="exp.job${i}.desc2" value="${
-                      state.exp["job" + i].desc2
-                  }"></div>
-            <div class="row"><label>성과3</label><input class="inpt" data-model="exp.job${i}.desc3" value="${
-                      state.exp["job" + i].desc3
-                  }"></div>
-            ${
-                i === 1
-                    ? '<hr class="small" style="border:none;border-top:1px solid var(--border)">'
-                    : ""
-            }
-          `
-              )
-              .join("")}
+        <hr class="small" style="border:none;border-top:1px solid var(--border)">
+        <div class="row"><label>학교 2</label><input class="inpt" data-model="edu.univ2.name" value="${
+            state.edu.univ2.name
+        }"></div>
+        <div class="two">
+          <div class="row"><label>전공</label><input class="inpt" data-model="edu.univ2.major" value="${
+              state.edu.univ2.major
+          }"></div>
+          <div class="row"><label>기간</label><input class="inpt" data-model="edu.univ2.period" value="${
+              state.edu.univ2.period
+          }"></div>
         </div>
-      `,
+      </div>
+      <div class="panel"><h3>경력</h3>
+        ${[1, 2]
+            .map(
+                (i) => `
+          <div class="row"><label>회사 ${i}</label><input class="inpt" data-model="exp.job${i}.company" value="${
+                    state.exp["job" + i].company
+                }"></div>
+          <div class="row"><label>기간/직무</label><input class="inpt" data-model="exp.job${i}.period" value="${
+                    state.exp["job" + i].period
+                }"></div>
+          <div class="row"><label>성과1</label><input class="inpt" data-model="exp.job${i}.desc1" value="${
+                    state.exp["job" + i].desc1
+                }"></div>
+          <div class="row"><label>성과2</label><input class="inpt" data-model="exp.job${i}.desc2" value="${
+                    state.exp["job" + i].desc2
+                }"></div>
+          <div class="row"><label>성과3</label><input class="inpt" data-model="exp.job${i}.desc3" value="${
+                    state.exp["job" + i].desc3
+                }"></div>
+          ${
+              i === 1
+                  ? '<hr class="small" style="border:none;border-top:1px solid var(--border)">'
+                  : ""
+          }
+        `
+            )
+            .join("")}
+      </div>`,
         3: () => `
-        <div class="panel"><h3>기술 숙련도(%)</h3>
-          <div class="row"><label>Java/Spring</label><input type="number" min="0" max="100" class="inpt" data-model="skills.spring" value="${
-              state.skills.spring
-          }"></div>
-          <div class="row"><label>DB/SQL</label><input type="number" min="0" max="100" class="inpt" data-model="skills.db" value="${
-              state.skills.db
-          }"></div>
-          <div class="row"><label>Cloud/DevOps</label><input type="number" min="0" max="100" class="inpt" data-model="skills.devops" value="${
-              state.skills.devops
-          }"></div>
-        </div>
-        <div class="panel"><h3>보유역량</h3>
-          ${[1, 2, 3]
-              .map(
-                  (i) => `
-            <div class="row"><label>역량 ${i}</label><input class="inpt" data-model="strengths.${i}" value="${state.strengths[i]}"></div>
-          `
-              )
-              .join("")}
-        </div>
-      `,
+      <div class="panel"><h3>기술 숙련도(%)</h3>
+        <div class="row"><label>Java/Spring</label><input type="number" min="0" max="100" class="inpt" data-model="skills.spring" value="${
+            state.skills.spring
+        }"></div>
+        <div class="row"><label>DB/SQL</label><input type="number" min="0" max="100" class="inpt" data-model="skills.db" value="${
+            state.skills.db
+        }"></div>
+        <div class="row"><label>Cloud/DevOps</label><input type="number" min="0" max="100" class="inpt" data-model="skills.devops" value="${
+            state.skills.devops
+        }"></div>
+      </div>
+      <div class="panel"><h3>보유역량</h3>
+        ${[1, 2, 3]
+            .map(
+                (i) => `
+          <div class="row"><label>역량 ${i}</label><input class="inpt" data-model="strengths.${i}" value="${state.strengths[i]}"></div>
+        `
+            )
+            .join("")}
+      </div>`,
         4: () => `
-        <div class="panel"><h3>프로젝트 1</h3>
-          <div class="row"><label>제목</label><input class="inpt" data-model="proj1.title" value="${state.proj1.title}"></div>
-          <div class="row"><label>메타</label><input class="inpt" data-model="proj1.meta" value="${state.proj1.meta}"></div>
-          <div class="row"><label>설명</label><textarea rows="3" data-model="proj1.desc">${state.proj1.desc}</textarea></div>
-          <div class="row"><label>링크</label><input class="inpt" data-model="proj1.link" value="${state.proj1.link}"></div>
-          <div class="row"><label>썸네일</label><label class="inbtn">업로드<input type="file" hidden accept="image/*" data-upload="proj1.thumb"></label></div>
-        </div>
-        <div class="panel"><h3>프로젝트 2</h3>
-          <div class="row"><label>제목</label><input class="inpt" data-model="proj2.title" value="${state.proj2.title}"></div>
-          <div class="row"><label>메타</label><input class="inpt" data-model="proj2.meta" value="${state.proj2.meta}"></div>
-          <div class="row"><label>설명</label><textarea rows="3" data-model="proj2.desc">${state.proj2.desc}</textarea></div>
-          <div class="row"><label>링크</label><input class="inpt" data-model="proj2.link" value="${state.proj2.link}"></div>
-          <div class="row"><label>썸네일</label><label class="inbtn">업로드<input type="file" hidden accept="image/*" data-upload="proj2.thumb"></label></div>
-        </div>
-      `,
+      <div class="panel"><h3>프로젝트 1</h3>
+        <div class="row"><label>제목</label><input class="inpt" data-model="proj1.title" value="${state.proj1.title}"></div>
+        <div class="row"><label>메타</label><input class="inpt" data-model="proj1.meta" value="${state.proj1.meta}"></div>
+        <div class="row"><label>설명</label><textarea rows="3" data-model="proj1.desc">${state.proj1.desc}</textarea></div>
+        <div class="row"><label>링크</label><input class="inpt" data-model="proj1.link" value="${state.proj1.link}"></div>
+        <div class="row"><label>썸네일</label><label class="inbtn">업로드<input type="file" hidden accept="image/*" data-upload="proj1.thumb"></label></div>
+      </div>
+      <div class="panel"><h3>프로젝트 2</h3>
+        <div class="row"><label>제목</label><input class="inpt" data-model="proj2.title" value="${state.proj2.title}"></div>
+        <div class="row"><label>메타</label><input class="inpt" data-model="proj2.meta" value="${state.proj2.meta}"></div>
+        <div class="row"><label>설명</label><textarea rows="3" data-model="proj2.desc">${state.proj2.desc}</textarea></div>
+        <div class="row"><label>링크</label><input class="inpt" data-model="proj2.link" value="${state.proj2.link}"></div>
+        <div class="row"><label>썸네일</label><label class="inbtn">업로드<input type="file" hidden accept="image/*" data-upload="proj2.thumb"></label></div>
+      </div>`,
         5: () => `
-        <div class="panel"><h3>수상</h3>
-          ${[1, 2]
-              .map(
-                  (i) =>
-                      `<div class="row"><label>Award ${i}</label><input class="inpt" data-model="awards.${i}" value="${state.awards[i]}"></div>`
-              )
-              .join("")}
-        </div>
-        <div class="panel"><h3>자격</h3>
-          ${[1, 2]
-              .map(
-                  (i) =>
-                      `<div class="row"><label>Cert ${i}</label><input class="inpt" data-model="cert.${i}" value="${state.cert[i]}"></div>`
-              )
-              .join("")}
-        </div>
-        <div class="panel"><h3>푸터</h3>
-          <div class="row"><label>표기 연도</label><input class="inpt" data-model="meta.year" value="${
-              state.meta.year
-          }"></div>
-        </div>
-      `,
+      <div class="panel"><h3>수상</h3>
+        ${[1, 2]
+            .map(
+                (i) =>
+                    `<div class="row"><label>Award ${i}</label><input class="inpt" data-model="awards.${i}" value="${state.awards[i]}"></div>`
+            )
+            .join("")}
+      </div>
+      <div class="panel"><h3>자격</h3>
+        ${[1, 2]
+            .map(
+                (i) =>
+                    `<div class="row"><label>Cert ${i}</label><input class="inpt" data-model="cert.${i}" value="${state.cert[i]}"></div>`
+            )
+            .join("")}
+      </div>
+      <div class="panel"><h3>푸터</h3>
+        <div class="row"><label>표기 연도</label><input class="inpt" data-model="meta.year" value="${
+            state.meta.year
+        }"></div>
+      </div>`,
     };
 
     function renderForm(n) {
+        const pane = qs("#formPane");
         pane.innerHTML = forms[n]();
+
         // 입력 바인딩
-        pane.querySelectorAll("[data-model]").forEach((inpt) => {
-            inpt.addEventListener("input", (e) => {
+        qsa("[data-model]", pane).forEach((inpt) => {
+            inpt.addEventListener("input", () => {
                 const path = inpt.getAttribute("data-model");
-                let val =
+                const val =
                     inpt.type === "number"
                         ? Number(inpt.value || 0)
                         : inpt.value;
                 set(path, val);
             });
         });
-        // 업로드 바인딩
-        pane.querySelectorAll("[data-upload]").forEach((fi) => {
-            fi.addEventListener("change", async (e) => {
+
+        // 이미지 업로드 -> dataURL 상태 반영
+        qsa("[data-upload]", pane).forEach((fi) => {
+            fi.addEventListener("change", async () => {
                 const file = fi.files?.[0];
                 if (!file) return;
                 const dataURL = await fileToDataURL(file);
@@ -317,200 +395,272 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function fileToDataURL(file) {
-        return new Promise((res) => {
-            const fr = new FileReader();
-            fr.onload = () => res(fr.result);
-            fr.readAsDataURL(file);
-        });
-    }
+    // ---------- 저장/불러오기/프린트/나가기 ----------
+    const btnSave = qs("#btnSave"); // 임시저장(DRAFT)
+    const btnLoad = qs("#btnLoad"); // 수동 불러오기
+    const btnPrint = qs("#btnPrint");
+    const btnExit = qs("#btnExit");
+    const btnUpload = qs("#btnUpload");
 
-    /* ---------- 저장/불러오기/출력 ---------- */
-    const btnSave = document.getElementById("btnSave");
-    const btnLoad = document.getElementById("btnLoad");
-    const btnPrint = document.getElementById("btnPrint");
-
-    // ✅ 프린트 함수들을 btnPrint 선언 이후로 이동
-    function _unhideAllForPrint() {
-        document.querySelectorAll(".slide").forEach((s) => {
-            _hiddenMap.set(s, s.hidden);
-            s.hidden = false;
-            s.style.display = "block";
-        });
-    }
-
-    function _restoreHiddenAfterPrint() {
-        document.querySelectorAll(".slide").forEach((s) => {
-            const prev = _hiddenMap.get(s);
-            if (prev !== undefined) {
-                s.hidden = prev;
-                s.style.display = prev ? "none" : "block";
-            }
-        });
-        _hiddenMap.clear();
-    }
-
-    if (btnSave) {
-        btnSave.onclick = () => {
-            localStorage.setItem("folio-dev-basic", JSON.stringify(state));
-            flash("저장됨");
-        };
-    }
-
-    if (btnLoad) {
-        btnLoad.onclick = () => {
-            const raw = localStorage.getItem("folio-dev-basic");
-            if (!raw) return flash("저장된 내용이 없습니다");
-            const data = JSON.parse(raw);
-            Object.assign(state, data);
-            applyBindings();
-            renderForm(page);
-            flash("불러옴");
-        };
-    }
-
-    // 프린트 헬퍼 함수
-    function _unhideAllForPrint() {
-        document.querySelectorAll(".slide").forEach((s) => {
-            _hiddenMap.set(s, s.hidden);
-            s.hidden = false;
-        });
-    }
-
-    function _restoreHiddenAfterPrint() {
-        document.querySelectorAll(".slide").forEach((s) => {
-            const prev = _hiddenMap.get(s);
-            if (prev !== undefined) {
-                s.hidden = prev;
-            }
-        });
-        _hiddenMap.clear();
-    }
-
-    // 버튼 이벤트 수정 ✅
-    if (btnPrint) {
-        btnPrint.onclick = () => {
-            // ❌ 여기서 _unhideAllForPrint() 호출하지 않음!
-            // beforeprint 이벤트가 자동으로 처리함
-            window.print();
-        };
-    }
-
-    // 브라우저 프린트 이벤트 (이게 핵심!)
-    window.addEventListener("beforeprint", () => {
-        // ✅ 프린트 다이얼로그가 열리는 순간에만 실행
-        _unhideAllForPrint();
-    });
-
-    window.addEventListener("afterprint", () => {
-        // ✅ 프린트 다이얼로그가 닫히면 즉시 복원
-        _restoreHiddenAfterPrint();
-    });
-
-    function flash(msg) {
-        const n = document.createElement("div");
-        n.textContent = msg;
-        n.style.cssText =
-            "position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#1a2430;border:1px solid #2a3646;color:#dfe8f6;padding:8px 12px;border-radius:10px;z-index:9999";
-        document.body.appendChild(n);
-        setTimeout(() => n.remove(), 1200);
-    }
-
-    // CSRF 헬퍼
-    function getCsrf() {
-        const token = document.querySelector('meta[name="_csrf"]')?.content;
-        const header = document.querySelector(
-            'meta[name="_csrf_header"]'
-        )?.content;
-        return token && header ? { header, token } : null;
-    }
-
-    // dataURL이면 먼저 업로드해서 URL로 바꿔주기(선택)
-    async function normalizeImageUrl(urlOrData) {
-        if (!urlOrData) return null;
-        if (!urlOrData.startsWith("data:")) return urlOrData;
-
-        const fd = new FormData();
-        const blob = await (await fetch(urlOrData)).blob();
-        fd.append("file", blob, "thumbnail.png");
-
-        const res = await fetch("/api/uploads/images", {
-            method: "POST",
-            body: fd,
-        });
-        if (!res.ok) throw new Error("이미지 업로드 실패");
-        const json = await res.json();
-        return json.url; // UploadController가 주는 url
-    }
-
-    // 업로드 버튼
-    document.getElementById("btnUpload").addEventListener("click", async () => {
+    // 초기 로드: id가 있을 때만 해당 초안을 자동 로드 / id 없으면 기본 템플릿로 시작
+    async function loadInitial() {
         try {
-            const btn = document.getElementById("btnUpload");
-            btn.disabled = true;
+            if (currentFolioId) {
+                const res = await guardFetch(
+                    `/api/folios/${encodeURIComponent(currentFolioId)}`
+                );
+                if (!res.ok) throw new Error("불러오기 실패");
+                const data = await res.json();
+                const incoming =
+                    (data &&
+                    typeof data.state === "object" &&
+                    Object.keys(data.state).length
+                        ? data.state
+                        : null) ||
+                    (data && typeof data.contentJson === "string"
+                        ? JSON.parse(data.contentJson)
+                        : null);
 
-            // 1) contentJson 만들기 (state 전체 직렬화)
-            const contentJson = JSON.stringify(state);
+                if (incoming) state = deepMerge(defaultState, incoming);
+                if (data.id || data.folioId)
+                    currentFolioId = data.id || data.folioId;
+            }
+        } catch (e) {
+            console.warn("초기 로드 실패(기본 템플릿로 진행):", e);
+        }
+    }
 
-            // 2) 썸네일 후보 결정 (프로필 사진 또는 프로젝트 썸네일 등)
-            let thumb =
-                state.intro?.photo ||
-                state.proj1?.thumb ||
-                state.proj2?.thumb ||
+    // (선택) 수동 불러오기 버튼: 내 최신 DRAFT를 가져와 적용
+    btnLoad?.addEventListener("click", async () => {
+        try {
+            const res = await guardFetch("/api/folios/me/dev-basic");
+            if (res.status === 204) {
+                toast("서버 임시저장 없음");
+                return;
+            }
+            if (!res.ok) throw new Error("불러오기 실패");
+            const data = await res.json();
+            const incoming = data?.contentJson
+                ? JSON.parse(data.contentJson)
+                : null;
+            if (incoming) state = deepMerge(defaultState, incoming);
+            if (data.id) currentFolioId = data.id;
+            applyBindings();
+            go(1);
+            toast("불러오기 완료");
+        } catch (e) {
+            console.error(e);
+            if (e.message !== "인증 필요") toast("불러오기 중 오류");
+        }
+    });
+
+    // 임시저장(DRAFT)
+    btnSave?.addEventListener("click", async () => {
+        try {
+            const snapshot = JSON.parse(JSON.stringify(state));
+            const contentJson = JSON.stringify(snapshot);
+            const firstImg =
+                snapshot.intro?.photo ||
+                snapshot.proj1?.thumb ||
+                snapshot.proj2?.thumb ||
                 null;
-            const thumbnailUrl = await normalizeImageUrl(thumb);
+            const thumbnail =
+                (await normalizeImageUrl(firstImg)) ||
+                "https://picsum.photos/seed/default/300";
 
-            // 3) 페이로드
             const payload = {
-                template: "dev-basic",
-                contentJson,
-                status: "DRAFT", // 공개할 때는 'PUBLISHED'로
-                thumbnail: thumbnailUrl, // 없으면 null/생략 가능
+                folioId: currentFolioId || null,
+                template: TEMPLATE, // ← 변수로!
+                contentJson, // 위에서 만든 contentJson 그대로
+                status: "DRAFT",
+                thumbnail,
+                title: (snapshot.intro?.name || "Untitled").trim(),
             };
 
-            // 4) CSRF 헤더
-            const csrf = getCsrf();
-            const headers = { "Content-Type": "application/json" };
-            if (csrf) headers[csrf.header] = csrf.token;
-
-            // 5) 서버로 전송
-            const res = await fetch("/folios/dev-basic", {
+            const res = await guardFetch("/api/folios/dev-basic", {
                 method: "POST",
-                headers,
+                headers: JSON_HEADERS,
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error(await res.text());
+            const saved = await res.json(); // { id: ... }
+            if (saved?.id) currentFolioId = saved.id;
+
+            toast("임시저장 완료");
+        } catch (e) {
+            console.error(e);
+            if (e.message !== "인증 필요") toast("임시저장 중 오류");
+        }
+    });
+
+    // 프린트: 모두 보였다가 복원
+    function unhideAllForPrint() {
+        qsa(".slide").forEach((s) => {
+            _hiddenMap.set(s, s.hidden);
+            s.hidden = false;
+        });
+    }
+    function restoreHiddenAfterPrint() {
+        qsa(".slide").forEach((s) => {
+            const prev = _hiddenMap.get(s);
+            if (prev !== undefined) s.hidden = prev;
+        });
+        _hiddenMap.clear();
+    }
+    btnPrint?.addEventListener("click", () => window.print());
+    window.addEventListener("beforeprint", unhideAllForPrint);
+    window.addEventListener("afterprint", restoreHiddenAfterPrint);
+
+    // 나가기
+    btnExit?.addEventListener("click", (e) => {
+        e.preventDefault();
+        const ref = document.referrer;
+        try {
+            if (ref) {
+                const prev = new URL(ref);
+                if (prev.origin === location.origin) {
+                    history.back();
+                    return;
+                }
+            }
+        } catch {}
+        location.href = "/";
+    });
+
+    // ---- 업로드(PUBLISHED): 모든 슬라이드 캡처 → 서버 전송 ----
+    function collectEditorStateJsonSafely() {
+        try {
+            return window.__folioStateJson__
+                ? JSON.stringify(window.__folioStateJson__)
+                : "{}";
+        } catch {
+            return "{}";
+        }
+    }
+    function getCurrentFolioIdSafely() {
+        try {
+            return window.__folioId__ || currentFolioId || null;
+        } catch {
+            return currentFolioId || null;
+        }
+    }
+
+    btnUpload?.addEventListener("click", async () => {
+        try {
+            btnUpload.disabled = true;
+            btnUpload.textContent = "업로딩...";
+
+            // ✅ 전체 슬라이드를 모두 캡처 (숨김도 일시적으로 표시)
+            const targets = [...document.querySelectorAll(".slide")];
+            if (!targets.length) {
+                alert("캡처할 슬라이드가 없습니다.");
+                return;
+            }
+            // 기존 hidden 상태 저장 후 전부 표시
+            const wasHidden = targets.map(
+                (s) => s.hidden || s.hasAttribute("hidden")
+            );
+            targets.forEach((s) => {
+                s.hidden = false;
+                s.removeAttribute("hidden");
+            });
+            // 레이아웃 반영 대기
+            await new Promise((r) =>
+                requestAnimationFrame(() => requestAnimationFrame(r))
+            );
+
+            // DOM → PNG dataURL
+            const images = [];
+            // 폰트 로딩 대기(가능한 경우)
+            try {
+                if (document.fonts?.ready) await document.fonts.ready;
+            } catch {}
+            for (const el of targets) {
+                const canvas = await html2canvas(el, {
+                    backgroundColor: "#ffffff",
+                    scale: 2,
+                    useCORS: true,
+                    // windowWidth/Height를 넉넉히 주면 일부 스타일 이슈를 피할 수 있어요 (선택)
+                    windowWidth: Math.max(
+                        document.documentElement.clientWidth,
+                        el.scrollWidth
+                    ),
+                    windowHeight: Math.max(
+                        document.documentElement.clientHeight,
+                        el.scrollHeight
+                    ),
+                });
+                images.push(canvas.toDataURL("image/png"));
+            }
+
+            // 캡처 완료 후 원래 hidden 상태로 복구
+            targets.forEach((s, i) => {
+                s.hidden = wasHidden[i];
+                if (wasHidden[i]) s.setAttribute("hidden", "");
+            });
+
+            const title =
+                (
+                    document.querySelector('[data-bind="intro.name"]')
+                        ?.textContent || ""
+                ).trim() || "Folio";
+
+            const contentJson = JSON.stringify(state); // 전체 상태도 같이 저장
+
+            const payload = {
+                folioId: getCurrentFolioIdSafely(),
+                template: TEMPLATE, // ← 대문자 변수 사용
+                title,
+                contentJson,
+                images, // 슬라이드 dataURL 배열
+            };
+
+            const res = await fetch("/api/folios/dev-basic/publish", {
+                method: "POST",
+                headers: JSON_HEADERS,
                 body: JSON.stringify(payload),
             });
 
             if (!res.ok) {
-                const txt = await res.text();
-                throw new Error("업로드 실패: " + txt);
+                const t = await res.text().catch(() => "");
+                throw new Error(
+                    `업로드 실패 ${res.status} ${res.statusText}\n${t.slice(
+                        0,
+                        300
+                    )}`
+                );
             }
 
-            const data = await res.json(); // FolioDetailDto
-            flash("업로드 완료!");
-            // 필요하면 업로드된 folioId로 이동:
-            // window.location.href = `/folios/detail/${data.folioId}`;
+            const data = await res.json();
+            const newId = data?.id;
+            if (!newId) {
+                alert("업로드는 되었지만 ID를 받지 못했습니다.");
+                return;
+            }
+
+            // 완료 → 상세 페이지로 이동
+            location.href = `/folios/detail/${encodeURIComponent(newId)}`;
         } catch (err) {
             console.error(err);
-            flash("업로드 중 오류");
+            alert("업로드 중 오류가 발생했습니다.\n" + err.message);
         } finally {
-            document.getElementById("btnUpload").disabled = false;
+            btnUpload.disabled = false;
+            btnUpload.textContent = "업로드";
         }
     });
 
-    /* ---------- 화살표/키보드 네비 ---------- */
-    const btnPrev = document.querySelector(".navArrow.left");
-    const btnNext = document.querySelector(".navArrow.right");
-
-    btnPrev?.addEventListener("click", () => go(page - 1));
-    btnNext?.addEventListener("click", () => go(page + 1));
-
-    // 키보드 ← →
+    // 키보드 네비
+    qs(".navArrow.left")?.addEventListener("click", () => go(page - 1));
+    qs(".navArrow.right")?.addEventListener("click", () => go(page + 1));
     window.addEventListener("keydown", (e) => {
         if (e.key === "ArrowLeft") go(page - 1);
         if (e.key === "ArrowRight") go(page + 1);
     });
 
-    /* ---------- init ---------- */
-    applyBindings();
-    go(1);
+    // ========== init ==========
+    (async function init() {
+        await loadInitial(); // id 있으면 그 초안만 자동 로드
+        applyBindings();
+        go(1);
+    })();
 });

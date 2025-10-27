@@ -1,23 +1,34 @@
 package com.example.demo.folio.dto;
 
 import com.example.demo.folio.entity.Folio;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import java.util.List;
-import java.util.Collections; // Collections 임포트
+
+import java.time.LocalDateTime;
 
 @Getter
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FoliosSummaryDto {
-    private String folioId;
-    private String userName;
-    private String thumbnail;
-    private List<String> skills;
+    private final String id;
+    private final String title;
+    private final String template;
+    private final String status;        // "DRAFT" | "PUBLISHED"
+    private final LocalDateTime updatedAt;
+    private final String thumbnail;
 
-    public FoliosSummaryDto(Folio folio){
-        this.folioId = folio.getId();
-        this.userName = folio.getUser().getName();
-        this.thumbnail = folio.getThumbnail();
-        // --- 수정된 부분: skills가 null일 경우 빈 리스트로 초기화 ---
-        this.skills = (folio.getSkills() != null) ? folio.getSkills() : Collections.emptyList();
-       
+    public static FoliosSummaryDto from(Folio f) {
+        String title = (f.getTitle() != null && !f.getTitle().isBlank())
+                ? f.getTitle().trim()
+                : "제목 없음";
+        return new FoliosSummaryDto(
+                f.getId(),
+                title,
+                f.getTemplate(),
+                f.getStatus().name(),
+                f.getUpdatedAt(),
+                f.getThumbnail()
+        );
     }
 }

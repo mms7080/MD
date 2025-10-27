@@ -56,7 +56,7 @@
 /* 폼 베이스 (모달 동일) */
 .auth .auth-form {
     display: grid;
-    gap: 12px;
+    justify-items: center; /* 내부 요소들을 수평 중앙으로 */
 }
 .auth .auth-field {
     display: grid;
@@ -147,5 +147,11 @@
     .auth .kf-auth__content--page {
         width: min(520px, calc(100% - 24px));
         border-radius: 12px;
+        margin: 12px auto 80px; /* 모바일에서도 하단 여백 넉넉히 */
+        padding: 24px 16px 22px; /* 내부 여백 살짝 축소해 균형 */
+    }
+    .auth .auth-form {
+        gap: 12px;
+        padding: 6px 0 8px;
     }
 }

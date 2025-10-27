@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -29,4 +30,15 @@ public interface FolioRepository extends JpaRepository<Folio, String> {
     Optional<Folio> findTopByUserAndStatusOrderByUpdatedAtDesc(Users user, Folio.Status status);
 
     Optional<Folio> findByIdAndUser(String id, Users user);
+
+    // 🔹 추가: 로그인 사용자의 Folio만 페이지로
+    @EntityGraph(attributePaths = {"user", "skills"})
+    Page<Folio> findAllByUser(Users user, Pageable pageable);
+    
+    @EntityGraph(attributePaths = {"user", "skills"})
+    List<Folio> findAllByUserAndStatusOrderByUpdatedAtDesc(Users user, Folio.Status status);
+
+    Page<Folio> findAllByUserAndStatus(Users user, Folio.Status status, Pageable pageable);
+    Page<Folio> findAllByStatusOrderByUpdatedAtDesc(Folio.Status status, Pageable pageable);
+    
 }

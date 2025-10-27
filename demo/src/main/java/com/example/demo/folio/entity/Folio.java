@@ -4,9 +4,11 @@ import com.example.demo.users.UsersEntity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,21 +28,25 @@ public class Folio {
     @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "template", length = 50, nullable = false)
     private String template = "dev-basic";
 
     public enum Status { DRAFT, PUBLISHED }
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20, nullable = false)
+    @Column(name = "status", length = 20, nullable = false)
     private Status status = Status.DRAFT;
 
-    // PPT 에디터 전체 상태
+    @Column(name = "title", length = 200, nullable = false)
+    private String title = "Untitled";
+
+    /** ✅ CLOB 로 *명확히* 바인딩 */
     @Lob
-    @Column(name = "content_json", nullable = false)
+    @JdbcTypeCode(SqlTypes.CLOB)
+    @Column(name = "content_json", columnDefinition = "CLOB")
     private String contentJson;
 
-    // 아래 메타/보조 필드들은 유지해도 됨(목록/검색용)
+    @Column(name = "thumbnail", length = 1000)
     private String thumbnail;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -48,7 +54,10 @@ public class Folio {
     @Column(name = "skill")
     private List<String> skills = new ArrayList<>();
 
+    /** ✅ 이것도 CLOB 로 명확히 */
     @Lob
+    @JdbcTypeCode(SqlTypes.CLOB)
+    @Column(name = "introduction", columnDefinition = "CLOB")
     private String introduction;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -62,9 +71,28 @@ public class Folio {
     private List<String> projectIds = new ArrayList<>();
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    private LocalDateTime updatedAt; 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void prePersist() {
+        if (template == null || template.isBlank()) template = "dev-basic";
+        if (status == null) status = Status.DRAFT;
+        if (title == null || title.isBlank()) title = "Untitled";
+        if (contentJson == null) contentJson = "{}";
+    }
+
+    public void setSkills(List<String> skills) {
+        this.skills = (skills == null) ? new ArrayList<>() : new ArrayList<>(skills);
+    }
+    public void setPhotos(List<String> photos) {
+        this.photos = (photos == null) ? new ArrayList<>() : new ArrayList<>(photos);
+    }
+    public void setProjectIds(List<String> projectIds) {
+        this.projectIds = (projectIds == null) ? new ArrayList<>() : new ArrayList<>(projectIds);
+    }
 }

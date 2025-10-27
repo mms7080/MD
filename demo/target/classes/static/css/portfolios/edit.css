@@ -273,3 +273,62 @@ button[type="submit"]:hover {
   height: 100px !important;
   border-radius: 6px;
 }
+
+
+/* ======================
+   Light Mode: Form Inputs Fix
+   ====================== */
+   html[data-theme="light"] input[type="text"],
+   html[data-theme="light"] input[type="url"],
+   html[data-theme="light"] input[type="file"],
+   html[data-theme="light"] textarea,
+   html[data-theme="light"] select,
+   html[data-theme="light"] .tag-input-box input {
+     background: #fff !important;       /* 흰색 배경 */
+     color: #000 !important;            /* 검은 글자 */
+     border: 1px solid #ccc !important; /* 연한 테두리 */
+   }
+   
+   /* placeholder 색상 */
+   html[data-theme="light"] input::placeholder,
+   html[data-theme="light"] textarea::placeholder {
+     color: #777 !important;
+   }
+   
+   /* select 내부 옵션 */
+   html[data-theme="light"] option {
+     background: #fff !important;
+     color: #000 !important;
+   }
+   
+   /* 버튼 */
+   html[data-theme="light"] button[type="submit"],
+   html[data-theme="light"] button[type="button"] {
+     background: #f5f5f5 !important;
+     color: #000 !important;
+     border: 1px solid #ccc !important;
+   }
+   
+   html[data-theme="light"] button[type="submit"]:hover,
+   html[data-theme="light"] button[type="button"]:hover {
+     background: #eaeaea !important;
+   }
+   
+   /* 태그 입력창 + 팀원 select */
+   html[data-theme="light"] .team-item select,
+   html[data-theme="light"] .tag-input-box input {
+     background: #fff !important;
+     color: #000 !important;
+     border: 1px solid #ccc !important;
+   }
+   
+   /* 미리보기 이미지 배경도 밝게 */
+   html[data-theme="light"] .cover-preview,
+   html[data-theme="light"] .icon-preview,
+   html[data-theme="light"] .image-preview {
+     background: #f9f9f9;
+     border: 1px solid #ddd;
+     border-radius: 8px;
+     padding: 8px;
+   }
+   

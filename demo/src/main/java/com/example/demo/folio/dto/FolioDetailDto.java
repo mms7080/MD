@@ -1,10 +1,12 @@
 package com.example.demo.folio.dto;
 
 import com.example.demo.folio.entity.Folio;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 
 import java.util.List;
-import java.util.ArrayList; // ArrayList 임포트
+import java.util.Map;
 
 @Getter
 public class FolioDetailDto {
@@ -15,23 +17,23 @@ public class FolioDetailDto {
     private List<String> photos;
     private List<PortfolioInFolioDto> projects;
 
-    // 1. 상세 정보 조회 시 사용 (포트폴리오 정보 포함)
-    public FolioDetailDto(Folio folio, List<PortfolioInFolioDto> projects) {
+    // ✅ SSR에서 바로 쓰게 파싱된 상태를 담아줌
+    private Map<String, Object> state;
+
+    @JsonProperty("id")
+    public String getId() { return folioId; }
+
+    public FolioDetailDto(Folio folio, List<PortfolioInFolioDto> projects, Map<String,Object> state) {
         this.folioId = folio.getId();
         this.user = new UserInFolioDto(folio.getUser());
         this.introduction = folio.getIntroduction();
         this.skills = folio.getSkills();
         this.photos = folio.getPhotos();
-        this.projects = projects;
+        this.projects = projects != null ? projects : List.of();
+        this.state = state != null ? state : Map.of();
     }
 
-    // 2. 저장 직후 응답 시 사용 (포트폴리오 정보 미포함)
-    public FolioDetailDto(Folio folio) {
-        this.folioId = folio.getId();
-        this.user = new UserInFolioDto(folio.getUser());
-        this.introduction = folio.getIntroduction();
-        this.skills = folio.getSkills();
-        this.photos = folio.getPhotos();
-        this.projects = new ArrayList<>(); // 빈 리스트로 초기화
+    public FolioDetailDto(Folio folio, Map<String,Object> state) {
+        this(folio, List.of(), state);
     }
 }
