@@ -191,3 +191,28 @@ document.addEventListener("click", (e) => {
     modal.style.display = "none";
   }
 });
+
+
+let currentCommentForm = null;
+
+// 댓글 삭제 모달 열기
+function openCommentDeleteModal(form) {
+  currentCommentForm = form; // 클릭된 폼 저장
+  const modal = document.getElementById("commentDeleteModal");
+  modal.style.display = "flex"; // 보이게
+  return false; // 기본 submit 막기
+}
+
+// 댓글 삭제 모달 닫기
+function closeCommentDeleteModal() {
+  const modal = document.getElementById("commentDeleteModal");
+  modal.style.display = "none";
+  currentCommentForm = null;
+}
+
+// 확인 버튼 → 실제 submit 실행
+document.getElementById("commentDeleteConfirm").addEventListener("click", () => {
+  if (currentCommentForm) {
+    currentCommentForm.submit(); // 진짜 삭제 실행
+  }
+});

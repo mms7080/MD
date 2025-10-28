@@ -218,16 +218,16 @@
               
                     <!-- ✅ 대표 이미지 (3개까지) -->
                     <div class="shots-row"
-     th:if="${portfolio.screenshots != null and portfolio.screenshots.size() > 0}">
-  <a class="shot"
-     th:each="shot, iter : ${portfolio.screenshots}"
-     th:if="${iter.index < 3}"
-     th:href="@{|/portfolios/${portfolio.id}|}">
-    <img class="shot-img"
-         th:src="${shot}"
-         th:alt="${portfolio.title + ' 화면'}" />
-  </a>
-</div>
+                        th:if="${portfolio.screenshots != null and portfolio.screenshots.size() > 0}">
+                    <a class="shot"
+                        th:each="shot, iter : ${portfolio.screenshots}"
+                        th:if="${iter.index < 3}"
+                        th:href="@{|/portfolios/${portfolio.id}|}">
+                        <img class="shot-img"
+                            th:src="${shot}"
+                            th:alt="${portfolio.title + ' 화면'}" />
+                    </a>
+                    </div>
 
               
                     <div class="shots-row"

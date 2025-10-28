@@ -239,8 +239,8 @@
                    sec:authorize="hasRole('ADMIN')">
                 <button type="button" class="btn-mini" onclick="enableEdit(this)">수정</button>
                 <form th:action="@{|/portfolios/${portfolio.id}/comments/${comment.id}/delete|}" 
-                      method="post" class="delete-form"
-                      onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                  method="post" class="delete-form"
+                  onsubmit="return openCommentDeleteModal(this);">
                   <input type="hidden" name="_csrf" th:value="${_csrf.token}">
                   <button type="submit" class="btn-mini danger">삭제</button>
                 </form>
@@ -304,6 +304,18 @@
       </div>
     </div>
   </div>
+
+  <!-- 댓글 삭제 모달 -->
+<div id="commentDeleteModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <p>이 댓글을 정말 삭제하시겠습니까?</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-confirm" id="commentDeleteConfirm">확인</button>
+      <button type="button" class="btn-confirm" onclick="closeCommentDeleteModal()">취소</button>
+    </div>
+  </div>
+</div>
+
 
   <script src="/js/portfolios/portfolios-detail.js" defer></script>
   <div th:replace="fragments/footer :: footer"></div>
