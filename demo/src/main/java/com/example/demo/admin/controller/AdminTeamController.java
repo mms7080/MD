@@ -6,13 +6,14 @@ import com.example.demo.users.UsersEntity.Users;
 import com.example.demo.users.UsersRepository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -74,47 +75,44 @@ public class AdminTeamController {
         teamService.deleteTeam(id);
     }
 
-    // ✅ 유저 목록 (페이징 + 나이 미입력 처리)
-    @GetMapping("/users")
-    public Map<String, Object> listUsers(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    // ✅ 유저 목록 (페이징 + 생년월일 → 나이 계산)
+// ✅ 유저 목록 (페이징 + 생년월일)
+@GetMapping("/users")
+public Map<String, Object> listUsers(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"));
+    Page<Users> userPage = usersRepository.findAll(pageable);
 
-        // 페이지 요청 설정
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"));
-        Page<Users> userPage = usersRepository.findAll(pageable);
+    List<Map<String, Object>> userList = userPage.getContent().stream()
+            .filter(u -> u.getDeleteStatus() == DeleteStatus.N)
+            .map(u -> {
+                Map<String, Object> map = new HashMap<>();
+                map.put("id", u.getId());
+                map.put("username", u.getUsername());
+                map.put("name", u.getName());
 
-        // 탈퇴 제외 필터 + 매핑
-        List<Map<String, Object>> userList = userPage.getContent().stream()
-                .filter(u -> u.getDeleteStatus() == DeleteStatus.N)
-                .map(u -> {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("id", u.getId());
-                    map.put("username", u.getUsername());
-                    map.put("name", u.getName());
+                // ✅ 생년월일 표시
+                if (u.getBirth() == null) {
+                    map.put("birth", "미입력");
+                } else {
+                    map.put("birth", u.getBirth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                }
 
-                    // 나이 미입력 처리
-                    if (u.getAge() == null || u.getAge() == 0) {
-                        map.put("age", "미입력");
-                    } else {
-                        map.put("age", u.getAge() + "세");
-                    }
+                map.put("deleteStatus", u.getDeleteStatus().name());
+                return map;
+            })
+            .toList();
 
-                    map.put("deleteStatus", u.getDeleteStatus().name());
-                    return map;
-                })
-                .toList();
+    Map<String, Object> result = new HashMap<>();
+    result.put("users", userList);
+    result.put("currentPage", page + 1);
+    result.put("totalPages", userPage.getTotalPages());
+    result.put("totalItems", userPage.getTotalElements());
+    return result;
+}
 
-        // 결과 구성 (페이징 정보 포함)
-        Map<String, Object> result = new HashMap<>();
-        result.put("users", userList);
-        result.put("currentPage", page + 1);
-        result.put("totalPages", userPage.getTotalPages());
-        result.put("totalItems", userPage.getTotalElements());
-        return result;
-    }
 
     // ✅ 회원 탈퇴 (Soft Delete)
     @DeleteMapping("/users/{id}")
