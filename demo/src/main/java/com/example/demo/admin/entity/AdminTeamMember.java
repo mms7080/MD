@@ -13,7 +13,7 @@ public class AdminTeamMember {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
-    private AdminTeam team; // ✅ mappedBy="team" 과 매칭
+    private AdminTeam team; 
 
     @Column(nullable = false)
     private Long userId;

@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>관리자 페이지 – kafolio</title>
 
-    <!-- 공통 헤더 스타일 -->
     <link rel="stylesheet" href="/css/header.css" />
-    <!-- 관리자 디자인 CSS (rail/page/panel/table 등) -->
     <link rel="stylesheet" href="/css/admin/admin.css" />
     <link rel="stylesheet" href="css/users/auth-modal.css" />
     <style>
@@ -19,7 +17,6 @@
         margin-top: 20px;
         flex-wrap: wrap;
       }
-
       .pagination button {
         border: none;
         border-radius: 6px;
@@ -30,8 +27,6 @@
         transition: all 0.2s ease;
         font-weight: 500;
       }
-
-      /* ===== 라이트 모드 ===== */
       [data-theme="light"] .pagination button {
         background: #f4f4f6;
         color: #222;
@@ -43,8 +38,6 @@
         background: #111;
         color: #fff;
       }
-
-      /* ===== 다크 모드 ===== */
       [data-theme="dark"] .pagination button {
         background: #1f1f25;
         color: #ddd;
@@ -56,70 +49,49 @@
         background: #fff;
         color: #111;
       }
-
       .pagination button:disabled {
         opacity: 0.4;
         cursor: not-allowed;
       }
     </style>
   </head>
+
   <body>
-    <!-- 공통 헤더 -->
     <div th:replace="fragments/header :: header('admin')"></div>
 
-    <!-- 본문: 좌측 레일 + 페이지 -->
     <div class="admin-shell">
-      <!-- 사이드바(레일) -->
       <aside class="nav-rail">
         <div class="org-name">관리자</div>
         <nav class="rail-menu" id="sidebar">
-          <a href="#" class="rail-item is-active" data-page="folice"
-            ><span class="dot"></span> Folice 관리</a
-          >
-          <a href="#" class="rail-item" data-page="profolios"
-            ><span class="dot"></span> 포토폴리오 관리</a
-          >
-          <a href="#" class="rail-item" data-page="teams"
-            ><span class="dot"></span> 팀 관리</a
-          >
-          <a href="#" class="rail-item" data-page="users"
-            ><span class="dot"></span> 유저 관리</a
-          >
+          <a href="#" class="rail-item is-active" data-page="folice"><span class="dot"></span> Folice 관리</a>
+          <a href="#" class="rail-item" data-page="profolios"><span class="dot"></span> 포토폴리오 관리</a>
+          <a href="#" class="rail-item" data-page="teams"><span class="dot"></span> 팀 관리</a>
+          <a href="#" class="rail-item" data-page="users"><span class="dot"></span> 유저 관리</a>
         </nav>
       </aside>
 
-      <!-- Page Area -->
       <main class="page">
         <div class="page-header">
           <div class="page-titles">
             <h1 id="pageTitle">Folice 관리</h1>
-            <p class="sub" id="pageSub">
-              파일/배너 등 Folice 리소스를 관리합니다.
-            </p>
+            <p class="sub" id="pageSub">파일/배너 등 Folice 리소스를 관리합니다.</p>
           </div>
-          <!-- ✅ 상단 primary 버튼(팀 저장) 제거됨 -->
         </div>
 
-        <!-- 컨텐츠 패널 -->
         <section class="panel">
           <div class="panel-head">
             <h2 id="panelTitle">Folice 목록</h2>
             <span class="count" id="panelCount">0건</span>
           </div>
 
-          <!-- 동적 컨텐츠 들어갈 곳 -->
           <div id="panelBody" class="table-wrap"></div>
 
           <div class="panel-foot" id="panelFoot" style="display: none">
             <span class="hint" id="rangeHint">0건 표시</span>
             <div class="pager">
-              <button class="pager-btn" id="prevPage" aria-label="이전">
-                ‹
-              </button>
+              <button class="pager-btn" id="prevPage">‹</button>
               <span class="pager-page is-current" id="pageIndex">1</span>
-              <button class="pager-btn" id="nextPage" aria-label="다음">
-                ›
-              </button>
+              <button class="pager-btn" id="nextPage">›</button>
             </div>
           </div>
         </section>
@@ -127,7 +99,7 @@
     </div>
 
     <script>
-      /* ------------------ 공통 엘리먼트 ------------------ */
+      /* ========================== 기본 엘리먼트 ========================== */
       const $title = document.getElementById("pageTitle");
       const $sub = document.getElementById("pageSub");
       const $panelTitle = document.getElementById("panelTitle");
@@ -135,43 +107,25 @@
       const $panelBody = document.getElementById("panelBody");
       const $panelFoot = document.getElementById("panelFoot");
 
-      /* ------------------ 페이지 텍스트 ------------------ */
+      /* ========================== 페이지 정보 ========================== */
       const pageMeta = {
-        folice: {
-          title: "Folice 관리",
-          sub: "파일/배너 등 Folice 리소스를 관리합니다.",
-          panelTitle: "Folice 목록",
-        },
-        profolios: {
-          title: "Profolios 관리",
-          sub: "프로젝트 포트폴리오를 관리합니다.",
-          panelTitle: "Profolios 목록",
-        },
-        teams: {
-          title: "팀 관리",
-          sub: "‘팀 편성’과 ‘팀 관리’ 탭에서 작업하세요.",
-          panelTitle: "팀",
-        },
-        users: {
-          title: "유저 관리",
-          sub: "사용자 계정과 권한을 관리합니다.",
-          panelTitle: "유저 목록",
-        },
+        folice: { title: "Folice 관리", sub: "파일/배너 등 Folice 리소스를 관리합니다.", panelTitle: "Folice 목록" },
+        profolios: { title: "Profolios 관리", sub: "프로젝트 포트폴리오를 관리합니다.", panelTitle: "Profolios 목록" },
+        teams: { title: "팀 관리", sub: "‘팀 편성’과 ‘팀 관리’ 탭에서 작업하세요.", panelTitle: "팀" },
+        users: { title: "유저 관리", sub: "사용자 계정과 권한을 관리합니다.", panelTitle: "유저 목록" },
       };
 
-      /* ------------------ 사이드바 ------------------ */
+      /* ========================== 사이드바 ========================== */
       document.querySelectorAll("#sidebar .rail-item").forEach((a) => {
         a.addEventListener("click", (e) => {
           e.preventDefault();
-          document
-            .querySelectorAll("#sidebar .rail-item")
-            .forEach((x) => x.classList.remove("is-active"));
+          document.querySelectorAll("#sidebar .rail-item").forEach((x) => x.classList.remove("is-active"));
           a.classList.add("is-active");
           loadPage(a.dataset.page);
         });
       });
 
-      /* ------------------ 페이지 로더 ------------------ */
+      /* ========================== 페이지 로딩 ========================== */
       function loadPage(page) {
         const meta = pageMeta[page];
         $title.textContent = meta.title;
@@ -184,163 +138,128 @@
         if (page === "teams") renderTeamsPage();
       }
 
-      /* ------------------ Folice / Profolios / Users 기존 그대로 유지 ------------------ */
+      /* ========================== FOLICE / PORTFOLIOS ========================== */
       function renderFolice() {
-        $panelFoot.style.display = "none"; 
+        $panelFoot.style.display = "none";
         $panelBody.innerHTML = "<p>Folice 관리 페이지입니다.</p>";
         $panelCount.textContent = "0건";
       }
 
       function renderProfolios() {
-        $panelFoot.style.display = "none"; 
+        $panelFoot.style.display = "none";
         $panelBody.innerHTML = "<p>Profolio 관리 페이지입니다.</p>";
         $panelCount.textContent = "0건";
       }
- /* ------------------ Users ------------------ */
-let currentUserPage = 1;
-const USERS_PER_PAGE = 10;
 
-async function renderUsers(page = 1) {
-  $panelFoot.style.display = "flex"; // ✅ 페이징 하단 보이기
+      /* ========================== USERS 관리 ========================== */
+      let currentUserPage = 1;
+      const USERS_PER_PAGE = 10;
 
-  try {
-    // ✅ 서버에서 유저 목록 가져오기 (페이징 파라미터 포함)
-    const res = await fetch(`/api/admin/users?page=${page - 1}&size=${USERS_PER_PAGE}`);
-    const data = await res.json();
+      async function renderUsers(page = 1) {
+        $panelFoot.style.display = "flex";
+        try {
+          const res = await fetch(`/api/admin/users?page=${page - 1}&size=${USERS_PER_PAGE}`);
+          const data = await res.json();
 
-    const usersList = data.users || [];
-    const totalPages = data.totalPages || 1;
-    const totalItems = data.totalItems || usersList.length;
+          const usersList = data.users || [];
+          const totalPages = data.totalPages || 1;
+          const totalItems = data.totalItems || usersList.length;
 
-    currentUserPage = data.currentPage || 1;
-    $panelCount.textContent = `${totalItems}명`;
+          currentUserPage = data.currentPage || 1;
+          $panelCount.textContent = `${totalItems}명`;
 
-    // ✅ 유저 테이블 렌더링
-    $panelBody.innerHTML = `
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>아이디(Username)</th>
-            <th>이름</th>
-            <th>생년월일</th>
-            <th class="th-actions">관리</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${
-            usersList.length === 0
-              ? `<tr><td colspan="5" style="text-align:center;color:#888;">표시할 회원이 없습니다.</td></tr>`
-              : usersList
-                  .map(
-                    (u) => `
-                    <tr>
-                      <td class="cell-strong">${u.id}</td>
-                      <td>${u.username}</td>
-                      <td>${u.name}</td>
-                      <td>${u.birth ? u.birth : "미입력"}</td>
-                      <td class="td-actions">
-                        ${
-                          u.deleteStatus === "Y"
-                            ? `<span style="color:#888;">탈퇴됨</span>`
-                            : `<button class="btn danger" data-act="delete" data-id="${u.id}">회원 탈퇴</button>`
-                        }
-                      </td>
-                    </tr>
-                  `
-                  )
-                  .join("")
+          $panelBody.innerHTML = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>아이디(Username)</th><th>이름</th><th>생년월일</th><th class="th-actions">관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${
+                  usersList.length === 0
+                    ? `<tr><td colspan="5" style="text-align:center;color:#888;">표시할 회원이 없습니다.</td></tr>`
+                    : usersList
+                        .map(
+                          (u) => `
+                            <tr>
+                              <td class="cell-strong">${u.id}</td>
+                              <td>${u.username}</td>
+                              <td>${u.name}</td>
+                              <td>${u.birth || "미입력"}</td>
+                              <td class="td-actions">
+                                ${
+                                  u.deleteStatus === "Y"
+                                    ? `<span style="color:#888;">탈퇴됨</span>`
+                                    : `<button class="btn danger" data-act="delete" data-id="${u.id}">회원 탈퇴</button>`
+                                }
+                              </td>
+                            </tr>`
+                        )
+                        .join("")
+                }
+              </tbody>
+            </table>
+          `;
+
+          const startPage = Math.max(1, page - 2);
+          const endPage = Math.min(totalPages, startPage + 4);
+
+          let paginationHTML = `
+            <div style="width:100%;display:flex;flex-direction:column;align-items:center;">
+              <div class="pagination">
+                <button id="prevPage" ${page === 1 ? "disabled" : ""}>‹</button>
+          `;
+
+          for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `<button class="${i === page ? "active" : ""}" data-page="${i}">${i}</button>`;
           }
-        </tbody>
-      </table>
-    `;
 
-    // ✅ 하단 페이지네이션 (번호 버튼 + 다크/라이트 대응)
-    const startPage = Math.max(1, page - 2);
-    const endPage = Math.min(totalPages, startPage + 4);
+          paginationHTML += `<button id="nextPage" ${page >= totalPages ? "disabled" : ""}>›</button></div></div>`;
+          $panelFoot.innerHTML = paginationHTML;
 
-    let paginationHTML = `
-      <div style="width:100%;display:flex;flex-direction:column;align-items:center;">
-        <div class="pagination">
-          <button id="prevPage" ${page === 1 ? "disabled" : ""}>‹</button>
-    `;
+          document.querySelectorAll(".pagination button[data-page]").forEach((btn) => {
+            btn.addEventListener("click", () => renderUsers(Number(btn.dataset.page)));
+          });
 
-    for (let i = startPage; i <= endPage; i++) {
-      paginationHTML += `
-        <button class="${i === page ? "active" : ""}" data-page="${i}">${i}</button>
-      `;
-    }
+          document.getElementById("prevPage").addEventListener("click", () => page > 1 && renderUsers(page - 1));
+          document.getElementById("nextPage").addEventListener("click", () => page < totalPages && renderUsers(page + 1));
 
-    paginationHTML += `
-          <button id="nextPage" ${page >= totalPages ? "disabled" : ""}>›</button>
-        </div>
-      </div>
-    `;
-
-    $panelFoot.innerHTML = paginationHTML;
-
-    // ✅ 페이지 이동 이벤트
-    document.querySelectorAll(".pagination button[data-page]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        renderUsers(Number(btn.dataset.page));
-      });
-    });
-
-    document.getElementById("prevPage").addEventListener("click", () => {
-      if (page > 1) renderUsers(page - 1);
-    });
-
-    document.getElementById("nextPage").addEventListener("click", () => {
-      if (page < totalPages) renderUsers(page + 1);
-    });
-
-    // ✅ 회원 탈퇴 기능 (Soft Delete)
-    document.querySelectorAll('[data-act="delete"]').forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        if (!confirm("정말 이 회원을 탈퇴 처리하시겠습니까?")) return;
-        const id = btn.dataset.id;
-        const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
-        const data = await res.json();
-
-        if (data.success) {
-          alert("회원이 탈퇴 처리되었습니다.");
-          renderUsers(page); // 현재 페이지 다시 로드
-        } else {
-          alert("탈퇴 실패: " + (data.message || "알 수 없는 오류"));
+          document.querySelectorAll('[data-act="delete"]').forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              if (!confirm("정말 이 회원을 탈퇴 처리하시겠습니까?")) return;
+              const id = btn.dataset.id;
+              const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+              const data = await res.json();
+              if (data.success) {
+                alert("회원이 탈퇴 처리되었습니다.");
+                renderUsers(page);
+              } else alert("탈퇴 실패: " + (data.message || "알 수 없는 오류"));
+            });
+          });
+        } catch (err) {
+          console.error(err);
+          alert("유저 데이터를 불러오지 못했습니다.");
         }
-      });
-    });
-  } catch (err) {
-    console.error(err);
-    alert("유저 데이터를 불러오지 못했습니다.");
-  }
-}
+      }
 
-
-      /* ======================================================
-   Teams – 실제 백엔드 연동
-====================================================== */
+      /* ========================== TEAMS 관리 ========================== */
       let allMembers = [];
       let teams = [];
       let editingTeamId = null;
 
-      // ✅ 유저 & 팀 불러오기
       async function loadMembers() {
         const res = await fetch("/api/admin/users/basic");
         allMembers = await res.json();
       }
+
       async function loadTeams() {
         const res = await fetch("/api/admin/teams");
         teams = await res.json();
       }
 
-      // ✅ 팀 저장
       async function saveTeam(name, memberNames) {
-        // memberNames → DB에 있는 userId로 변환
-        const memberIds = allMembers
-          .filter((m) => memberNames.includes(m.name))
-          .map((m) => m.id);
-
+        const memberIds = allMembers.filter((m) => memberNames.includes(m.name)).map((m) => m.id);
         const res = await fetch("/api/admin/teams", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -352,41 +271,31 @@ async function renderUsers(page = 1) {
         renderTeamsPage("manage");
       }
 
-      // ✅ 팀 삭제
       async function deleteTeam(id) {
         const res = await fetch(`/api/admin/teams/${id}`, { method: "DELETE" });
         if (res.ok) {
           alert("삭제되었습니다.");
           await loadTeams();
           renderTeamsPage("manage");
-        } else {
-          alert("삭제 실패");
-        }
+        } else alert("삭제 실패");
       }
 
-      /* ------------------ 팀 페이지 ------------------ */
       async function renderTeamsPage(activeTab = "compose") {
-        $panelFoot.style.display = "none"; 
+        $panelFoot.style.display = "none";
         await Promise.all([loadMembers(), loadTeams()]);
         $panelCount.textContent = `${teams.length}팀`;
 
         $panelBody.innerHTML = `
-    <div class="tabbar" role="tablist">
-      <button class="tab ${
-        activeTab === "compose" ? "is-active" : ""
-      }" data-tab="compose">팀 편성</button>
-      <button class="tab ${
-        activeTab === "manage" ? "is-active" : ""
-      }" data-tab="manage">팀 관리</button>
-    </div>
-    <div id="teamsTabContent"></div>
-  `;
+          <div class="tabbar" role="tablist">
+            <button class="tab ${activeTab === "compose" ? "is-active" : ""}" data-tab="compose">팀 편성</button>
+            <button class="tab ${activeTab === "manage" ? "is-active" : ""}" data-tab="manage">팀 관리</button>
+          </div>
+          <div id="teamsTabContent"></div>
+        `;
 
         document.querySelectorAll(".tabbar .tab").forEach((btn) => {
           btn.addEventListener("click", () => {
-            document
-              .querySelectorAll(".tabbar .tab")
-              .forEach((b) => b.classList.remove("is-active"));
+            document.querySelectorAll(".tabbar .tab").forEach((b) => b.classList.remove("is-active"));
             btn.classList.add("is-active");
             renderTeamsTab(btn.dataset.tab);
           });
@@ -397,44 +306,37 @@ async function renderUsers(page = 1) {
 
       function renderTeamsTab(tab) {
         const wrap = document.getElementById("teamsTabContent");
-        if (tab === "compose") renderTeamComposer(wrap);
-        else renderTeamListView(wrap);
+        tab === "compose" ? renderTeamComposer(wrap) : renderTeamListView(wrap);
       }
 
-      /* ------------------ 팀 편성 탭 ------------------ */
       function renderTeamComposer(rootEl) {
         rootEl.innerHTML = `
-    <div class="team-manager">
-      <div class="team-column">
-        <h3>회원 목록</h3>
-        <input type="search" id="memberSearch" placeholder="회원 검색" />
-        <ul id="memberList" class="list-box"></ul>
-      </div>
-      <div class="team-controls">
-        <button id="btnAdd" class="btn">▶</button>
-        <button id="btnRemove" class="btn">◀</button>
-      </div>
-      <div class="team-column">
-        <h3>선택된 팀원</h3>
-        <ul id="selectedList" class="list-box"></ul>
-        <input type="text" id="teamName" placeholder="팀 이름 입력" />
-        <button id="btnSaveTeam" class="btn btn-teal full">${
-          editingTeamId ? "팀 수정 완료" : "팀 저장"
-        }</button>
-      </div>
-    </div>
-  `;
+          <div class="team-manager">
+            <div class="team-column">
+              <h3>회원 목록</h3>
+              <input type="search" id="memberSearch" placeholder="회원 검색" />
+              <ul id="memberList" class="list-box"></ul>
+            </div>
+            <div class="team-controls">
+              <button id="btnAdd" class="btn">▶</button>
+              <button id="btnRemove" class="btn">◀</button>
+            </div>
+            <div class="team-column">
+              <h3>선택된 팀원</h3>
+              <ul id="selectedList" class="list-box"></ul>
+              <input type="text" id="teamName" placeholder="팀 이름 입력" />
+              <button id="btnSaveTeam" class="btn btn-teal full">${editingTeamId ? "팀 수정 완료" : "팀 저장"}</button>
+            </div>
+          </div>
+        `;
 
         const $memberList = document.getElementById("memberList");
         const $selectedList = document.getElementById("selectedList");
         const $memberSearch = document.getElementById("memberSearch");
         const $teamName = document.getElementById("teamName");
 
-        // 렌더링 함수
         function renderAllMembers() {
-          const selectedNames = [...$selectedList.children].map(
-            (li) => li.textContent
-          );
+          const selectedNames = [...$selectedList.children].map((li) => li.textContent);
           $memberList.innerHTML = "";
           allMembers.forEach((m) => {
             if (!selectedNames.includes(m.name)) {
@@ -446,19 +348,15 @@ async function renderUsers(page = 1) {
           });
         }
 
-        // 리스트 선택 기능
         function makeSelectable($ul) {
           $ul.addEventListener("click", (e) => {
             if (e.target.tagName === "LI") {
-              [...$ul.children].forEach((li) =>
-                li.classList.remove("selected")
-              );
+              [...$ul.children].forEach((li) => li.classList.remove("selected"));
               e.target.classList.add("selected");
             }
           });
         }
 
-        // 버튼 이벤트
         document.getElementById("btnAdd").addEventListener("click", () => {
           const sel = $memberList.querySelector(".selected");
           if (sel) $selectedList.appendChild(sel);
@@ -470,24 +368,18 @@ async function renderUsers(page = 1) {
             renderAllMembers();
           }
         });
-        document
-          .getElementById("btnSaveTeam")
-          .addEventListener("click", async () => {
-            const name = $teamName.value.trim();
-            const members = [...$selectedList.children].map(
-              (li) => li.textContent
-            );
-            if (!name) return alert("팀 이름을 입력하세요!");
-            if (members.length === 0) return alert("팀원을 선택하세요!");
-            await saveTeam(name, members);
-          });
+        document.getElementById("btnSaveTeam").addEventListener("click", async () => {
+          const name = $teamName.value.trim();
+          const members = [...$selectedList.children].map((li) => li.textContent);
+          if (!name) return alert("팀 이름을 입력하세요!");
+          if (members.length === 0) return alert("팀원을 선택하세요!");
+          await saveTeam(name, members);
+        });
 
         $memberSearch.addEventListener("input", () => {
           const q = $memberSearch.value.toLowerCase();
           [...$memberList.children].forEach((li) => {
-            li.style.display = li.textContent.toLowerCase().includes(q)
-              ? ""
-              : "none";
+            li.style.display = li.textContent.toLowerCase().includes(q) ? "" : "none";
           });
         });
 
@@ -496,53 +388,47 @@ async function renderUsers(page = 1) {
         renderAllMembers();
       }
 
-      /* ------------------ 팀 관리 탭 ------------------ */
       function renderTeamListView(rootEl) {
         rootEl.innerHTML = `
-    <div class="team-result">
-      <h3>저장된 팀 목록</h3>
-      <ul id="teamList"></ul>
-    </div>
-  `;
+          <div class="team-result">
+            <h3>저장된 팀 목록</h3>
+            <ul id="teamList"></ul>
+          </div>
+        `;
 
         const $teamList = document.getElementById("teamList");
         function draw() {
           $teamList.innerHTML = teams
             .map(
               (t) => `
-        <li>
-          <div class="team-item">
-            <div class="team-info">
-              <div class="team-name">${t.name}</div>
-              <div class="team-members">${t.members.join(", ")}</div>
-              <div class="team-meta">${t.createdAt}</div>
-            </div>
-            <div class="team-actions">
-              <button class="btn danger" data-act="delete" data-id="${
-                t.id
-              }">삭제</button>
-            </div>
-          </div>
-        </li>
-      `
+              <li>
+                <div class="team-item">
+                  <div class="team-info">
+                    <div class="team-name">${t.name}</div>
+                    <div class="team-members">${t.members.join(", ")}</div>
+                    <div class="team-meta">${t.createdAt}</div>
+                  </div>
+                  <div class="team-actions">
+                    <button class="btn danger" data-act="delete" data-id="${t.id}">삭제</button>
+                  </div>
+                </div>
+              </li>`
             )
             .join("");
           $panelCount.textContent = `${teams.length}팀`;
         }
 
         $teamList.addEventListener("click", async (e) => {
-          const act = e.target.dataset.act;
-          const id = Number(e.target.dataset.id);
-          if (act === "delete") {
+          if (e.target.dataset.act === "delete") {
             if (!confirm("정말 이 팀을 삭제하시겠습니까?")) return;
-            await deleteTeam(id);
+            await deleteTeam(Number(e.target.dataset.id));
           }
         });
 
         draw();
       }
 
-      /* ------------------ 초기 진입 ------------------ */
+      /* ========================== 초기 로드 ========================== */
       loadPage("folice");
     </script>
   </body>
