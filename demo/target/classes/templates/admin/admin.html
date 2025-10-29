@@ -1,565 +1,558 @@
 <!DOCTYPE html>
 <html lang="ko" data-theme="light">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>관리자 페이지 – kafolio</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>관리자 페이지 – kafolio</title>
 
-        <!-- 공통 헤더 스타일 -->
-        <link rel="stylesheet" href="/css/header.css" />
-        <!-- 관리자 디자인 CSS (rail/page/panel/table 등) -->
-        <link rel="stylesheet" href="/css/admin/admin.css" />
-        <link rel="stylesheet" href="css/users/auth-modal.css" />
-    </head>
-    <body>
-        <!-- 공통 헤더 -->
-        <div th:replace="fragments/header :: header('admin')"></div>
+    <!-- 공통 헤더 스타일 -->
+    <link rel="stylesheet" href="/css/header.css" />
+    <!-- 관리자 디자인 CSS (rail/page/panel/table 등) -->
+    <link rel="stylesheet" href="/css/admin/admin.css" />
+    <link rel="stylesheet" href="css/users/auth-modal.css" />
+    <style>
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
 
-        <!-- 본문: 좌측 레일 + 페이지 -->
-        <div class="admin-shell">
-            <!-- 사이드바(레일) -->
-            <aside class="nav-rail">
-                <div class="org-name">관리자</div>
-                <nav class="rail-menu" id="sidebar">
-                    <a href="#" class="rail-item is-active" data-page="folice"
-                        ><span class="dot"></span> Folice 관리</a
-                    >
-                    <a href="#" class="rail-item" data-page="profolios"
-                        ><span class="dot"></span> 포토폴리오 관리</a
-                    >
-                    <a href="#" class="rail-item" data-page="teams"
-                        ><span class="dot"></span> 팀 관리</a
-                    >
-                    <a href="#" class="rail-item" data-page="users"
-                        ><span class="dot"></span> 유저 관리</a
-                    >
-                </nav>
-            </aside>
+      .pagination button {
+        border: none;
+        border-radius: 6px;
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
 
-            <!-- Page Area -->
-            <main class="page">
-                <div class="page-header">
-                    <div class="page-titles">
-                        <h1 id="pageTitle">Folice 관리</h1>
-                        <p class="sub" id="pageSub">
-                            파일/배너 등 Folice 리소스를 관리합니다.
-                        </p>
-                    </div>
-                    <!-- ✅ 상단 primary 버튼(팀 저장) 제거됨 -->
-                </div>
+      /* ===== 라이트 모드 ===== */
+      [data-theme="light"] .pagination button {
+        background: #f4f4f6;
+        color: #222;
+      }
+      [data-theme="light"] .pagination button:hover {
+        background: #e2e2e6;
+      }
+      [data-theme="light"] .pagination button.active {
+        background: #111;
+        color: #fff;
+      }
 
-                <!-- 컨텐츠 패널 -->
-                <section class="panel">
-                    <div class="panel-head">
-                        <h2 id="panelTitle">Folice 목록</h2>
-                        <span class="count" id="panelCount">0건</span>
-                    </div>
+      /* ===== 다크 모드 ===== */
+      [data-theme="dark"] .pagination button {
+        background: #1f1f25;
+        color: #ddd;
+      }
+      [data-theme="dark"] .pagination button:hover {
+        background: #2d2d35;
+      }
+      [data-theme="dark"] .pagination button.active {
+        background: #fff;
+        color: #111;
+      }
 
-                    <!-- 동적 컨텐츠 들어갈 곳 -->
-                    <div id="panelBody" class="table-wrap"></div>
+      .pagination button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 공통 헤더 -->
+    <div th:replace="fragments/header :: header('admin')"></div>
 
-                    <div
-                        class="panel-foot"
-                        id="panelFoot"
-                        style="display: none"
-                    >
-                        <span class="hint" id="rangeHint">0건 표시</span>
-                        <div class="pager">
-                            <button
-                                class="pager-btn"
-                                id="prevPage"
-                                aria-label="이전"
-                            >
-                                ‹
-                            </button>
-                            <span class="pager-page is-current" id="pageIndex"
-                                >1</span
-                            >
-                            <button
-                                class="pager-btn"
-                                id="nextPage"
-                                aria-label="다음"
-                            >
-                                ›
-                            </button>
-                        </div>
-                    </div>
-                </section>
-            </main>
+    <!-- 본문: 좌측 레일 + 페이지 -->
+    <div class="admin-shell">
+      <!-- 사이드바(레일) -->
+      <aside class="nav-rail">
+        <div class="org-name">관리자</div>
+        <nav class="rail-menu" id="sidebar">
+          <a href="#" class="rail-item is-active" data-page="folice"
+            ><span class="dot"></span> Folice 관리</a
+          >
+          <a href="#" class="rail-item" data-page="profolios"
+            ><span class="dot"></span> 포토폴리오 관리</a
+          >
+          <a href="#" class="rail-item" data-page="teams"
+            ><span class="dot"></span> 팀 관리</a
+          >
+          <a href="#" class="rail-item" data-page="users"
+            ><span class="dot"></span> 유저 관리</a
+          >
+        </nav>
+      </aside>
+
+      <!-- Page Area -->
+      <main class="page">
+        <div class="page-header">
+          <div class="page-titles">
+            <h1 id="pageTitle">Folice 관리</h1>
+            <p class="sub" id="pageSub">
+              파일/배너 등 Folice 리소스를 관리합니다.
+            </p>
+          </div>
+          <!-- ✅ 상단 primary 버튼(팀 저장) 제거됨 -->
         </div>
 
-        <script>
-            /* ------------------ 더미 데이터 ------------------ */
-            const allMembers = [
-                { id: 1, name: "박범수" },
-                { id: 2, name: "김철수" },
-                { id: 3, name: "이영희" },
-                { id: 4, name: "John Doe" },
-                { id: 5, name: "Jane Smith" },
-                { id: 6, name: "최민수" },
-                { id: 7, name: "한가인" },
-                { id: 8, name: "이준호" },
-                { id: 9, name: "홍길동" },
-                { id: 10, name: "강하늘" },
-                { id: 11, name: "송지효" },
-                { id: 12, name: "유재석" },
-                { id: 13, name: "정형돈" },
-                { id: 14, name: "박명수" },
-                { id: 15, name: "이효리" },
-                { id: 16, name: "아이유" },
-                { id: 17, name: "손흥민" },
-                { id: 18, name: "김연아" },
-                { id: 19, name: "차은우" },
-                { id: 20, name: "전지현" },
-            ];
-            let teams = []; // {id, name, members: [], createdAt}
+        <!-- 컨텐츠 패널 -->
+        <section class="panel">
+          <div class="panel-head">
+            <h2 id="panelTitle">Folice 목록</h2>
+            <span class="count" id="panelCount">0건</span>
+          </div>
 
-            let foliceList = [
-                {
-                    id: "F1",
-                    name: "banner.png",
-                    owner: "admin",
-                    status: "활성",
-                    created: "2025-09-06",
-                },
-                {
-                    id: "F2",
-                    name: "hero.jpg",
-                    owner: "admin",
-                    status: "비활성",
-                    created: "2025-09-01",
-                },
-            ];
-            let profoliosList = [
-                {
-                    id: "P1",
-                    title: "웹 포트폴리오",
-                    author: "박범수",
-                    tag: "#Landing",
-                    created: "2025-09-05",
-                },
-                {
-                    id: "P2",
-                    title: "어드민 리디자인",
-                    author: "이영희",
-                    tag: "#Admin",
-                    created: "2025-08-27",
-                },
-            ];
-            let usersList = [
-                {
-                    id: 1,
-                    email: "user1@example.com",
-                    nick: "범수",
-                    role: "USER",
-                    joined: "2025-09-01",
-                },
-                {
-                    id: 2,
-                    email: "admin@example.com",
-                    nick: "관리자",
-                    role: "ADMIN",
-                    joined: "2025-09-02",
-                },
-            ];
+          <!-- 동적 컨텐츠 들어갈 곳 -->
+          <div id="panelBody" class="table-wrap"></div>
 
-            /* ------------------ 공통 엘리먼트 ------------------ */
-            const $title = document.getElementById("pageTitle");
-            const $sub = document.getElementById("pageSub");
-            const $panelTitle = document.getElementById("panelTitle");
-            const $panelCount = document.getElementById("panelCount");
-            const $panelBody = document.getElementById("panelBody");
-            const $panelFoot = document.getElementById("panelFoot");
-            const $rangeHint = document.getElementById("rangeHint");
-            const $pageIndex = document.getElementById("pageIndex");
+          <div class="panel-foot" id="panelFoot" style="display: none">
+            <span class="hint" id="rangeHint">0건 표시</span>
+            <div class="pager">
+              <button class="pager-btn" id="prevPage" aria-label="이전">
+                ‹
+              </button>
+              <span class="pager-page is-current" id="pageIndex">1</span>
+              <button class="pager-btn" id="nextPage" aria-label="다음">
+                ›
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
 
-            /* ------------------ 페이지 텍스트 ------------------ */
-            const pageMeta = {
-                folice: {
-                    title: "Folice 관리",
-                    sub: "파일/배너 등 Folice 리소스를 관리합니다.",
-                    panelTitle: "Folice 목록",
-                },
-                profolios: {
-                    title: "Profolios 관리",
-                    sub: "프로젝트 포트폴리오를 관리합니다.",
-                    panelTitle: "Profolios 목록",
-                },
-                teams: {
-                    title: "팀 관리",
-                    sub: "‘팀 편성’과 ‘팀 관리’ 탭에서 작업하세요.",
-                    panelTitle: "팀",
-                },
-                users: {
-                    title: "유저 관리",
-                    sub: "사용자 계정과 권한을 관리합니다.",
-                    panelTitle: "유저 목록",
-                },
-            };
+    <script>
+      /* ------------------ 공통 엘리먼트 ------------------ */
+      const $title = document.getElementById("pageTitle");
+      const $sub = document.getElementById("pageSub");
+      const $panelTitle = document.getElementById("panelTitle");
+      const $panelCount = document.getElementById("panelCount");
+      const $panelBody = document.getElementById("panelBody");
+      const $panelFoot = document.getElementById("panelFoot");
 
-            /* ------------------ 사이드바 ------------------ */
-            document.querySelectorAll("#sidebar .rail-item").forEach((a) => {
-                a.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    document
-                        .querySelectorAll("#sidebar .rail-item")
-                        .forEach((x) => x.classList.remove("is-active"));
-                    a.classList.add("is-active");
-                    loadPage(a.dataset.page);
-                });
+      /* ------------------ 페이지 텍스트 ------------------ */
+      const pageMeta = {
+        folice: {
+          title: "Folice 관리",
+          sub: "파일/배너 등 Folice 리소스를 관리합니다.",
+          panelTitle: "Folice 목록",
+        },
+        profolios: {
+          title: "Profolios 관리",
+          sub: "프로젝트 포트폴리오를 관리합니다.",
+          panelTitle: "Profolios 목록",
+        },
+        teams: {
+          title: "팀 관리",
+          sub: "‘팀 편성’과 ‘팀 관리’ 탭에서 작업하세요.",
+          panelTitle: "팀",
+        },
+        users: {
+          title: "유저 관리",
+          sub: "사용자 계정과 권한을 관리합니다.",
+          panelTitle: "유저 목록",
+        },
+      };
+
+      /* ------------------ 사이드바 ------------------ */
+      document.querySelectorAll("#sidebar .rail-item").forEach((a) => {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          document
+            .querySelectorAll("#sidebar .rail-item")
+            .forEach((x) => x.classList.remove("is-active"));
+          a.classList.add("is-active");
+          loadPage(a.dataset.page);
+        });
+      });
+
+      /* ------------------ 페이지 로더 ------------------ */
+      function loadPage(page) {
+        const meta = pageMeta[page];
+        $title.textContent = meta.title;
+        $sub.textContent = meta.sub;
+        $panelTitle.textContent = meta.panelTitle;
+
+        if (page === "folice") renderFolice();
+        if (page === "profolios") renderProfolios();
+        if (page === "users") renderUsers();
+        if (page === "teams") renderTeamsPage();
+      }
+
+      /* ------------------ Folice / Profolios / Users 기존 그대로 유지 ------------------ */
+      function renderFolice() {
+        $panelFoot.style.display = "none"; 
+        $panelBody.innerHTML = "<p>Folice 관리 페이지입니다.</p>";
+        $panelCount.textContent = "0건";
+      }
+
+      function renderProfolios() {
+        $panelFoot.style.display = "none"; 
+        $panelBody.innerHTML = "<p>Profolio 관리 페이지입니다.</p>";
+        $panelCount.textContent = "0건";
+      }
+      /* ------------------ Users ------------------ */
+      let currentUserPage = 1;
+      const USERS_PER_PAGE = 10;
+
+      async function renderUsers(page = 1) {
+        $panelFoot.style.display = "flex"; // ✅ 페이징 하단 보이기
+
+        try {
+          // ✅ 서버에서 유저 목록 가져오기 (페이징 파라미터 포함)
+          const res = await fetch(
+            `/api/admin/users?page=${page - 1}&size=${USERS_PER_PAGE}`
+          );
+          const data = await res.json();
+
+          const usersList = data.users || [];
+          const totalPages = data.totalPages || 1;
+          const totalItems = data.totalItems || usersList.length;
+
+          currentUserPage = data.currentPage || 1;
+          $panelCount.textContent = `${totalItems}명`;
+
+          // ✅ 유저 테이블 렌더링
+          $panelBody.innerHTML = `
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>아이디(Username)</th>
+            <th>이름</th>
+            <th>나이</th>
+            <th class="th-actions">관리</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${
+            usersList.length === 0
+              ? `<tr><td colspan="5" style="text-align:center;color:#888;">표시할 회원이 없습니다.</td></tr>`
+              : usersList
+                  .map(
+                    (u) => `
+                    <tr>
+                      <td class="cell-strong">${u.id}</td>
+                      <td>${u.username}</td>
+                      <td>${u.name}</td>
+                      <td>${u.age}</td>
+                      <td class="td-actions">
+                        ${
+                          u.deleteStatus === "Y"
+                            ? `<span style="color:#888;">탈퇴됨</span>`
+                            : `<button class="btn danger" data-act="delete" data-id="${u.id}">회원 탈퇴</button>`
+                        }
+                      </td>
+                    </tr>
+                  `
+                  )
+                  .join("")
+          }
+        </tbody>
+      </table>
+    `;
+
+          // ✅ 하단 페이지네이션 (번호 버튼 + 다크/라이트 대응)
+          const startPage = Math.max(1, page - 2);
+          const endPage = Math.min(totalPages, startPage + 4);
+
+          let paginationHTML = `
+      <div style="width:100%;display:flex;flex-direction:column;align-items:center;">
+        <div class="pagination">
+          <button id="prevPage" ${page === 1 ? "disabled" : ""}>‹</button>
+    `;
+
+          for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `
+        <button class="${
+          i === page ? "active" : ""
+        }" data-page="${i}">${i}</button>
+      `;
+          }
+
+          paginationHTML += `
+          <button id="nextPage" ${
+            page >= totalPages ? "disabled" : ""
+          }>›</button>
+        </div>
+      </div>
+    `;
+
+          $panelFoot.innerHTML = paginationHTML;
+
+          // ✅ 페이지 이동 이벤트
+          document
+            .querySelectorAll(".pagination button[data-page]")
+            .forEach((btn) => {
+              btn.addEventListener("click", () => {
+                renderUsers(Number(btn.dataset.page));
+              });
             });
 
-            /* ------------------ 페이지 로더 ------------------ */
-            function loadPage(page) {
-                const meta = pageMeta[page];
-                $title.textContent = meta.title;
-                $sub.textContent = meta.sub;
-                $panelTitle.textContent = meta.panelTitle;
+          document.getElementById("prevPage").addEventListener("click", () => {
+            if (page > 1) renderUsers(page - 1);
+          });
 
-                if (page === "folice") renderFolice();
-                if (page === "profolios") renderProfolios();
-                if (page === "users") renderUsers();
-                if (page === "teams") renderTeamsPage(); // ✅ 탭 구조
-            }
+          document.getElementById("nextPage").addEventListener("click", () => {
+            if (page < totalPages) renderUsers(page + 1);
+          });
 
-            /* ------------------ Folice ------------------ */
-            function renderFolice() {
-                $panelFoot.style.display = "none";
-                $panelCount.textContent = `${foliceList.length}건`;
-                $panelBody.innerHTML = `
-    <table class="table">
-      <thead>
-        <tr><th>ID</th><th>파일명</th><th>업로더</th><th>상태</th><th>업로드일</th><th class="th-actions">관리</th></tr>
-      </thead>
-      <tbody>
-        ${foliceList
-            .map(
-                (f) => `
-          <tr>
-            <td class="cell-strong">${f.id}</td>
-            <td>${f.name}</td>
-            <td>${f.owner}</td>
-            <td>${f.status}</td>
-            <td>${f.created}</td>
-            <td class="td-actions">
-              <button class="btn">수정</button>
-              <button class="btn">삭제</button>
-            </td>
-          </tr>
-        `
-            )
-            .join("")}
-      </tbody>
-    </table>`;
-            }
+          // ✅ 회원 탈퇴 기능 (Soft Delete)
+          document.querySelectorAll('[data-act="delete"]').forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              if (!confirm("정말 이 회원을 탈퇴 처리하시겠습니까?")) return;
+              const id = btn.dataset.id;
+              const res = await fetch(`/api/admin/users/${id}`, {
+                method: "DELETE",
+              });
+              const data = await res.json();
 
-            /* ------------------ Profolios ------------------ */
-            function renderProfolios() {
-                $panelFoot.style.display = "none";
-                $panelCount.textContent = `${profoliosList.length}건`;
-                $panelBody.innerHTML = `
-    <table class="table">
-      <thead>
-        <tr><th>ID</th><th>제목</th><th>작성자</th><th>태그</th><th>등록일</th><th class="th-actions">관리</th></tr>
-      </thead>
-      <tbody>
-        ${profoliosList
-            .map(
-                (p) => `
-          <tr>
-            <td class="cell-strong">${p.id}</td>
-            <td>${p.title}</td>
-            <td>${p.author}</td>
-            <td>${p.tag}</td>
-            <td>${p.created}</td>
-            <td class="td-actions">
-              <button class="btn">수정</button>
-              <button class="btn">삭제</button>
-            </td>
-          </tr>
-        `
-            )
-            .join("")}
-      </tbody>
-    </table>`;
-            }
+              if (data.success) {
+                alert("회원이 탈퇴 처리되었습니다.");
+                renderUsers(page); // 현재 페이지 다시 로드
+              } else {
+                alert("탈퇴 실패: " + (data.message || "알 수 없는 오류"));
+              }
+            });
+          });
+        } catch (err) {
+          console.error(err);
+          alert("유저 데이터를 불러오지 못했습니다.");
+        }
+      }
 
-            /* ------------------ Users ------------------ */
-            function renderUsers() {
-                $panelFoot.style.display = "none";
-                $panelCount.textContent = `${usersList.length}건`;
-                $panelBody.innerHTML = `
-    <table class="table">
-      <thead>
-        <tr><th>ID</th><th>이메일</th><th>닉네임</th><th>역할</th><th>가입일</th><th class="th-actions">관리</th></tr>
-      </thead>
-      <tbody>
-        ${usersList
-            .map(
-                (u) => `
-          <tr>
-            <td class="cell-strong">${u.id}</td>
-            <td>${u.email}</td>
-            <td>${u.nick}</td>
-            <td>${u.role}</td>
-            <td>${u.joined}</td>
-            <td class="td-actions">
-              <button class="btn">수정</button>
-              <button class="btn">삭제</button>
-            </td>
-          </tr>
-        `
-            )
-            .join("")}
-      </tbody>
-    </table>`;
-            }
+      /* ======================================================
+   Teams – 실제 백엔드 연동
+====================================================== */
+      let allMembers = [];
+      let teams = [];
+      let editingTeamId = null;
 
-            /* ======================================================
-   Teams – 탭(팀 편성 / 팀 관리) + 각각의 화면 렌더러
-   ====================================================== */
-            let editingTeamId = null;
+      // ✅ 유저 & 팀 불러오기
+      async function loadMembers() {
+        const res = await fetch("/api/admin/users/basic");
+        allMembers = await res.json();
+      }
+      async function loadTeams() {
+        const res = await fetch("/api/admin/teams");
+        teams = await res.json();
+      }
 
-            function renderTeamsPage(activeTab = "compose") {
-                $panelFoot.style.display = "none";
-                $panelTitle.textContent = "팀";
-                $panelCount.textContent = `${teams.length}팀`;
+      // ✅ 팀 저장
+      async function saveTeam(name, memberNames) {
+        // memberNames → DB에 있는 userId로 변환
+        const memberIds = allMembers
+          .filter((m) => memberNames.includes(m.name))
+          .map((m) => m.id);
 
-                // 탭 + 컨테이너
-                $panelBody.innerHTML = `
+        const res = await fetch("/api/admin/teams", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, memberIds }),
+        });
+        if (!res.ok) alert("팀 저장 실패");
+        else alert("팀이 저장되었습니다!");
+        await loadTeams();
+        renderTeamsPage("manage");
+      }
+
+      // ✅ 팀 삭제
+      async function deleteTeam(id) {
+        const res = await fetch(`/api/admin/teams/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          alert("삭제되었습니다.");
+          await loadTeams();
+          renderTeamsPage("manage");
+        } else {
+          alert("삭제 실패");
+        }
+      }
+
+      /* ------------------ 팀 페이지 ------------------ */
+      async function renderTeamsPage(activeTab = "compose") {
+        $panelFoot.style.display = "none"; 
+        await Promise.all([loadMembers(), loadTeams()]);
+        $panelCount.textContent = `${teams.length}팀`;
+
+        $panelBody.innerHTML = `
     <div class="tabbar" role="tablist">
       <button class="tab ${
-          activeTab === "compose" ? "is-active" : ""
-      }" data-tab="compose" role="tab" aria-selected="${
-                    activeTab === "compose"
-                }">팀 편성</button>
+        activeTab === "compose" ? "is-active" : ""
+      }" data-tab="compose">팀 편성</button>
       <button class="tab ${
-          activeTab === "manage" ? "is-active" : ""
-      }"  data-tab="manage"  role="tab" aria-selected="${
-                    activeTab === "manage"
-                }">팀 관리</button>
+        activeTab === "manage" ? "is-active" : ""
+      }" data-tab="manage">팀 관리</button>
     </div>
     <div id="teamsTabContent"></div>
   `;
 
-                // 이벤트
-                document.querySelectorAll(".tabbar .tab").forEach((btn) => {
-                    btn.addEventListener("click", () => {
-                        document
-                            .querySelectorAll(".tabbar .tab")
-                            .forEach((b) => b.classList.remove("is-active"));
-                        btn.classList.add("is-active");
-                        const tab = btn.dataset.tab;
-                        renderTeamsTab(tab);
-                    });
-                });
+        document.querySelectorAll(".tabbar .tab").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document
+              .querySelectorAll(".tabbar .tab")
+              .forEach((b) => b.classList.remove("is-active"));
+            btn.classList.add("is-active");
+            renderTeamsTab(btn.dataset.tab);
+          });
+        });
 
-                // 초기 탭
-                renderTeamsTab(activeTab);
-            }
+        renderTeamsTab(activeTab);
+      }
 
-            function renderTeamsTab(tab) {
-                const wrap = document.getElementById("teamsTabContent");
-                if (tab === "compose") {
-                    renderTeamComposer(wrap);
-                } else {
-                    renderTeamListView(wrap);
-                }
-            }
+      function renderTeamsTab(tab) {
+        const wrap = document.getElementById("teamsTabContent");
+        if (tab === "compose") renderTeamComposer(wrap);
+        else renderTeamListView(wrap);
+      }
 
-            /* ---------- 팀 편성 탭 ---------- */
-            function renderTeamComposer(rootEl) {
-                rootEl.innerHTML = `
+      /* ------------------ 팀 편성 탭 ------------------ */
+      function renderTeamComposer(rootEl) {
+        rootEl.innerHTML = `
     <div class="team-manager">
-      <!-- 좌: 회원 목록 -->
       <div class="team-column">
         <h3>회원 목록</h3>
         <input type="search" id="memberSearch" placeholder="회원 검색" />
         <ul id="memberList" class="list-box"></ul>
       </div>
-
-      <!-- 중앙: 이동 버튼 -->
       <div class="team-controls">
         <button id="btnAdd" class="btn">▶</button>
         <button id="btnRemove" class="btn">◀</button>
       </div>
-
-      <!-- 우: 선택된 팀원 & 저장 -->
       <div class="team-column">
         <h3>선택된 팀원</h3>
         <ul id="selectedList" class="list-box"></ul>
         <input type="text" id="teamName" placeholder="팀 이름 입력" />
         <button id="btnSaveTeam" class="btn btn-teal full">${
-            editingTeamId ? "팀 수정 완료" : "팀 저장"
+          editingTeamId ? "팀 수정 완료" : "팀 저장"
         }</button>
       </div>
     </div>
   `;
 
-                const $memberList = document.getElementById("memberList");
-                const $selectedList = document.getElementById("selectedList");
-                const $memberSearch = document.getElementById("memberSearch");
-                const $teamName = document.getElementById("teamName");
-                const $btnAdd = document.getElementById("btnAdd");
-                const $btnRemove = document.getElementById("btnRemove");
-                const $btnSaveTeam = document.getElementById("btnSaveTeam");
+        const $memberList = document.getElementById("memberList");
+        const $selectedList = document.getElementById("selectedList");
+        const $memberSearch = document.getElementById("memberSearch");
+        const $teamName = document.getElementById("teamName");
 
-                // 편집 모드라면 채우기
-                if (editingTeamId !== null) {
-                    const t = teams.find((v) => v.id === editingTeamId);
-                    if (t) {
-                        $teamName.value = t.name;
-                        t.members.forEach((nm, i) => {
-                            const li = document.createElement("li");
-                            li.textContent = nm;
-                            li.dataset.id = "sel-" + i;
-                            $selectedList.appendChild(li);
-                        });
-                    }
-                }
-
-                function renderAllMembers() {
-                    const selectedNames = [...$selectedList.children].map(
-                        (li) => li.textContent
-                    );
-                    $memberList.innerHTML = "";
-                    allMembers.forEach((m) => {
-                        if (!selectedNames.includes(m.name)) {
-                            const li = document.createElement("li");
-                            li.textContent = m.name;
-                            li.dataset.id = m.id;
-                            $memberList.appendChild(li);
-                        }
-                    });
-                }
-                function makeSelectable($ul) {
-                    $ul.addEventListener("click", (e) => {
-                        if (e.target.tagName === "LI") {
-                            [...$ul.children].forEach((li) =>
-                                li.classList.remove("selected")
-                            );
-                            e.target.classList.add("selected");
-                        }
-                    });
-                }
-
-                $btnAdd.addEventListener("click", () => {
-                    const sel = $memberList.querySelector(".selected");
-                    if (!sel) return;
-                    sel.classList.remove("selected");
-                    $selectedList.appendChild(sel);
-                });
-                $btnRemove.addEventListener("click", () => {
-                    const sel = $selectedList.querySelector(".selected");
-                    if (!sel) return;
-                    sel.remove();
-                    renderAllMembers();
-                });
-
-                $btnSaveTeam.addEventListener("click", () => {
-                    const name = $teamName.value.trim();
-                    const members = [...$selectedList.children].map(
-                        (li) => li.textContent
-                    );
-                    if (!name) {
-                        alert("팀 이름을 입력하세요!");
-                        return;
-                    }
-                    if (members.length === 0) {
-                        alert("팀원을 선택하세요!");
-                        return;
-                    }
-
-                    if (editingTeamId !== null) {
-                        const idx = teams.findIndex(
-                            (t) => t.id === editingTeamId
-                        );
-                        if (idx >= 0) {
-                            teams[idx].name = name;
-                            teams[idx].members = members;
-                        }
-                        editingTeamId = null;
-                    } else {
-                        const id = (teams.at(-1)?.id ?? 0) + 1;
-                        const createdAt = new Date().toLocaleString();
-                        teams.push({ id, name, members, createdAt });
-                    }
-                    // 완료 후 ‘팀 관리’ 탭으로 이동
-                    renderTeamsPage("manage");
-                });
-
-                $memberSearch.addEventListener("input", () => {
-                    const q = $memberSearch.value.toLowerCase();
-                    [...$memberList.children].forEach((li) => {
-                        li.style.display = li.textContent
-                            .toLowerCase()
-                            .includes(q)
-                            ? ""
-                            : "none";
-                    });
-                });
-
-                makeSelectable($memberList);
-                makeSelectable($selectedList);
-                renderAllMembers();
+        // 렌더링 함수
+        function renderAllMembers() {
+          const selectedNames = [...$selectedList.children].map(
+            (li) => li.textContent
+          );
+          $memberList.innerHTML = "";
+          allMembers.forEach((m) => {
+            if (!selectedNames.includes(m.name)) {
+              const li = document.createElement("li");
+              li.textContent = m.name;
+              li.dataset.id = m.id;
+              $memberList.appendChild(li);
             }
+          });
+        }
 
-            /* ---------- 팀 관리 탭 ---------- */
-            function renderTeamListView(rootEl) {
-                rootEl.innerHTML = `
+        // 리스트 선택 기능
+        function makeSelectable($ul) {
+          $ul.addEventListener("click", (e) => {
+            if (e.target.tagName === "LI") {
+              [...$ul.children].forEach((li) =>
+                li.classList.remove("selected")
+              );
+              e.target.classList.add("selected");
+            }
+          });
+        }
+
+        // 버튼 이벤트
+        document.getElementById("btnAdd").addEventListener("click", () => {
+          const sel = $memberList.querySelector(".selected");
+          if (sel) $selectedList.appendChild(sel);
+        });
+        document.getElementById("btnRemove").addEventListener("click", () => {
+          const sel = $selectedList.querySelector(".selected");
+          if (sel) {
+            sel.remove();
+            renderAllMembers();
+          }
+        });
+        document
+          .getElementById("btnSaveTeam")
+          .addEventListener("click", async () => {
+            const name = $teamName.value.trim();
+            const members = [...$selectedList.children].map(
+              (li) => li.textContent
+            );
+            if (!name) return alert("팀 이름을 입력하세요!");
+            if (members.length === 0) return alert("팀원을 선택하세요!");
+            await saveTeam(name, members);
+          });
+
+        $memberSearch.addEventListener("input", () => {
+          const q = $memberSearch.value.toLowerCase();
+          [...$memberList.children].forEach((li) => {
+            li.style.display = li.textContent.toLowerCase().includes(q)
+              ? ""
+              : "none";
+          });
+        });
+
+        makeSelectable($memberList);
+        makeSelectable($selectedList);
+        renderAllMembers();
+      }
+
+      /* ------------------ 팀 관리 탭 ------------------ */
+      function renderTeamListView(rootEl) {
+        rootEl.innerHTML = `
     <div class="team-result">
       <h3>저장된 팀 목록</h3>
       <ul id="teamList"></ul>
     </div>
   `;
-                const $teamList = document.getElementById("teamList");
 
-                function draw() {
-                    $teamList.innerHTML = teams
-                        .map(
-                            (t) => `
-      <li>
-        <div class="team-item">
-          <div class="team-info">
-            <div class="team-name">${t.name}</div>
-            <div class="team-members">${t.members.join(", ")}</div>
-            <div class="team-meta">${t.createdAt}</div>
-          </div>
-          <div class="team-actions">
-            <button class="btn" data-act="edit" data-id="${t.id}">수정</button>
-            <button class="btn danger" data-act="delete" data-id="${
+        const $teamList = document.getElementById("teamList");
+        function draw() {
+          $teamList.innerHTML = teams
+            .map(
+              (t) => `
+        <li>
+          <div class="team-item">
+            <div class="team-info">
+              <div class="team-name">${t.name}</div>
+              <div class="team-members">${t.members.join(", ")}</div>
+              <div class="team-meta">${t.createdAt}</div>
+            </div>
+            <div class="team-actions">
+              <button class="btn danger" data-act="delete" data-id="${
                 t.id
-            }">삭제</button>
+              }">삭제</button>
+            </div>
           </div>
-        </div>
-      </li>
-    `
-                        )
-                        .join("");
-                    $panelCount.textContent = `${teams.length}팀`;
-                }
+        </li>
+      `
+            )
+            .join("");
+          $panelCount.textContent = `${teams.length}팀`;
+        }
 
-                $teamList.addEventListener("click", (e) => {
-                    const act = e.target.dataset.act;
-                    const id = Number(e.target.dataset.id);
-                    if (!act || !id) return;
+        $teamList.addEventListener("click", async (e) => {
+          const act = e.target.dataset.act;
+          const id = Number(e.target.dataset.id);
+          if (act === "delete") {
+            if (!confirm("정말 이 팀을 삭제하시겠습니까?")) return;
+            await deleteTeam(id);
+          }
+        });
 
-                    if (act === "edit") {
-                        editingTeamId = id; // 편집 대상 저장
-                        renderTeamsPage("compose"); // 👉 팀 편성 탭으로 이동 + 데이터 주입
-                    }
-                    if (act === "delete") {
-                        if (!confirm("정말 이 팀을 삭제하시겠습니까?")) return;
-                        teams = teams.filter((t) => t.id !== id);
-                        draw();
-                    }
-                });
+        draw();
+      }
 
-                draw();
-            }
-
-            /* ------------------ 초기 진입 ------------------ */
-            loadPage("folice");
-        </script>
-    </body>
+      /* ------------------ 초기 진입 ------------------ */
+      loadPage("folice");
+    </script>
+  </body>
 </html>

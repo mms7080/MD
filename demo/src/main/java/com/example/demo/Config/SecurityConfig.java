@@ -26,7 +26,9 @@ public class SecurityConfig {
         http
             // CSRF 기본 활성 (폼에 CSRF 토큰만 넣으면 됨)
             .csrf(csrf -> csrf
-      .ignoringRequestMatchers("/api/send-code"))
+      .ignoringRequestMatchers(
+                    "/api/**",
+                    "/api/send-code"))
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
