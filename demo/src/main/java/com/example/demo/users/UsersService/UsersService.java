@@ -70,7 +70,7 @@ public class UsersService {
         users.setPassword(encodedPassword);
         users.setName(usersDTO.getName());
         users.setEmail(normalizedEmail);
-        users.setAge(usersDTO.getAge());
+        users.setBirth(usersDTO.getBirth());
         users.setGender(usersDTO.getGender());
         users.setRole(Role.USER);
 
@@ -198,7 +198,7 @@ public class UsersService {
         ProfileDTO profiledto = new ProfileDTO();
         profiledto.setName(users.getName());
         profiledto.setEmail(users.getEmail());
-        profiledto.setAge(users.getAge());
+        profiledto.setBirth(users.getBirth());
         profiledto.setGender(users.getGender());
         profiledto.setProfileImgUrl(profile != null ? profile.getProfileImgUrl() : null);
         profiledto.setGithubUrl(profile != null && profile.getGithubUrl() != null ? profile.getGithubUrl() : "");
