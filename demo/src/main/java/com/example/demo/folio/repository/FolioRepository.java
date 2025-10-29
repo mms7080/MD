@@ -4,6 +4,7 @@ import com.example.demo.folio.entity.Folio;
 import com.example.demo.users.UsersEntity.Users;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,5 +41,12 @@ public interface FolioRepository extends JpaRepository<Folio, String> {
 
     Page<Folio> findAllByUserAndStatus(Users user, Folio.Status status, Pageable pageable);
     Page<Folio> findAllByStatusOrderByUpdatedAtDesc(Folio.Status status, Pageable pageable);
+
+    @Query("SELECT f FROM Folio f JOIN FETCH f.user")
+    List<Folio> findAllWithUser();
+
+    @Query("SELECT f FROM Folio f JOIN FETCH f.user WHERE f.status = 'PUBLISHED'")
+    List<Folio> findAllPublishedWithUser();
+    
     
 }

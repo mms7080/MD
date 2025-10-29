@@ -28,6 +28,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
       .ignoringRequestMatchers(
                     "/api/**",
+                    "/api/admin/folios",
                     "/api/send-code"))
 
             .authorizeHttpRequests(auth -> auth
@@ -45,7 +46,8 @@ public class SecurityConfig {
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/uploads/**", // 이미지(훈희)
                     "/home/**",
-                    "/forgot/**"
+                    "/forgot/**",
+                    "/api/admin/folios"
                    
                    
                    

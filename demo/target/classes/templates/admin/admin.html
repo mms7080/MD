@@ -63,7 +63,7 @@
       <aside class="nav-rail">
         <div class="org-name">관리자</div>
         <nav class="rail-menu" id="sidebar">
-          <a href="#" class="rail-item is-active" data-page="folice"><span class="dot"></span> Folice 관리</a>
+          <a href="#" class="rail-item is-active" data-page="folio"><span class="dot"></span> 폴리오 관리</a>
           <a href="#" class="rail-item" data-page="profolios"><span class="dot"></span> 포토폴리오 관리</a>
           <a href="#" class="rail-item" data-page="teams"><span class="dot"></span> 팀 관리</a>
           <a href="#" class="rail-item" data-page="users"><span class="dot"></span> 유저 관리</a>
@@ -73,14 +73,14 @@
       <main class="page">
         <div class="page-header">
           <div class="page-titles">
-            <h1 id="pageTitle">Folice 관리</h1>
-            <p class="sub" id="pageSub">파일/배너 등 Folice 리소스를 관리합니다.</p>
+            <h1 id="pageTitle">폴리오 관리</h1>
+            <p class="sub" id="pageSub">폴리오를 관리합니다.</p>
           </div>
         </div>
 
         <section class="panel">
           <div class="panel-head">
-            <h2 id="panelTitle">Folice 목록</h2>
+            <h2 id="panelTitle">폴리오 목록</h2>
             <span class="count" id="panelCount">0건</span>
           </div>
 
@@ -109,8 +109,8 @@
 
       /* ========================== 페이지 정보 ========================== */
       const pageMeta = {
-        folice: { title: "Folice 관리", sub: "파일/배너 등 Folice 리소스를 관리합니다.", panelTitle: "Folice 목록" },
-        profolios: { title: "Profolios 관리", sub: "프로젝트 포트폴리오를 관리합니다.", panelTitle: "Profolios 목록" },
+        folio: { title: "폴리오 관리", sub: "폴리오를 관리합니다.", panelTitle: "폴리오 목록" },
+        profolios: { title: "포토폴리오 관리", sub: "프로젝트 포트폴리오를 관리합니다.", panelTitle: "포토폴리오 목록" },
         teams: { title: "팀 관리", sub: "‘팀 편성’과 ‘팀 관리’ 탭에서 작업하세요.", panelTitle: "팀" },
         users: { title: "유저 관리", sub: "사용자 계정과 권한을 관리합니다.", panelTitle: "유저 목록" },
       };
@@ -132,22 +132,104 @@
         $sub.textContent = meta.sub;
         $panelTitle.textContent = meta.panelTitle;
 
-        if (page === "folice") renderFolice();
+        if (page === "folio") renderFolio();
         if (page === "profolios") renderProfolios();
         if (page === "users") renderUsers();
         if (page === "teams") renderTeamsPage();
       }
 
-      /* ========================== FOLICE / PORTFOLIOS ========================== */
-      function renderFolice() {
-        $panelFoot.style.display = "none";
-        $panelBody.innerHTML = "<p>Folice 관리 페이지입니다.</p>";
-        $panelCount.textContent = "0건";
+      
+      /* ========================== FOLIO 관리 ========================== */
+      async function renderFolio(page = 1) {
+        $panelFoot.style.display = "flex";
+        try {
+          const res = await fetch(`/api/admin/folios?page=${page - 1}&size=10`);
+          const data = await res.json();
+          const folios = data.folios || [];
+          const totalPages = data.totalPages || 1;
+          const totalItems = data.totalItems || folios.length;
+
+          $panelCount.textContent = `${totalItems}건`;
+
+          $panelBody.innerHTML = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>썸네일</th>
+                  <th>작성자</th>
+                  <th>제목</th>
+                  <th>템플릿</th>
+                  <th>상태</th>
+                  <th>작성일</th>
+                  <th class="th-actions">관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${
+                  folios.length === 0
+                    ? `<tr><td colspan="8" style="text-align:center;color:#888;">등록된 폴리오가 없습니다.</td></tr>`
+                    : folios.map(f => `
+                      <tr>
+                        <td><img src="${f.thumbnail || "https://picsum.photos/seed/folio/80/50"}" style="width:80px;height:50px;object-fit:cover;border-radius:4px;"></td>
+                        <td>${f.user ? f.user.name : "미지정"}</td>
+                        <td>${f.title}</td>
+                        <td>${f.template}</td>
+                        <td>${f.status}</td>
+                        <td>${f.createdAt}</td>
+                        <td class="td-actions">
+                          <button class="btn danger" data-act="delete" data-id="${f.id}">삭제</button>
+                        </td>
+                      </tr>
+                    `).join("")
+                }
+              </tbody>
+            </table>
+          `;
+
+          // 페이지네이션
+          const startPage = Math.max(1, page - 2);
+          const endPage = Math.min(totalPages, startPage + 4);
+          let paginationHTML = `
+            <div style="width:100%;display:flex;flex-direction:column;align-items:center;">
+              <div class="pagination">
+                <button id="prevFolioPage" ${page === 1 ? "disabled" : ""}>‹</button>
+          `;
+
+          for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `<button class="${i === page ? "active" : ""}" data-page="${i}">${i}</button>`;
+          }
+
+          paginationHTML += `<button id="nextFolioPage" ${page >= totalPages ? "disabled" : ""}>›</button></div></div>`;
+          $panelFoot.innerHTML = paginationHTML;
+
+          document.querySelectorAll(".pagination button[data-page]").forEach((btn) => {
+            btn.addEventListener("click", () => renderFolio(Number(btn.dataset.page)));
+          });
+          document.getElementById("prevFolioPage").addEventListener("click", () => page > 1 && renderFolio(page - 1));
+          document.getElementById("nextFolioPage").addEventListener("click", () => page < totalPages && renderFolio(page + 1));
+
+          document.querySelectorAll('[data-act="delete"]').forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              if (!confirm("정말 이 폴리오를 삭제하시겠습니까?")) return;
+              const id = btn.dataset.id;
+              const res = await fetch(`/api/admin/folios/${id}`, { method: "DELETE" });
+              const result = await res.json();
+              if (result.success) {
+                alert("폴리오가 삭제되었습니다.");
+                renderFolio(page);
+              } else alert("삭제 실패: " + (result.message || "알 수 없는 오류"));
+            });
+          });
+        } catch (err) {
+          console.error(err);
+          alert("폴리오 데이터를 불러오지 못했습니다.");
+        }
       }
+
 
       function renderProfolios() {
         $panelFoot.style.display = "none";
-        $panelBody.innerHTML = "<p>Profolio 관리 페이지입니다.</p>";
+        $panelBody.innerHTML = "<p>포토폴리오 관리 페이지입니다.</p>";
         $panelCount.textContent = "0건";
       }
 
@@ -429,7 +511,7 @@
       }
 
       /* ========================== 초기 로드 ========================== */
-      loadPage("folice");
+      loadPage("folio");
     </script>
   </body>
 </html>
