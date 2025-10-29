@@ -1,6 +1,9 @@
 package com.example.demo.users.UsersEntity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,8 +38,12 @@ public class Users {
     @Column(nullable = false)
     private String email;
 
+    // @Column(nullable = false)
+    // private Integer age;
+
     @Column(nullable = false)
-    private Integer age;
+    private LocalDate birth; // 생년월일
+
 
     @Enumerated(EnumType.STRING) // ✅ enum을 문자열로 저장
     @Column(nullable = false, length = 10)
@@ -51,5 +58,9 @@ public class Users {
 
     @Column
     private LocalDateTime deletedAt; // 삭제일자
+
+    @Column
+    @CreationTimestamp
+    private LocalDateTime createdAt; // 생성일자
 
 }

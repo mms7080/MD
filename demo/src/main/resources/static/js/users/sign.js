@@ -80,46 +80,46 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-/* ========== 생년월일 → 만 나이 자동 계산 ========== */
-(function () {
-    const birth = document.getElementById("birth");
-    const ageHidden = document.getElementById("ageHidden");
-    if (!birth || !ageHidden) return;
+// /* ========== 생년월일 → 만 나이 자동 계산 ========== */
+// (function () {
+//     const birth = document.getElementById("birth");
+//     const ageHidden = document.getElementById("ageHidden");
+//     if (!birth || !ageHidden) return;
 
-    // 미래 금지 / 최소연도
-    const today = new Date();
-    birth.max = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(
-        2,
-        "0"
-    )}-${String(today.getDate()).padStart(2, "0")}`;
-    birth.min = `1900-01-01`;
+//     // 미래 금지 / 최소연도
+//     const today = new Date();
+//     birth.max = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(
+//         2,
+//         "0"
+//     )}-${String(today.getDate()).padStart(2, "0")}`;
+//     birth.min = `1900-01-01`;
 
-    function syncAge() {
-        const val = birth.value; // yyyy-mm-dd
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) {
-            ageHidden.value = "";
-            return;
-        }
-        const [y, m, d] = val.split("-").map(Number);
-        const b = new Date(y, m - 1, d);
-        if (isNaN(b)) {
-            ageHidden.value = "";
-            return;
-        }
+//     function syncAge() {
+//         const val = birth.value; // yyyy-mm-dd
+//         if (!/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+//             ageHidden.value = "";
+//             return;
+//         }
+//         const [y, m, d] = val.split("-").map(Number);
+//         const b = new Date(y, m - 1, d);
+//         if (isNaN(b)) {
+//             ageHidden.value = "";
+//             return;
+//         }
 
-        const now = new Date();
-        let age = now.getFullYear() - b.getFullYear();
-        const beforeBirthday =
-            now.getMonth() < b.getMonth() ||
-            (now.getMonth() === b.getMonth() && now.getDate() < b.getDate());
-        if (beforeBirthday) age--;
-        ageHidden.value = age >= 0 && age < 200 ? String(age) : "";
-    }
+//         const now = new Date();
+//         let age = now.getFullYear() - b.getFullYear();
+//         const beforeBirthday =
+//             now.getMonth() < b.getMonth() ||
+//             (now.getMonth() === b.getMonth() && now.getDate() < b.getDate());
+//         if (beforeBirthday) age--;
+//         ageHidden.value = age >= 0 && age < 200 ? String(age) : "";
+//     }
 
-    birth.addEventListener("change", syncAge);
-    birth.addEventListener("input", syncAge);
-    if (!ageHidden.value) syncAge();
-})();
+//     birth.addEventListener("change", syncAge);
+//     birth.addEventListener("input", syncAge);
+//     if (!ageHidden.value) syncAge();
+// })();
 
 (function () {
     const combo = document.getElementById("emailCombo");
