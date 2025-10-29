@@ -29,6 +29,7 @@ public class SecurityConfig {
       .ignoringRequestMatchers(
                     "/api/**",
                     "/api/admin/folios",
+                    "/api/admin/portfolios",
                     "/api/send-code"))
 
             .authorizeHttpRequests(auth -> auth
@@ -47,6 +48,7 @@ public class SecurityConfig {
                     "/uploads/**", // 이미지(훈희)
                     "/home/**",
                     "/forgot/**",
+                    "/api/admin/portfolios",
                     "/api/admin/folios"
                    
                    

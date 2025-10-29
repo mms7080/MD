@@ -13,45 +13,246 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 6px;
-        margin-top: 20px;
+        gap: 8px;
+        margin-top: 24px;
         flex-wrap: wrap;
       }
+
       .pagination button {
+        width: 36px;
+        height: 36px;
         border: none;
-        border-radius: 6px;
-        width: 34px;
-        height: 34px;
-        font-size: 14px;
+        border-radius: 10px;
+        font-size: 14px; 
+        font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 500;
+        transition: background 0.18s ease, color 0.18s ease,
+          box-shadow 0.18s ease, border-color 0.18s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        letter-spacing: 0.1px;
+        border: 1px solid transparent;
       }
+
       [data-theme="light"] .pagination button {
         background: #f4f4f6;
         color: #222;
+        border-color: #e7e7eb; 
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
       }
       [data-theme="light"] .pagination button:hover {
-        background: #e2e2e6;
+        background: #e9e9ee;
       }
       [data-theme="light"] .pagination button.active {
-        background: #111;
+        background: #111; 
         color: #fff;
+        border-color: #111;
+        box-shadow: none;
       }
+
       [data-theme="dark"] .pagination button {
         background: #1f1f25;
         color: #ddd;
+        border-color: #2a2a32;
+        box-shadow: none;
       }
       [data-theme="dark"] .pagination button:hover {
-        background: #2d2d35;
+        background: #2a2a32;
       }
       [data-theme="dark"] .pagination button.active {
-        background: #fff;
+        background: #fff; 
         color: #111;
+        border-color: #fff;
       }
+
+
       .pagination button:disabled {
-        opacity: 0.4;
+        opacity: 0.45;
         cursor: not-allowed;
+        box-shadow: none;
+      }
+
+
+      @media (max-width: 600px) {
+        .pagination button {
+          width: 32px;
+          height: 32px;
+          font-size: 13px;
+          border-radius: 8px;
+        }
+      }
+      #panelFoot {
+        display: flex;
+        justify-content: center !important;
+        align-items: center;
+        width: 100%;
+      }
+
+
+      .kf-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+      }
+
+      .kf-card {
+        position: relative;
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #e2e2e6;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .kf-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .kf-card__thumb {
+        display: block;
+        border-bottom: 1px solid #e2e2e6;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .kf-card__thumb img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.35s ease;
+      }
+
+      .kf-card__thumb:hover img {
+        transform: scale(1.05);
+      }
+
+      .kf-card__body {
+        padding: 14px 16px;
+      }
+
+      .kf-card__title {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .kf-card__title a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .kf-card__inline {
+        font-size: 13px;
+        color: #777;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .kf-card__desc {
+        font-size: 13px;
+        color: #555;
+        margin: 8px 0;
+        line-height: 1.5;
+        min-height: 38px;
+      }
+
+      .kf-card__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 6px;
+      }
+
+      .kf-tag {
+        background: #f4f4f6;
+        border: 1px solid #ddd;
+        color: #333;
+        border-radius: 999px;
+        padding: 3px 8px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .kf-like-right {
+        font-weight: 700;
+        color: #999;
+        font-size: 13px;
+        text-align: right;
+      }
+      .admin-actions {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        gap: 6px;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+
+      .kf-card:hover .admin-actions {
+        opacity: 1;
+      }
+
+      .admin-actions .btn {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 4px 8px;
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        transition: all 0.25s ease;
+      }
+
+      .admin-actions .btn:hover {
+        filter: brightness(1.2);
+      }
+
+      .admin-actions .danger {
+        background: #e54848;
+        border-color: #c93535;
+      }
+
+      .admin-actions .danger:hover {
+        background: #ff4f4f;
+      }
+
+
+      [data-theme="dark"] .kf-card {
+        background: #1c1c21;
+        border-color: #2d2d33;
+        box-shadow: none;
+      }
+
+      [data-theme="dark"] .kf-card__thumb {
+        border-bottom-color: #2d2d33;
+      }
+
+      [data-theme="dark"] .kf-card__desc {
+        color: #aaa;
+      }
+
+      [data-theme="dark"] .kf-tag {
+        background: #2d2d35;
+        border-color: #3c3c46;
+        color: #ddd;
+      }
+
+      [data-theme="dark"] .kf-like-right {
+        color: #bbb;
+      }
+
+      [data-theme="dark"] .admin-actions .btn {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
       }
     </style>
   </head>
@@ -63,10 +264,18 @@
       <aside class="nav-rail">
         <div class="org-name">관리자</div>
         <nav class="rail-menu" id="sidebar">
-          <a href="#" class="rail-item is-active" data-page="folio"><span class="dot"></span> 폴리오 관리</a>
-          <a href="#" class="rail-item" data-page="profolios"><span class="dot"></span> 포토폴리오 관리</a>
-          <a href="#" class="rail-item" data-page="teams"><span class="dot"></span> 팀 관리</a>
-          <a href="#" class="rail-item" data-page="users"><span class="dot"></span> 유저 관리</a>
+          <a href="#" class="rail-item is-active" data-page="folio"
+            ><span class="dot"></span> 폴리오 관리</a
+          >
+          <a href="#" class="rail-item" data-page="profolios"
+            ><span class="dot"></span> 포토폴리오 관리</a
+          >
+          <a href="#" class="rail-item" data-page="teams"
+            ><span class="dot"></span> 팀 관리</a
+          >
+          <a href="#" class="rail-item" data-page="users"
+            ><span class="dot"></span> 유저 관리</a
+          >
         </nav>
       </aside>
 
@@ -99,7 +308,6 @@
     </div>
 
     <script>
-      /* ========================== 기본 엘리먼트 ========================== */
       const $title = document.getElementById("pageTitle");
       const $sub = document.getElementById("pageSub");
       const $panelTitle = document.getElementById("panelTitle");
@@ -107,25 +315,43 @@
       const $panelBody = document.getElementById("panelBody");
       const $panelFoot = document.getElementById("panelFoot");
 
-      /* ========================== 페이지 정보 ========================== */
+      /* 페이지 정보 */
       const pageMeta = {
-        folio: { title: "폴리오 관리", sub: "폴리오를 관리합니다.", panelTitle: "폴리오 목록" },
-        profolios: { title: "포토폴리오 관리", sub: "프로젝트 포트폴리오를 관리합니다.", panelTitle: "포토폴리오 목록" },
-        teams: { title: "팀 관리", sub: "‘팀 편성’과 ‘팀 관리’ 탭에서 작업하세요.", panelTitle: "팀" },
-        users: { title: "유저 관리", sub: "사용자 계정과 권한을 관리합니다.", panelTitle: "유저 목록" },
+        folio: {
+          title: "폴리오 관리",
+          sub: "폴리오를 관리합니다.",
+          panelTitle: "폴리오 목록",
+        },
+        profolios: {
+          title: "포토폴리오 관리",
+          sub: "프로젝트 포트폴리오를 관리합니다.",
+          panelTitle: "포토폴리오 목록",
+        },
+        teams: {
+          title: "팀 관리",
+          sub: "‘팀 편성’과 ‘팀 관리’ 탭에서 작업하세요.",
+          panelTitle: "팀",
+        },
+        users: {
+          title: "유저 관리",
+          sub: "사용자 계정과 권한을 관리합니다.",
+          panelTitle: "유저 목록",
+        },
       };
 
-      /* ========================== 사이드바 ========================== */
+      /* 사이드바*/
       document.querySelectorAll("#sidebar .rail-item").forEach((a) => {
         a.addEventListener("click", (e) => {
           e.preventDefault();
-          document.querySelectorAll("#sidebar .rail-item").forEach((x) => x.classList.remove("is-active"));
+          document
+            .querySelectorAll("#sidebar .rail-item")
+            .forEach((x) => x.classList.remove("is-active"));
           a.classList.add("is-active");
           loadPage(a.dataset.page);
         });
       });
 
-      /* ========================== 페이지 로딩 ========================== */
+      /* 페이지 로딩*/
       function loadPage(page) {
         const meta = pageMeta[page];
         $title.textContent = meta.title;
@@ -138,8 +364,7 @@
         if (page === "teams") renderTeamsPage();
       }
 
-      
-      /* ========================== FOLIO 관리 ========================== */
+      /* FOLIO 관리 */
       async function renderFolio(page = 1) {
         $panelFoot.style.display = "flex";
         try {
@@ -168,19 +393,28 @@
                 ${
                   folios.length === 0
                     ? `<tr><td colspan="8" style="text-align:center;color:#888;">등록된 폴리오가 없습니다.</td></tr>`
-                    : folios.map(f => `
+                    : folios
+                        .map(
+                          (f) => `
                       <tr>
-                        <td><img src="${f.thumbnail || "https://picsum.photos/seed/folio/80/50"}" style="width:80px;height:50px;object-fit:cover;border-radius:4px;"></td>
+                        <td><img src="${
+                          f.thumbnail ||
+                          "https://picsum.photos/seed/folio/80/50"
+                        }" style="width:80px;height:50px;object-fit:cover;border-radius:4px;"></td>
                         <td>${f.user ? f.user.name : "미지정"}</td>
                         <td>${f.title}</td>
                         <td>${f.template}</td>
                         <td>${f.status}</td>
                         <td>${f.createdAt}</td>
                         <td class="td-actions">
-                          <button class="btn danger" data-act="delete" data-id="${f.id}">삭제</button>
+                          <button class="btn danger" data-act="delete" data-id="${
+                            f.id
+                          }">삭제</button>
                         </td>
                       </tr>
-                    `).join("")
+                    `
+                        )
+                        .join("")
                 }
               </tbody>
             </table>
@@ -192,32 +426,52 @@
           let paginationHTML = `
             <div style="width:100%;display:flex;flex-direction:column;align-items:center;">
               <div class="pagination">
-                <button id="prevFolioPage" ${page === 1 ? "disabled" : ""}>‹</button>
+                <button id="prevFolioPage" ${
+                  page === 1 ? "disabled" : ""
+                }>‹</button>
           `;
 
           for (let i = startPage; i <= endPage; i++) {
-            paginationHTML += `<button class="${i === page ? "active" : ""}" data-page="${i}">${i}</button>`;
+            paginationHTML += `<button class="${
+              i === page ? "active" : ""
+            }" data-page="${i}">${i}</button>`;
           }
 
-          paginationHTML += `<button id="nextFolioPage" ${page >= totalPages ? "disabled" : ""}>›</button></div></div>`;
+          paginationHTML += `<button id="nextFolioPage" ${
+            page >= totalPages ? "disabled" : ""
+          }>›</button></div></div>`;
           $panelFoot.innerHTML = paginationHTML;
 
-          document.querySelectorAll(".pagination button[data-page]").forEach((btn) => {
-            btn.addEventListener("click", () => renderFolio(Number(btn.dataset.page)));
-          });
-          document.getElementById("prevFolioPage").addEventListener("click", () => page > 1 && renderFolio(page - 1));
-          document.getElementById("nextFolioPage").addEventListener("click", () => page < totalPages && renderFolio(page + 1));
+          document
+            .querySelectorAll(".pagination button[data-page]")
+            .forEach((btn) => {
+              btn.addEventListener("click", () =>
+                renderFolio(Number(btn.dataset.page))
+              );
+            });
+          document
+            .getElementById("prevFolioPage")
+            .addEventListener("click", () => page > 1 && renderFolio(page - 1));
+          document
+            .getElementById("nextFolioPage")
+            .addEventListener(
+              "click",
+              () => page < totalPages && renderFolio(page + 1)
+            );
 
           document.querySelectorAll('[data-act="delete"]').forEach((btn) => {
             btn.addEventListener("click", async () => {
               if (!confirm("정말 이 폴리오를 삭제하시겠습니까?")) return;
               const id = btn.dataset.id;
-              const res = await fetch(`/api/admin/folios/${id}`, { method: "DELETE" });
+              const res = await fetch(`/api/admin/folios/${id}`, {
+                method: "DELETE",
+              });
               const result = await res.json();
               if (result.success) {
                 alert("폴리오가 삭제되었습니다.");
                 renderFolio(page);
-              } else alert("삭제 실패: " + (result.message || "알 수 없는 오류"));
+              } else
+                alert("삭제 실패: " + (result.message || "알 수 없는 오류"));
             });
           });
         } catch (err) {
@@ -226,21 +480,144 @@
         }
       }
 
+      //포토폴리오
+      async function renderProfolios(page = 1) {
+        $panelFoot.style.display = "flex";
+        try {
+          const res = await fetch(
+            `/api/admin/portfolios?page=${page - 1}&size=12`
+          );
+          const data = await res.json();
+          const portfolios = data.portfolios || [];
+          const totalPages = data.totalPages || 1;
+          const totalItems = data.totalItems || portfolios.length;
+          $panelCount.textContent = `${totalItems}건`;
 
-      function renderProfolios() {
-        $panelFoot.style.display = "none";
-        $panelBody.innerHTML = "<p>포토폴리오 관리 페이지입니다.</p>";
-        $panelCount.textContent = "0건";
+          $panelBody.innerHTML = `
+      <div class="kf-grid">
+        ${
+          portfolios.length === 0
+            ? `<p style="grid-column:1/-1;text-align:center;color:#888;">등록된 포트폴리오가 없습니다.</p>`
+            : portfolios
+                .map(
+                  (p) => `
+                  <article class="kf-card">
+                    <a class="kf-card__thumb" href="/portfolios/${p.id}">
+                      <img src="${
+                        p.cover || "/images/default-thumbnail.png"
+                      }" alt="${p.title}">
+                    </a>
+                    <div class="admin-actions">
+                      <button class="btn small" data-act="edit" data-id="${
+                        p.id
+                      }">수정</button>
+                      <button class="btn danger small" data-act="delete" data-id="${
+                        p.id
+                      }">삭제</button>
+                    </div>
+                    <div class="kf-card__body">
+                      <h3 class="kf-card__title"><a href="/portfolios/${
+                        p.id
+                      }">${p.title}</a></h3>
+                      <div class="kf-card__inline">
+                        <span>${p.creator}</span>
+                        <span>·</span>
+                        <time>${p.createdAt}</time>
+                      </div>
+                      <p class="kf-card__desc">${p.desc || ""}</p>
+                      <div class="kf-card__tags">
+                        ${
+                          Array.isArray(p.tags)
+                            ? p.tags
+                                .slice(0, 5)
+                                .map((t) => `<span class="kf-tag">#${t}</span>`)
+                                .join("")
+                            : ""
+                        }
+                      </div>
+                      <div style="margin-top:6px;text-align:right;" class="kf-like-right">
+                        ♥ ${p.likeCount}
+                      </div>
+                    </div>
+                  </article>
+                `
+                )
+                .join("")
+        }
+      </div>
+    `;
+
+          // 페이지네이션
+          const startPage = Math.max(1, page - 2);
+          const endPage = Math.min(totalPages, startPage + 4);
+          let paginationHTML = `
+      <div class="pagination">
+        <button id="prevProfolioPage" ${page === 1 ? "disabled" : ""}>‹</button>
+    `;
+
+          for (let i = startPage; i <= endPage; i++) {
+            paginationHTML += `<button class="${
+              i === page ? "active" : ""
+            }" data-page="${i}">${i}</button>`;
+          }
+
+          paginationHTML += `<button id="nextProfolioPage" ${
+            page >= totalPages ? "disabled" : ""
+          }>›</button></div>`;
+          $panelFoot.innerHTML = paginationHTML;
+
+          document
+            .querySelectorAll(".pagination button[data-page]")
+            .forEach((btn) => {
+              btn.addEventListener("click", () =>
+                renderProfolios(Number(btn.dataset.page))
+              );
+            });
+
+          document
+            .getElementById("prevProfolioPage")
+            .addEventListener("click", () => {
+              if (page > 1) renderProfolios(page - 1);
+            });
+          document
+            .getElementById("nextProfolioPage")
+            .addEventListener("click", () => {
+              if (page < totalPages) renderProfolios(page + 1);
+            });
+
+          // 수정 / 삭제
+          document.querySelectorAll(".admin-actions button").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              const id = btn.dataset.id;
+              if (btn.dataset.act === "delete") {
+                if (!confirm("정말 삭제하시겠습니까?")) return;
+                const res = await fetch(`/api/admin/portfolios/${id}`, {
+                  method: "DELETE",
+                });
+                const result = await res.json();
+                alert(result.success ? "삭제 완료" : "삭제 실패");
+                renderProfolios(page);
+              } else if (btn.dataset.act === "edit") {
+                window.location.href = `/portfolios/edit/${id}`;
+              }
+            });
+          });
+        } catch (err) {
+          console.error(err);
+          alert("포트폴리오 데이터를 불러오지 못했습니다.");
+        }
       }
 
-      /* ========================== USERS 관리 ========================== */
+      /*유저관리 */
       let currentUserPage = 1;
       const USERS_PER_PAGE = 10;
 
       async function renderUsers(page = 1) {
         $panelFoot.style.display = "flex";
         try {
-          const res = await fetch(`/api/admin/users?page=${page - 1}&size=${USERS_PER_PAGE}`);
+          const res = await fetch(
+            `/api/admin/users?page=${page - 1}&size=${USERS_PER_PAGE}`
+          );
           const data = await res.json();
 
           const usersList = data.users || [];
@@ -294,24 +671,41 @@
           `;
 
           for (let i = startPage; i <= endPage; i++) {
-            paginationHTML += `<button class="${i === page ? "active" : ""}" data-page="${i}">${i}</button>`;
+            paginationHTML += `<button class="${
+              i === page ? "active" : ""
+            }" data-page="${i}">${i}</button>`;
           }
 
-          paginationHTML += `<button id="nextPage" ${page >= totalPages ? "disabled" : ""}>›</button></div></div>`;
+          paginationHTML += `<button id="nextPage" ${
+            page >= totalPages ? "disabled" : ""
+          }>›</button></div></div>`;
           $panelFoot.innerHTML = paginationHTML;
 
-          document.querySelectorAll(".pagination button[data-page]").forEach((btn) => {
-            btn.addEventListener("click", () => renderUsers(Number(btn.dataset.page)));
-          });
+          document
+            .querySelectorAll(".pagination button[data-page]")
+            .forEach((btn) => {
+              btn.addEventListener("click", () =>
+                renderUsers(Number(btn.dataset.page))
+              );
+            });
 
-          document.getElementById("prevPage").addEventListener("click", () => page > 1 && renderUsers(page - 1));
-          document.getElementById("nextPage").addEventListener("click", () => page < totalPages && renderUsers(page + 1));
+          document
+            .getElementById("prevPage")
+            .addEventListener("click", () => page > 1 && renderUsers(page - 1));
+          document
+            .getElementById("nextPage")
+            .addEventListener(
+              "click",
+              () => page < totalPages && renderUsers(page + 1)
+            );
 
           document.querySelectorAll('[data-act="delete"]').forEach((btn) => {
             btn.addEventListener("click", async () => {
               if (!confirm("정말 이 회원을 탈퇴 처리하시겠습니까?")) return;
               const id = btn.dataset.id;
-              const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+              const res = await fetch(`/api/admin/users/${id}`, {
+                method: "DELETE",
+              });
               const data = await res.json();
               if (data.success) {
                 alert("회원이 탈퇴 처리되었습니다.");
@@ -325,7 +719,7 @@
         }
       }
 
-      /* ========================== TEAMS 관리 ========================== */
+      /* 팀관리 */
       let allMembers = [];
       let teams = [];
       let editingTeamId = null;
@@ -341,7 +735,9 @@
       }
 
       async function saveTeam(name, memberNames) {
-        const memberIds = allMembers.filter((m) => memberNames.includes(m.name)).map((m) => m.id);
+        const memberIds = allMembers
+          .filter((m) => memberNames.includes(m.name))
+          .map((m) => m.id);
         const res = await fetch("/api/admin/teams", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -369,15 +765,21 @@
 
         $panelBody.innerHTML = `
           <div class="tabbar" role="tablist">
-            <button class="tab ${activeTab === "compose" ? "is-active" : ""}" data-tab="compose">팀 편성</button>
-            <button class="tab ${activeTab === "manage" ? "is-active" : ""}" data-tab="manage">팀 관리</button>
+            <button class="tab ${
+              activeTab === "compose" ? "is-active" : ""
+            }" data-tab="compose">팀 편성</button>
+            <button class="tab ${
+              activeTab === "manage" ? "is-active" : ""
+            }" data-tab="manage">팀 관리</button>
           </div>
           <div id="teamsTabContent"></div>
         `;
 
         document.querySelectorAll(".tabbar .tab").forEach((btn) => {
           btn.addEventListener("click", () => {
-            document.querySelectorAll(".tabbar .tab").forEach((b) => b.classList.remove("is-active"));
+            document
+              .querySelectorAll(".tabbar .tab")
+              .forEach((b) => b.classList.remove("is-active"));
             btn.classList.add("is-active");
             renderTeamsTab(btn.dataset.tab);
           });
@@ -407,7 +809,9 @@
               <h3>선택된 팀원</h3>
               <ul id="selectedList" class="list-box"></ul>
               <input type="text" id="teamName" placeholder="팀 이름 입력" />
-              <button id="btnSaveTeam" class="btn btn-teal full">${editingTeamId ? "팀 수정 완료" : "팀 저장"}</button>
+              <button id="btnSaveTeam" class="btn btn-teal full">${
+                editingTeamId ? "팀 수정 완료" : "팀 저장"
+              }</button>
             </div>
           </div>
         `;
@@ -418,7 +822,9 @@
         const $teamName = document.getElementById("teamName");
 
         function renderAllMembers() {
-          const selectedNames = [...$selectedList.children].map((li) => li.textContent);
+          const selectedNames = [...$selectedList.children].map(
+            (li) => li.textContent
+          );
           $memberList.innerHTML = "";
           allMembers.forEach((m) => {
             if (!selectedNames.includes(m.name)) {
@@ -433,7 +839,9 @@
         function makeSelectable($ul) {
           $ul.addEventListener("click", (e) => {
             if (e.target.tagName === "LI") {
-              [...$ul.children].forEach((li) => li.classList.remove("selected"));
+              [...$ul.children].forEach((li) =>
+                li.classList.remove("selected")
+              );
               e.target.classList.add("selected");
             }
           });
@@ -450,18 +858,24 @@
             renderAllMembers();
           }
         });
-        document.getElementById("btnSaveTeam").addEventListener("click", async () => {
-          const name = $teamName.value.trim();
-          const members = [...$selectedList.children].map((li) => li.textContent);
-          if (!name) return alert("팀 이름을 입력하세요!");
-          if (members.length === 0) return alert("팀원을 선택하세요!");
-          await saveTeam(name, members);
-        });
+        document
+          .getElementById("btnSaveTeam")
+          .addEventListener("click", async () => {
+            const name = $teamName.value.trim();
+            const members = [...$selectedList.children].map(
+              (li) => li.textContent
+            );
+            if (!name) return alert("팀 이름을 입력하세요!");
+            if (members.length === 0) return alert("팀원을 선택하세요!");
+            await saveTeam(name, members);
+          });
 
         $memberSearch.addEventListener("input", () => {
           const q = $memberSearch.value.toLowerCase();
           [...$memberList.children].forEach((li) => {
-            li.style.display = li.textContent.toLowerCase().includes(q) ? "" : "none";
+            li.style.display = li.textContent.toLowerCase().includes(q)
+              ? ""
+              : "none";
           });
         });
 
@@ -491,7 +905,9 @@
                     <div class="team-meta">${t.createdAt}</div>
                   </div>
                   <div class="team-actions">
-                    <button class="btn danger" data-act="delete" data-id="${t.id}">삭제</button>
+                    <button class="btn danger" data-act="delete" data-id="${
+                      t.id
+                    }">삭제</button>
                   </div>
                 </div>
               </li>`
@@ -509,8 +925,6 @@
 
         draw();
       }
-
-      /* ========================== 초기 로드 ========================== */
       loadPage("folio");
     </script>
   </body>
