@@ -427,6 +427,7 @@ private String normalizeFolderName(String rawName) {
         case "오오커뮤니티" -> folder = "oo";
         case "플레너포유" -> folder = "plannerforu";
         case "필모라" -> folder = "filmora";
+        case "모드미" -> folder = "modeme";
         
         // ✅ 필요할 때마다 추가
     }
