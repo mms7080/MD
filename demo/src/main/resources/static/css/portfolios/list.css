@@ -260,6 +260,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    z-index: 20;
 }
 
 /* 드롭다운 컨테이너 */
@@ -311,6 +312,7 @@ body {
     padding: 6px;
     box-shadow: var(--shadow);
     display: none;
+    z-index:30;
 }
 .kf-dd[open] .kf-dd__menu {
     display: block;
@@ -349,6 +351,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); /* 3열 */
     gap: 20px;
+    z-index:1;
 }
 
 /* 반응형(선택) */

@@ -2,8 +2,6 @@ package com.example.demo.portfolios.controller;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -14,17 +12,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.portfolios.dto.PortfolioFormDto;
 import com.example.demo.portfolios.entity.PortfolioComment;
 import com.example.demo.portfolios.entity.PortfoliosEntity;
 import com.example.demo.portfolios.repository.PortfolioCommentRepository;
-import com.example.demo.portfolios.repository.PortfoliosRepository;
+
 import com.example.demo.portfolios.service.CommentService;
 import com.example.demo.portfolios.service.PortfolioService;
 import com.example.demo.users.UsersEntity.Role;
@@ -36,20 +33,19 @@ import com.example.demo.users.UsersRepository.UsersRepository;
 public class PortfoliosController {
 
     private final PortfolioService portfolioService;
-    private final PortfoliosRepository portfoliosRepository;
     private final CommentService commentService;
     private final PortfolioCommentRepository commentRepository;
     private final UsersRepository usersRepository;
 
     public PortfoliosController(
             PortfolioService portfolioService,
-            PortfoliosRepository portfoliosRepository,
+            
             CommentService commentService,
             PortfolioCommentRepository commentRepository,
             UsersRepository usersRepository
     ) {
         this.portfolioService = portfolioService;
-        this.portfoliosRepository = portfoliosRepository;
+        
         this.commentService = commentService;
         this.commentRepository = commentRepository;
         this.usersRepository = usersRepository;
@@ -161,7 +157,7 @@ public class PortfoliosController {
     public String deletePortfolio(@PathVariable Long id) {
         portfolioService.deletePortfolio(id);
         return "redirect:/portfolios";
-    }
+    } 
 
     @PostMapping({"/{id}/comments"})
     public String addComment(@PathVariable Long id,
@@ -266,6 +262,55 @@ public ResponseEntity<String> toggleLike(@PathVariable Long id, Principal princi
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("error");
     }
+}
+
+
+
+@GetMapping("/portfolios")
+public String listPortfolios(
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false) List<String> tags,
+        @RequestParam(defaultValue = "latest") String sort,
+        Model model) {
+
+    boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+    boolean hasTags = tags != null && !tags.isEmpty();
+
+    if (hasTags) {
+        tags = tags.stream()
+                   .map(String::toLowerCase)
+                   .toList();
+    }
+
+    // 🔹 1. 검색/필터 조건으로 포트폴리오 조회
+    List<PortfoliosEntity> portfolios;
+    if (hasKeyword && hasTags) {
+        portfolios = portfolioService.searchPortfoliosWithTags(keyword.trim(), tags);
+    } else if (hasKeyword) {
+        portfolios = portfolioService.searchPortfolios(keyword.trim());
+    } else if (hasTags) {
+        portfolios = portfolioService.filterByTags(tags);
+    } else {
+        portfolios = portfolioService.getPublicPortfolios();
+    }
+
+    // 🔹 2. Lazy 필드 강제 초기화 (getPublicPortfolios()의 핵심 부분만 재활용)
+    portfolios.forEach(p -> {
+        if (p.getTags() != null) p.getTags().size();
+        if (p.getLikes() != null) p.getLikes().size();
+        if (p.getScreenshots() != null) p.getScreenshots().size();
+    });
+
+    // 🔹 3. 정렬 적용
+    portfolios = portfolioService.sortPortfolios(portfolios, sort);
+
+    // 🔹 4. 모델로 전달
+    model.addAttribute("portfolios", portfolios);
+    model.addAttribute("keyword", keyword);
+    model.addAttribute("selectedTags", tags);
+    model.addAttribute("sort", sort);
+
+    return "portfolios/list";
 }
 
 

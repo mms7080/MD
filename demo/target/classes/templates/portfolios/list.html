@@ -35,82 +35,100 @@
                th:value="${keyword}">
     </form>
 
-    <!-- 필터 바 -->
-    <div class="kf-filterbar">
-        <form id="filters" class="kf-filterform">
-            <!-- 언어/툴 체크박스 (숨김) -->
-            <input id="open-lang" type="checkbox" hidden />
-            <input id="open-tools" type="checkbox" hidden />
-            <input id="lang-js" type="checkbox" hidden />
-            <input id="lang-ts" type="checkbox" hidden />
-            <input id="lang-java" type="checkbox" hidden />
-            <input id="lang-python" type="checkbox" hidden />
-            <input id="tool-react" type="checkbox" hidden />
-            <input id="tool-next" type="checkbox" hidden />
-            <input id="tool-spring" type="checkbox" hidden />
-            <input id="tool-tailwind" type="checkbox" hidden />
-            <input id="tool-express" type="checkbox" hidden />
-            <input id="tool-thymeleaf" type="checkbox" hidden />
-
-            <!-- LANGUAGE -->
-            <div class="kf-dd kf-dd--lang">
-                <label class="kf-chip" for="open-lang">LANGUAGE</label>
-                <div class="kf-dd__panel">
-                    <input class="opt-search" type="search" placeholder="언어 검색 (예: Java)" />
-                    <ul class="opt-list">
-                        <li><label class="opt" for="lang-js">JavaScript</label></li>
-                        <li><label class="opt" for="lang-ts">TypeScript</label></li>
-                        <li><label class="opt" for="lang-java">Java</label></li>
-                        <li><label class="opt" for="lang-python">Python</label></li>
-                    </ul>
-                    <div class="dd-actions">
-                        <button class="btn ghost" type="reset">초기화</button>
-                        <label class="btn primary" for="open-lang">적용</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TOOLS -->
-            <div class="kf-dd kf-dd--tools">
-                <label class="kf-chip" for="open-tools">TOOLS</label>
-                <div class="kf-dd__panel">
-                    <input class="opt-search" type="search" placeholder="툴 검색 (예: React)" />
-                    <ul class="opt-list">
-                        <li><label class="opt" for="tool-react">React</label></li>
-                        <li><label class="opt" for="tool-next">Next.js</label></li>
-                        <li><label class="opt" for="tool-spring">Spring Boot</label></li>
-                        <li><label class="opt" for="tool-tailwind">Tailwind</label></li>
-                        <li><label class="opt" for="tool-express">Express</label></li>
-                        <li><label class="opt" for="tool-thymeleaf">Thymeleaf</label></li>
-                    </ul>
-                    <div class="dd-actions">
-                        <button class="btn ghost" type="reset">초기화</button>
-                        <label class="btn primary" for="open-tools">적용</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 선택된 항목 -->
-            <div class="kf-selected">
-                <div class="kf-selected__cloud">
-                    <label class="chip" for="lang-js">JavaScript<span class="x">×</span></label>
-                    <label class="chip" for="lang-ts">TypeScript<span class="x">×</span></label>
-                    <label class="chip" for="lang-java">Java<span class="x">×</span></label>
-                    <label class="chip" for="lang-python">Python<span class="x">×</span></label>
-                    <label class="chip" for="tool-react">React<span class="x">×</span></label>
-                    <label class="chip" for="tool-next">Next.js<span class="x">×</span></label>
-                    <label class="chip" for="tool-spring">Spring Boot<span class="x">×</span></label>
-                    <label class="chip" for="tool-tailwind">Tailwind<span class="x">×</span></label>
-                    <label class="chip" for="tool-express">Express<span class="x">×</span></label>
-                    <label class="chip" for="tool-thymeleaf">Thymeleaf<span class="x">×</span></label>
-                </div>
-            </div>
-        </form>
-
-        <a href="/portfolios/create" class="btn primary kf-create-btn" sec:authorize="hasRole('ADMIN')">
-            CREATE
-        </a>
-    </div>
+   <!-- ✅ 필터 바 -->
+<div class="kf-filterbar">
+    <!-- ✅ 서버로 전달되도록 form에 action/method 추가 -->
+    <form id="filters" class="kf-filterform" action="/portfolios" method="get">
+      <!-- 언어/툴 토글 -->
+      <input id="open-lang" type="checkbox" hidden />
+      <input id="open-tools" type="checkbox" hidden />
+  
+      <!-- ✅ 실제 전송될 체크박스들 -->
+      <!-- LANGUAGE -->
+      <input id="lang-js" name="tags" value="JavaScript" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('JavaScript')}" />
+      <input id="lang-ts" name="tags" value="TypeScript" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('TypeScript')}" />
+      <input id="lang-java" name="tags" value="Java" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('Java')}" />
+      <input id="lang-python" name="tags" value="Python" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('Python')}" />
+  
+      <!-- TOOLS -->
+      <input id="tool-react" name="tags" value="React" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('React')}" />
+      <input id="tool-next" name="tags" value="Next.js" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('Next.js')}" />
+      <input id="tool-spring" name="tags" value="Spring Boot" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('Spring Boot')}" />
+      <input id="tool-tailwind" name="tags" value="Tailwind" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('Tailwind')}" />
+      <input id="tool-express" name="tags" value="Express" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('Express')}" />
+      <input id="tool-thymeleaf" name="tags" value="Thymeleaf" type="checkbox" hidden
+             th:checked="${selectedTags != null and selectedTags.contains('Thymeleaf')}" />
+  
+      <!-- LANGUAGE DROPDOWN -->
+      <div class="kf-dd kf-dd--lang">
+        <label class="kf-chip" for="open-lang">LANGUAGE</label>
+        <div class="kf-dd__panel">
+          <input class="opt-search" type="search" placeholder="언어 검색 (예: Java)" />
+          <ul class="opt-list">
+            <li><label class="opt" for="lang-js">JavaScript</label></li>
+            <li><label class="opt" for="lang-ts">TypeScript</label></li>
+            <li><label class="opt" for="lang-java">Java</label></li>
+            <li><label class="opt" for="lang-python">Python</label></li>
+          </ul>
+          <div class="dd-actions">
+            <button class="btn ghost" type="reset">초기화</button>
+            <!-- ✅ form submit으로 변경 -->
+            <button class="btn primary" type="submit">적용</button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- TOOLS DROPDOWN -->
+      <div class="kf-dd kf-dd--tools">
+        <label class="kf-chip" for="open-tools">TOOLS</label>
+        <div class="kf-dd__panel">
+          <input class="opt-search" type="search" placeholder="툴 검색 (예: React)" />
+          <ul class="opt-list">
+            <li><label class="opt" for="tool-react">React</label></li>
+            <li><label class="opt" for="tool-next">Next.js</label></li>
+            <li><label class="opt" for="tool-spring">Spring Boot</label></li>
+            <li><label class="opt" for="tool-tailwind">Tailwind</label></li>
+            <li><label class="opt" for="tool-express">Express</label></li>
+            <li><label class="opt" for="tool-thymeleaf">Thymeleaf</label></li>
+          </ul>
+          <div class="dd-actions">
+            <button class="btn ghost" type="reset">초기화</button>
+            <button class="btn primary" type="submit">적용</button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- ✅ 선택된 태그 표시 -->
+      <div class="kf-selected">
+        <div class="kf-selected__cloud">
+          <label class="chip" for="lang-js">JavaScript<span class="x">×</span></label>
+          <label class="chip" for="lang-ts">TypeScript<span class="x">×</span></label>
+          <label class="chip" for="lang-java">Java<span class="x">×</span></label>
+          <label class="chip" for="lang-python">Python<span class="x">×</span></label>
+          <label class="chip" for="tool-react">React<span class="x">×</span></label>
+          <label class="chip" for="tool-next">Next.js<span class="x">×</span></label>
+          <label class="chip" for="tool-spring">Spring Boot<span class="x">×</span></label>
+          <label class="chip" for="tool-tailwind">Tailwind<span class="x">×</span></label>
+          <label class="chip" for="tool-express">Express<span class="x">×</span></label>
+          <label class="chip" for="tool-thymeleaf">Thymeleaf<span class="x">×</span></label>
+        </div>
+      </div>
+    </form>
+  
+    <a href="/portfolios/create" class="btn primary kf-create-btn" sec:authorize="hasRole('ADMIN')">
+      CREATE
+    </a>
+  </div>
+  
 </section>
 
 

@@ -471,6 +471,73 @@ public List<PortfoliosEntity> searchByTitleAndTags(String keyword, List<String> 
     }
     
     
+    @Transactional(readOnly = true)
+public List<PortfoliosEntity> searchPortfolios(String keyword) {
+    // 대소문자 무시를 위해 keyword를 소문자로 변환
+    String lowerKeyword = keyword.toLowerCase();
+
+    // 제목, 태그 둘 다 검색
+    return repository.findByTitleContainingIgnoreCaseOrTagsContaining(lowerKeyword);
+}
+
+@Transactional(readOnly = true)
+public List<PortfoliosEntity> filterByTags(List<String> tags) {
+    List<String> lowerTags = tags.stream()
+            .map(tag -> "%" + tag.toLowerCase() + "%") // LIKE 비교용
+            .toList();
+    return repository.findByTagsInIgnoreCase(lowerTags);
+}
+
+
+
+@Transactional(readOnly = true)
+public List<PortfoliosEntity> searchPortfoliosWithTags(String keyword, List<String> tags) {
+    String lowerKeyword = keyword.toLowerCase();
+    List<String> lowerTags = tags.stream()
+            .map(String::toLowerCase)
+            .toList();
+
+    return repository.findByKeywordAndTags(lowerKeyword, lowerTags);
+}
+
+
+@Transactional(readOnly = true)
+public List<PortfoliosEntity> sortPortfolios(List<PortfoliosEntity> list, String sort) {
+
+    if (list == null || list.isEmpty()) return list;
+
+    // createdAt이나 likeCount 실제 필드명에 맞춰서 수정해줘야 해
+    // 예시로: portfolio.getCreatedAt(), portfolio.getLikeCount()
+
+    if ("likes".equalsIgnoreCase(sort)) {
+        // 좋아요 많은 순 (내림차순)
+        return list.stream()
+                .sorted((a, b) -> {
+                    Integer aLikes = safeLikes(a.getLikeCount());
+                    Integer bLikes = safeLikes(b.getLikeCount());
+                    return bLikes.compareTo(aLikes); // b 먼저 -> desc
+                })
+                .toList();
+    }
+
+    // 기본: 최신순 (createdAt desc)
+    return list.stream()
+            .sorted((a, b) -> {
+                // createdAt null 안전 처리
+                var aDate = a.getCreatedAt();
+                var bDate = b.getCreatedAt();
+                if (aDate == null && bDate == null) return 0;
+                if (aDate == null) return 1;  // null은 뒤로
+                if (bDate == null) return -1;
+                return bDate.compareTo(aDate); // 최신 먼저
+            })
+            .toList();
+}
+
+private Integer safeLikes(Integer likeCount) {
+    return likeCount == null ? 0 : likeCount;
+}
+
 
 
 
