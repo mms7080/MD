@@ -42,29 +42,99 @@ window.changeImage = function (step) {
 };
 
 /* -----------------------------
-   태그 더보기 / 접기
+   태그: 아래로 펼치기(자연스러운 두 줄) + 우측 버튼 고정
 ----------------------------- */
-window.toggleTags = function (button) {
-  const tagsList = button.previousElementSibling;
-  if (!tagsList) return;
 
-  const allTags = tagsList.querySelectorAll(".tag-item");
-  const visibleCount = tagsList.querySelectorAll(".tag-item:not([style*='display: none'])").length;
+/** 각 tags-box마다 .tags-extra 만들고, 6개 이후는 거기로 "이동" */
+function initTagsExpandable(){
+  document.querySelectorAll(".tags-box").forEach(box=>{
+    const list = box.querySelector(".tags-list");
+    const label = box.querySelector(".tags-label");
+    if(!list || !label) return;
 
-  if (button.dataset.expanded === "true") {
-    allTags.forEach((tag, i) => (tag.style.display = i < 6 ? "inline-block" : "none"));
-    button.textContent = "+ 더보기";
+    // 이미 초기화면 스킵
+    if (box.dataset.tagsInited === "true") return;
+
+    const iconLeft = box.closest(".icon-left");
+    if(!iconLeft) return;
+
+    // 2행 컨테이너 생성
+    let extra = iconLeft.querySelector(".tags-extra");
+    if(!extra){
+      extra = document.createElement("div");
+      extra.className = "tags-extra";
+      iconLeft.appendChild(extra);  // 그리드 2행에 붙음
+    }else{
+      extra.innerHTML = "";
+    }
+
+    // 기본 6개는 첫 줄, 나머지는 아래 줄로 이동
+    const tags = Array.from(list.querySelectorAll(".tag-item"));
+    tags.forEach((tag, idx)=>{
+      if(idx < 6){
+        tag.style.display = "inline-block";
+        list.appendChild(tag);
+      }else{
+        tag.style.display = "inline-block";
+        extra.appendChild(tag);
+      }
+    });
+
+    // 라벨 폭만큼 들여쓰기 계산 → 두 번째 줄을 첫 태그 시작점에 맞춤
+    const listRect  = list.getBoundingClientRect();
+    const boxRect   = box.getBoundingClientRect();
+    const startPx   = Math.max(0, Math.round(listRect.left - boxRect.left));
+    extra.style.setProperty('--tags-start', startPx + 'px');
+
+    // 더보기 버튼 표시/문구
+    const moreBtn = box.querySelector(".tag-more-btn");
+    if(moreBtn){
+      moreBtn.style.display = extra.children.length ? "inline-block" : "none";
+      moreBtn.dataset.expanded = "false";
+      moreBtn.textContent = "+ 더보기";
+    }
+
+    // 리사이즈 시 들여쓰기 재계산
+    let rAF;
+    const recalc = ()=>{
+      cancelAnimationFrame(rAF);
+      rAF = requestAnimationFrame(()=>{
+        const lr = list.getBoundingClientRect();
+        const br = box.getBoundingClientRect();
+        extra.style.setProperty('--tags-start', Math.max(0, Math.round(lr.left - br.left)) + 'px');
+      });
+    };
+    window.addEventListener('resize', recalc);
+
+    box.dataset.tagsInited = "true";
+  });
+}
+
+window.toggleTags = function(button){
+  const iconLeft = button.closest(".icon-left");
+  if(!iconLeft) return;
+  const extra = iconLeft.querySelector(".tags-extra");
+  if(!extra) return;
+
+  const expanded = button.dataset.expanded === "true";
+  if(expanded){
+    // 접기
+    extra.style.display = "none";
     button.dataset.expanded = "false";
-  } else {
-    for (let i = visibleCount; i < visibleCount + 6 && i < allTags.length; i++) {
-      allTags[i].style.display = "inline-block";
-    }
-    if (visibleCount + 6 >= allTags.length) {
-      button.textContent = "접기";
-      button.dataset.expanded = "true";
-    }
+    button.textContent = "+ 더보기";
+  }else{
+    // 열기
+    extra.style.display = "flex";
+    button.dataset.expanded = "true";
+    button.textContent = "접기";
   }
 };
+
+/* DOMContentLoaded */
+document.addEventListener("DOMContentLoaded", () => {
+  initTagsExpandable();
+});
+
 
 /* -----------------------------
    댓글 수정 기능
