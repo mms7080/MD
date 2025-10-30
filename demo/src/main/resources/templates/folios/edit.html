@@ -1,422 +1,226 @@
 <!DOCTYPE html>
 <html lang="ko" th:with="tpl=${template}">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta name="_csrf" th:content="${_csrf.token}" />
-        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
-        <meta name="folio-template" th:content="${template}" />
-        <link rel="stylesheet" th:href="@{/css/folios/edit.css}" />
-        <script defer th:src="@{/js/folios/edit.js}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+  <meta name="folio-template" th:content="${template}" />
+  <link rel="stylesheet" th:href="@{/css/folios/edit.css}" />
+  <script defer th:src="@{/js/folios/edit.js}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <title th:text="'포트폴리오 – ' + ${template}">포트폴리오</title>
+</head>
 
-        <title>포트폴리오 – 기본 템플릿</title>
-    </head>
-    <body class="scrollbar-hidden">
-        <div class="top">
-            <div class="nav">
-                <button class="btn" data-goto="1">1. 소개</button>
-                <button class="btn" data-goto="2">2. 학력/경력</button>
-                <button class="btn" data-goto="3">3. 기술/역량</button>
-                <button class="btn" data-goto="4">4. 프로젝트</button>
-                <button class="btn" data-goto="5">5. 수상/자격</button>
+<!-- 템플릿 클래스 자동 부착: tpl-dev-basic | tpl-dev-creative | tpl-dev-profile -->
+<body class="scrollbar-hidden" th:classappend="' tpl-' + ${template}">
+  <div class="top">
+    <div class="nav">
+      <button class="btn" data-goto="1">1. 소개</button>
+      <button class="btn" data-goto="2">2. 학력/경력</button>
+      <button class="btn" data-goto="3">3. 기술/역량</button>
+      <button class="btn" data-goto="4">4. 프로젝트</button>
+      <button class="btn" data-goto="5">5. 수상/자격</button>
+    </div>
+    <span class="chip" id="pageChip">1 / 5</span>
+    <div class="nav">
+      <button id="btnSave" class="btn">임시저장</button>
+      <button id="btnLoad" class="btn">불러오기</button>
+      <button id="btnUpload" class="btn primary">업로드</button>
+      <button id="btnPrint" class="btn primary">PDF로 저장</button>
+    </div>
+    <button id="btnExit" class="exit-btn" aria-label="이전페이지">
+      <span class="sign">
+        <svg viewBox="0 0 512 512"><path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"/></svg>
+      </span>
+      <span class="text">나가기</span>
+    </button>
+  </div>
+
+  <div class="wrap">
+    <!-- 무대 -->
+    <section class="stage">
+      <!-- ===== 공통 데이터 구조는 유지, 레이아웃만 CSS로 바꿔서 3가지 스킨 ===== -->
+
+      <!-- p1: 소개 -->
+      <article class="slide p1" data-page="1" aria-label="소개">
+        <div class="pad">
+          <span class="kicker">Profile</span>
+
+          <div class="head">
+            <!-- 왼쪽: 사진 + 기본정보 -->
+            <div class="left">
+              <div class="photo"><img id="photo1" alt="프로필" /></div>
+
+              <div class="rows">
+                <div><span class="name" data-bind="intro.name">김개발</span></div>
+                <div><span data-bind="intro.city">Seoul, Korea</span></div>
+                <div><span data-bind="intro.birth">1996-07-15</span></div>
+              </div>
+
+              <div class="p1-mini-sep"></div>
+
+              <div class="contact">
+                <span data-bind="intro.phone">010-1234-5678</span>
+                <span data-bind="intro.email">me@example.com</span>
+                <span data-bind="intro.site">github.com/me</span>
+              </div>
             </div>
-            <span class="chip" id="pageChip">1 / 5</span>
-            <div class="nav">
-                <button id="btnSave" class="btn">임시저장</button>
-                <button id="btnLoad" class="btn">불러오기</button>
-                <button id="btnUpload" class="btn primary">업로드</button>
-                <button id="btnPrint" class="btn primary">PDF로 저장</button>
+
+            <!-- 오른쪽: 자기소개 -->
+            <div class="about">
+              <div class="h3" data-bind="intro.title">“사용자 성장에 맞춰 확장되는 백엔드를 설계합니다.”</div>
+              <p class="muted" data-bind="intro.summary"></p>
             </div>
-            <button id="btnExit" class="exit-btn" aria-label="이전페이지">
-                <span class="sign">
-                    <svg viewBox="0 0 512 512">
-                        <path
-                            d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
-                        ></path>
-                    </svg>
-                </span>
-                <span class="text">나가기</span>
-            </button>
+          </div>
         </div>
 
-        <div class="wrap">
-            <!-- 무대 -->
-            <section class="stage">
-                <!-- 슬라이드 1: 소개 -->
-                <article class="slide p1" data-page="1" aria-label="소개">
-                    <div class="pad">
-                        <span class="kicker">Profile</span>
-
-                        <div class="head">
-                            <!-- 왼쪽: 사진 + 기본정보 -->
-                            <div class="left">
-                                <div class="photo">
-                                    <img id="photo1" alt="프로필" />
-                                </div>
-
-                                <!-- <div class="name" data-bind="intro.name">
-                                    김개발
-                                </div> -->
-
-                                <div class="rows">
-                                    <div>
-                                        <span
-                                            class="name"
-                                            data-bind="intro.name"
-                                            >김개발</span
-                                        >
-                                    </div>
-                                    <div>
-                                        <span data-bind="intro.city"
-                                            >Seoul, Korea</span
-                                        >
-                                    </div>
-                                    <div>
-                                        <span data-bind="intro.birth"
-                                            >1996-07-15</span
-                                        >
-                                    </div>
-                                </div>
-                                <!--구분선 -->
-                                <div class="p1-mini-sep"></div>
-
-                                <div class="contact">
-                                    <span data-bind="intro.phone"
-                                        >010-1234-5678</span
-                                    >
-                                    <span data-bind="intro.email"
-                                        >me@example.com</span
-                                    >
-                                    <span data-bind="intro.site"
-                                        >github.com/me</span
-                                    >
-                                </div>
-                            </div>
-
-                            <!-- 오른쪽: 자기소개 텍스트만 -->
-                            <div class="about">
-                                <div class="h3" data-bind="intro.title">
-                                    “사용자 성장에 맞춰 확장되는 백엔드를
-                                    설계합니다.”
-                                </div>
-                                <p class="muted" data-bind="intro.summary"></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="footer">
-                        <span
-                            >© <span data-bind="meta.year">2025</span>
-                            <span data-bind="intro.name">Kim Dev</span></span
-                        >
-                    </div>
-                </article>
-
-                <!-- 슬라이드 2: 학력/경력 -->
-                <article
-                    class="slide p2"
-                    data-page="2"
-                    hidden
-                    aria-label="학력 및 경력"
-                >
-                    <div class="pad">
-                        <div class="h2">학력</div>
-                        <div class="cols-2">
-                            <div class="card">
-                                <div class="h3" data-bind="edu.univ1.name">
-                                    KAFLAB University
-                                </div>
-                                <div class="muted" data-bind="edu.univ1.major">
-                                    컴퓨터공학과 (B.S.)
-                                </div>
-                                <div class="small" data-bind="edu.univ1.period">
-                                    2015 – 2019
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="h3" data-bind="edu.univ2.name">
-                                    KAFLAB Graduate
-                                </div>
-                                <div class="muted" data-bind="edu.univ2.major">
-                                    데이터공학 (M.S.)
-                                </div>
-                                <div class="small" data-bind="edu.univ2.period">
-                                    2019 – 2021
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="h2" style="margin-top: 24px">경력</div>
-                        <div class="grid">
-                            <div class="card">
-                                <div class="h3" data-bind="exp.job1.company">
-                                    Acme Corp
-                                </div>
-                                <div class="small" data-bind="exp.job1.period">
-                                    2021.03 – 2023.12 · Backend Engineer
-                                </div>
-                                <ul class="muted">
-                                    <li data-bind="exp.job1.desc1">
-                                        Spring 기반 주문 시스템 마이크로서비스
-                                        전환
-                                    </li>
-                                    <li data-bind="exp.job1.desc2">
-                                        MongoDB → PostgreSQL 마이그레이션 주도
-                                    </li>
-                                    <li data-bind="exp.job1.desc3">
-                                        CI/CD 파이프라인 최적화로 배포시간 40%
-                                        단축
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card">
-                                <div class="h3" data-bind="exp.job2.company">
-                                    Beta Studio
-                                </div>
-                                <div class="small" data-bind="exp.job2.period">
-                                    2024.01 – 현재 · Senior Backend
-                                </div>
-                                <ul class="muted">
-                                    <li data-bind="exp.job2.desc1">
-                                        대규모 이벤트 트래픽 대응 아키텍처 설계
-                                    </li>
-                                    <li data-bind="exp.job2.desc2">
-                                        Kafka 스트림 기반 통계 파이프라인 구축
-                                    </li>
-                                    <li data-bind="exp.job2.desc3">
-                                        성능 튜닝으로 P95 응답 320ms → 140ms
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 슬라이드 3: 기술/역량 -->
-                <article
-                    class="slide p3"
-                    data-page="3"
-                    hidden
-                    aria-label="기술 및 역량"
-                >
-                    <div class="pad">
-                        <div class="h2">기술스택</div>
-                        <div class="skills">
-                            <div class="skill">
-                                <div class="h3">Java / Spring</div>
-                                <div class="meter">
-                                    <i
-                                        style="width: 90%"
-                                        data-bind-style="skills.spring"
-                                    ></i>
-                                </div>
-                                <div class="small muted">
-                                    프로덕션 5년 / JPA, MVC, Security
-                                </div>
-                            </div>
-                            <div class="skill">
-                                <div class="h3">DB / SQL</div>
-                                <div class="meter">
-                                    <i
-                                        style="width: 80%"
-                                        data-bind-style="skills.db"
-                                    ></i>
-                                </div>
-                                <div class="small muted">
-                                    PostgreSQL, Redis, Query Tuning
-                                </div>
-                            </div>
-                            <div class="skill">
-                                <div class="h3">Cloud & DevOps</div>
-                                <div class="meter">
-                                    <i
-                                        style="width: 70%"
-                                        data-bind-style="skills.devops"
-                                    ></i>
-                                </div>
-                                <div class="small muted">
-                                    AWS, Docker, Github Actions
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="h2" style="margin-top: 24px">보유역량</div>
-                        <ul class="grid muted">
-                            <li data-bind="strengths.1">
-                                확장성과 유지보수를 고려한 모듈 설계
-                            </li>
-                            <li data-bind="strengths.2">
-                                문제 재현/측정/개선의 성과 지향 워크플로
-                            </li>
-                            <li data-bind="strengths.3">
-                                명확한 문서화와 팀 커뮤니케이션
-                            </li>
-                        </ul>
-                    </div>
-                </article>
-
-                <!-- 슬라이드 4: 프로젝트 하이라이트 -->
-                <article
-                    class="slide p4"
-                    data-page="4"
-                    hidden
-                    aria-label="프로젝트"
-                >
-                    <div class="pad grid">
-                        <div class="h2">프로젝트 하이라이트</div>
-
-                        <!-- 프로젝트 1 -->
-                        <div class="proj">
-                            <div class="thumb">
-                                <img id="thumb1" alt="프로젝트1" />
-                            </div>
-                            <div>
-                                <div class="h3" data-bind="proj1.title">
-                                    실시간 주문 처리 시스템
-                                </div>
-                                <div class="small muted" data-bind="proj1.meta">
-                                    2024 · Backend Lead · Spring / Kafka / Redis
-                                </div>
-                                <p class="muted" data-bind="proj1.desc">
-                                    대규모 트래픽에 대응하는 이벤트 기반
-                                    아키텍처로 재설계.
-                                </p>
-                                <div class="badges">
-                                    <span class="pill" data-bind="proj1.link"
-                                        >github.com/acme/order</span
-                                    >
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 프로젝트 2 -->
-                        <div class="proj">
-                            <div class="thumb">
-                                <img id="thumb2" alt="프로젝트2" />
-                            </div>
-                            <div>
-                                <div class="h3" data-bind="proj2.title">
-                                    추천 모델 서빙 플랫폼
-                                </div>
-                                <div class="small muted" data-bind="proj2.meta">
-                                    2023 · Backend · Spring / gRPC / Kubernetes
-                                </div>
-                                <p class="muted" data-bind="proj2.desc">
-                                    모델 버전 관리와 롤백이 쉬운 서빙 파이프라인
-                                    구축.
-                                </p>
-                                <div class="badges">
-                                    <span class="pill" data-bind="proj2.link"
-                                        >github.com/acme/reco</span
-                                    >
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-
-                <!-- 슬라이드 5: 수상/자격 & 마무리 -->
-                <article
-                    class="slide p5"
-                    data-page="5"
-                    hidden
-                    aria-label="수상 및 자격"
-                >
-                    <div class="pad">
-                        <div class="h2">수상 및 자격</div>
-                        <div class="grid">
-                            <div class="card">
-                                <div class="h3">Awards</div>
-                                <ul class="muted">
-                                    <li data-bind="awards.1">
-                                        2024 NAVI Hackathon – 최우수상
-                                    </li>
-                                    <li data-bind="awards.2">
-                                        2023 회사 기술 공모 – 최우수
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="card">
-                                <div class="h3">Certifications</div>
-                                <ul class="muted">
-                                    <li data-bind="cert.1">
-                                        AWS Certified Solutions Architect –
-                                        Associate
-                                    </li>
-                                    <li data-bind="cert.2">
-                                        SQLD / 정보처리기사
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="h2" style="margin-top: 26px">Contact</div>
-                        <p class="muted">
-                            함께 성장할 팀을 찾고 있습니다. 아래 연락처로 편하게
-                            연락 주세요.
-                        </p>
-                        <div class="contact">
-                            <span class="pill" data-bind="intro.email"
-                                >me@example.com</span
-                            >
-                            <span class="pill" data-bind="intro.phone"
-                                >010-1234-5678</span
-                            >
-                            <span class="pill" data-bind="intro.site"
-                                >github.com/me</span
-                            >
-                        </div>
-                    </div>
-                    <div class="footer">
-                        <span>감사합니다.</span
-                        ><span data-bind="intro.name">Kim Dev</span>
-                    </div>
-                </article>
-                <button
-                    class="navArrow left"
-                    type="button"
-                    aria-label="이전 슬라이드"
-                >
-                    <svg
-                        stroke="currentColor"
-                        fill="currentColor"
-                        stroke-width="0"
-                        viewBox="0 0 320 512"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z"
-                        ></path>
-                    </svg>
-                </button>
-                <button
-                    class="navArrow right"
-                    type="button"
-                    aria-label="다음 슬라이드"
-                >
-                    <svg
-                        stroke="currentColor"
-                        fill="currentColor"
-                        stroke-width="0"
-                        viewBox="0 0 320 512"
-                        height="1em"
-                        width="1em"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"
-                        ></path>
-                    </svg>
-                </button>
-            </section>
-
-            <!-- 사이드: 현재 페이지 폼 -->
-            <aside id="formPane">
-                <!-- 각 페이지별 폼이 JS로 교체 렌더링됩니다 -->
-            </aside>
+        <div class="footer">
+          <span>© <span data-bind="meta.year">2025</span> <span data-bind="intro.name">Kim Dev</span></span>
         </div>
-    </body>
+      </article>
+
+      <!-- p2: 학력/경력 -->
+      <article class="slide p2" data-page="2" hidden aria-label="학력 및 경력">
+        <div class="pad">
+          <div class="h2">학력</div>
+          <div class="cols-2">
+            <div class="card">
+              <div class="h3" data-bind="edu.univ1.name">KAFLAB University</div>
+              <div class="muted" data-bind="edu.univ1.major">컴퓨터공학과 (B.S.)</div>
+              <div class="small" data-bind="edu.univ1.period">2015 – 2019</div>
+            </div>
+            <div class="card">
+              <div class="h3" data-bind="edu.univ2.name">KAFLAB Graduate</div>
+              <div class="muted" data-bind="edu.univ2.major">데이터공학 (M.S.)</div>
+              <div class="small" data-bind="edu.univ2.period">2019 – 2021</div>
+            </div>
+          </div>
+
+          <div class="h2" style="margin-top:24px">경력</div>
+          <div class="grid">
+            <div class="card">
+              <div class="h3" data-bind="exp.job1.company">Acme Corp</div>
+              <div class="small" data-bind="exp.job1.period">2021.03 – 2023.12 · Backend Engineer</div>
+              <ul class="muted">
+                <li data-bind="exp.job1.desc1">Spring 기반 주문 시스템 마이크로서비스 전환</li>
+                <li data-bind="exp.job1.desc2">MongoDB → PostgreSQL 마이그레이션 주도</li>
+                <li data-bind="exp.job1.desc3">CI/CD 파이프라인 최적화로 배포시간 40% 단축</li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="h3" data-bind="exp.job2.company">Beta Studio</div>
+              <div class="small" data-bind="exp.job2.period">2024.01 – 현재 · Senior Backend</div>
+              <ul class="muted">
+                <li data-bind="exp.job2.desc1">대규모 이벤트 트래픽 대응 아키텍처 설계</li>
+                <li data-bind="exp.job2.desc2">Kafka 스트림 기반 통계 파이프라인 구축</li>
+                <li data-bind="exp.job2.desc3">성능 튜닝으로 P95 응답 320ms → 140ms</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- p3: 기술/역량 -->
+      <article class="slide p3" data-page="3" hidden aria-label="기술 및 역량">
+        <div class="pad">
+          <div class="h2">기술스택</div>
+          <div class="skills">
+            <div class="skill">
+              <div class="h3">Java / Spring</div>
+              <div class="meter"><i style="width:90%" data-bind-style="skills.spring"></i></div>
+              <div class="small muted">프로덕션 5년 / JPA, MVC, Security</div>
+            </div>
+            <div class="skill">
+              <div class="h3">DB / SQL</div>
+              <div class="meter"><i style="width:80%" data-bind-style="skills.db"></i></div>
+              <div class="small muted">PostgreSQL, Redis, Query Tuning</div>
+            </div>
+            <div class="skill">
+              <div class="h3">Cloud & DevOps</div>
+              <div class="meter"><i style="width:70%" data-bind-style="skills.devops"></i></div>
+              <div class="small muted">AWS, Docker, Github Actions</div>
+            </div>
+          </div>
+
+          <div class="h2" style="margin-top:24px">보유역량</div>
+          <ul class="grid muted">
+            <li data-bind="strengths.1">확장성과 유지보수를 고려한 모듈 설계</li>
+            <li data-bind="strengths.2">문제 재현/측정/개선의 성과 지향 워크플로</li>
+            <li data-bind="strengths.3">명확한 문서화와 팀 커뮤니케이션</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- p4: 프로젝트 -->
+      <article class="slide p4" data-page="4" hidden aria-label="프로젝트">
+        <div class="pad grid">
+          <div class="h2">프로젝트 하이라이트</div>
+
+          <div class="proj">
+            <div class="thumb"><img id="thumb1" alt="프로젝트1" /></div>
+            <div>
+              <div class="h3" data-bind="proj1.title">실시간 주문 처리 시스템</div>
+              <div class="small muted" data-bind="proj1.meta">2024 · Backend Lead · Spring / Kafka / Redis</div>
+              <p class="muted" data-bind="proj1.desc">대규모 트래픽 대응 아키텍처로 재설계.</p>
+              <div class="badges"><span class="pill" data-bind="proj1.link">github.com/acme/order</span></div>
+            </div>
+          </div>
+
+          <div class="proj">
+            <div class="thumb"><img id="thumb2" alt="프로젝트2" /></div>
+            <div>
+              <div class="h3" data-bind="proj2.title">추천 모델 서빙 플랫폼</div>
+              <div class="small muted" data-bind="proj2.meta">2023 · Backend · Spring / gRPC / Kubernetes</div>
+              <p class="muted" data-bind="proj2.desc">버전 관리·롤백 쉬운 서빙 파이프라인.</p>
+              <div class="badges"><span class="pill" data-bind="proj2.link">github.com/acme/reco</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- p5: 수상/자격 -->
+      <article class="slide p5" data-page="5" hidden aria-label="수상 및 자격">
+        <div class="pad">
+          <div class="h2">수상 및 자격</div>
+          <div class="grid">
+            <div class="card">
+              <div class="h3">Awards</div>
+              <ul class="muted">
+                <li data-bind="awards.1">2024 NAVI Hackathon – 최우수상</li>
+                <li data-bind="awards.2">2023 회사 기술 공모 – 최우수</li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="h3">Certifications</div>
+              <ul class="muted">
+                <li data-bind="cert.1">AWS Certified Solutions Architect – Associate</li>
+                <li data-bind="cert.2">SQLD / 정보처리기사</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="h2" style="margin-top:26px">Contact</div>
+          <p class="muted">함께 성장할 팀을 찾고 있습니다. 아래 연락처로 편하게 연락 주세요.</p>
+          <div class="contact">
+            <span class="pill" data-bind="intro.email">me@example.com</span>
+            <span class="pill" data-bind="intro.phone">010-1234-5678</span>
+            <span class="pill" data-bind="intro.site">github.com/me</span>
+          </div>
+        </div>
+        <div class="footer"><span>감사합니다.</span><span data-bind="intro.name">Kim Dev</span></div>
+      </article>
+
+      <button class="navArrow left" type="button" aria-label="이전 슬라이드">
+        <svg stroke="currentColor" fill="currentColor" viewBox="0 0 320 512" height="1em" width="1em"><path d="M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z"></path></svg>
+      </button>
+      <button class="navArrow right" type="button" aria-label="다음 슬라이드">
+        <svg stroke="currentColor" fill="currentColor" viewBox="0 0 320 512" height="1em" width="1em"><path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"></path></svg>
+      </button>
+    </section>
+
+    <!-- 사이드 폼 -->
+    <aside id="formPane"></aside>
+  </div>
+</body>
 </html>

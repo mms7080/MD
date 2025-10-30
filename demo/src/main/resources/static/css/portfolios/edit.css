@@ -332,3 +332,75 @@ button[type="submit"]:hover {
      padding: 8px;
    }
    
+   /* -------------------------------
+   템플릿2: dev-creative (강조 색, 히어로형 레이아웃)
+-------------------------------- */
+.tpl-dev-creative .p1 .pad { padding: 0; }
+.tpl-dev-creative .p1 .head {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  align-items: stretch;
+  gap: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0,0,0,.25);
+}
+.tpl-dev-creative .p1 .left {
+  background: linear-gradient(180deg,#101827, #0b1220);
+  color: #dfe8f6;
+  padding: 28px;
+}
+.tpl-dev-creative .p1 .left .photo {
+  width: 180px; height: 220px; border-radius: 16px; overflow: hidden;
+  margin-bottom: 18px; border: 1px solid #2a3646;
+}
+.tpl-dev-creative .p1 .about {
+  background: #ffffff;
+  padding: 36px 42px;
+}
+.tpl-dev-creative .p1 .about .h3 {
+  font-size: 28px; line-height: 1.35; font-weight: 800;
+  letter-spacing: -0.2px;
+}
+.tpl-dev-creative .p1 .contact .pill,
+.tpl-dev-creative .pill {
+  background: #0ea5e9; color:#fff; border: none;
+}
+.tpl-dev-creative .p2 .card { border-left: 4px solid #0ea5e9; }
+.tpl-dev-creative .h2 { color:#0ea5e9; }
+
+/* 프로젝트 썸네일을 카드 타일처럼 */
+.tpl-dev-creative .p4 .proj {
+  display: grid; grid-template-columns: 300px 1fr; gap: 20px;
+  padding: 16px; border:1px solid var(--border); border-radius: 12px;
+  background: var(--panel);
+}
+.tpl-dev-creative .p4 .thumb img { width:100%; height:200px; object-fit:cover; border-radius:10px; }
+
+/* -------------------------------
+   템플릿3: dev-profile (다크·카드형, 중앙 집중)
+-------------------------------- */
+.tpl-dev-profile .p1 .pad { padding: 28px; }
+.tpl-dev-profile .p1 .head {
+  display: grid; grid-template-columns: 1fr; gap: 18px;
+  background: #0e1116; color:#cdd6f4; border-radius: 18px; padding: 28px;
+  border: 1px solid #1b2330; box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.tpl-dev-profile .p1 .left { display: grid; grid-template-columns: 120px 1fr; gap: 18px; align-items:center; }
+.tpl-dev-profile .p1 .left .photo { width:120px; height:120px; border-radius:50%; overflow:hidden; border:2px solid #283347; }
+.tpl-dev-profile .p1 .rows .name { font-size: 22px; font-weight: 800; }
+.tpl-dev-profile .p1 .about { border-top: 1px dashed #263044; padding-top: 18px; }
+.tpl-dev-profile .p1 .about .h3 { font-size: 22px; font-weight: 700; }
+
+.tpl-dev-profile .h2 { color:#93c5fd; }
+.tpl-dev-profile .card { background:#0f1520; border:1px solid #1b2330; }
+.tpl-dev-profile .muted { color:#9da9be; }
+
+.tpl-dev-profile .p3 .meter { background:#1b2330; border-radius:10px; height:10px; overflow:hidden; }
+.tpl-dev-profile .p3 .meter i { background:#93c5fd; display:block; height:100%; }
+
+.tpl-dev-profile .p4 .proj { background:#0f1520; border:1px solid #1b2330; border-radius:12px; padding:16px; display:grid; grid-template-columns:220px 1fr; gap:16px; }
+.tpl-dev-profile .p4 .thumb img { width:100%; height:160px; object-fit:cover; border-radius:10px; }
+
+.tpl-dev-profile .pill { background:#111827; border:1px solid #334155; color:#cbd5e1; }
+.tpl-dev-profile .footer { color:#9da9be; }
