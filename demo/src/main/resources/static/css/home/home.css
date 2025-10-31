@@ -335,3 +335,23 @@ body {
     display: block;
     border-radius: 18px;
 }
+
+
+/* 🌗 라이트모드용 카드 구분 */
+html[data-theme="light"] .topic2-card {
+    background: #fff; /* 흰 배경 위에서는 완전한 흰색 카드 */
+    border: 1px solid rgba(0, 0, 0, 0.08); /* 살짝 윤곽선 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06); /* 은은한 그림자 */
+  }
+  
+  /* 🌙 다크모드용 카드 유지 (기존 느낌 유지) */
+  html[data-theme="dark"] .topic2-card {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.02)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: none;
+  }
+  
