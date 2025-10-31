@@ -102,39 +102,54 @@ Page<PortfoliosEntity> searchByTitleAndTags(@Param("keyword") String keyword,
 
                                             
 
+// 🔹 제목, 태그 검색 (대소문자 무시)
+@Query("""
+SELECT DISTINCT p FROM PortfoliosEntity p
+LEFT JOIN FETCH p.tags t
+LEFT JOIN FETCH p.likes l
+WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+   OR LOWER(p.desc) LIKE LOWER(CONCAT('%', :keyword, '%'))
+   OR LOWER(t) LIKE LOWER(CONCAT('%', :keyword, '%'))
+""")
+List<PortfoliosEntity> findByTitleContainingIgnoreCaseOrTagsContaining(@Param("keyword") String keyword);
 
-    @Query("""
-        SELECT DISTINCT p FROM PortfoliosEntity p
-        LEFT JOIN p.tags t
-        WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
-           OR LOWER(t) LIKE LOWER(CONCAT('%', :keyword, '%'))
-    """)
-    List<PortfoliosEntity> findByTitleContainingIgnoreCaseOrTagsContaining(@Param("keyword") String keyword);
-    
-    @Query("""
-        SELECT DISTINCT p FROM PortfoliosEntity p
-        LEFT JOIN p.tags t
-        WHERE LOWER(t) IN :tags
-    """)
-    List<PortfoliosEntity> findByTagsInIgnoreCase(@Param("tags") List<String> tags);
-    
-    
 
-    @Query("""
-        SELECT DISTINCT p FROM PortfoliosEntity p
-        LEFT JOIN p.tags t
-        WHERE (
-            LOWER(p.title) LIKE CONCAT('%', :keyword, '%')
-            OR LOWER(p.desc) LIKE CONCAT('%', :keyword, '%')
-            OR LOWER(t) LIKE CONCAT('%', :keyword, '%')
-        )
-        AND LOWER(t) IN :tags
-    """)
-    List<PortfoliosEntity> findByKeywordAndTags(
-            @Param("keyword") String keyword,
-            @Param("tags") List<String> tags);
-    
-    
-    
+
+// 🔹 태그 필터링
+@Query("""
+SELECT DISTINCT p FROM PortfoliosEntity p
+LEFT JOIN FETCH p.tags t
+LEFT JOIN FETCH p.likes l
+WHERE LOWER(t) IN :tags
+""")
+List<PortfoliosEntity> findByTagsInIgnoreCase(@Param("tags") List<String> tags);
+
+
+
+// 🔹 제목 + 태그 조합 검색
+@Query("""
+SELECT DISTINCT p FROM PortfoliosEntity p
+LEFT JOIN FETCH p.tags t
+LEFT JOIN FETCH p.likes l
+WHERE (
+    LOWER(p.title) LIKE CONCAT('%', :keyword, '%')
+    OR LOWER(p.desc) LIKE CONCAT('%', :keyword, '%')
+    OR LOWER(t) LIKE CONCAT('%', :keyword, '%')
+)
+AND LOWER(t) IN :tags
+""")
+List<PortfoliosEntity> findByKeywordAndTags(
+        @Param("keyword") String keyword,
+        @Param("tags") List<String> tags);
+
+
+
+        @Query("""
+SELECT DISTINCT p FROM PortfoliosEntity p
+LEFT JOIN FETCH p.tags t
+LEFT JOIN FETCH p.likes l
+WHERE p.isPublic = true
+""")
+List<PortfoliosEntity> findAllWithTagsAndLikes();
 
 }

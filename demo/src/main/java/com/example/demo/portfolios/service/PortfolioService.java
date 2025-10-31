@@ -483,11 +483,25 @@ public List<PortfoliosEntity> searchPortfolios(String keyword) {
 
 @Transactional(readOnly = true)
 public List<PortfoliosEntity> filterByTags(List<String> tags) {
+    // 소문자로 통일
     List<String> lowerTags = tags.stream()
-            .map(tag -> "%" + tag.toLowerCase() + "%") // LIKE 비교용
+            .map(String::toLowerCase)
             .toList();
-    return repository.findByTagsInIgnoreCase(lowerTags);
+
+    // 모든 포트폴리오 로드 (tags와 likes 미리 fetch)
+    List<PortfoliosEntity> all = repository.findAllWithTagsAndLikes();
+
+    // ✅ 포함 여부 필터링 (부분 일치)
+    return all.stream()
+            .filter(p -> p.getTags().stream()
+                    .map(String::toLowerCase)
+                    .anyMatch(tag ->
+                        lowerTags.stream().anyMatch(tag::contains)
+                    )
+            )
+            .toList();
 }
+
 
 
 

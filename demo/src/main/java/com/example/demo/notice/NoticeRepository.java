@@ -1,10 +1,12 @@
 package com.example.demo.notice;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
@@ -19,4 +21,7 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     //  다음글
     Optional<Notice> findFirstByIdGreaterThanOrderByIdAsc(Long id);
+
+    // home에서 불러오기
+    List<Notice> findTop4ByOrderByCreatedAtDesc();
 }

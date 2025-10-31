@@ -58,7 +58,7 @@
                                 />
                             </div>
                             <div class="topic2-desc">
-                                <a class="topic2-title" href="#">
+                                <a class="topic2-title" href="http://localhost:9999/portfolios">
                                     <strong
                                         >인기 급상승 포트폴리오 지금
                                         만나보세요.</strong
@@ -109,7 +109,7 @@
 
                             <!-- 설명칸 -->
                             <div class="topic2-desc">
-                                <a class="topic2-title" href="#">
+                                <a class="topic2-title" href="http://localhost:9999/folios">
                                     <strong
                                         >다양한 템플릿으로 나만의 포트폴리오를
                                         만들어보자!</strong
@@ -148,49 +148,19 @@
                     <div class="trends-head">
                         <h2 class="section-title">공지사항</h2>
                     </div>
+                    
 
                     <ul class="trend-list">
-                        <li>
-                            <a href="#">
-                                <strong>Edge Functions 도입 가속화</strong>
-                                <span class="meta"
-                                    >ZDNet Korea / 김라임 기자 /
-                                    2025.08.05</span
-                                >
-                            </a>
+                        <li th:each="notice : ${recentNotices}">
+                          <a th:href="@{|/notice/${notice.id}|}">
+                            <strong th:text="${notice.title}">공지 제목</strong>
+                            <span class="meta"
+                                  th:text="${notice.writer + ' / ' + #temporals.format(notice.createdAt, 'yyyy.MM.dd')}">
+                              작성자 / 날짜
+                            </span>
+                          </a>
                         </li>
-                        <li>
-                            <a href="#">
-                                <strong
-                                    >웹앱에서 AI 프롬프트 컴포넌트
-                                    표준화</strong
-                                >
-                                <span class="meta"
-                                    >Medium / J. Lee / 2025.08.03</span
-                                >
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <strong
-                                    >CSS Container Queries 실무 적용
-                                    사례</strong
-                                >
-                                <span class="meta"
-                                    >Smashing Magazine / R. Park /
-                                    2025.08.01</span
-                                >
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <strong>WebGPU 채택과 3D UI 트렌드</strong>
-                                <span class="meta"
-                                    >Mozilla Blog / K. Han / 2025.07.29</span
-                                >
-                            </a>
-                        </li>
-                    </ul>
+                      </ul>
                 </div>
             </section>
 
