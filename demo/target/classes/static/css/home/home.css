@@ -95,7 +95,7 @@ body {
 
 /* 설명칸 */
 .topic2-desc {
-    padding: 16px 18px 18px;
+    padding: 16px 18px 24px;
     background: linear-gradient(
         180deg,
         rgba(255, 255, 255, 0.06),

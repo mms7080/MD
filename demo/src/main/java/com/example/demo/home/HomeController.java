@@ -1,6 +1,7 @@
 package com.example.demo.home;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
@@ -32,12 +33,19 @@ public class HomeController {
         List<PortfoliosEntity> portfolios = portfolioService.getPublicPortfolios();
         List<Notice> recentNotices = noticeRepository.findTop4ByOrderByCreatedAtDesc();
     
-        System.out.println("📢 recentNotices = " + (recentNotices == null ? "null" : recentNotices.size()));
+        // ✅ 통계정보 생성
+        Map<String, Integer> stats = portfolioService.getPortfolioStats();
+    
+        System.out.println("📊 views=" + stats.get("views") + ", likes=" + stats.get("likes"));
     
         model.addAttribute("portfolios", portfolios);
         model.addAttribute("recentNotices", recentNotices);
+        model.addAttribute("stats", stats);
+    
         return "home/home";
     }
+    
+    
     
 
     

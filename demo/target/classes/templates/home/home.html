@@ -23,7 +23,7 @@
                 <div class="topics topics-v2">
                     <div class="topics-head">
                         <h2 class="section-title">인기 급상승🔥</h2>
-                        <a class="topics-more" href="#">
+                        <a class="topics-more" href="http://localhost:9999/portfolios">
                             더보기
                             <svg
                                 viewBox="0 0 24 24"
@@ -78,15 +78,17 @@
                                         />
                                     </svg>
                                 </a>
-                                <div class="topic2-meta">
-                                    <span class="m"
-                                        ><span class="emoji">👁️‍🗨️</span>
-                                        1819회</span
-                                    >
-                                    <span class="m hot"
-                                        ><span class="emoji">♥</span> 8개</span
-                                    >
+                                <div class="topic2-meta" th:if="${stats != null}">
+                                    <span class="m">
+                                        <span class="emoji">👁️‍🗨️</span>
+                                        <span th:text="${stats.views != null ? #numbers.formatDecimal(stats.views, 0, 0) + '회' : '0회'}">0회</span>
+                                    </span>
+                                    <span class="m hot">
+                                        <span class="emoji">♥</span>
+                                        <span th:text="${stats.likes != null ? #numbers.formatDecimal(stats.likes, 0, 0) + '개' : '0개'}">0개</span>
+                                    </span>
                                 </div>
+                            
                             </div>
                         </article>
 

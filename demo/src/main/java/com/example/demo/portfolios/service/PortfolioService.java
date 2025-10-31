@@ -9,8 +9,10 @@ import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -553,6 +555,26 @@ private Integer safeLikes(Integer likeCount) {
     return likeCount == null ? 0 : likeCount;
 }
 
+
+// home.html 전용
+@Transactional(readOnly = true)
+public Map<String, Integer> getPortfolioStats() {
+    List<PortfoliosEntity> all = repository.findAll();
+
+    int totalViews = all.stream()
+            .mapToInt(p -> p.getViewCount() != null ? p.getViewCount() : 0)
+            .sum();
+
+    int totalLikes = all.stream()
+            .mapToInt(p -> (p.getLikes() != null ? p.getLikes().size() : 0))
+            .sum();
+
+    Map<String, Integer> stats = new HashMap<>();
+    stats.put("views", totalViews);
+    stats.put("likes", totalLikes);
+
+    return stats;
+}
 
 
 
