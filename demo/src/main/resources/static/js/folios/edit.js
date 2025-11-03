@@ -1,7 +1,13 @@
+// ====== 교체: 파일 맨 위 DOMContentLoaded 시작부 ======
 document.addEventListener("DOMContentLoaded", () => {
-  const TEMPLATE =
-    document.querySelector('meta[name="folio-template"]')?.content || "dev-basic";
+  // 1) URL의 ?template= 값 우선 → meta 태그 → 기본값(dev-basic)
+  const params = new URLSearchParams(location.search);
+  const templateFromUrl = params.get("template");
+  const templateFromMeta = document.querySelector('meta[name="folio-template"]')?.content;
+  const TEMPLATE = (templateFromUrl || templateFromMeta || "dev-basic").trim();
 
+  // 2) 템플릿별 스킨 클래스를 body에 강제 부착 (예: tpl-dev-creative, tpl-dev-profile)
+  document.body.classList.add(`tpl-${TEMPLATE}`);
   // ---------- 유틸 ----------
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [...r.querySelectorAll(s)];
@@ -28,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // 현재 작업 folio 식별자 (?id=...)
-  const params = new URLSearchParams(location.search);
+//   const params = new URLSearchParams(location.search);
   let currentFolioId = params.get("id") || null;
 
   const guardFetch = async (url, opts = {}) => {

@@ -1,19 +1,336 @@
 <!DOCTYPE html>
 <html lang="ko" th:with="tpl=${template}">
+    <!-- 템플릿 자동 인식 스크립트: URL ?template= 값으로 body에 클래스 붙이기 -->
+<script>
+  (function() {
+    const params = new URLSearchParams(location.search);
+    const t = params.get("template") || "dev-basic";
+    document.addEventListener("DOMContentLoaded", function() {
+      document.body.classList.add("tpl-" + t);
+    });
+  })();
+</script>
+
 <head>
+    <script>
+  // HTML 그리기 전에 미리 붙여서 깜빡임 방지
+  (function () {
+    var t = new URLSearchParams(location.search).get('template') || 'dev-basic';
+    document.documentElement.classList.add('tpl-' + t);
+  })();
+</script>
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="_csrf" th:content="${_csrf.token}" />
   <meta name="_csrf_header" th:content="${_csrf.headerName}" />
-  <meta name="folio-template" th:content="${template}" />
-  <link rel="stylesheet" th:href="@{/css/folios/edit.css}" />
+  <meta name="folio-template"
+      th:content="${template != null ? template : param.template}" />
+  <link rel="stylesheet"
+      th:href="@{/css/folios/edit.css}" />
+
+<!-- 스킨 CSS를 인라인으로 최후에 로드: 캐시/우선순위 문제 우회 -->
+<style id="skin-css">
+/* ===== 템플릿2: dev-creative ===== */
+html.tpl-dev-creative body.tpl-dev-creative .p1 .pad{padding:0!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p1 .head{
+  display:grid!important;grid-template-columns:40% 60%!important;gap:0!important;
+  align-items:stretch!important;border-radius:18px!important;overflow:hidden!important;
+  box-shadow:0 8px 28px rgba(0,0,0,.25)!important;background:#fff!important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p1 .left{
+  background:linear-gradient(180deg,#101827,#0b1220)!important;color:#dfe8f6!important;padding:28px!important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p1 .left .photo{
+  width:180px!important;height:220px!important;border-radius:16px!important;overflow:hidden!important;margin-bottom:18px!important;border:1px solid #2a3646!important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p1 .about{background:#fff!important;padding:36px 42px!important;color:#0f172a!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p1 .about .h3{font-size:28px!important;line-height:1.35!important;font-weight:800!important;letter-spacing:-.2px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .h2{color:#0ea5e9!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .card{border-left:4px solid #0ea5e9!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p4 .proj{
+  display:grid!important;grid-template-columns:300px 1fr!important;gap:20px!important;
+  padding:16px!important;border:2px solid #0ea5e9!important;border-radius:12px!important;background:#f0f9ff!important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p4 .thumb img{width:100%!important;height:200px!important;object-fit:cover!important;border-radius:10px!important;}
+
+/* ===== 템플릿3: dev-profile ===== */
+html.tpl-dev-profile body.tpl-dev-profile .p1 .pad{padding:28px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p1 .head{
+  display:grid!important;grid-template-columns:1fr!important;gap:18px!important;
+  background:#0e1116!important;color:#cdd6f4!important;border-radius:18px!important;padding:28px!important;
+  border:1px solid #1b2330!important;box-shadow:0 8px 24px rgba(0,0,0,.35)!important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .p1 .left{display:grid!important;grid-template-columns:120px 1fr!important;gap:18px!important;align-items:center!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p1 .left .photo{width:120px!important;height:120px!important;border-radius:50%!important;overflow:hidden!important;border:2px solid #283347!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p1 .rows .name{font-size:22px!important;font-weight:800!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p1 .about{border-top:1px dashed #263044!important;padding-top:18px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p1 .about .h3{font-size:22px!important;font-weight:700!important;}
+html.tpl-dev-profile body.tpl-dev-profile .h2{color:#93c5fd!important;}
+html.tpl-dev-profile body.tpl-dev-profile .card{background:#0f1520!important;border:1px solid #1b2330!important;}
+html.tpl-dev-profile body.tpl-dev-profile .muted{color:#9da9be!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p3 .meter{background:#1b2330!important;border-radius:10px!important;height:10px!important;overflow:hidden!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p3 .meter i{background:#93c5fd!important;display:block!important;height:100%!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p4 .proj{background:#0f1520!important;border:1px solid #1b2330!important;border-radius:12px!important;padding:16px!important;display:grid!important;grid-template-columns:220px 1fr!important;gap:16px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p4 .thumb img{width:100%!important;height:160px!important;object-fit:cover!important;border-radius:10px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .pill{background:#111827!important;border:1px solid #334155!important;color:#cbd5e1!important;}
+html.tpl-dev-profile body.tpl-dev-profile .footer{color:#9da9be!important;}
+</style>
+
+<style id="skin-css-2">
+/* =============================
+   FINAL OVERRIDES (p2/p3/p5)
+   템플릿2/3 전용, !important로 강제 적용
+============================= */
+
+/* ===== TEMPLATE 2: dev-creative ===== */
+/* p2: 세로 타임라인 */
+html.tpl-dev-creative body.tpl-dev-creative .p2 .pad{padding:10px 4px 24px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .h2{margin:4px 0 10px!important;color:#0ea5e9!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .cols-2,
+html.tpl-dev-creative body.tpl-dev-creative .p2 .grid{display:block!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .grid{position:relative!important;padding-left:28px!important;margin-top:8px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .grid::before{
+  content:"";position:absolute;left:10px;top:4px;bottom:4px;width:2px;
+  background:linear-gradient(#0ea5e9,#38bdf8);border-radius:2px;opacity:.9;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .card{
+  position:relative!important;margin:14px 0!important;padding:14px 16px 12px!important;
+  border:1px solid var(--border)!important;border-radius:12px!important;background:#fff!important;
+  box-shadow:0 8px 20px rgba(14,165,233,.06)!important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .card::before{
+  content:"";position:absolute;left:-20px;top:16px;width:12px;height:12px;border-radius:50%;
+  background:#0ea5e9;box-shadow:0 0 0 4px rgba(14,165,233,.18);
+}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .card .h3{font-weight:800!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .small{color:#475569!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .muted{color:#64748b!important}
+
+/* p3: 3열 카드 + 파란 레벨바 + 칩 */
+html.tpl-dev-creative body.tpl-dev-creative .p3 .skills{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:16px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p3 .skill{background:#fff!important;border:1px solid var(--border)!important;border-radius:14px!important;padding:14px!important;box-shadow:0 10px 24px rgba(14,165,233,.07)!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p3 .skill .h3{font-weight:900!important;margin:0 0 6px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p3 .meter{background:#eaf6ff!important;border-radius:999px!important;height:12px!important;overflow:hidden!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p3 .meter i{background:#0ea5e9!important;height:100%!important;display:block!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p3 .grid.muted{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:10px!important;margin-top:12px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p3 .grid.muted li{background:#f0f9ff!important;border:1px dashed #bae6fd!important;border-radius:999px!important;padding:8px 12px!important;color:#0c4a6e!important;font-weight:600!important;text-align:center!important;}
+
+/* p5: 배지 카드 2열 */
+html.tpl-dev-creative body.tpl-dev-creative .p5 .pad{padding-top:8px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p5 .grid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:16px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p5 .card{border:1px solid var(--border)!important;border-radius:16px!important;background:#fff!important;box-shadow:0 8px 22px rgba(14,165,233,.08)!important;padding:14px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p5 .card .h3{display:flex!important;align-items:center!important;gap:8px!important;margin-bottom:8px!important;font-weight:900!important;color:#0ea5e9!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p5 ul{display:flex!important;flex-wrap:wrap!important;gap:8px!important;}
+html.tpl-dev-creative body.tpl-dev-creative .p5 li{background:#f0f9ff!important;border:1px solid #bae6fd!important;color:#0c4a6e!important;padding:6px 10px!important;border-radius:12px!important;font-weight:600!important;}
+
+/* ===== TEMPLATE 3: dev-profile (라이트 테마) ===== */
+/* 전체 톤 라이트닝 (이전 다크 덮어쓰기) */
+html.tpl-dev-profile body.tpl-dev-profile .p1-profile-wrap,
+html.tpl-dev-profile body.tpl-dev-profile .profile-card,
+html.tpl-dev-profile body.tpl-dev-profile .profile-main,
+html.tpl-dev-profile body.tpl-dev-profile .p4-profile .list-card,
+html.tpl-dev-profile body.tpl-dev-profile .p2 .card,
+html.tpl-dev-profile body.tpl-dev-profile .p3 .skill,
+html.tpl-dev-profile body.tpl-dev-profile .p5 .card{
+  background:#ffffff!important;color:#0f172a!important;border-color:#e5e7eb!important;box-shadow:0 8px 24px rgba(2,6,23,.06)!important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .h2,
+html.tpl-dev-profile body.tpl-dev-profile .p4-profile .h2.soft{color:#2563eb!important;}
+html.tpl-dev-profile body.tpl-dev-profile .muted{color:#475569!important;}
+html.tpl-dev-profile body.tpl-dev-profile .pill{background:#f8fafc!important;border:1px solid #e2e8f0!important;color:#0f172a!important;}
+
+/* p2: 좌 학력 카드 / 우 경력 타임라인 */
+html.tpl-dev-profile body.tpl-dev-profile .p2 .pad{padding:10px 4px 22px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p2 .h2{margin:6px 0 10px!important;color:#2563eb!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p2 .cols-2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:16px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p2 .cols-2 .card{border-radius:14px!important;padding:14px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p2 .grid{position:relative!important;margin-top:16px!important;padding-left:28px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p2 .grid::before{content:"";position:absolute;left:12px;top:6px;bottom:6px;width:2px;background:#dbeafe;border-radius:2px;}
+html.tpl-dev-profile body.tpl-dev-profile .p2 .grid .card{position:relative!important;margin:12px 0!important;padding:14px 16px!important;border-radius:14px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p2 .grid .card::before{content:"";position:absolute;left:-20px;top:16px;width:12px;height:12px;border-radius:50%;background:#2563eb;box-shadow:0 0 0 4px rgba(37,99,235,.18);}
+html.tpl-dev-profile body.tpl-dev-profile .p2 .card .h3{font-weight:800!important;}
+
+/* p3: 라이트 바 + 칩 */
+html.tpl-dev-profile body.tpl-dev-profile .p3 .skills{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p3 .skill{border-radius:14px!important;padding:14px!important;display:grid!important;grid-template-columns:180px 1fr!important;gap:12px!important;align-items:center!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p3 .skill .h3{margin:0!important;font-weight:900!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p3 .meter{background:#eef2ff!important;height:12px!important;border-radius:999px!important;overflow:hidden!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p3 .meter i{background:#2563eb!important;height:100%!important;display:block!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p3 .grid.muted{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important;margin-top:12px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p3 .grid.muted li{background:#f8fafc!important;border:1px dashed #e2e8f0!important;color:#0f172a!important;border-radius:10px!important;padding:8px 10px!important;text-align:center!important;font-weight:600!important;}
+
+/* p5: 라이트 카드 */
+html.tpl-dev-profile body.tpl-dev-profile .p5 .grid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:16px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p5 .card{border-radius:16px!important;padding:14px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p5 .card .h3{display:flex!important;align-items:center!important;gap:8px!important;color:#2563eb!important;font-weight:900!important;margin-bottom:8px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p5 ul{display:flex!important;flex-direction:column!important;gap:8px!important;}
+html.tpl-dev-profile body.tpl-dev-profile .p5 li{background:#f8fafc!important;border:1px solid #e2e8f0!important;border-radius:12px!important;padding:8px 10px!important;}
+</style>
+
+<style id="skin-css-3">
+/* =========================================================
+   공통 톤 & 간격(템플릿2/3) – p1~p5 카드 모서리/그림자/패딩 통일
+========================================================= */
+html.tpl-dev-creative body.tpl-dev-creative .card,
+html.tpl-dev-profile  body.tpl-dev-profile  .card{
+  border-radius:16px !important;
+  box-shadow:0 8px 22px rgba(2,6,23,.06) !important;
+  padding:16px !important;
+}
+
+/* section 가장자리 붙는 느낌 제거 (프로젝트/타임라인 등) */
+html.tpl-dev-creative body.tpl-dev-creative .p2 .pad,
+html.tpl-dev-creative body.tpl-dev-creative .p4-creative,
+html.tpl-dev-creative body.tpl-dev-creative .p5 .pad,
+html.tpl-dev-profile  body.tpl-dev-profile  .p2 .pad,
+html.tpl-dev-profile  body.tpl-dev-profile  .p4-profile,
+html.tpl-dev-profile  body.tpl-dev-profile  .p5 .pad{
+  padding: 16px 18px 20px !important;
+}
+
+/* 섹션 제목 여백 통일 */
+html.tpl-dev-creative body.tpl-dev-creative .h2,
+html.tpl-dev-profile  body.tpl-dev-profile  .h2{
+  margin: 4px 0 12px !important;
+}
+
+/* =========================================================
+   템플릿2 (dev-creative)
+   - p1 타이포/패딩 통일
+   - p2 타임라인 점을 카드 '정중앙'에 정렬
+   - p4 프로젝트: 바깥 여백/카드 간격/이미지 라운드
+   - p5 수상/자격: 아이콘 배지형 2열 디자인
+========================================================= */
+
+/* p1: HERO를 다른 섹션과 톤 맞춤 */
+html.tpl-dev-creative body.tpl-dev-creative .p1-creative-hero{
+  border-radius:18px !important;
+  padding:28px 32px !important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p1-creative-hero .display{
+  font-size:40px !important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p1-creative-details .card{
+  margin-left:5% ;margin-top:12px !important;
+}
+
+/* p2: 세로 타임라인 – 파란 점 카드 중앙 정렬 */
+html.tpl-dev-creative body.tpl-dev-creative .p2 .grid{ padding-left:32px !important; }
+html.tpl-dev-creative body.tpl-dev-creative .p2 .grid::before{ left:14px !important; }
+html.tpl-dev-creative body.tpl-dev-creative .p2 .card{
+  margin: 14px 6px !important; position:relative !important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p2 .card::before{
+  left:-22px !important; /* 타임라인 라인과 자연스런 간격 */
+  top:50% !important; transform:translateY(-50%) !important; /* ★ 중앙 정렬 핵심 */
+  width:12px !important; height:12px !important; border-radius:50% !important;
+  background:#0ea5e9 !important; box-shadow:0 0 0 4px rgba(14,165,233,.18) !important;
+}
+
+/* p4: 프로젝트 – 가장자리 붙는 느낌 제거 + 카드 간격 */
+html.tpl-dev-creative body.tpl-dev-creative .p4-creative{ padding: 16px 18px 24px !important; }
+html.tpl-dev-creative body.tpl-dev-creative .p4-creative .grid2{ gap:18px !important; }
+html.tpl-dev-creative body.tpl-dev-creative .proj-card{ margin: 4px !important; }
+html.tpl-dev-creative body.tpl-dev-creative .proj-card .cover{
+  height:220px !important; overflow:hidden !important; border-bottom:1px solid #eef2f6 !important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .proj-card .cover img{
+  width:100% !important; height:100% !important; object-fit:cover !important;
+  border-top-left-radius:16px !important; border-top-right-radius:16px !important;
+}
+
+/* p5: 수상/자격 – 아이콘배지 2열, 강조 색 */
+html.tpl-dev-creative body.tpl-dev-creative .p5 .grid{
+  display:grid !important; grid-template-columns: repeat(2,1fr) !important; gap:16px !important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p5 .card .h3{
+  display:flex !important; align-items:center !important; gap:10px !important;
+  color:#0ea5e9 !important; font-weight:900 !important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p5 .card .h3::before{
+  content:""; width:14px; height:14px; border-radius:50%;
+  background: radial-gradient(circle at 35% 35%, #38bdf8, #0ea5e9);
+  box-shadow:0 0 0 4px rgba(14,165,233,.15);
+}
+html.tpl-dev-creative body.tpl-dev-creative .p5 ul{
+  display:flex !important; flex-direction:column !important; gap:8px !important; margin-top:6px !important;
+}
+html.tpl-dev-creative body.tpl-dev-creative .p5 li{
+  background:#f0f9ff !important; border:1px solid #bae6fd !important; color:#0c4a6e !important;
+  border-radius:12px !important; padding:8px 10px !important;
+}
+
+/* =========================================================
+   템플릿3 (dev-profile, 라이트)
+   - p1 프로필카드 상단 헤더/칩 보정으로 더 '이쁘게'
+   - p4 프로젝트: 가장자리 여백/카드 간격
+   - p5 수상/자격: 리본헤더 카드 2열 (템플릿2와 구분)
+========================================================= */
+
+/* p1: 프로필 카드 상단 헤더 라인 + 칩 보정 */
+html.tpl-dev-profile body.tpl-dev-profile .profile-card{
+  border-radius:18px !important; overflow:hidden !important;
+  padding-top:0 !important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .profile-card::before{
+  content:""; display:block; height:6px;
+  background: linear-gradient(90deg,#93c5fd,#2563eb); /* 상단 컬러 바 */
+}
+html.tpl-dev-profile body.tpl-dev-profile .profile-card .identity .name{
+  font-size:22px !important; font-weight:900 !important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .profile-card .identity .role{
+  color:#1e3a8a !important; font-weight:700 !important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .profile-card .contacts .pill{
+  background:#eef2ff !important; border:1px solid #e0e7ff !important; color:#1e3a8a !important;
+}
+
+/* p4: 프로젝트 – 가장자리 여백/카드 간격 확대 */
+html.tpl-dev-profile body.tpl-dev-profile .p4-profile{ padding:16px 18px 24px !important; }
+html.tpl-dev-profile body.tpl-dev-profile .p4-profile .list-card{
+  margin: 8px 4px !important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .p4-profile .list-card .thumb{
+  border-radius:12px !important; overflow:hidden !important;
+}
+
+/* p5: 수상/자격 – 리본형 헤더 카드 2열 */
+html.tpl-dev-profile body.tpl-dev-profile .p5 .grid{
+  display:grid !important; grid-template-columns: repeat(2,1fr) !important; gap:16px !important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .p5 .card{
+  position:relative !important; border-radius:16px !important; overflow:hidden !important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .p5 .card .h3{
+  font-weight:900 !important; color:#2563eb !important; margin:0 0 10px !important;
+  padding-top:10px !important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .p5 .card::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:8px;
+  background: linear-gradient(90deg,#bfdbfe,#2563eb); /* 상단 리본 */
+}
+html.tpl-dev-profile body.tpl-dev-profile .p5 ul{
+  display:flex !important; flex-direction:column !important; gap:8px !important;
+}
+html.tpl-dev-profile body.tpl-dev-profile .p5 li{
+  background:#f8fafc !important; border:1px solid #e2e8f0 !important; border-radius:12px !important;
+  padding:8px 10px !important; color:#0f172a !important;
+}
+</style>
+
+
   <script defer th:src="@{/js/folios/edit.js}"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <title th:text="'포트폴리오 – ' + ${template}">포트폴리오</title>
 </head>
 
 <!-- 템플릿 클래스 자동 부착: tpl-dev-basic | tpl-dev-creative | tpl-dev-profile -->
-<body class="scrollbar-hidden" th:classappend="' tpl-' + ${template}">
+<!-- 교체: tpl-클래스를 서버에서 확정적으로 붙임 -->
+<body class="scrollbar-hidden"
+      th:classappend="' tpl-' + (${template != null ? template : param.template})">
+
   <div class="top">
     <div class="nav">
       <button class="btn" data-goto="1">1. 소개</button>
@@ -42,174 +359,496 @@
     <section class="stage">
       <!-- ===== 공통 데이터 구조는 유지, 레이아웃만 CSS로 바꿔서 3가지 스킨 ===== -->
 
-      <!-- p1: 소개 -->
-      <article class="slide p1" data-page="1" aria-label="소개">
-        <div class="pad">
-          <span class="kicker">Profile</span>
-
-          <div class="head">
-            <!-- 왼쪽: 사진 + 기본정보 -->
-            <div class="left">
-              <div class="photo"><img id="photo1" alt="프로필" /></div>
-
-              <div class="rows">
-                <div><span class="name" data-bind="intro.name">김개발</span></div>
-                <div><span data-bind="intro.city">Seoul, Korea</span></div>
-                <div><span data-bind="intro.birth">1996-07-15</span></div>
-              </div>
-
-              <div class="p1-mini-sep"></div>
-
-              <div class="contact">
-                <span data-bind="intro.phone">010-1234-5678</span>
-                <span data-bind="intro.email">me@example.com</span>
-                <span data-bind="intro.site">github.com/me</span>
-              </div>
-            </div>
-
-            <!-- 오른쪽: 자기소개 -->
-            <div class="about">
-              <div class="h3" data-bind="intro.title">“사용자 성장에 맞춰 확장되는 백엔드를 설계합니다.”</div>
-              <p class="muted" data-bind="intro.summary"></p>
-            </div>
+<!-- p1: 소개 -->
+<article class="slide p1" data-page="1" aria-label="소개">
+  <!-- 기본템플릿1 -->
+  <th:block th:if="${tpl != 'dev-creative' and tpl != 'dev-profile'}">
+    <div class="pad">
+      <span class="kicker">Profile</span>
+      <div class="head">
+        <div class="left">
+          <div class="photo"><img id="photo1" alt="프로필" /></div>
+          <div class="rows">
+            <div><span class="name" data-bind="intro.name">김개발</span></div>
+            <div><span data-bind="intro.city">Seoul, Korea</span></div>
+            <div><span data-bind="intro.birth">1996-07-15</span></div>
+          </div>
+          <div class="p1-mini-sep"></div>
+          <div class="contact">
+            <span data-bind="intro.phone">010-1234-5678</span>
+            <span data-bind="intro.email">me@example.com</span>
+            <span data-bind="intro.site">github.com/me</span>
           </div>
         </div>
-
-        <div class="footer">
-          <span>© <span data-bind="meta.year">2025</span> <span data-bind="intro.name">Kim Dev</span></span>
+        <div class="about">
+          <div class="h3" data-bind="intro.title">“사용자 성장에 맞춰 확장되는 백엔드를 설계합니다.”</div>
+          <p class="muted" data-bind="intro.summary"></p>
         </div>
-      </article>
+      </div>
+    </div>
+  </th:block>
+
+  <!-- 템플릿2 -->
+  <th:block th:if="${tpl == 'dev-creative'}">
+    <header class="p1-creative-hero">
+      <div class="hero-left">
+        <div class="hero-right">
+        <div class="hero-photo"></div>
+      </div>
+        <h1 class="display" data-bind="intro.name">Kim Dev</h1>
+        <p class="tagline" data-bind="intro.title">사용자 성장에 맞춰 확장되는 백엔드</p>
+        <div class="hero-contacts">
+          <span class="pill" data-bind="intro.email">me@example.com</span>
+          <span class="pill" data-bind="intro.site">github.com/me</span>
+          <span class="pill" data-bind="intro.phone">010-1234-5678</span>
+        </div>
+      </div>
+      
+    </header>
+    <section class="p1-creative-details">
+      <div class="card big">
+        <h3>About</h3>
+        <p class="muted" data-bind="intro.summary"></p>
+      </div>
+      <div class="card mini">
+        <h3>Base</h3>
+        <p><span data-bind="intro.city">Seoul, Korea</span></p>
+        <p><span data-bind="intro.birth">1996-07-15</span></p>
+      </div>
+    </section>
+  </th:block>
+
+  <!-- 템플릿3 -->
+  <th:block th:if="${tpl == 'dev-profile'}">
+    <section class="p1-profile-wrap">
+      <aside class="profile-card">
+        <div class="avatar"><img id="photo1" alt="프로필" /></div>
+        <div class="identity">
+          <div class="name" data-bind="intro.name">Kim Dev</div>
+          <div class="role small" data-bind="intro.title">Backend Engineer</div>
+        </div>
+        <div class="meta">
+          <div><strong>City</strong><span data-bind="intro.city">Seoul</span></div>
+          <div><strong>Birth</strong><span data-bind="intro.birth">1996-07-15</span></div>
+        </div>
+        <div class="contacts">
+          <a class="pill" data-bind="intro.email">me@example.com</a>
+          <a class="pill" data-bind="intro.site">github.com/me</a>
+          <a class="pill" data-bind="intro.phone">010-1234-5678</a>
+        </div>
+      </aside>
+      <div class="profile-main">
+        <h2>소개</h2>
+        <p class="muted" data-bind="intro.summary"></p>
+      </div>
+    </section>
+  </th:block>
+
+  <div class="footer">
+    <span>© <span data-bind="meta.year">2025</span> <span data-bind="intro.name">Kim Dev</span></span>
+  </div>
+</article>
+
+
 
       <!-- p2: 학력/경력 -->
-      <article class="slide p2" data-page="2" hidden aria-label="학력 및 경력">
-        <div class="pad">
-          <div class="h2">학력</div>
-          <div class="cols-2">
-            <div class="card">
-              <div class="h3" data-bind="edu.univ1.name">KAFLAB University</div>
-              <div class="muted" data-bind="edu.univ1.major">컴퓨터공학과 (B.S.)</div>
-              <div class="small" data-bind="edu.univ1.period">2015 – 2019</div>
-            </div>
-            <div class="card">
-              <div class="h3" data-bind="edu.univ2.name">KAFLAB Graduate</div>
-              <div class="muted" data-bind="edu.univ2.major">데이터공학 (M.S.)</div>
-              <div class="small" data-bind="edu.univ2.period">2019 – 2021</div>
-            </div>
-          </div>
-
-          <div class="h2" style="margin-top:24px">경력</div>
-          <div class="grid">
-            <div class="card">
-              <div class="h3" data-bind="exp.job1.company">Acme Corp</div>
-              <div class="small" data-bind="exp.job1.period">2021.03 – 2023.12 · Backend Engineer</div>
-              <ul class="muted">
-                <li data-bind="exp.job1.desc1">Spring 기반 주문 시스템 마이크로서비스 전환</li>
-                <li data-bind="exp.job1.desc2">MongoDB → PostgreSQL 마이그레이션 주도</li>
-                <li data-bind="exp.job1.desc3">CI/CD 파이프라인 최적화로 배포시간 40% 단축</li>
-              </ul>
-            </div>
-            <div class="card">
-              <div class="h3" data-bind="exp.job2.company">Beta Studio</div>
-              <div class="small" data-bind="exp.job2.period">2024.01 – 현재 · Senior Backend</div>
-              <ul class="muted">
-                <li data-bind="exp.job2.desc1">대규모 이벤트 트래픽 대응 아키텍처 설계</li>
-                <li data-bind="exp.job2.desc2">Kafka 스트림 기반 통계 파이프라인 구축</li>
-                <li data-bind="exp.job2.desc3">성능 튜닝으로 P95 응답 320ms → 140ms</li>
-              </ul>
-            </div>
-          </div>
+<article class="slide p2" data-page="2" hidden aria-label="학력 및 경력">
+  <!-- 기본템플릿1 -->
+  <th:block th:if="${tpl != 'dev-creative' and tpl != 'dev-profile'}">
+    <div class="pad">
+      <div class="h2">학력</div>
+      <div class="cols-2">
+        <div class="card">
+          <div class="h3" data-bind="edu.univ1.name">KAFLAB University</div>
+          <div class="muted" data-bind="edu.univ1.major">컴퓨터공학과 (B.S.)</div>
+          <div class="small" data-bind="edu.univ1.period">2015 – 2019</div>
         </div>
-      </article>
+        <div class="card">
+          <div class="h3" data-bind="edu.univ2.name">KAFLAB Graduate</div>
+          <div class="muted" data-bind="edu.univ2.major">데이터공학 (M.S.)</div>
+          <div class="small" data-bind="edu.univ2.period">2019 – 2021</div>
+        </div>
+      </div>
 
-      <!-- p3: 기술/역량 -->
-      <article class="slide p3" data-page="3" hidden aria-label="기술 및 역량">
-        <div class="pad">
-          <div class="h2">기술스택</div>
-          <div class="skills">
-            <div class="skill">
-              <div class="h3">Java / Spring</div>
-              <div class="meter"><i style="width:90%" data-bind-style="skills.spring"></i></div>
-              <div class="small muted">프로덕션 5년 / JPA, MVC, Security</div>
-            </div>
-            <div class="skill">
-              <div class="h3">DB / SQL</div>
-              <div class="meter"><i style="width:80%" data-bind-style="skills.db"></i></div>
-              <div class="small muted">PostgreSQL, Redis, Query Tuning</div>
-            </div>
-            <div class="skill">
-              <div class="h3">Cloud & DevOps</div>
-              <div class="meter"><i style="width:70%" data-bind-style="skills.devops"></i></div>
-              <div class="small muted">AWS, Docker, Github Actions</div>
-            </div>
-          </div>
-
-          <div class="h2" style="margin-top:24px">보유역량</div>
-          <ul class="grid muted">
-            <li data-bind="strengths.1">확장성과 유지보수를 고려한 모듈 설계</li>
-            <li data-bind="strengths.2">문제 재현/측정/개선의 성과 지향 워크플로</li>
-            <li data-bind="strengths.3">명확한 문서화와 팀 커뮤니케이션</li>
+      <div class="h2" style="margin-top:24px">경력</div>
+      <div class="grid">
+        <div class="card">
+          <div class="h3" data-bind="exp.job1.company">Acme Corp</div>
+          <div class="small" data-bind="exp.job1.period">2021.03 – 2023.12 · Backend Engineer</div>
+          <ul class="muted">
+            <li data-bind="exp.job1.desc1"></li>
+            <li data-bind="exp.job1.desc2"></li>
+            <li data-bind="exp.job1.desc3"></li>
           </ul>
         </div>
-      </article>
+        <div class="card">
+          <div class="h3" data-bind="exp.job2.company">Beta Studio</div>
+          <div class="small" data-bind="exp.job2.period">2024.01 – 현재 · Senior Backend</div>
+          <ul class="muted">
+            <li data-bind="exp.job2.desc1"></li>
+            <li data-bind="exp.job2.desc2"></li>
+            <li data-bind="exp.job2.desc3"></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </th:block>
 
-      <!-- p4: 프로젝트 -->
-      <article class="slide p4" data-page="4" hidden aria-label="프로젝트">
-        <div class="pad grid">
-          <div class="h2">프로젝트 하이라이트</div>
+  <!-- 템플릿2: 세로 타임라인 -->
+  <th:block th:if="${tpl == 'dev-creative'}">
+    <div class="pad">
+      <div class="h2">Academic</div>
+      <div class="cols-2">
+        <div class="card">
+          <div class="h3" data-bind="edu.univ1.name"></div>
+          <div class="muted" data-bind="edu.univ1.major"></div>
+          <div class="small" data-bind="edu.univ1.period"></div>
+        </div>
+        <div class="card">
+          <div class="h3" data-bind="edu.univ2.name"></div>
+          <div class="muted" data-bind="edu.univ2.major"></div>
+          <div class="small" data-bind="edu.univ2.period"></div>
+        </div>
+      </div>
 
-          <div class="proj">
-            <div class="thumb"><img id="thumb1" alt="프로젝트1" /></div>
-            <div>
-              <div class="h3" data-bind="proj1.title">실시간 주문 처리 시스템</div>
-              <div class="small muted" data-bind="proj1.meta">2024 · Backend Lead · Spring / Kafka / Redis</div>
-              <p class="muted" data-bind="proj1.desc">대규모 트래픽 대응 아키텍처로 재설계.</p>
-              <div class="badges"><span class="pill" data-bind="proj1.link">github.com/acme/order</span></div>
-            </div>
+      <div class="h2" style="margin-top:18px">Experience</div>
+      <div class="grid">
+        <div class="card">
+          <div class="h3" data-bind="exp.job1.company"></div>
+          <div class="small" data-bind="exp.job1.period"></div>
+          <ul class="muted">
+            <li data-bind="exp.job1.desc1"></li>
+            <li data-bind="exp.job1.desc2"></li>
+            <li data-bind="exp.job1.desc3"></li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="h3" data-bind="exp.job2.company"></div>
+          <div class="small" data-bind="exp.job2.period"></div>
+          <ul class="muted">
+            <li data-bind="exp.job2.desc1"></li>
+            <li data-bind="exp.job2.desc2"></li>
+            <li data-bind="exp.job2.desc3"></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </th:block>
+
+  <!-- 템플릿3: 좌 학력 카드 / 우 경력 타임라인 -->
+  <th:block th:if="${tpl == 'dev-profile'}">
+    <div class="pad">
+      <div class="h2">학력</div>
+      <div class="cols-2">
+        <div class="card">
+          <div class="h3" data-bind="edu.univ1.name"></div>
+          <div class="muted" data-bind="edu.univ1.major"></div>
+          <div class="small" data-bind="edu.univ1.period"></div>
+        </div>
+        <div class="card">
+          <div class="h3" data-bind="edu.univ2.name"></div>
+          <div class="muted" data-bind="edu.univ2.major"></div>
+          <div class="small" data-bind="edu.univ2.period"></div>
+        </div>
+      </div>
+
+      <div class="h2" style="margin-top:18px">경력</div>
+      <div class="grid">
+        <div class="card">
+          <div class="h3" data-bind="exp.job1.company"></div>
+          <div class="small" data-bind="exp.job1.period"></div>
+          <ul class="muted">
+            <li data-bind="exp.job1.desc1"></li>
+            <li data-bind="exp.job1.desc2"></li>
+            <li data-bind="exp.job1.desc3"></li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="h3" data-bind="exp.job2.company"></div>
+          <div class="small" data-bind="exp.job2.period"></div>
+          <ul class="muted">
+            <li data-bind="exp.job2.desc1"></li>
+            <li data-bind="exp.job2.desc2"></li>
+            <li data-bind="exp.job2.desc3"></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </th:block>
+</article>
+
+
+      <!-- p3: 기술/역량 -->
+<article class="slide p3" data-page="3" hidden aria-label="기술 및 역량">
+  <!-- 기본템플릿1 -->
+  <th:block th:if="${tpl != 'dev-creative' and tpl != 'dev-profile'}">
+    <div class="pad">
+      <div class="h2">기술스택</div>
+      <div class="skills">
+        <div class="skill">
+          <div class="h3">Java / Spring</div>
+          <div class="meter"><i style="width:90%" data-bind-style="skills.spring"></i></div>
+          <div class="small muted">프로덕션 5년 / JPA, MVC, Security</div>
+        </div>
+        <div class="skill">
+          <div class="h3">DB / SQL</div>
+          <div class="meter"><i style="width:80%" data-bind-style="skills.db"></i></div>
+          <div class="small muted">PostgreSQL, Redis, Query Tuning</div>
+        </div>
+        <div class="skill">
+          <div class="h3">Cloud & DevOps</div>
+          <div class="meter"><i style="width:70%" data-bind-style="skills.devops"></i></div>
+          <div class="small muted">AWS, Docker, Github Actions</div>
+        </div>
+      </div>
+
+      <div class="h2" style="margin-top:24px">보유역량</div>
+      <ul class="grid muted">
+        <li data-bind="strengths.1"></li>
+        <li data-bind="strengths.2"></li>
+        <li data-bind="strengths.3"></li>
+      </ul>
+    </div>
+  </th:block>
+
+  <!-- 템플릿2: 카드 3열 + 칩 -->
+  <th:block th:if="${tpl == 'dev-creative'}">
+    <div class="pad">
+      <div class="h2">Skills</div>
+      <div class="skills">
+        <div class="skill">
+          <div class="h3">Java / Spring</div>
+          <div class="meter"><i data-bind-style="skills.spring"></i></div>
+          <div class="small muted">JPA, MVC, Security</div>
+        </div>
+        <div class="skill">
+          <div class="h3">DB / SQL</div>
+          <div class="meter"><i data-bind-style="skills.db"></i></div>
+          <div class="small muted">PostgreSQL, Redis, Tuning</div>
+        </div>
+        <div class="skill">
+          <div class="h3">Cloud & DevOps</div>
+          <div class="meter"><i data-bind-style="skills.devops"></i></div>
+          <div class="small muted">AWS, Docker, CI/CD</div>
+        </div>
+      </div>
+
+      <div class="h2" style="margin-top:16px">Strengths</div>
+      <ul class="grid muted">
+        <li data-bind="strengths.1"></li>
+        <li data-bind="strengths.2"></li>
+        <li data-bind="strengths.3"></li>
+      </ul>
+    </div>
+  </th:block>
+
+  <!-- 템플릿3: 라이트 바 + 칩 3열 -->
+  <th:block th:if="${tpl == 'dev-profile'}">
+    <div class="pad">
+      <div class="h2">기술 숙련도</div>
+      <div class="skills">
+        <div class="skill">
+          <div class="h3">Java / Spring</div>
+          <div class="meter"><i data-bind-style="skills.spring"></i></div>
+        </div>
+        <div class="skill">
+          <div class="h3">DB / SQL</div>
+          <div class="meter"><i data-bind-style="skills.db"></i></div>
+        </div>
+        <div class="skill">
+          <div class="h3">Cloud & DevOps</div>
+          <div class="meter"><i data-bind-style="skills.devops"></i></div>
+        </div>
+      </div>
+
+      <div class="h2" style="margin-top:12px">보유역량</div>
+      <ul class="grid muted">
+        <li data-bind="strengths.1"></li>
+        <li data-bind="strengths.2"></li>
+        <li data-bind="strengths.3"></li>
+      </ul>
+    </div>
+  </th:block>
+</article>
+
+
+<!-- p4: 프로젝트 -->
+<article class="slide p4" data-page="4" hidden aria-label="프로젝트">
+  <!-- 기본템플릿1 -->
+  <th:block th:if="${tpl != 'dev-creative' and tpl != 'dev-profile'}">
+    <div class="pad grid">
+      <div class="h2">프로젝트 하이라이트</div>
+      <div class="proj">
+        <div class="thumb"><img id="thumb1" alt="프로젝트1" /></div>
+        <div>
+          <div class="h3" data-bind="proj1.title"></div>
+          <div class="small muted" data-bind="proj1.meta"></div>
+          <p class="muted" data-bind="proj1.desc"></p>
+          <div class="badges"><span class="pill" data-bind="proj1.link"></span></div>
+        </div>
+      </div>
+      <div class="proj">
+        <div class="thumb"><img id="thumb2" alt="프로젝트2" /></div>
+        <div>
+          <div class="h3" data-bind="proj2.title"></div>
+          <div class="small muted" data-bind="proj2.meta"></div>
+          <p class="muted" data-bind="proj2.desc"></p>
+          <div class="badges"><span class="pill" data-bind="proj2.link"></span></div>
+        </div>
+      </div>
+    </div>
+  </th:block>
+
+  <!-- 템플릿2: 2열 카드 그리드 -->
+  <th:block th:if="${tpl == 'dev-creative'}">
+    <div class="p4-creative">
+      <h2 class="h2 accent">Projects</h2>
+      <div class="grid2">
+        <article class="card proj-card">
+          <div class="cover"><img id="thumb1" alt="프로젝트1" /></div>
+          <div class="body">
+            <h3 class="title" data-bind="proj1.title"></h3>
+            <div class="meta small" data-bind="proj1.meta"></div>
+            <p class="desc muted" data-bind="proj1.desc"></p>
+            <div class="links"><a class="pill" data-bind="proj1.link"></a></div>
           </div>
-
-          <div class="proj">
-            <div class="thumb"><img id="thumb2" alt="프로젝트2" /></div>
-            <div>
-              <div class="h3" data-bind="proj2.title">추천 모델 서빙 플랫폼</div>
-              <div class="small muted" data-bind="proj2.meta">2023 · Backend · Spring / gRPC / Kubernetes</div>
-              <p class="muted" data-bind="proj2.desc">버전 관리·롤백 쉬운 서빙 파이프라인.</p>
-              <div class="badges"><span class="pill" data-bind="proj2.link">github.com/acme/reco</span></div>
-            </div>
+        </article>
+        <article class="card proj-card">
+          <div class="cover"><img id="thumb2" alt="프로젝트2" /></div>
+          <div class="body">
+            <h3 class="title" data-bind="proj2.title"></h3>
+            <div class="meta small" data-bind="proj2.meta"></div>
+            <p class="desc muted" data-bind="proj2.desc"></p>
+            <div class="links"><a class="pill" data-bind="proj2.link"></a></div>
           </div>
+        </article>
+      </div>
+    </div>
+  </th:block>
+
+  <!-- 템플릿3: 리스트 카드 -->
+  <th:block th:if="${tpl == 'dev-profile'}">
+    <div class="p4-profile">
+      <h2 class="h2 soft">Projects</h2>
+      <article class="list-card">
+        <div class="thumb"><img id="thumb1" alt="프로젝트1" /></div>
+        <div class="info">
+          <h3 data-bind="proj1.title"></h3>
+          <div class="small muted" data-bind="proj1.meta"></div>
+          <p class="muted" data-bind="proj1.desc"></p>
+          <div><a class="pill" data-bind="proj1.link"></a></div>
         </div>
       </article>
+      <article class="list-card">
+        <div class="thumb"><img id="thumb2" alt="프로젝트2" /></div>
+        <div class="info">
+          <h3 data-bind="proj2.title"></h3>
+          <div class="small muted" data-bind="proj2.meta"></div>
+          <p class="muted" data-bind="proj2.desc"></p>
+          <div><a class="pill" data-bind="proj2.link"></a></div>
+        </div>
+      </article>
+    </div>
+  </th:block>
+</article>
+
 
       <!-- p5: 수상/자격 -->
-      <article class="slide p5" data-page="5" hidden aria-label="수상 및 자격">
-        <div class="pad">
-          <div class="h2">수상 및 자격</div>
-          <div class="grid">
-            <div class="card">
-              <div class="h3">Awards</div>
-              <ul class="muted">
-                <li data-bind="awards.1">2024 NAVI Hackathon – 최우수상</li>
-                <li data-bind="awards.2">2023 회사 기술 공모 – 최우수</li>
-              </ul>
-            </div>
-            <div class="card">
-              <div class="h3">Certifications</div>
-              <ul class="muted">
-                <li data-bind="cert.1">AWS Certified Solutions Architect – Associate</li>
-                <li data-bind="cert.2">SQLD / 정보처리기사</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="h2" style="margin-top:26px">Contact</div>
-          <p class="muted">함께 성장할 팀을 찾고 있습니다. 아래 연락처로 편하게 연락 주세요.</p>
-          <div class="contact">
-            <span class="pill" data-bind="intro.email">me@example.com</span>
-            <span class="pill" data-bind="intro.phone">010-1234-5678</span>
-            <span class="pill" data-bind="intro.site">github.com/me</span>
-          </div>
+<article class="slide p5" data-page="5" hidden aria-label="수상 및 자격">
+  <!-- 기본템플릿1 -->
+  <th:block th:if="${tpl != 'dev-creative' and tpl != 'dev-profile'}">
+    <div class="pad">
+      <div class="h2">수상 및 자격</div>
+      <div class="grid">
+        <div class="card">
+          <div class="h3">Awards</div>
+          <ul class="muted">
+            <li data-bind="awards.1"></li>
+            <li data-bind="awards.2"></li>
+          </ul>
         </div>
-        <div class="footer"><span>감사합니다.</span><span data-bind="intro.name">Kim Dev</span></div>
-      </article>
+        <div class="card">
+          <div class="h3">Certifications</div>
+          <ul class="muted">
+            <li data-bind="cert.1"></li>
+            <li data-bind="cert.2"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="h2" style="margin-top:26px">Contact</div>
+      <p class="muted">함께 성장할 팀을 찾고 있습니다. 아래 연락처로 편하게 연락 주세요.</p>
+      <div class="contact">
+        <span class="pill" data-bind="intro.email"></span>
+        <span class="pill" data-bind="intro.phone"></span>
+        <span class="pill" data-bind="intro.site"></span>
+      </div>
+    </div>
+    <div class="footer"><span>감사합니다.</span><span data-bind="intro.name">Kim Dev</span></div>
+  </th:block>
+
+  <!-- 템플릿2: 배지 카드 2열 -->
+  <th:block th:if="${tpl == 'dev-creative'}">
+    <div class="pad">
+      <div class="h2">Achievements</div>
+      <div class="grid">
+        <div class="card">
+          <div class="h3">Awards</div>
+          <ul>
+            <li data-bind="awards.1"></li>
+            <li data-bind="awards.2"></li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="h3">Certifications</div>
+          <ul>
+            <li data-bind="cert.1"></li>
+            <li data-bind="cert.2"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="h2" style="margin-top:18px">Contact</div>
+      <div class="contact">
+        <span class="pill" data-bind="intro.email"></span>
+        <span class="pill" data-bind="intro.phone"></span>
+        <span class="pill" data-bind="intro.site"></span>
+      </div>
+    </div>
+    <div class="footer"><span>Thank you.</span><span data-bind="intro.name"></span></div>
+  </th:block>
+
+  <!-- 템플릿3: 라이트 카드 2열 -->
+  <th:block th:if="${tpl == 'dev-profile'}">
+    <div class="pad">
+      <div class="h2">수상 & 자격</div>
+      <div class="grid">
+        <div class="card">
+          <div class="h3">Awards</div>
+          <ul>
+            <li data-bind="awards.1"></li>
+            <li data-bind="awards.2"></li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="h3">Certifications</div>
+          <ul>
+            <li data-bind="cert.1"></li>
+            <li data-bind="cert.2"></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="h2" style="margin-top:18px">Contact</div>
+      <div class="contact">
+        <span class="pill" data-bind="intro.email"></span>
+        <span class="pill" data-bind="intro.phone"></span>
+        <span class="pill" data-bind="intro.site"></span>
+      </div>
+    </div>
+    <div class="footer"><span>감사합니다.</span><span data-bind="intro.name"></span></div>
+  </th:block>
+</article>
 
       <button class="navArrow left" type="button" aria-label="이전 슬라이드">
         <svg stroke="currentColor" fill="currentColor" viewBox="0 0 320 512" height="1em" width="1em"><path d="M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z"></path></svg>
