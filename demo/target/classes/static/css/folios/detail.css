@@ -1,24 +1,10 @@
-/* ===========================
-   detail.css (상세 페이지 전용)
-   =========================== */
-
-/* (선택) 사용 폰트 */
-@font-face {
-    font-family: "Paperozi";
-    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2")
-        format("woff2");
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
 /* 색/레이아웃 변수 */
 :root {
     --bg: #0e1116;
     --text: #e8edf4;
     --muted: #9aa3ad;
     --border: #212933;
-    --maxw: 980px;
+    --maxw: 1280px;
 }
 
 /* 기본 */
@@ -28,8 +14,7 @@ body {
     padding: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: "Paperozi", "Pretendard", system-ui, -apple-system,
-        "Noto Sans KR", sans-serif;
+
     -webkit-font-smoothing: antialiased;
 }
 
@@ -67,6 +52,58 @@ body {
     color: #4f46e5;
     font-size: 12px;
 }
+
+/* .fd-head {
+    position: relative; 
+    padding: 20px 0 8px;
+    margin: 0 0 12px;
+}
+.fd-user {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.fd-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #d9d9d9;
+    border: 1px solid var(--border);
+    flex: 0 0 64px;
+}
+.fd-user-title {
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.25;
+    margin: 0;
+}
+
+.fd-user-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 4px;
+}
+.fd-user-name {
+    font-weight: 700;
+}
+.fd-dot {
+    opacity: 0.6;
+}
+
+.fd-meta .dot {
+    opacity: 0.6;
+}
+.fd-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 12px;
+} */
 
 /* 슬라이드 스택: 간격/여백/라운드/그림자 없음 */
 .fd-stack {

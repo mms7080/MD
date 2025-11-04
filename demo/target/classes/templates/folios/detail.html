@@ -1,14 +1,29 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html
+    lang="ko"
+    xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{fragments/layout :: layout(
+    pageTitle = ${folio.title} ?: 'Folio 상세',
+    headerKey  = 'folio',
+    activeMenu = 'detail',
+    css = ~{::#detail-css},
+    js  = ~{::#detail-js},
+    content = ~{::#folio-detail}
+  )}"
+>
     <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title th:text="${folio.title} ?: 'Folio 상세'">Folio 상세</title>
-        <link rel="stylesheet" th:href="@{/css/folios/detail.css}" />
-        <script th:src="@{/js/folios/detail.js}" defer></script>
+        <!-- 페이지 전용 CSS -->
+        <th:block id="detail-css">
+            <link rel="stylesheet" th:href="@{/css/folios/detail.css}" />
+        </th:block>
+
+        <th:block id="detail-js">
+            <script th:src="@{/js/folios/detail.js}" defer></script>
+        </th:block>
     </head>
+
     <body>
-        <main class="fd-wrap">
+        <section id="folio-detail" class="fd-wrap">
             <header class="fd-head">
                 <h1 class="fd-title" th:text="${folio.title}">제목 없음</h1>
                 <div class="fd-meta">
@@ -27,19 +42,26 @@
                         >DRAFT</span
                     >
                 </div>
-                <button id="btnExit" class="exit-btn" aria-label="이전페이지">
+
+                <!-- 🔁 JS 없이 동작하도록 버튼을 링크로 변경 -->
+                <a
+                    id="btnExit"
+                    class="exit-btn"
+                    href="/folios"
+                    aria-label="목록으로"
+                >
                     <span class="sign">
                         <svg viewBox="0 0 512 512">
                             <path
                                 d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
-                            ></path>
+                            />
                         </svg>
                     </span>
                     <span class="text">나가기</span>
-                </button>
+                </a>
             </header>
 
-            <!-- 1) 사진이 하나라도 있으면 세로로 렌더 -->
+            <!-- 1) 사진이 하나라도 있으면 세로 렌더 -->
             <section
                 class="fd-body"
                 th:if="${folio.photos != null and !#lists.isEmpty(folio.photos)}"
@@ -56,10 +78,11 @@
                 </div>
             </section>
 
-            <!-- 2) 사진은 비었지만 썸네일이 있으면 썸네일은 보여주기 -->
+            <!-- 2) 사진은 비었지만 썸네일이 있으면 썸네일 표시 -->
             <section
                 class="fd-body"
-                th:if="${(folio.photos == null or #lists.isEmpty(folio.photos)) and (folio.thumbnail != null and !#strings.isEmpty(folio.thumbnail))}"
+                th:if="${(folio.photos == null or #lists.isEmpty(folio.photos)) 
+                     and (folio.thumbnail != null and !#strings.isEmpty(folio.thumbnail))}"
             >
                 <div class="fd-stack">
                     <figure class="fd-slide">
@@ -73,14 +96,144 @@
                 </div>
             </section>
 
-            <!-- 3) 진짜 아무것도 없으면 안내 -->
+            <!-- 3) 아무것도 없으면 안내 -->
             <section
                 class="fd-empty"
-                th:if="${(folio.photos == null or #lists.isEmpty(folio.photos)) and (folio.thumbnail == null or #strings.isEmpty(folio.thumbnail))}"
+                th:if="${(folio.photos == null or #lists.isEmpty(folio.photos)) 
+                     and (folio.thumbnail == null or #strings.isEmpty(folio.thumbnail))}"
             >
                 아직 등록된 이미지가 없습니다.
             </section>
-        </main>
-        <!-- 상세 페이지는 별도 JS 불필요. (기존 fetch 기반 detail.js는 사용 안 함) -->
+        </section>
     </body>
 </html>
+
+<!-- <!DOCTYPE html>
+<html
+    lang="ko"
+    xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{fragments/layout :: layout(
+    pageTitle = ${folio.title} ?: 'Folio 상세',
+    headerKey  = 'folio',
+    activeMenu = 'detail',
+    css = ~{::#detail-css},
+    js  = ~{::#detail-js},
+    content = ~{::#folio-detail}
+  )}"
+>
+    <head>
+       
+        <th:block id="detail-css">
+            <link rel="stylesheet" th:href="@{/css/folios/detail.css}" />
+        </th:block>
+
+        <th:block id="detail-js">
+            <script th:src="@{/js/folios/detail.js}" defer></script>
+        </th:block>
+    </head>
+
+    <body>
+        <section id="folio-detail" class="fd-wrap">
+            <header class="fd-head">
+                <div class="fd-user">
+                    <img
+                        class="fd-avatar"
+                        th:src="${(folio.user != null 
+                && folio.user.profile != null 
+                && !#strings.isEmpty(folio.user.profile.profileImgUrl))
+                ? folio.user.profile.profileImgUrl
+                : '/images/avatar-default.png'}"
+                        alt="프로필 이미지"
+                    />
+
+                    <div class="fd-user-text">
+                        <div class="fd-user-title" th:text="${folio.title}">
+                            제목 없음
+                        </div>
+
+                        <div class="fd-user-meta">
+                            <span
+                                class="fd-user-name"
+                                th:text="${folio.user != null ? folio.user.name : '익명'}"
+                                >익명</span
+                            >
+                            <span class="fd-dot">·</span>
+                            <time
+                                class="fd-user-date"
+                                th:text="${#temporals.format(folio.updatedAt, 'yyyy.MM.dd')}"
+                                >0000.00.00</time
+                            >
+
+                            <span
+                                class="fd-badge"
+                                th:if="${isOwner and folio.status.name() == 'DRAFT'}"
+                                >DRAFT</span
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                
+                <a
+                    id="btnExit"
+                    class="exit-btn"
+                    href="/folios"
+                    aria-label="목록으로"
+                >
+                    <span class="sign">
+                        <svg viewBox="0 0 512 512">
+                            <path
+                                d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+                            />
+                        </svg>
+                    </span>
+                    <span class="text">나가기</span>
+                </a>
+            </header>
+
+            
+            <section
+                class="fd-body"
+                th:if="${folio.photos != null and !#lists.isEmpty(folio.photos)}"
+            >
+                <div class="fd-stack">
+                    <figure class="fd-slide" th:each="img : ${folio.photos}">
+                        <img
+                            th:src="${img}"
+                            alt="folio slide"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    </figure>
+                </div>
+            </section>
+
+            
+            <section
+                class="fd-body"
+                th:if="${(folio.photos == null or #lists.isEmpty(folio.photos)) 
+                     and (folio.thumbnail != null and !#strings.isEmpty(folio.thumbnail))}"
+            >
+                <div class="fd-stack">
+                    <figure class="fd-slide">
+                        <img
+                            th:src="${folio.thumbnail}"
+                            alt="thumbnail"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    </figure>
+                </div>
+            </section>
+
+            
+            <section
+                class="fd-empty"
+                th:if="${(folio.photos == null or #lists.isEmpty(folio.photos)) 
+                     and (folio.thumbnail == null or #strings.isEmpty(folio.thumbnail))}"
+            >
+                아직 등록된 이미지가 없습니다.
+            </section>
+        </section>
+    </body>
+</html> -->
