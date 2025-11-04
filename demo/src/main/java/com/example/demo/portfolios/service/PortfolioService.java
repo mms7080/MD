@@ -55,9 +55,10 @@ public class PortfolioService {
      * ✅ 리스트 페이지용 — LazyInitialization 방지용 트랜잭션 유지
      */
     @Transactional(readOnly = true)
-    public List<PortfoliosEntity> getAllPortfolios(org.springframework.data.domain.Pageable pageable) {
-        return repository.findAllBasic(pageable).getContent(); // ✅ EntityGraph로 미리 로드됨
-    }
+public List<PortfoliosEntity> getAllPortfolios(Pageable pageable) {
+    return repository.findAllBasic(pageable).getContent();
+}
+
 
     /**
      * 파일 저장 (이미지/ZIP 구분)

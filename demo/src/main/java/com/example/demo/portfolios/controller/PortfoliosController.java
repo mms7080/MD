@@ -59,9 +59,22 @@ public class PortfoliosController {
                        @RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "12") int size,
                        @RequestParam(required = false) String keyword,
-                       @RequestParam(required = false) List<String> tags) {
-    
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+                       @RequestParam(required = false) List<String> tags,
+                       @RequestParam(defaultValue = "latest") String sort) {
+        
+        // ✅ "null" 문자열 방어
+    if ("null".equals(keyword)) keyword = null;
+    if (tags != null && tags.size() == 1 && "null".equals(tags.get(0))) {
+        tags = null;
+    }
+
+         // ✅ 정렬 설정
+        Sort sortOption = "oldest".equals(sort)
+        ? Sort.by(Sort.Direction.ASC, "createdAt")
+        : Sort.by(Sort.Direction.DESC, "createdAt");
+            
+        Pageable pageable = PageRequest.of(page, size, sortOption);
+        
         List<PortfoliosEntity> portfolios;
     
         // ✅ 1. 검색 + 필터 조합
@@ -84,6 +97,7 @@ public class PortfoliosController {
         model.addAttribute("portfolios", portfolios);
         model.addAttribute("keyword", keyword);
         model.addAttribute("selectedTags", tags);
+        model.addAttribute("sort",sort);
         return "portfolios/list";
     }
     
@@ -312,8 +326,5 @@ public String listPortfolios(
 
     return "portfolios/list";
 }
-
-
-
 
 }
