@@ -36,6 +36,10 @@ public interface PortfoliosRepository extends JpaRepository<PortfoliosEntity, Lo
 Optional<PortfoliosEntity> findDetailByIdForEdit(@Param("id") Long id);
 
 @EntityGraph(attributePaths = {"tags", "team", "likes"})
+@Query(
+    value = "SELECT p FROM PortfoliosEntity p ORDER BY p.id DESC",
+    countQuery = "SELECT COUNT(p) FROM PortfoliosEntity p"
+)
 Page<PortfoliosEntity> findAllBasic(Pageable pageable);
 
 
