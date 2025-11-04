@@ -51,18 +51,18 @@
         <link th:href="@{/css/header.css}" rel="stylesheet" />
         <link th:href="@{/css/footer.css}" rel="stylesheet" />
         <link th:href="@{/css/users/auth-modal.css}" rel="stylesheet" />
-        <!-- <link th:href="@{/css/folios.css}" rel="stylesheet" /> -->
+
         <!-- 페이지 전용 CSS 슬롯 -->
         <th:block th:replace="${css} ?: ~{}"></th:block>
     </head>
 
-    <body>
+    <body class="site">
         <!-- 공통 헤더 -->
         <div th:replace="~{fragments/modals :: authModals}"></div>
         <div th:replace="~{fragments/header :: header(${headerKey})}"></div>
 
         <!-- 페이지 콘텐츠 메인 슬롯 -->
-        <main th:replace="${content}"></main>
+        <main class="site-main" th:replace="${content}"></main>
 
         <!-- 공통 푸터 -->
         <div th:replace="~{fragments/footer :: footer}"></div>
