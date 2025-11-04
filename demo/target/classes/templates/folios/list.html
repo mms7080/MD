@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html
     lang="ko"
-    th:replace="~{fragments/folios-layout :: layout(
+    th:replace="~{fragments/layout :: layout(
     pageTitle = 'Folio 목록',
+    headerKey = 'folio',
     activeMenu = 'list',
     css = ~{::#list-css},
     js = ~{::#list-js},
@@ -15,37 +16,67 @@
         </th:block>
     </head>
     <body>
-        <div id="folios-list-content">
-            <h1 class="folios-title">Folio 둘러보기</h1>
+        <div id="folios-list-content" class="folios-shell">
+            <!-- 본문 -->
+            <section class="folios-content">
+                <h1 class="folios-title">Folio 둘러보기</h1>
 
-            <div id="folio-grid" class="kf-grid"></div>
+                <div id="folio-grid" class="kf-grid"></div>
 
-            <nav
-                id="pagination"
-                class="pagination"
-                aria-label="Folio list navigation"
-            ></nav>
+                <nav
+                    id="pagination"
+                    class="pagination"
+                    aria-label="Folio list navigation"
+                ></nav>
 
-            <template id="folio-card-template">
-                <article class="kf-card">
-                    <a class="kf-card__thumb" href="#">
-                        <img
-                            src="https://picsum.photos/seed/placeholder/400/250"
-                            alt="Folio 썸네일"
-                        />
-                    </a>
-                    <div class="kf-card__body">
-                        <div class="kf-card__head">
-                            <div class="kf-card__left">
-                                <h3 class="kf-card__title">
-                                    <a href="#">사용자 이름</a>
-                                </h3>
+                <template id="folio-card-template">
+                    <article class="kf-card">
+                        <a class="kf-card__thumb" href="#">
+                            <img
+                                src="https://picsum.photos/seed/placeholder/400/250"
+                                alt="Folio 썸네일"
+                            />
+                        </a>
+                        <div class="kf-card__body">
+                            <div class="kf-card__head">
+                                <div class="kf-card__left">
+                                    <h3 class="kf-card__title">
+                                        <a href="#" class="folio-name"
+                                            >사용자 이름</a
+                                        >
+                                        <time
+                                            class="folio-date"
+                                            datetime=""
+                                        ></time>
+                                    </h3>
+                                </div>
                             </div>
+                            <div class="kf-card__tags"></div>
                         </div>
-                        <div class="kf-card__tags"></div>
-                    </div>
-                </article>
-            </template>
+                    </article>
+                </template>
+            </section>
+
+            <!-- 사이드바 -->
+            <aside class="folios-sidebar">
+                <nav class="folios-menu">
+                    <a
+                        th:href="@{/folios}"
+                        th:classappend="${activeMenu=='list'}?' is-active'"
+                        >🗂️ Folios 둘러보기</a
+                    >
+                    <a
+                        th:href="@{/folios/write}"
+                        th:classappend="${activeMenu=='write'}?' is-active'"
+                        >✨ 새로 만들기</a
+                    >
+                    <a
+                        th:href="@{/folios/append}"
+                        th:classappend="${activeMenu=='append'}?' is-active'"
+                        >🛠️ 템플릿 관리</a
+                    >
+                </nav>
+            </aside>
         </div>
 
         <th:block id="list-js">
