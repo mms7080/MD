@@ -42,16 +42,16 @@
                     ? it.thumbnail
                     : "https://picsum.photos/seed/folio/600/338";
 
-            // 제목: 이름 / 작성날짜
-            const titleAnchor = node.querySelector(".kf-card__title > a");
-            titleAnchor.textContent = `${it.title || "제목 없음"} / ${fmtDate(
-                it.updatedAt
-            )}`;
-            titleAnchor.href = link.href;
+            // 제목: 이름 / 날짜 → 이름(왼쪽) + 날짜(오른쪽) 분리
+            const titleContainer = node.querySelector(".kf-card__title");
+            titleContainer.innerHTML = `
+                <span class="folio-name">${it.title || "제목 없음"}</span>
+                <span class="folio-date">${fmtDate(it.updatedAt)}</span>
+            `;
 
-            // 태그(상태)
+            // 태그(상태) 주석해제시 -> PUBLISHED
             const tags = node.querySelector(".kf-card__tags");
-            tags.innerHTML = `<span class="fl-badge">${it.status}</span>`;
+            // tags.innerHTML = `<span class="fl-badge">${it.status}</span>`;
 
             grid.appendChild(node);
         }
