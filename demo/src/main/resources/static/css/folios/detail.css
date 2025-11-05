@@ -241,8 +241,8 @@ body {
 /* 컨텐츠 우측 가장자리와 거의 붙도록 위치 계산 */
 .fd-actions {
     position: fixed;
-    top: 80%;
-    right: max(12px, calc((100vw - var(--maxw)) / 2 - 72px));
+    top: 75%;
+    right: max(12px, calc((100vw - var(--maxw)) / 2 - 96px));
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
