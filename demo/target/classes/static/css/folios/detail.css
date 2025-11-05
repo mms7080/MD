@@ -33,7 +33,7 @@ body {
 .fd-title {
     font-size: 28px;
     font-weight: 800;
-    margin: 0 0 6px;
+    margin: 0px;
 }
 .fd-meta {
     display: flex;
@@ -52,60 +52,23 @@ body {
     color: #4f46e5;
     font-size: 12px;
 }
-
-/* .fd-head {
-    position: relative; 
-    padding: 20px 0 8px;
-    margin: 0 0 12px;
-}
-.fd-user {
+.fd-head-top {
     display: flex;
+    gap: 16px;
     align-items: center;
-    gap: 14px;
 }
 .fd-avatar {
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    background: #d9d9d9;
-    border: 1px solid var(--border);
-    flex: 0 0 64px;
 }
-.fd-user-title {
-    font-size: 22px;
-    font-weight: 800;
-    line-height: 1.25;
-    margin: 0;
-}
-
-.fd-user-meta {
+.fd-head-texts {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--muted);
-    font-size: 14px;
-    margin-top: 4px;
-}
-.fd-user-name {
-    font-weight: 700;
-}
-.fd-dot {
-    opacity: 0.6;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.fd-meta .dot {
-    opacity: 0.6;
-}
-.fd-badge {
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: #eef2ff;
-    color: #4f46e5;
-    font-size: 12px;
-} */
-
-/* 슬라이드 스택: 간격/여백/라운드/그림자 없음 */
 .fd-stack {
     display: grid;
     gap: 0; /* ← 공백 제거 */
@@ -206,31 +169,159 @@ body {
     }
 }
 
-/* (선택) 프린트: 이미지 한 장씩 페이지 분리 */
+/* ===== Print: 슬라이드만, 크롭 없이 꽉 차게 ===== */
 @media print {
+    /* 페이지 자체 여백 제거(A4 기준) */
     @page {
+        size: A4 portrait;
         margin: 0;
     }
+
+    /* 화면용 레이아웃/헤더/푸터/액션바 숨김 */
+    .site > * {
+        display: none !important;
+    }
+    #folio-detail,
+    #folio-detail .fd-body,
+    #folio-detail .fd-stack {
+        display: block !important;
+    }
+    #folio-detail {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+    }
+    .fd-head,
+    .fd-actions,
+    .fd-empty {
+        display: none !important;
+    }
+
+    /* 슬라이드: 한 장당 한 페이지 */
+    .fd-stack {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .fd-slide {
+        margin: 0 !important;
+        padding: 0 !important;
+        page-break-after: always; /* 다음 페이지로 넘김 */
+        break-after: page;
+    }
+    .fd-slide:last-child {
+        page-break-after: auto;
+        break-after: auto;
+    }
+
+    /* 이미지: 페이지에 맞춰 비율 유지하며 최대 확장(잘림 방지) */
+    .fd-slide img {
+        display: block !important;
+        width: 210mm; /* A4 가로폭에 맞춤 */
+        height: 297mm; /* A4 세로폭에 맞춤 */
+        object-fit: contain; /* 크롭 없이 비율 유지 */
+        object-position: center center;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: #fff !important;
+    }
+
+    /* 브라우저가 인쇄시 강제로 생기는 여백/테두리 제거 보정 */
     html,
     body {
         background: #fff !important;
-        color: #000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
-    .fd-wrap {
-        max-width: none;
-        margin: 0;
-        padding: 0;
+}
+
+/* ===== Sticky Actions (오른쪽 플로팅바) - 최종본 ===== */
+
+/* 컨텐츠 우측 가장자리와 거의 붙도록 위치 계산 */
+.fd-actions {
+    position: fixed;
+    top: 80%;
+    right: max(12px, calc((100vw - var(--maxw)) / 2 - 72px));
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 3000;
+}
+
+/* 버튼 + 캡션 묶음 */
+.fd-act {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px; /* 아이콘과 캡션 사이 간격 */
+}
+
+/* 원 버튼 (확대 버전) */
+.fd-action {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px solid var(--line, rgba(255, 255, 255, 0.14));
+    background: var(--surface, rgba(255, 255, 255, 0.06));
+    backdrop-filter: blur(6px);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.12s ease, background 0.12s ease,
+        border-color 0.12s ease;
+}
+
+.fd-action .fd-ico {
+    font-size: 22px; /* 아이콘도 키움 */
+    line-height: 1;
+}
+
+/* 호버/액티브 */
+.fd-action:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.24);
+}
+.fd-action:active {
+    transform: translateY(0);
+}
+
+/* 캡션 (공유/저장/좋아요/위로) */
+.fd-cap {
+    font-size: 12px;
+    line-height: 1;
+    color: var(--muted, #9aa3ad);
+    user-select: none;
+}
+
+/* 라이트 모드 대비 */
+html[data-theme="light"] .fd-action {
+    border-color: rgba(15, 23, 42, 0.12);
+    background: rgba(15, 23, 42, 0.04);
+}
+html[data-theme="light"] .fd-action:hover {
+    background: rgba(15, 23, 42, 0.08);
+    border-color: rgba(15, 23, 42, 0.2);
+}
+
+/* 작은 화면에서는 위치 조정/숨김 */
+@media (max-width: 1024px) {
+    .fd-actions {
+        right: 10px;
     }
-    .fd-head {
-        padding: 16px;
+}
+@media (max-width: 768px) {
+    .fd-actions {
+        display: none;
     }
-    .fd-slide img {
-        page-break-before: always;
-        page-break-after: auto;
-        break-before: page;
-    }
-    .fd-slide:first-child img {
-        page-break-before: auto;
-        break-before: auto;
+}
+
+/* 인쇄 시 숨김 */
+@media print {
+    .fd-actions {
+        display: none !important;
     }
 }

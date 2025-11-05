@@ -24,41 +24,45 @@
 
     <body>
         <section id="folio-detail" class="fd-wrap">
-            <header class="fd-head">
-                <h1 class="fd-title" th:text="${folio.title}">제목 없음</h1>
-                <div class="fd-meta">
-                    <span
-                        th:text="${#temporals.format(folio.updatedAt, 'yyyy.MM.dd HH:mm')}"
-                        >-</span
-                    >
-                    <span class="dot">·</span>
-                    <span
-                        th:text="${folio.user != null ? folio.user.name : '익명'}"
-                        >작성자</span
-                    >
-                    <span
-                        class="fd-badge"
-                        th:if="${isOwner and folio.status.name() == 'DRAFT'}"
-                        >DRAFT</span
-                    >
+            <header
+                class="fd-head"
+                th:with="
+          intro=${detail != null && detail.state != null ? detail.state['intro'] : null},
+          titleText=${(folio.title != null && !#strings.isEmpty(folio.title))
+                       ? folio.title
+                       : '제목 없음'},
+          authorName=${(folio.user != null && !#strings.isEmpty(folio.user.name))
+                        ? folio.user.name
+                        : (intro != null && !#strings.isEmpty(intro['name']))
+                           ? intro['name']
+                           : '익명'},
+          avatarUrl=${(intro != null && !#strings.isEmpty(intro['avatarUrl']))
+                       ? intro['avatarUrl']
+                       : '/images/avatar-default.png'}
+        "
+            >
+                <div class="fd-head-top">
+                    <img
+                        class="fd-avatar"
+                        th:src="${avatarUrl}"
+                        alt="author avatar"
+                        loading="lazy"
+                        decoding="async"
+                    />
+                    <div class="fd-head-texts">
+                        <h1 class="fd-title" th:text="${titleText}">
+                            제목 없음
+                        </h1>
+                        <div class="fd-meta">
+                            <span th:text="${authorName}">작성자</span>
+                            <span
+                                class="fd-badge"
+                                th:if="${isOwner and folio.status != null and folio.status.name() == 'DRAFT'}"
+                                >DRAFT</span
+                            >
+                        </div>
+                    </div>
                 </div>
-
-                <!-- 🔁 JS 없이 동작하도록 버튼을 링크로 변경 -->
-                <a
-                    id="btnExit"
-                    class="exit-btn"
-                    href="/folios"
-                    aria-label="목록으로"
-                >
-                    <span class="sign">
-                        <svg viewBox="0 0 512 512">
-                            <path
-                                d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
-                            />
-                        </svg>
-                    </span>
-                    <span class="text">나가기</span>
-                </a>
             </header>
 
             <!-- 1) 사진이 하나라도 있으면 세로 렌더 -->
@@ -104,136 +108,49 @@
             >
                 아직 등록된 이미지가 없습니다.
             </section>
+            <!-- 오른쪽 스티키 액션바 -->
+            <!-- 아이콘 나중에 바꿀 거임 -->
+            <aside
+                class="fd-actions"
+                aria-label="빠른 동작"
+                th:attr="data-folio-id=${folio.id}"
+            >
+                <div class="fd-act">
+                    <button
+                        type="button"
+                        class="fd-action"
+                        data-action="share"
+                        title="공유 (URL 복사)"
+                    >
+                        <span class="fd-ico">🔗</span>
+                    </button>
+                    <div class="fd-cap">공유</div>
+                </div>
+
+                <div class="fd-act">
+                    <button
+                        type="button"
+                        class="fd-action"
+                        data-action="save"
+                        title="저장 (PDF로 인쇄)"
+                    >
+                        <span class="fd-ico">🖨️</span>
+                    </button>
+                    <div class="fd-cap">저장</div>
+                </div>
+
+                <div class="fd-act">
+                    <button
+                        type="button"
+                        class="fd-action fd-top"
+                        data-action="top"
+                        title="맨 위로"
+                    >
+                        <span class="fd-ico">⬆️</span>
+                    </button>
+                    <div class="fd-cap">맨 위로</div>
+                </div>
+            </aside>
         </section>
     </body>
 </html>
-
-<!-- <!DOCTYPE html>
-<html
-    lang="ko"
-    xmlns:th="http://www.thymeleaf.org"
-    th:replace="~{fragments/layout :: layout(
-    pageTitle = ${folio.title} ?: 'Folio 상세',
-    headerKey  = 'folio',
-    activeMenu = 'detail',
-    css = ~{::#detail-css},
-    js  = ~{::#detail-js},
-    content = ~{::#folio-detail}
-  )}"
->
-    <head>
-       
-        <th:block id="detail-css">
-            <link rel="stylesheet" th:href="@{/css/folios/detail.css}" />
-        </th:block>
-
-        <th:block id="detail-js">
-            <script th:src="@{/js/folios/detail.js}" defer></script>
-        </th:block>
-    </head>
-
-    <body>
-        <section id="folio-detail" class="fd-wrap">
-            <header class="fd-head">
-                <div class="fd-user">
-                    <img
-                        class="fd-avatar"
-                        th:src="${(folio.user != null 
-                && folio.user.profile != null 
-                && !#strings.isEmpty(folio.user.profile.profileImgUrl))
-                ? folio.user.profile.profileImgUrl
-                : '/images/avatar-default.png'}"
-                        alt="프로필 이미지"
-                    />
-
-                    <div class="fd-user-text">
-                        <div class="fd-user-title" th:text="${folio.title}">
-                            제목 없음
-                        </div>
-
-                        <div class="fd-user-meta">
-                            <span
-                                class="fd-user-name"
-                                th:text="${folio.user != null ? folio.user.name : '익명'}"
-                                >익명</span
-                            >
-                            <span class="fd-dot">·</span>
-                            <time
-                                class="fd-user-date"
-                                th:text="${#temporals.format(folio.updatedAt, 'yyyy.MM.dd')}"
-                                >0000.00.00</time
-                            >
-
-                            <span
-                                class="fd-badge"
-                                th:if="${isOwner and folio.status.name() == 'DRAFT'}"
-                                >DRAFT</span
-                            >
-                        </div>
-                    </div>
-                </div>
-
-                
-                <a
-                    id="btnExit"
-                    class="exit-btn"
-                    href="/folios"
-                    aria-label="목록으로"
-                >
-                    <span class="sign">
-                        <svg viewBox="0 0 512 512">
-                            <path
-                                d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
-                            />
-                        </svg>
-                    </span>
-                    <span class="text">나가기</span>
-                </a>
-            </header>
-
-            
-            <section
-                class="fd-body"
-                th:if="${folio.photos != null and !#lists.isEmpty(folio.photos)}"
-            >
-                <div class="fd-stack">
-                    <figure class="fd-slide" th:each="img : ${folio.photos}">
-                        <img
-                            th:src="${img}"
-                            alt="folio slide"
-                            loading="lazy"
-                            decoding="async"
-                        />
-                    </figure>
-                </div>
-            </section>
-
-            
-            <section
-                class="fd-body"
-                th:if="${(folio.photos == null or #lists.isEmpty(folio.photos)) 
-                     and (folio.thumbnail != null and !#strings.isEmpty(folio.thumbnail))}"
-            >
-                <div class="fd-stack">
-                    <figure class="fd-slide">
-                        <img
-                            th:src="${folio.thumbnail}"
-                            alt="thumbnail"
-                            loading="lazy"
-                            decoding="async"
-                        />
-                    </figure>
-                </div>
-            </section>
-
-            
-            <section
-                class="fd-empty"
-                th:if="${(folio.photos == null or #lists.isEmpty(folio.photos)) 
-                     and (folio.thumbnail == null or #strings.isEmpty(folio.thumbnail))}"
-            >
-                아직 등록된 이미지가 없습니다.
-            </section>
-        </section>
-    </body>
-</html> -->
