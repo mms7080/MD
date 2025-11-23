@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.demo.admin.repository.AdminTeamRepository;
 import com.example.demo.users.UsersDTO.HeaderLogin;
 import com.example.demo.users.UsersDTO.ProfileDTO;
 import com.example.demo.users.UsersEntity.DeleteStatus;
@@ -33,6 +34,7 @@ public class UserController {
     private final HeaderLogin keep;
     private final UsersService usersService;
     private final UsersRepository usersRepository;
+    private final AdminTeamRepository adminTeamRepository;
 
     @ModelAttribute
     public void addAttributes(Model model, Principal principal) {
@@ -52,7 +54,19 @@ public class UserController {
     }
 
     @GetMapping("/team")
-    public String mypageTeam() {
+    public String mypageTeam(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/home?modal=signin";
+        }
+
+        Users users = usersService.getUserByUsername(principal.getName());
+        Long userId = users.getId();
+
+        var teams = adminTeamRepository.findWithAllMembersByMemberUserId(userId);
+
+        model.addAttribute("user", users);
+        model.addAttribute("teams", teams);
+
         return "mypage/team";
     }
 
@@ -92,7 +106,7 @@ public class UserController {
                 name,
                 githubUrl,
                 positions,
-                profileImageFile,  
+                profileImageFile,
                 profileImgUrlHidden);
         return "redirect:/mypage/home";
     }
@@ -124,8 +138,9 @@ public class UserController {
     @PostMapping("/api/check-password")
     @ResponseBody
     public boolean checkPassword(@RequestParam("currentPassword") String currentPassword,
-                                 Principal principal) {
-        if (principal == null) return false;
+            Principal principal) {
+        if (principal == null)
+            return false;
         return usersService.verifyCurrentPassword(principal.getName(), currentPassword);
     }
 
