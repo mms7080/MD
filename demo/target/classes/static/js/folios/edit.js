@@ -235,13 +235,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const forms = {
         1: () => `
       <div class="panel"><h3>소개</h3>
-        <div class="row"><label>타이틀</label><input class="inpt" data-model="intro.title" value="${state.intro.title}"></div>
+        <div class="row"><label>타이틀</label><input class="inpt" data-model="intro.title" value="${state.intro.title}"axlength="30"
+            data-maxlen="30"></div>
         <div class="two">
-          <div class="row"><label>이름(footer)</label><input class="inpt" data-model="intro.name" value="${state.intro.name}"></div>
+          <div class="row"><label>이름</label><input class="inpt" data-model="intro.name" value="${state.intro.name}"></div>
           <div class="row"><label>생년월일</label><input class="inpt" data-model="intro.birth" value="${state.intro.birth}"></div>
         </div>
         <div class="row"><label>거주지</label><input class="inpt" data-model="intro.city" value="${state.intro.city}"></div>
-        <div class="row"><label>자기소개</label><textarea rows="4" data-model="intro.summary">${state.intro.summary}</textarea></div>
+        <div class="row"><label>자기소개</label><textarea rows="4" data-model="intro.summary"maxlength="300"
+            data-maxlen="300">${state.intro.summary}</textarea></div>
       </div>
       <div class="panel"><h3>연락처</h3>
         <div class="two">

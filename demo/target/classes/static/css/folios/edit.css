@@ -635,6 +635,8 @@ textarea {
     padding: 9px 10px;
     font-size: 14px;
     transition: border-color 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .inpt:focus,
