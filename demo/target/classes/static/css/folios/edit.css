@@ -425,6 +425,7 @@ label.inbtn {
     font-size: 19px;
     padding: 20px;
     box-sizing: border-box;
+    white-space: pre-line;
 }
 
 /* ===== 슬라이드 2: 학력/경력 ===== */
@@ -854,4 +855,16 @@ textarea {
     .exit-btn .text {
         display: none;
     }
+}
+
+.row-head {
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    gap: 8px;
+}
+
+.row-head .count {
+    font-size: 11px;
+    color: var(--muted);
 }
