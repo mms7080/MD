@@ -97,20 +97,17 @@ document.addEventListener("DOMContentLoaded", () => {
             ],
         },
         exp: {
-            job1: {
-                company: "Acme Corp",
-                period: "2021.03 – 2023.12 · Backend Engineer",
-                desc1: "Spring 기반 주문 시스템 마이크로서비스 전환",
-                desc2: "MongoDB → PostgreSQL 마이그레이션 주도",
-                desc3: "CI/CD 최적화로 배포시간 40% 단축",
-            },
-            job2: {
-                company: "Beta Studio",
-                period: "2024.01 – 현재 · Senior Backend",
-                desc1: "대규모 이벤트 트래픽 대응 아키텍처 설계",
-                desc2: "Kafka 스트림 기반 통계 파이프라인 구축",
-                desc3: "성능 튜닝으로 P95 응답 320ms → 140ms",
-            },
+            jobs: [
+                {
+                    company: "Acme Corp",
+                    period: "2021.03 – 2023.12 · Backend Engineer",
+                    achievements: [
+                        "Spring 기반 주문 시스템 마이크로서비스 전환",
+                        "MongoDB → PostgreSQL 마이그레이션 주도",
+                        "CI/CD 최적화로 배포시간 40% 단축",
+                    ],
+                },
+            ],
         },
         skills: { spring: 90, db: 80, devops: 70 },
         strengths: {
@@ -190,6 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
             qs("#thumb2")?.setAttribute("src", state.proj2.thumb);
         syncFormInputs();
         renderEduCards();
+        renderExpCards();
     }
 
     function renderEduCards() {
@@ -238,6 +236,60 @@ document.addEventListener("DOMContentLoaded", () => {
             .replaceAll(">", "&gt;")
             .replaceAll('"', "&quot;")
             .replaceAll("'", "&#039;");
+    }
+
+    function renderExpCards() {
+        const host = qs("#expList");
+        if (!host) return;
+
+        const jobs = state?.exp?.jobs || [];
+        host.innerHTML = "";
+
+        // 빈 항목 스킵(회사/기간/성과가 전부 비면 안 보이게)
+        const visible = jobs.filter((j) => {
+            const company = (j?.company || "").trim();
+            const period = (j?.period || "").trim();
+            const d1 = (j?.desc1 || "").trim();
+            const d2 = (j?.desc2 || "").trim();
+            const d3 = (j?.desc3 || "").trim();
+            return company || period || d1 || d2 || d3;
+        });
+
+        if (!visible.length) {
+            host.innerHTML = `
+          <div class="card">
+            <div class="h3">경력을 추가해 주세요</div>
+            <div class="muted">오른쪽 패널에서 + 경력 추가를 눌러 입력하세요.</div>
+          </div>
+        `;
+            return;
+        }
+
+        visible.forEach((j) => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            // 성과 리스트(빈 건 제외)
+            const bullets = (j.achievements || [])
+                .map((x) => (x || "").trim())
+                .filter(Boolean);
+
+            card.innerHTML = `
+          <div class="h3">${escapeHtml(j.company || "")}</div>
+          <div class="small">${escapeHtml(j.period || "")}</div>
+          ${
+              bullets.length
+                  ? `<ul class="muted">
+                      ${bullets
+                          .map((b) => `<li>${escapeHtml(b)}</li>`)
+                          .join("")}
+                    </ul>`
+                  : ``
+          }
+        `;
+
+            host.appendChild(card);
+        });
     }
 
     function syncFormInputs() {
@@ -365,34 +417,74 @@ document.addEventListener("DOMContentLoaded", () => {
             </button>
             </div>
         </div>
-      <div class="panel"><h3>경력</h3>
-        ${[1, 2]
+        <div class="panel"><h3>경력</h3>
+
+        ${(state.exp.jobs || [])
             .map(
-                (i) => `
-          <div class="row"><label>회사 ${i}</label><input class="inpt" data-model="exp.job${i}.company" value="${
-                    state.exp["job" + i].company
-                }"></div>
-          <div class="row"><label>기간/직무</label><input class="inpt" data-model="exp.job${i}.period" value="${
-                    state.exp["job" + i].period
-                }"></div>
-          <div class="row"><label>성과1</label><input class="inpt" data-model="exp.job${i}.desc1" value="${
-                    state.exp["job" + i].desc1
-                }"></div>
-          <div class="row"><label>성과2</label><input class="inpt" data-model="exp.job${i}.desc2" value="${
-                    state.exp["job" + i].desc2
-                }"></div>
-          <div class="row"><label>성과3</label><input class="inpt" data-model="exp.job${i}.desc3" value="${
-                    state.exp["job" + i].desc3
-                }"></div>
-          ${
-              i === 1
-                  ? '<hr class="small" style="border:none;border-top:1px solid var(--border)">'
-                  : ""
-          }
-        `
+                (job, idx) => `
+            <div class="panel" data-job-index="${idx}">
+                <div class="row" style="display:flex;justify-content:space-between;align-items:center;">
+                <label>경력 ${idx + 1}</label>
+                ${
+                    idx > 0
+                        ? `<button type="button" class="btn" data-remove-job="${idx}" style="font-size:11px;padding:2px 6px;">삭제</button>`
+                        : ""
+                }
+                </div>
+
+                <div class="row">
+                <label>회사</label>
+                <input class="inpt" data-model="exp.jobs.${idx}.company" value="${
+                    job.company || ""
+                }">
+                </div>
+
+                <div class="row">
+                <label>기간/직무</label>
+                <input class="inpt" data-model="exp.jobs.${idx}.period" value="${
+                    job.period || ""
+                }">
+                </div>
+
+                <div class="panel" style="margin-top:10px;">
+                <div class="row" style="display:flex;justify-content:space-between;align-items:center;">
+                    <label style="margin:0;">성과</label>
+                    <button type="button" class="btn" data-add-achievement="${idx}" style="font-size:11px;padding:2px 6px;">
+                    + 성과 추가
+                    </button>
+                </div>
+
+                ${(job.achievements || [])
+                    .map(
+                        (a, aidx) => `
+                    <div class="row" style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;">
+                        <input class="inpt" data-model="exp.jobs.${idx}.achievements.${aidx}" value="${
+                            a || ""
+                        }" placeholder="성과를 입력하세요">
+                        <button type="button" class="btn" data-remove-achievement="${idx}:${aidx}" style="font-size:11px;padding:2px 8px;">삭제</button>
+                    </div>
+                    `
+                    )
+                    .join("")}
+
+                ${
+                    !job.achievements || job.achievements.length === 0
+                        ? `<div class="small muted">+ 성과 추가를 눌러 항목을 추가하세요.</div>`
+                        : ""
+                }
+                </div>
+            </div>
+            `
             )
             .join("")}
-      </div>`,
+
+        <div class="row" style="margin-top:10px;">
+            <button type="button" class="btn" data-add-job>+ 경력 추가</button>
+        </div>
+
+        </div>
+
+        `,
 
         3: () => `
       <div class="panel"><h3>기술 숙련도(%)</h3>
@@ -506,6 +598,51 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.addEventListener("click", () => {
                 const idx = Number(btn.dataset.removeSchool);
                 state.edu.schools.splice(idx, 1);
+                renderForm(2);
+            });
+        });
+
+        // 경력 추가 토글
+        pane.querySelector("[data-add-job]")?.addEventListener("click", () => {
+            state.exp.jobs.push({
+                company: "",
+                period: "",
+                achievements: [],
+            });
+            renderForm(2);
+        });
+
+        qsa("[data-remove-job]", pane).forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const idx = Number(btn.dataset.removeJob);
+                state.exp.jobs.splice(idx, 1);
+                renderForm(2);
+            });
+        });
+
+        // 성과 추가 토글
+        qsa("[data-add-achievement]", pane).forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const jobIdx = Number(btn.dataset.addAchievement);
+                const job = state.exp.jobs[jobIdx];
+                if (!job.achievements) job.achievements = [];
+                job.achievements.push("");
+                renderForm(2);
+            });
+        });
+
+        qsa("[data-remove-achievement]", pane).forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const [jobIdxStr, achIdxStr] = String(
+                    btn.dataset.removeAchievement
+                ).split(":");
+                const jobIdx = Number(jobIdxStr);
+                const achIdx = Number(achIdxStr);
+
+                const job = state.exp.jobs[jobIdx];
+                if (!job?.achievements) return;
+
+                job.achievements.splice(achIdx, 1);
                 renderForm(2);
             });
         });
