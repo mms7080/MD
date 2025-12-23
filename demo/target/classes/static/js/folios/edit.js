@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
             birth: "1996-07-15",
             city: "Seoul, Korea",
             summary:
-                "서비스의 안정성과 확장성을 최우선으로 생각하는 백엔드 엔지니어 [이름] 입니다...",
+                "서비스의 안정성과 확장성을 최우선으로 생각하는 백엔드 엔지니어 [이름]입니다. 사용자의 신뢰를 얻는 서비스는 단순히 기능 구현을 넘어 안정적인 운영과 효율적인 구조에서 비롯된다고 믿습니다. 문제를 체계적으로 분석하고, 재사용성과 유지보수성을 고려한 코드를 작성하며, 팀과의 협업 속에서 더 나은 아키텍처를 고민합니다. 작은 개선이 큰 가치를 만든다고 생각하며 꾸준히 성장하고 있습니다.",
             email: "me@example.com",
             phone: "010-1234-5678",
             site: "github.com/me",
@@ -235,13 +235,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const forms = {
         1: () => `
       <div class="panel"><h3>소개</h3>
-        <div class="row"><label>타이틀</label><input class="inpt" data-model="intro.title" value="${state.intro.title}"></div>
+        <div class="row">
+        <div class="row-head">
+          <label>타이틀</label>
+          <span class="count" data-counter-for="intro.title">(0/30)</span>
+        </div><input class="inpt" data-model="intro.title" value="${state.intro.title}"axlength="30"
+            data-maxlen="30"></div>
         <div class="two">
-          <div class="row"><label>이름(footer)</label><input class="inpt" data-model="intro.name" value="${state.intro.name}"></div>
+          <div class="row"><label>이름</label><input class="inpt" data-model="intro.name" value="${state.intro.name}"></div>
           <div class="row"><label>생년월일</label><input class="inpt" data-model="intro.birth" value="${state.intro.birth}"></div>
         </div>
         <div class="row"><label>거주지</label><input class="inpt" data-model="intro.city" value="${state.intro.city}"></div>
-        <div class="row"><label>자기소개</label><textarea rows="4" data-model="intro.summary">${state.intro.summary}</textarea></div>
+        <div class="row"><div class="row-head">
+          <label>자기소개</label>
+          <span class="count" data-counter-for="intro.summary">(0/300)</span>
+        </div><textarea rows="4" data-model="intro.summary"maxlength="300"
+            data-maxlen="300">${state.intro.summary}</textarea></div>
       </div>
       <div class="panel"><h3>연락처</h3>
         <div class="two">
@@ -371,16 +380,35 @@ document.addEventListener("DOMContentLoaded", () => {
         const pane = qs("#formPane");
         pane.innerHTML = forms[n]();
 
-        // 입력 바인딩
+        // 입력 바인딩 + 글자수 제한/카운터
         qsa("[data-model]", pane).forEach((inpt) => {
-            inpt.addEventListener("input", () => {
-                const path = inpt.getAttribute("data-model");
-                const val =
-                    inpt.type === "number"
-                        ? Number(inpt.value || 0)
-                        : inpt.value;
-                set(path, val);
-            });
+            const path = inpt.getAttribute("data-model");
+            const max = Number(inpt.dataset.maxlen || 0) || null;
+            const counterSpan =
+                pane.querySelector(`[data-counter-for="${path}"]`) || null;
+
+            const applyAndSet = () => {
+                let val = inpt.value || "";
+
+                // 최대 글자수 강제
+                if (max && val.length > max) {
+                    val = val.slice(0, max);
+                    inpt.value = val;
+                }
+
+                // 카운터 표시 (현재/최대)
+                if (counterSpan && max) {
+                    counterSpan.textContent = `(${val.length}/${max})`;
+                }
+
+                const v = inpt.type === "number" ? Number(val || 0) : val;
+                set(path, v);
+            };
+
+            // 초기 1회 적용
+            applyAndSet();
+
+            inpt.addEventListener("input", applyAndSet);
         });
 
         // 이미지 업로드 -> dataURL 상태 반영

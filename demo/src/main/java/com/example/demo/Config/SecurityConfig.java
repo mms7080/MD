@@ -26,7 +26,7 @@ public class SecurityConfig {
         http
             // CSRF 기본 활성 (폼에 CSRF 토큰만 넣으면 됨)
             .csrf(csrf -> csrf
-      .ignoringRequestMatchers(
+            .ignoringRequestMatchers(
                     "/api/**",
                     "/api/admin/folios",
                     "/api/admin/portfolios",
@@ -43,20 +43,19 @@ public class SecurityConfig {
                     "/api/**",
                     "/portfolios",
                     "/portfolios/**",
-                    "/folios/**", // 추가 페이지 접근은 허용(준회)
+                    "/folios/**", // folios 전체 허용(개발시에만)
                     "/css/**", "/js/**", "/images/**", "/webjars/**",
                     "/uploads/**", // 이미지(훈희)
                     "/home/**",
                     "/forgot/**",
                     "/api/admin/portfolios",
                     "/api/admin/folios"
-                   
-                   
-                   
-                    ,"/**" 
-                    //일단 테스트로 전체허용해놨다
+
+                    ,"/**"  //일단 테스트로 전체허용
                 ).permitAll()
 
+                // .requestMatchers("/folios/write", "/folios/append").authenticated() 
+                
                 // 관리자만 허용
                 // .requestMatchers().hasRole("ADMIN")
 
