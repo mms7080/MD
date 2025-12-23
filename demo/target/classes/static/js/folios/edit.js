@@ -88,16 +88,13 @@ document.addEventListener("DOMContentLoaded", () => {
             photo: "",
         },
         edu: {
-            univ1: {
-                name: "KAFLAB University",
-                major: "컴퓨터공학과 (B.S.)",
-                period: "2015 – 2019",
-            },
-            univ2: {
-                name: "KAFLAB Graduate",
-                major: "데이터공학 (M.S.)",
-                period: "2019 – 2021",
-            },
+            schools: [
+                {
+                    name: "KAFLAB University",
+                    major: "컴퓨터공학과 (B.S.)",
+                    period: "2015 – 2019",
+                },
+            ],
         },
         exp: {
             job1: {
@@ -192,6 +189,55 @@ document.addEventListener("DOMContentLoaded", () => {
         if (state.proj2?.thumb)
             qs("#thumb2")?.setAttribute("src", state.proj2.thumb);
         syncFormInputs();
+        renderEduCards();
+    }
+
+    function renderEduCards() {
+        const host = qs("#eduList");
+        if (!host) return;
+
+        const schools = state?.edu?.schools || [];
+        host.innerHTML = "";
+
+        // 빈 항목은 안 보이게(선택) — name/major/period 전부 비면 스킵
+        const visible = schools.filter((s) => {
+            const name = (s?.name || "").trim();
+            const major = (s?.major || "").trim();
+            const period = (s?.period || "").trim();
+            return name || major || period;
+        });
+
+        // 아무것도 없으면 빈 카드 하나(선택)
+        if (!visible.length) {
+            host.innerHTML = `
+          <div class="card">
+            <div class="h3">학력을 추가해 주세요</div>
+            <div class="muted">오른쪽 패널에서 + 학교 추가를 눌러 입력하세요.</div>
+          </div>
+        `;
+            return;
+        }
+
+        visible.forEach((s) => {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `
+          <div class="h3">${escapeHtml(s.name || "")}</div>
+          <div class="muted">${escapeHtml(s.major || "")}</div>
+          <div class="small">${escapeHtml(s.period || "")}</div>
+        `;
+            host.appendChild(card);
+        });
+    }
+
+    // XSS 방지용(간단 버전)
+    function escapeHtml(str) {
+        return String(str)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
     }
 
     function syncFormInputs() {
@@ -243,7 +289,15 @@ document.addEventListener("DOMContentLoaded", () => {
             data-maxlen="30"></div>
         <div class="two">
           <div class="row"><label>이름</label><input class="inpt" data-model="intro.name" value="${state.intro.name}"></div>
-          <div class="row"><label>생년월일</label><input class="inpt" data-model="intro.birth" value="${state.intro.birth}"></div>
+          <div class="row"><label>생년월일</label>
+                <input
+                class="inpt"
+                type="date"
+                data-model="intro.birth"
+                value="${state.intro.birth}"
+                min="1900-01-01"
+                />
+            </div>
         </div>
         <div class="row"><label>거주지</label><input class="inpt" data-model="intro.city" value="${state.intro.city}"></div>
         <div class="row"><div class="row-head">
@@ -263,31 +317,54 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>`,
         2: () => `
-      <div class="panel"><h3>학력</h3>
-        <div class="row"><label>학교 1</label><input class="inpt" data-model="edu.univ1.name" value="${
-            state.edu.univ1.name
-        }"></div>
-        <div class="two">
-          <div class="row"><label>전공</label><input class="inpt" data-model="edu.univ1.major" value="${
-              state.edu.univ1.major
-          }"></div>
-          <div class="row"><label>기간</label><input class="inpt" data-model="edu.univ1.period" value="${
-              state.edu.univ1.period
-          }"></div>
+        <div class="panel"><h3>학력</h3>
+
+            ${state.edu.schools
+                .map(
+                    (school, idx) => `
+            <div class="panel" data-school-index="${idx}">
+                <div class="row" style="display:flex;justify-content:space-between;align-items:center;">
+                <label>학교 ${idx + 1}</label>
+                ${
+                    idx > 0
+                        ? `<button type="button" class="btn" data-remove-school="${idx}" style="font-size:11px;padding:2px 6px;">삭제</button>`
+                        : ""
+                }
+                </div>
+
+                <div class="row">
+                <label>학교명</label>
+                <input class="inpt" data-model="edu.schools.${idx}.name" value="${
+                        school.name
+                    }">
+                </div>
+
+                <div class="two">
+                <div class="row">
+                    <label>전공</label>
+                    <input class="inpt" data-model="edu.schools.${idx}.major" value="${
+                        school.major
+                    }">
+                </div>
+                <div class="row">
+                    <label>기간</label>
+                    <input class="inpt" data-model="edu.schools.${idx}.period" value="${
+                        school.period
+                    }">
+                </div>
+                </div>
+            </div>
+            `
+                )
+                .join("")}
+
+            <!-- 추가 버튼 -->
+            <div class="row" style="margin-top:10px;">
+            <button type="button" class="btn" data-add-school>
+                + 학교 추가
+            </button>
+            </div>
         </div>
-        <hr class="small" style="border:none;border-top:1px solid var(--border)">
-        <div class="row"><label>학교 2</label><input class="inpt" data-model="edu.univ2.name" value="${
-            state.edu.univ2.name
-        }"></div>
-        <div class="two">
-          <div class="row"><label>전공</label><input class="inpt" data-model="edu.univ2.major" value="${
-              state.edu.univ2.major
-          }"></div>
-          <div class="row"><label>기간</label><input class="inpt" data-model="edu.univ2.period" value="${
-              state.edu.univ2.period
-          }"></div>
-        </div>
-      </div>
       <div class="panel"><h3>경력</h3>
         ${[1, 2]
             .map(
@@ -316,6 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
             )
             .join("")}
       </div>`,
+
         3: () => `
       <div class="panel"><h3>기술 숙련도(%)</h3>
         <div class="row"><label>Java/Spring</label><input type="number" min="0" max="100" class="inpt" data-model="skills.spring" value="${
@@ -409,6 +487,27 @@ document.addEventListener("DOMContentLoaded", () => {
             applyAndSet();
 
             inpt.addEventListener("input", applyAndSet);
+        });
+
+        // 학력 추가 토글
+        pane.querySelector("[data-add-school]")?.addEventListener(
+            "click",
+            () => {
+                state.edu.schools.push({
+                    name: "",
+                    major: "",
+                    period: "",
+                });
+                renderForm(2);
+            }
+        );
+
+        qsa("[data-remove-school]", pane).forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const idx = Number(btn.dataset.removeSchool);
+                state.edu.schools.splice(idx, 1);
+                renderForm(2);
+            });
         });
 
         // 이미지 업로드 -> dataURL 상태 반영

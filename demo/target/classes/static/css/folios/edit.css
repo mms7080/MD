@@ -662,6 +662,23 @@ textarea {
     width: 100%;
 }
 
+.row-head {
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    gap: 8px;
+}
+
+.row-head .count {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.inpt[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.9;
+}
+
 /* ===== 프린트 스타일 ===== */
 @media print {
     @page {
@@ -855,16 +872,4 @@ textarea {
     .exit-btn .text {
         display: none;
     }
-}
-
-.row-head {
-    display: flex;
-    align-items: center;
-    /* justify-content: space-between; */
-    gap: 8px;
-}
-
-.row-head .count {
-    font-size: 11px;
-    color: var(--muted);
 }
