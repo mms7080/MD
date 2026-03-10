@@ -173,7 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------- 바인딩 ----------
     function applyBindings() {
         qsa("[data-bind]").forEach(
-            (el) => (el.textContent = get(el.getAttribute("data-bind")) ?? "")
+            (el) => (el.textContent = get(el.getAttribute("data-bind")) ?? ""),
         );
         qsa("[data-bind-style]").forEach((el) => {
             const v = get(el.getAttribute("data-bind-style"));
@@ -326,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     qsa(".top [data-goto]").forEach((btn) =>
-        btn.addEventListener("click", () => go(+btn.dataset.goto))
+        btn.addEventListener("click", () => go(+btn.dataset.goto)),
     );
 
     // ---------- 사이드 폼 ----------
@@ -387,8 +387,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="row">
                 <label>학교명</label>
                 <input class="inpt" data-model="edu.schools.${idx}.name" value="${
-                        school.name
-                    }">
+                    school.name
+                }">
                 </div>
 
                 <div class="two">
@@ -406,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 </div>
             </div>
-            `
+            `,
                 )
                 .join("")}
 
@@ -463,7 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }" placeholder="성과를 입력하세요">
                         <button type="button" class="btn" data-remove-achievement="${idx}:${aidx}" style="font-size:11px;padding:2px 8px;">삭제</button>
                     </div>
-                    `
+                    `,
                     )
                     .join("")}
 
@@ -474,7 +474,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 </div>
             </div>
-            `
+            `,
             )
             .join("")}
 
@@ -503,7 +503,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .map(
                 (i) => `
           <div class="row"><label>역량 ${i}</label><input class="inpt" data-model="strengths.${i}" value="${state.strengths[i]}"></div>
-        `
+        `,
             )
             .join("")}
       </div>`,
@@ -527,7 +527,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ${[1, 2]
             .map(
                 (i) =>
-                    `<div class="row"><label>Award ${i}</label><input class="inpt" data-model="awards.${i}" value="${state.awards[i]}"></div>`
+                    `<div class="row"><label>Award ${i}</label><input class="inpt" data-model="awards.${i}" value="${state.awards[i]}"></div>`,
             )
             .join("")}
       </div>
@@ -535,7 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ${[1, 2]
             .map(
                 (i) =>
-                    `<div class="row"><label>Cert ${i}</label><input class="inpt" data-model="cert.${i}" value="${state.cert[i]}"></div>`
+                    `<div class="row"><label>Cert ${i}</label><input class="inpt" data-model="cert.${i}" value="${state.cert[i]}"></div>`,
             )
             .join("")}
       </div>
@@ -591,7 +591,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     period: "",
                 });
                 renderForm(2);
-            }
+            },
         );
 
         qsa("[data-remove-school]", pane).forEach((btn) => {
@@ -634,7 +634,7 @@ document.addEventListener("DOMContentLoaded", () => {
         qsa("[data-remove-achievement]", pane).forEach((btn) => {
             btn.addEventListener("click", () => {
                 const [jobIdxStr, achIdxStr] = String(
-                    btn.dataset.removeAchievement
+                    btn.dataset.removeAchievement,
                 ).split(":");
                 const jobIdx = Number(jobIdxStr);
                 const achIdx = Number(achIdxStr);
@@ -671,7 +671,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             if (currentFolioId) {
                 const res = await guardFetch(
-                    `/api/folios/${encodeURIComponent(currentFolioId)}`
+                    `/api/folios/${encodeURIComponent(currentFolioId)}`,
                 );
                 if (!res.ok) throw new Error("불러오기 실패");
                 const data = await res.json();
@@ -822,7 +822,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             // 기존 hidden 상태 저장 후 전부 표시
             const wasHidden = targets.map(
-                (s) => s.hidden || s.hasAttribute("hidden")
+                (s) => s.hidden || s.hasAttribute("hidden"),
             );
             targets.forEach((s) => {
                 s.hidden = false;
@@ -830,7 +830,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             // 레이아웃 반영 대기
             await new Promise((r) =>
-                requestAnimationFrame(() => requestAnimationFrame(r))
+                requestAnimationFrame(() => requestAnimationFrame(r)),
             );
 
             // DOM → PNG dataURL
@@ -847,11 +847,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     // windowWidth/Height를 넉넉히 주면 일부 스타일 이슈를 피할 수 있어요 (선택)
                     windowWidth: Math.max(
                         document.documentElement.clientWidth,
-                        el.scrollWidth
+                        el.scrollWidth,
                     ),
                     windowHeight: Math.max(
                         document.documentElement.clientHeight,
-                        el.scrollHeight
+                        el.scrollHeight,
                     ),
                 });
                 images.push(canvas.toDataURL("image/png"));
@@ -890,8 +890,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error(
                     `업로드 실패 ${res.status} ${res.statusText}\n${t.slice(
                         0,
-                        300
-                    )}`
+                        300,
+                    )}`,
                 );
             }
 

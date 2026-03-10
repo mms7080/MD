@@ -1,8 +1,6 @@
 package com.example.demo.users.UsersEntity;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.CollectionTable;
@@ -34,5 +32,6 @@ public class Profile {
     @CollectionTable(name = "user_profile_position", joinColumns = @JoinColumn(name = "id"))
     @Column(name = "position")
     private Set<String> positions = new HashSet<>();
+    
 
 }
